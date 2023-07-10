@@ -1,16 +1,13 @@
 interface NavProps {
     loggedIn: boolean
 }
-//TODO: MAKE THIS MOBILE FRIENDLY!!
 export default function Nav({ loggedIn }: NavProps) {
-    // const menus = [
-    //     { name: "Home", href: "/" },
-    // ];
+
 
     const loggedInMenus = [
-        { name: "Accounts", href: "/auth/accounts" },
-        { name: "Sell", href: "/auth/sell" },
-        { name: "Profile", href: "/auth/profile" },
+        { name: "Accounts", href: "/app/accounts" },
+        { name: "Debit", href: "/app/debit" },
+        { name: "Profile", href: "/app/profile" },
         { name: "Logout", href: "/logout" },
     ];
 
@@ -25,17 +22,6 @@ export default function Nav({ loggedIn }: NavProps) {
                 Debit Llama
             </div>
             <ul class="flex gap-6">
-                {/* {menus.map((menu) => (
-                    <li>
-                        <a
-                            href={menu.href}
-                            class="text-gray-500 hover:text-gray-700 py-1 border-gray-500"
-                        >
-                            {menu.name}
-                        </a>
-                    </li>
-                ))} */}
-
                 {
                     loggedIn ? (
                         loggedInMenus.map((menu) => (
