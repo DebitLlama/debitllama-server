@@ -43,7 +43,7 @@ export default function Accounts() {
         <Layout isLoggedIn={true}>
             {/* <h1 class="text-2xl font-bold mb-5 text-center">Accounts</h1> */}
             <section class="flex flex-row">
-                <a href={"/app/addNewAccount"} class="mb-8 bg-gradient-to-b w-max mx-auto text-blue-500 font-semibold from-slate-50 to-blue-100 px-10 py-3 rounded-2xl shadow-blue-400 shadow-md border-b-4 hover border-b border-blue-200 hover:shadow-sm transition-all duration-500">Create New Account</a>
+                <a href={"/app/addNewAccount"} class="mb-8 bg-gradient-to-b w-max mx-auto text-indigo-500 font-semibold from-slate-50 to-indigo-100 px-10 py-3 rounded-2xl shadow-indigo-400 shadow-md border-b-4 hover border-b border-indigo-200 hover:shadow-sm transition-all duration-500">Create New Account</a>
             </section>
 
             <section class="flex flex-row px-4 flex-wrap" >
@@ -69,7 +69,7 @@ export default function Accounts() {
                 </a>
 
                 <div class="items-center hidden md:flex gap-x-3">
-                    <a href="#" class="px-2 py-1 text-sm text-blue-500 rounded-md dark:bg-gray-800 bg-blue-100/60">1</a>
+                    <a href="#" class="px-2 py-1 text-sm text-indigo-500 rounded-md dark:bg-gray-800 bg-indigo-100/60">1</a>
                     <a href="#" class="px-2 py-1 text-sm text-gray-500 rounded-md dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100">2</a>
                     <a href="#" class="px-2 py-1 text-sm text-gray-500 rounded-md dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100">3</a>
                 </div>
@@ -134,7 +134,7 @@ export default function Accounts() {
                                             <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">One-Time</td>
                                             <td class="px-4 py-4 text-sm whitespace-nowrap">
                                                 <div class="flex items-center gap-x-6">
-                                                    <button class="text-blue-500 transition-colors duration-200 hover:text-indigo-500 focus:outline-none">
+                                                    <button class="text-indigo-500 transition-colors duration-200 hover:text-indigo-500 focus:outline-none">
                                                         Manage
                                                     </button>
                                                 </div>
@@ -162,7 +162,7 @@ export default function Accounts() {
                                             <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">Monthly subscription</td>
                                             <td class="px-4 py-4 text-sm whitespace-nowrap">
                                                 <div class="flex items-center gap-x-6">
-                                                    <button class="text-blue-500 transition-colors duration-200 hover:text-indigo-500 focus:outline-none">
+                                                    <button class="text-indigo-500 transition-colors duration-200 hover:text-indigo-500 focus:outline-none">
                                                         Manage
                                                     </button>
                                                 </div>
@@ -189,7 +189,7 @@ export default function Accounts() {
                                             <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">Monthly subscription</td>
                                             <td class="px-4 py-4 text-sm whitespace-nowrap">
                                                 <div class="flex items-center gap-x-6">
-                                                    <button class="text-blue-500 transition-colors duration-200 hover:text-indigo-500 focus:outline-none">
+                                                    <button class="text-indigo-500 transition-colors duration-200 hover:text-indigo-500 focus:outline-none">
                                                         Manage
                                                     </button>
                                                 </div>
@@ -216,7 +216,7 @@ export default function Accounts() {
                                             <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">Monthly subscription</td>
                                             <td class="px-4 py-4 text-sm whitespace-nowrap">
                                                 <div class="flex items-center gap-x-6">
-                                                    <button class="text-blue-500 transition-colors duration-200 hover:text-indigo-500 focus:outline-none">
+                                                    <button class="text-indigo-500 transition-colors duration-200 hover:text-indigo-500 focus:outline-none">
                                                         Manage
                                                     </button>
                                                 </div>
@@ -243,7 +243,7 @@ export default function Accounts() {
                                             <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">Monthly subscription</td>
                                             <td class="px-4 py-4 text-sm whitespace-nowrap">
                                                 <div class="flex items-center gap-x-6">
-                                                    <button class="text-blue-500 transition-colors duration-200 hover:text-indigo-500 focus:outline-none">
+                                                    <button class="text-indigo-500 transition-colors duration-200 hover:text-indigo-500 focus:outline-none">
                                                         Manage
                                                     </button>
                                                 </div>
@@ -268,7 +268,7 @@ export default function Accounts() {
                     </a>
 
                     <div class="items-center hidden md:flex gap-x-3">
-                        <a href="#" class="px-2 py-1 text-sm text-blue-500 rounded-md dark:bg-gray-800 bg-blue-100/60">1</a>
+                        <a href="#" class="px-2 py-1 text-sm text-indigo-500 rounded-md dark:bg-gray-800 bg-indigo-100/60">1</a>
                         <a href="#" class="px-2 py-1 text-sm text-gray-500 rounded-md dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100">2</a>
                         <a href="#" class="px-2 py-1 text-sm text-gray-500 rounded-md dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100">3</a>
                         <a href="#" class="px-2 py-1 text-sm text-gray-500 rounded-md dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100">...</a>
