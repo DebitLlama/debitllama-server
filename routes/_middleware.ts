@@ -16,6 +16,7 @@ export async function handler(
   const client = createClient(
     Deno.env.get("SUPABASE_URL") || "",
     Deno.env.get("SUPABASE_KEY") || "",
+    { auth: { persistSession: false } },
   );
 
   ctx.state.supabaseClient = client;
