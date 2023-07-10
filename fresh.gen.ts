@@ -3,32 +3,48 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $0 from "./routes/_middleware.ts";
-import * as $1 from "./routes/auth/_middleware.ts";
-import * as $2 from "./routes/auth/accounts.tsx";
-import * as $3 from "./routes/auth/profile.tsx";
-import * as $4 from "./routes/auth/secret.tsx";
-import * as $5 from "./routes/auth/sell.tsx";
-import * as $6 from "./routes/buy-button.tsx";
-import * as $7 from "./routes/index.tsx";
-import * as $8 from "./routes/logout.tsx";
-import * as $9 from "./routes/signup.tsx";
-import * as $$0 from "./islands/WalletAddressSelector.tsx";
+import * as $1 from "./routes/app/_middleware.ts";
+import * as $2 from "./routes/app/accounts.tsx";
+import * as $3 from "./routes/app/addNewAccount.tsx";
+import * as $4 from "./routes/app/debit.tsx";
+import * as $5 from "./routes/app/feedback.tsx";
+import * as $6 from "./routes/app/paymentIntents.ts";
+import * as $7 from "./routes/app/profile.tsx";
+import * as $8 from "./routes/app/secret.tsx";
+import * as $9 from "./routes/app/virtualaccount.tsx";
+import * as $10 from "./routes/buy-button.tsx";
+import * as $11 from "./routes/index.tsx";
+import * as $12 from "./routes/logout.tsx";
+import * as $13 from "./routes/signup.tsx";
+import * as $$0 from "./islands/CurrencySelectDropdown.tsx";
+import * as $$1 from "./islands/WalletAddressSelector.tsx";
+import * as $$2 from "./islands/accountCreatePageForm.tsx";
+import * as $$3 from "./islands/accountCreateSubmitButton.tsx";
+import * as $$4 from "./islands/accountPasswordInput.tsx";
 
 const manifest = {
   routes: {
     "./routes/_middleware.ts": $0,
-    "./routes/auth/_middleware.ts": $1,
-    "./routes/auth/accounts.tsx": $2,
-    "./routes/auth/profile.tsx": $3,
-    "./routes/auth/secret.tsx": $4,
-    "./routes/auth/sell.tsx": $5,
-    "./routes/buy-button.tsx": $6,
-    "./routes/index.tsx": $7,
-    "./routes/logout.tsx": $8,
-    "./routes/signup.tsx": $9,
+    "./routes/app/_middleware.ts": $1,
+    "./routes/app/accounts.tsx": $2,
+    "./routes/app/addNewAccount.tsx": $3,
+    "./routes/app/debit.tsx": $4,
+    "./routes/app/feedback.tsx": $5,
+    "./routes/app/paymentIntents.ts": $6,
+    "./routes/app/profile.tsx": $7,
+    "./routes/app/secret.tsx": $8,
+    "./routes/app/virtualaccount.tsx": $9,
+    "./routes/buy-button.tsx": $10,
+    "./routes/index.tsx": $11,
+    "./routes/logout.tsx": $12,
+    "./routes/signup.tsx": $13,
   },
   islands: {
-    "./islands/WalletAddressSelector.tsx": $$0,
+    "./islands/CurrencySelectDropdown.tsx": $$0,
+    "./islands/WalletAddressSelector.tsx": $$1,
+    "./islands/accountCreatePageForm.tsx": $$2,
+    "./islands/accountCreateSubmitButton.tsx": $$3,
+    "./islands/accountPasswordInput.tsx": $$4,
   },
   baseUrl: import.meta.url,
 };
