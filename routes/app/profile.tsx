@@ -8,7 +8,7 @@ import { validateAddress } from "../../lib/web3backend.ts";
 
 export const handler: Handlers<any, State> = {
   async POST(req, ctx) {
-    let redirect = "/auth/profile";
+    let redirect = "/app/profile";
     const headers = new Headers();
 
 
@@ -19,7 +19,7 @@ export const handler: Handlers<any, State> = {
     const validAddress = validateAddress(walletaddress);
 
     if (!validAddress) {
-      redirect = `/auth/profile?error=${"Invalid Wallet Address"}`
+      redirect = `/app/profile?error=${"Invalid Wallet Address"}`
       headers.set("location", redirect);
       return new Response(null, { status: 303, headers })
     }
@@ -51,7 +51,7 @@ export const handler: Handlers<any, State> = {
 
 
     if (error) {
-      redirect = `/auth/profile?error=${error.message}`
+      redirect = `/app/profile?error=${error.message}`
     }
 
     headers.set("location", redirect);
@@ -64,8 +64,7 @@ export const handler: Handlers<any, State> = {
 
     // Get the data and use it to populate the fields!
     const { data: profileData, error: profileError } = await ctx.state.supabaseClient.from("Profiles").select().eq("userid", userid);
-    console.log('profile data in request')
-    console.log(profileData);
+
     if (profileData[0] === undefined) {
       return ctx.render(
         {
