@@ -48,11 +48,13 @@ export const handler: Handlers<any, State> = {
 
 export default function Login(props: PageProps) {
     const err = props.url.searchParams.get("error");
-
     return (
         <>
             <section class="bg-gray-200">
                 <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+                    <div class="mx-auto">
+                        <img src="/logo.svg" width="100" />
+                    </div>
                     <div class="mx-auto">
                         <h2 class="text-2xl font-bold mb-5 text-center">Login</h2>
                     </div>
