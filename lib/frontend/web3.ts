@@ -1,4 +1,3 @@
-
 export function isEthereumUndefined() {
   //@ts-ignore This runs in the browser only. Checking if the browser has window.ethereum
   return window.ethereum === undefined;
@@ -14,9 +13,12 @@ export async function requestAccounts() {
     const accounts = await window.ethereum.request({
       method: "eth_requestAccounts",
     });
-    console.log(accounts);
     return accounts[0];
   } catch (err: any) {
     return "Please Connect Your Wallet";
   }
 }
+
+//TODO: I need to switch network
+
+//TODO: I need to implement the client side contract functions

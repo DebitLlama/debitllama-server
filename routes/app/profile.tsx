@@ -3,7 +3,7 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import Layout from "../../components/Layout.tsx";
 import { State } from "../_middleware.ts";
 import WalletAddressSelector from "../../islands/WalletAddressSelector.tsx"
-import { validateAddress } from "../../lib/web3backend.ts";
+import { validateAddress } from "../../lib/backend/web3.ts";
 
 
 export const handler: Handlers<any, State> = {
