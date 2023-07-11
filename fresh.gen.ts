@@ -19,8 +19,7 @@ import * as $13 from "./routes/signup.tsx";
 import * as $$0 from "./islands/CurrencySelectDropdown.tsx";
 import * as $$1 from "./islands/WalletAddressSelector.tsx";
 import * as $$2 from "./islands/accountCreatePageForm.tsx";
-import * as $$3 from "./islands/accountCreateSubmitButton.tsx";
-import * as $$4 from "./islands/accountPasswordInput.tsx";
+import * as $$3 from "./islands/accountPasswordInput.tsx";
 
 const manifest = {
   routes: {
@@ -43,8 +42,7 @@ const manifest = {
     "./islands/CurrencySelectDropdown.tsx": $$0,
     "./islands/WalletAddressSelector.tsx": $$1,
     "./islands/accountCreatePageForm.tsx": $$2,
-    "./islands/accountCreateSubmitButton.tsx": $$3,
-    "./islands/accountPasswordInput.tsx": $$4,
+    "./islands/accountPasswordInput.tsx": $$3,
   },
   baseUrl: import.meta.url,
 };
