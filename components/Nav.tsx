@@ -19,7 +19,8 @@ export default function Nav({ loggedIn }: NavProps) {
     return (
         <div class="bg-white max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
             <div class="text-2xl  ml-1 font-bold flex flex-row">
-                <img src="/logo.svg" width="35" class={"mr-3"} />{" "}Debit Llama
+                <img src="/logo.svg" width="45" class={"mr-3"} />{" "}
+                <span class="mt-1">Debit</span><span class="text-gray-600 mt-1">Llama</span>
             </div>
             <ul class="flex gap-6">
                 {
