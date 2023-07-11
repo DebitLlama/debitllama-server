@@ -15,6 +15,7 @@ export default function Layout(props: LayoutProps) {
         <title>DebitLlama</title>
         <link rel="stylesheet" href="/styles.css" />
         <script src="/zxcvbn.js"></script>
+        <script src="/directdebit_bundle.js"></script>
       </Head>
       <Nav loggedIn={props.isLoggedIn} />
       <div class="p-4 mx-auto max-w-screen-md">
