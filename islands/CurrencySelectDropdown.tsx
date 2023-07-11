@@ -13,7 +13,6 @@ export default function CurrencySelectDropdown() {
     const [selectableCurrencyArray, setSelectableCurrencyArray] = useState(ethereumCurrencies);
 
     const onSelectNetwork = (event: any) => {
-        console.log(event.target.value);
         setSelectedNetwork(event.target.value);
     }
 
