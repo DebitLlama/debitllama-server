@@ -30,7 +30,7 @@ export default function AccountPasswordInput(props: AccountPasswordInputProps) {
             <p class="text-red-800">{props.passwordMatchError}</p>
         </div>
         <div class="mb-4">
-            <p class="text-sm ...">The password is used for encrypting your account and it's needed for spending. Do not reuse your login password. The accounts are non-custodial and if you loose your password we can't recover it for you. You can always your account and withdraw the deposit with the wallet you created it with.</p>
+            <p class="text-sm ...">The password is used for encrypting your account and it's needed for spending. Do not reuse your login password. The accounts are non-custodial and if you loose your password we can't recover it for you. You can always close the account and withdraw the deposit with the wallet you created it with.</p>
 
         </div>
     </>
