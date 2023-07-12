@@ -19,6 +19,7 @@ export default function AccountPasswordInput(props: AccountPasswordInputProps) {
 
 
         <PasswordStrengthDisplay passwordStrengthNotification={props.passwordStrengthNotification}></PasswordStrengthDisplay>
+        <p class="text-sm text-gray-500">You need to use a good or strong password</p>
 
 
     </div>
