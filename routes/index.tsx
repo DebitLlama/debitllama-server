@@ -52,11 +52,11 @@ export default function Login(props: PageProps) {
         <>
             <section class="bg-gray-200">
                 <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-                    <div class="mx-auto">
+                    <div class="mx-auto mb-5">
                         <img src="/logo.svg" width="100" />
                     </div>
                     <div class="mx-auto">
-                        <h2 class="text-2xl font-bold mb-5 text-center">Login</h2>
+                        <h2 class="text-2xl font-bold mb-5 text-center">Welcome to <span>Debit</span><span class="text-gray-600">Llama</span></h2>
                     </div>
 
                     <div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0">
@@ -68,6 +68,9 @@ export default function Login(props: PageProps) {
                                 </div>
                             )}
                             <form class="space-y-4 md:space-y-6" method="POST">
+                                <div class="mx-auto">
+                                    <h2 class="text-2xl font-bold mb-5 text-center">Login</h2>
+                                </div>
                                 <div>
                                     <label for="email" class="block mb-2 text-sm font-medium">Your email</label>
                                     <input type="email" name="email" id="email" class="border border-gray-300 sm:text-sm rounded-lg focus:ring-indigo-600 focus:border-indigo-600 block w-full p-2.5 dark:focus:ring-indigo-500 dark:focus:border-indigo-500" placeholder="name@company.com" />
@@ -95,13 +98,10 @@ export default function Login(props: PageProps) {
                         </svg>
                     </span>
 
-                    <p class="text-sm text-gray-600 dark:text-gray-300">We use cookies to ensure that we give you the best experience on our website. <a href="#" class="text-indigo-500 hover:underline">Read cookies policies</a>. </p>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">We use cookies to ensure you stay logged in. <a href="#" class="text-indigo-500 hover:underline">Read cookies policies</a>. </p>
                 </div>
 
                 <div class="flex items-center mt-6 gap-x-4 shrink-0 lg:mt-0">
-                    <button class="w-1/2 text-xs text-gray-800 underline transition-colors duration-300 md:w-auto dark:text-white dark:hover:text-gray-400 hover:text-gray-600 focus:outline-none">
-                        Cookie Setting
-                    </button>
 
                     <button class=" text-xs w-1/2 md:w-auto font-medium bg-gray-800 rounded-lg hover:bg-gray-700 text-white px-4 py-2.5 duration-300 transition-colors focus:outline-none">
                         Accept All Cookies
