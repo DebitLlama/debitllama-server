@@ -4,18 +4,19 @@
 
 import * as $0 from "./routes/_middleware.ts";
 import * as $1 from "./routes/app/_middleware.ts";
-import * as $2 from "./routes/app/accounts.tsx";
-import * as $3 from "./routes/app/addNewAccount.tsx";
-import * as $4 from "./routes/app/debit.tsx";
-import * as $5 from "./routes/app/feedback.tsx";
-import * as $6 from "./routes/app/paymentIntents.ts";
-import * as $7 from "./routes/app/profile.tsx";
-import * as $8 from "./routes/app/secret.tsx";
-import * as $9 from "./routes/app/virtualaccount.tsx";
-import * as $10 from "./routes/buy-button.tsx";
-import * as $11 from "./routes/index.tsx";
-import * as $12 from "./routes/logout.tsx";
-import * as $13 from "./routes/signup.tsx";
+import * as $2 from "./routes/app/account.tsx";
+import * as $3 from "./routes/app/accounts.tsx";
+import * as $4 from "./routes/app/addNewAccount.tsx";
+import * as $5 from "./routes/app/debit.tsx";
+import * as $6 from "./routes/app/feedback.tsx";
+import * as $7 from "./routes/app/paymentIntents.ts";
+import * as $8 from "./routes/app/profile.tsx";
+import * as $9 from "./routes/app/secret.tsx";
+import * as $10 from "./routes/app/virtualaccount.tsx";
+import * as $11 from "./routes/buy-button.tsx";
+import * as $12 from "./routes/index.tsx";
+import * as $13 from "./routes/logout.tsx";
+import * as $14 from "./routes/signup.tsx";
 import * as $$0 from "./islands/CurrencySelectDropdown.tsx";
 import * as $$1 from "./islands/WalletAddressSelector.tsx";
 import * as $$2 from "./islands/accountCreatePageForm.tsx";
@@ -25,18 +26,19 @@ const manifest = {
   routes: {
     "./routes/_middleware.ts": $0,
     "./routes/app/_middleware.ts": $1,
-    "./routes/app/accounts.tsx": $2,
-    "./routes/app/addNewAccount.tsx": $3,
-    "./routes/app/debit.tsx": $4,
-    "./routes/app/feedback.tsx": $5,
-    "./routes/app/paymentIntents.ts": $6,
-    "./routes/app/profile.tsx": $7,
-    "./routes/app/secret.tsx": $8,
-    "./routes/app/virtualaccount.tsx": $9,
-    "./routes/buy-button.tsx": $10,
-    "./routes/index.tsx": $11,
-    "./routes/logout.tsx": $12,
-    "./routes/signup.tsx": $13,
+    "./routes/app/account.tsx": $2,
+    "./routes/app/accounts.tsx": $3,
+    "./routes/app/addNewAccount.tsx": $4,
+    "./routes/app/debit.tsx": $5,
+    "./routes/app/feedback.tsx": $6,
+    "./routes/app/paymentIntents.ts": $7,
+    "./routes/app/profile.tsx": $8,
+    "./routes/app/secret.tsx": $9,
+    "./routes/app/virtualaccount.tsx": $10,
+    "./routes/buy-button.tsx": $11,
+    "./routes/index.tsx": $12,
+    "./routes/logout.tsx": $13,
+    "./routes/signup.tsx": $14,
   },
   islands: {
     "./islands/CurrencySelectDropdown.tsx": $$0,
