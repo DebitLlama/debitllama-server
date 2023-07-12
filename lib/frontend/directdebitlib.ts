@@ -1,3 +1,6 @@
+export const ETHENCRYPTPUBLICKEY = ""
+
+
 export function newAccountSecrets() {
   //@ts-ignore this dependency is imported through a browser script tag
   return directdebitlib.newAccountSecrets();
@@ -32,6 +35,16 @@ export function packToSolidityProof(proof: Proof): SolidityProof {
 export function BufferFrom(data: any) {
   //@ts-ignore this dependency is imported through a browser script tag
   return directdebitlib.Buffer.from(data);
+}
+
+export function ethEncryptData(publicKey: any, data: any) {
+  //@ts-ignore this dependency is imported through a browser script tag
+  return directdebitlib.encryptData(publicKey, data);
+}
+
+export function packEncryptedMessage(encryptedMessage: any) {
+  //@ts-ignore this dependency is imported through a browser script tag
+  return directdebitlib.packEncryptedMessage(encryptedMessage);
 }
 
 export type PaymentIntentSecret = {
