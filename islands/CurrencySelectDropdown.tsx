@@ -1,43 +1,51 @@
 
 import { useEffect, useState } from 'preact/hooks';
+import { SelectableCurrency } from './accountCreatePageForm.tsx';
 
-const availableNetworks = ["Ethereum", "BitTorrent Chain"]
 
-const ethereumCurrencies = [{ name: "ETH", native: true }, { name: "USDC", native: false }]
+interface CurrencySelectDropdownProps {
+    selectedNetwork: string,
+    setSelectedNetwork: (to: string) => void;
+    selectableCurrencyArray: SelectableCurrency[]
+    setSelectableCurrencyArray: (to: SelectableCurrency[]) => void
+    availableNetworks: string[]
+    selectedCurrency: SelectableCurrency,
+    setSelectedCurrency: (to: SelectableCurrency) => void;
 
-const bittorrentCurrencies = [{ name: "BTTC", native: true }, { name: "USDT", native: false }]
+}
 
-export default function CurrencySelectDropdown() {
+export default function CurrencySelectDropdown(props: CurrencySelectDropdownProps) {
 
-    const [selectedNetwork, setSelectedNetwork] = useState(availableNetworks[0]);
-    const [selectableCurrencyArray, setSelectableCurrencyArray] = useState(ethereumCurrencies);
 
     const onSelectNetwork = (event: any) => {
-        setSelectedNetwork(event.target.value);
+        props.setSelectedNetwork(event.target.value);
     }
 
-    useEffect(() => {
-        if (selectedNetwork === availableNetworks[0]) {
-            setSelectableCurrencyArray(ethereumCurrencies)
-        } else if (selectedNetwork === availableNetworks[1]) {
-            setSelectableCurrencyArray(bittorrentCurrencies);
-        }
-    }, [selectedNetwork]);
+    const onSelectCurrency = (event: any) => {
+        props.setSelectedCurrency(JSON.parse(event.target.value))
+    }
+
+    // useEffect(() => {
+    //     if (selectedNetwork === availableNetworks[0]) {
+    //         setSelectableCurrencyArray(ethereumCurrencies)
+    //     } else if (selectedNetwork === availableNetworks[1]) {
+    //         setSelectableCurrencyArray(bittorrentCurrencies);
+    //     }
+    // }, [selectedNetwork]);
 
     return <>
         <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="networkSelect">Currency</label>
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="networkSelect">Network</label>
 
             <select name="network" id="networkSelect" onChange={onSelectNetwork} class="w-full h-9 rounded-lg">
-                {availableNetworks.map((network) => <option value={network}>{network}</option>)}
+                {props.availableNetworks.map((network) => <option value={network}>{network}</option>)}
             </select>
         </div>
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="currencySelect">Currency</label>
-            <select name="currency" id={"currencySelect"} class="w-full h-9 rounded-lg">
-                {selectableCurrencyArray.map((curr) => <option value={curr.name}>{curr.name} <small>{!curr.native ? "(ERC-20)" : ""}</small>    </option>)}
+            <select onChange={onSelectCurrency} name="currency" id={"currencySelect"} class="w-full h-9 rounded-lg">
+                {props.selectableCurrencyArray.map((curr) => <option value={JSON.stringify(curr)}>{curr.name} <small>{!curr.native ? "(ERC-20)" : ""}</small></option>)}
             </select>
-
         </div>
     </>
 }
