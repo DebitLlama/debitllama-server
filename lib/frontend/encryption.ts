@@ -1,187 +1,88 @@
-import { BufferFrom } from "./directdebitlib.ts";
-
-/**
- * These crypto functions run only in the browser
- */
-export enum Status {
-  Success,
-  Failure,
-}
-export type Options<T> = {
-  status: Status;
-  error: any;
-  data: T;
-};
-
-export function decodeUint8Array(uint8array: Uint8Array): string {
-  return new TextDecoder("utf-8").decode(uint8array);
-}
-
-export function encodeStringToUint8Array(data: string): Uint8Array {
-  return new TextEncoder().encode(data);
-}
-
-export async function encryptAccountNote(
-  note: string,
-  passwd: string,
-): Promise<string> {
-  const encryptedBytes = await encrypt(
-    BufferFrom(note),
-    passwd,
+// for large strings, use this from https://stackoverflow.com/a/49124600
+const buff_to_base64 = (buff: any) =>
+  btoa(
+    new Uint8Array(buff).reduce(
+      (data, byte) => data + String.fromCharCode(byte),
+      "",
+    ),
   );
 
-  if (encryptedBytes === undefined) {
-    throw Error("Failed to encrypt note");
-  }
+const base64_to_buf = (b64: any) =>
+  //@ts-ignore This is a javascript dependency I copied here, null is ok
+  Uint8Array.from(atob(b64), (c) => c.charCodeAt(null));
 
-  return decodeUint8Array(encryptedBytes);
-}
+const enc = new TextEncoder();
+const dec = new TextDecoder();
 
-export async function decryptWallet(
-  encryptedNote: string,
-  passwd: string,
-): Promise<Options<string>> {
-  const options: Options<string> = {
-    error: "",
-    data: "",
-    status: Status.Success,
-  };
+const getPasswordKey = (password: string) =>
+  window.crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, [
+    "deriveKey",
+    "deriveBits",
+  ]);
 
-  const onError = (err: any) => {
-    options.error = "Unable to decrypt keyfile.";
-    options.status = Status.Failure;
-  };
-  const cipherbytes = BufferFrom(encryptedNote);
-
-  try {
-    const decryptedBytes = await decrypt(cipherbytes, passwd, onError);
-    const decodedBytes = decodeUint8Array(decryptedBytes);
-    options.data = JSON.parse(decodedBytes);
-  } catch (err) {
-    options.status = Status.Failure;
-    options.error = "Unable to decrypt keyfile";
-  }
-  return options;
-}
-
-async function encrypt(startbuff: ArrayBuffer, passwd: string) {
-  const plaintextbytes = new Uint8Array(startbuff);
-  const pbkdf2iterations = 10000;
-  const passphrasebytes = new TextEncoder().encode(passwd);
-  const pbkdf2salt = window.crypto.getRandomValues(new Uint8Array(8));
-  const passphrasekey = await window.crypto.subtle
-    .importKey("raw", passphrasebytes, { name: "PBKDF2" }, false, [
-      "deriveBits",
-    ])
-    .catch((err) => {
-      console.log(err);
-    });
-
-  let pbkdf2bytes = await window.crypto.subtle
-    .deriveBits(
-      {
-        name: "PBKDF2",
-        salt: pbkdf2salt,
-        iterations: pbkdf2iterations,
-        hash: "SHA-256",
-      },
-      passphrasekey as CryptoKey,
-      384,
-    )
-    .catch((err) => {
-      console.log(err);
-    });
-  pbkdf2bytes = new Uint8Array(pbkdf2bytes as ArrayBuffer);
-  const keybytes = pbkdf2bytes.slice(0, 32);
-  const ivbytes = pbkdf2bytes.slice(32);
-
-  const encryptionkey = await window.crypto.subtle.importKey(
-    "raw",
-    keybytes,
-    { name: "AES-CBC", length: 256 },
+const deriveKey = (passwordKey: any, salt: any, keyUsage: any) =>
+  window.crypto.subtle.deriveKey(
+    {
+      name: "PBKDF2",
+      salt: salt,
+      iterations: 250000,
+      hash: "SHA-256",
+    },
+    passwordKey,
+    { name: "AES-GCM", length: 256 },
     false,
-    ["encrypt"],
+    keyUsage,
   );
 
-  let cipherBytes = await window.crypto.subtle
-    .encrypt({ name: "AES-CBC", iv: ivbytes }, encryptionkey, plaintextbytes)
-    .catch((err) => {
-      console.error(err);
-    });
+export async function aesEncryptData(secretData: any, password: any) {
+  try {
+    const salt = window.crypto.getRandomValues(new Uint8Array(16));
+    const iv = window.crypto.getRandomValues(new Uint8Array(12));
+    const passwordKey = await getPasswordKey(password);
+    const aesKey = await deriveKey(passwordKey, salt, ["encrypt"]);
+    const encryptedContent = await window.crypto.subtle.encrypt(
+      {
+        name: "AES-GCM",
+        iv: iv,
+      },
+      aesKey,
+      enc.encode(secretData),
+    );
 
-  if (!cipherBytes) {
-    return;
+    const encryptedContentArr = new Uint8Array(encryptedContent);
+    let buff = new Uint8Array(
+      salt.byteLength + iv.byteLength + encryptedContentArr.byteLength,
+    );
+    buff.set(salt, 0);
+    buff.set(iv, salt.byteLength);
+    buff.set(encryptedContentArr, salt.byteLength + iv.byteLength);
+    const base64Buff = buff_to_base64(buff);
+    return base64Buff;
+  } catch (e) {
+    console.log(`Error - ${e}`);
+    return "";
   }
-
-  cipherBytes = new Uint8Array(cipherBytes);
-  //@ts-ignore cipherbytes.length is erroring but this will only run in the browser
-  const resultBytes = new Uint8Array(cipherBytes.length + 16);
-  resultBytes.set(new TextEncoder().encode("Salted__"));
-  resultBytes.set(pbkdf2salt, 8);
-  //@ts-ignore cipherBytes is erroring but this will only run in the browser
-  resultBytes.set(cipherBytes, 16);
-  return resultBytes;
 }
 
-async function decrypt(
-  cipherbytes: ArrayBuffer,
-  passwd: string,
-  onError: CallableFunction,
-): Promise<Uint8Array> {
-  const pbkdf2iterations = 10000;
-  const passphrasebytes = new TextEncoder().encode(passwd);
-  const pbkdf2salt = cipherbytes.slice(8, 16);
-  const passphrasekey = await window.crypto.subtle
-    .importKey("raw", passphrasebytes, { name: "PBKDF2" }, false, [
-      "deriveBits",
-    ])
-    .catch((err) => {
-      onError(err);
-    });
-
-  let pbkdf2bytes = await window.crypto.subtle
-    .deriveBits(
+export async function aesDecryptData(encryptedData: any, password: any) {
+  try {
+    const encryptedDataBuff = base64_to_buf(encryptedData);
+    const salt = encryptedDataBuff.slice(0, 16);
+    const iv = encryptedDataBuff.slice(16, 16 + 12);
+    const data = encryptedDataBuff.slice(16 + 12);
+    const passwordKey = await getPasswordKey(password);
+    const aesKey = await deriveKey(passwordKey, salt, ["decrypt"]);
+    const decryptedContent = await window.crypto.subtle.decrypt(
       {
-        name: "PBKDF2",
-        salt: pbkdf2salt,
-        iterations: pbkdf2iterations,
-        hash: "SHA-256",
+        name: "AES-GCM",
+        iv: iv,
       },
-      passphrasekey as CryptoKey,
-      384,
-    )
-    .catch((err) => {
-      onError(err);
-    });
-  pbkdf2bytes = new Uint8Array(pbkdf2bytes as ArrayBuffer);
-
-  const keybytes = pbkdf2bytes.slice(0, 32);
-  const ivbytes = pbkdf2bytes.slice(32);
-  cipherbytes = cipherbytes.slice(16);
-
-  const decryptionKey = await window.crypto.subtle
-    .importKey("raw", keybytes, { name: "AES-CBC", length: 256 }, false, [
-      "decrypt",
-    ])
-    .catch((err) => {
-      onError(err);
-    });
-  let plaintextbytes = await window.crypto.subtle
-    .decrypt(
-      { name: "AES-CBC", iv: ivbytes },
-      decryptionKey as CryptoKey,
-      cipherbytes,
-    )
-    .catch((err) => {
-      onError(err);
-    });
-
-  if (!plaintextbytes) {
-    onError("Error Decrypting File, Wrong password.");
+      aesKey,
+      data,
+    );
+    return dec.decode(decryptedContent);
+  } catch (e) {
+    console.log(`Error - ${e}`);
+    return "";
   }
-  //@ts-ignore playtextbytes is erroring but this will run in the browser
-  plaintextbytes = new Uint8Array(plaintextbytes);
-
-  //@ts-ignore playtextbytes is erroring but this will run in the browser
-  return plaintextbytes;
 }
