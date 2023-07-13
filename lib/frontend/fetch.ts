@@ -12,3 +12,12 @@ export async function saveAccountData(
     },
   }).then((response) => response.status);
 }
+
+export function redirectToAccountPage(
+  networkId: string,
+  commitment: string,
+  name: string,
+) {
+  const params = JSON.stringify({ networkId, commitment, name });
+  window.location.href = `/app/account?q=${params}`;
+}
