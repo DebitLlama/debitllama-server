@@ -2,10 +2,11 @@ import { useState } from 'preact/hooks';
 
 import CurrencySelectDropdown from "./CurrencySelectDropdown.tsx";
 import AccountPasswordInput from "./accountPasswordInput.tsx";
-import { ChainIds, NetworkNames, approveSpend, availableNetworks, chainIdFromNetworkName, depositEth, depositToken, fetchAbi, getAllowance, getContract, getDirectDebitContractAddress, handleNetworkSelect, parseEther, requestAccounts } from "../lib/frontend/web3.ts";
-import { decodeAccountSecrets, ethEncryptData, newAccountSecrets, toNoteHex } from '../lib/frontend/directdebitlib.ts';
+import { approveSpend, depositEth, depositToken, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts } from "../lib/frontend/web3.ts";
+import { decodeAccountSecrets, ethEncryptData, newAccountSecrets, packEncryptedMessage, toNoteHex } from '../lib/frontend/directdebitlib.ts';
 import { aesEncryptData } from '../lib/frontend/encryption.ts';
-import { saveAccountData } from '../lib/frontend/fetch.ts';
+import { redirectToAccountPage } from '../lib/frontend/fetch.ts';
+import { ChainIds, DonauTestnetTokens, NetworkNames, availableNetworks, chainIdFromNetworkName, getDirectDebitContractAddress } from "../lib/shared/web3.ts";
 
 const strength = [
     "Worst ☹",
@@ -24,12 +25,11 @@ const ethereumCurrencies = [
     { name: "USDC", native: false, contractAddress: "" }
 ]
 
-const bittorrentCurrencies = [{ name: "BTT", native: true, contractAddress: "" }, { name: "USDT", native: false, contractAddress: "" }]
+const bittorrentCurrencies = [{ name: "BTT", native: true, contractAddress: "" }, { name: "USDTM", native: false, contractAddress: DonauTestnetTokens.USDTM }]
 
 interface AccountCreatePageFormProps {
     ethEncryptPublicKey: string,
-    directdebitContract_donau: string,
-    mockERC20Address_donau: string
+    walletaddress: string
 }
 
 export default function AccountCreatePageForm(props: AccountCreatePageFormProps) {
@@ -47,6 +47,9 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
     const [selectedCurrency, setSelectedCurrency] = useState<SelectableCurrency>(selectableCurrencyArray[0]);
 
     const [depositAmount, setDepositAmount] = useState("");
+
+    const [walletMismatchError, setShowWalletMismatchError] = useState(false);
+
 
     function setPasswordAndCheck(to: string) {
         if (to === "") {
@@ -110,7 +113,9 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
         //Encrypt the note with a public key
         const encryptedNote = await ethEncryptData(props.ethEncryptPublicKey, passwdEncryptedNote);
 
-        return { encryptedNote, commitment };
+        const packed = await packEncryptedMessage(encryptedNote);
+
+        return { encryptedNote: packed, commitment };
     }
 
     function handleError(msg: string) {
@@ -134,12 +139,9 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
             virtualaccount.encryptedNote)
 
         if (depositTx !== undefined) {
-            await depositTx.wait().then(async (receipt2: any) => {
-                if (receipt2.status === 1) {
-                    // Save the data on the backend!
-                    const status = await saveAccountData(chainId, virtualaccount.commitment, name);
-                    //TODO: REdirect to a new page
-                    // returns 202 accepted on success, then I need to redirect
+            await depositTx.wait().then((receipt: any) => {
+                if (receipt.status === 1) {
+                    redirectToAccountPage(chainId, virtualaccount.commitment, name);
                 }
             })
         }
@@ -147,6 +149,7 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
 
 
     async function onSubmitForm(event: any) {
+        setShowWalletMismatchError(false);
         event.preventDefault();
         // I check if I can find a wallet
         const chainId = chainIdFromNetworkName[selectedNetwork as NetworkNames];
@@ -157,8 +160,13 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
             return;
         }
 
-
         const address = await requestAccounts();
+
+        if (props.walletaddress !== address) {
+            setShowWalletMismatchError(true);
+            return
+        }
+
         const virtualaccount = await setUpAccount();
         const contractAddress = getDirectDebitContractAddress[chainId as ChainIds];
 
@@ -172,6 +180,8 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
 
 
             const allowance: bigint = await getAllowance(erc20Contract, address, contractAddress);
+
+            // TODO: Need to disable the button and maybe show a popup so people don't navigate away!
 
             if (allowance >= parseEther(depositAmount)) {
                 // Just deposit
@@ -206,12 +216,9 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
             );
 
             if (tx !== undefined) {
-                await tx.wait().then(async (receipt: any) => {
+                await tx.wait().then((receipt: any) => {
                     if (receipt.status === 1) {
-                        // Save the data on the backend!
-                        const status = await saveAccountData(chainId, virtualaccount.commitment, name);
-                        //returns 202 accepted on success, then I need to redirect
-                        //TODO: redirect to a new page
+                        redirectToAccountPage(chainId, virtualaccount.commitment, name);
                     }
                 })
             }
@@ -249,6 +256,7 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
             passwordMatchError={passwordMatchError}
             passwordStrengthNotification={passwordStrengthNotification}
         ></AccountPasswordInput>
+        {walletMismatchError ? <p class="text-sm text-red-500">Your browser wallet does not match your profile!</p> : ""}
         <button
             disabled={isButtonDisabled()}
             class="w-full bg-indigo-500 text-white text-sm font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
