@@ -1,58 +1,7 @@
 import { ethers } from "../../ethers.min.js";
+import { ChainIds, explorerUrl, networkNameFromId, rpcUrl, walletCurrency } from "../shared/web3.ts";
 import { SolidityProof } from "./directdebitlib.ts";
 
-export enum NetworkNames {
-  BTT_TESTNET = "BTT Donau Testnet",
-}
-export const availableNetworks = [
-  NetworkNames.BTT_TESTNET.toString(),
-];
-
-enum NetworkTickers {
-  BTT_TESTNET = "BTT",
-}
-
-export enum ChainIds {
-  BTT_TESTNET_ID = "0x405",
-}
-
-enum DirectDebitContractAddress {
-  BTT_TESTNET = "",
-}
-
-enum RPCURLS {
-  BTT_TESTNET = "https://pre-rpc.bt.io/",
-}
-
-enum EXPORERURLS {
-  BTT_TESTNET = "https://testscan.bt.io",
-}
-
-const rpcUrl: { [key in ChainIds]: RPCURLS } = {
-  [ChainIds.BTT_TESTNET_ID]: RPCURLS.BTT_TESTNET,
-};
-
-const explorerUrl: { [key in ChainIds]: EXPORERURLS } = {
-  [ChainIds.BTT_TESTNET_ID]: EXPORERURLS.BTT_TESTNET,
-};
-
-const walletCurrency: { [key in ChainIds]: NetworkTickers } = {
-  [ChainIds.BTT_TESTNET_ID]: NetworkTickers.BTT_TESTNET,
-};
-
-export const getDirectDebitContractAddress: {
-  [keys in ChainIds]: DirectDebitContractAddress;
-} = {
-  [ChainIds.BTT_TESTNET_ID]: DirectDebitContractAddress.BTT_TESTNET,
-};
-
-const networkNameFromId: { [key in ChainIds]: NetworkNames } = {
-  [ChainIds.BTT_TESTNET_ID]: NetworkNames.BTT_TESTNET,
-};
-
-export const chainIdFromNetworkName: { [key in NetworkNames]: ChainIds } = {
-  [NetworkNames.BTT_TESTNET]: ChainIds.BTT_TESTNET_ID,
-};
 
 export function isEthereumUndefined() {
   //@ts-ignore This runs in the browser only. Checking if the browser has window.ethereum
@@ -76,7 +25,7 @@ export async function requestAccounts() {
 }
 
 async function onboardOrSwitchNetwork(networkid: any, handleError: any) {
-  if (!isEthereumUndefined()) {
+  if (isEthereumUndefined()) {
     handleError("You need to install metamask");
     redirectToMetamask();
     return false;
@@ -167,9 +116,9 @@ export async function fetchAbi(at: string) {
 }
 
 function getWeb3Provider() {
-  //@ts-ignore
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  //@ts-ignore
+  //@ts-ignore window.ethereum needs to be ignored. this code runs in the browser
+  const provider = new ethers.BrowserProvider(window.ethereum);
+  //@ts-ignore window.ethereum needs to be ignored. this code runs in the browser
   window.ethereum.on("chainChanged", (chainId) => {
     // Handle the new chain.
     // Correctly handling chain changes can be complicated.
@@ -194,7 +143,8 @@ export async function getContract(
   abiPath: string,
 ): Promise<any> {
   const artifact = await fetchAbi(abiPath);
-  const signer = provider.getSigner();
+  const signer = await provider.getSigner();
+  console.log(signer);
   return new ethers.Contract(at, artifact.abi, signer);
 }
 // Smart contract functions start here
