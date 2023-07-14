@@ -17,7 +17,8 @@ export function redirectToAccountPage(
   networkId: string,
   commitment: string,
   name: string,
+  currency: string,
 ) {
-  const params = JSON.stringify({ networkId, commitment, name });
+  const params = JSON.stringify({ networkId, commitment, name, currency });
   window.location.href = `/app/account?q=${params}`;
 }
