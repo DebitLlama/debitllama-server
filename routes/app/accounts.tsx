@@ -1,23 +1,35 @@
 import Layout from "../../components/Layout.tsx";
 import { State } from "../_middleware.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
+import { ChainIds, networkNameFromId } from "../../lib/shared/web3.ts";
 
 interface AccountDisplayElementProps {
     amount: string,
     currency: string,
     createdDate: string,
-    network: string
+    networkName: string,
+    networkId: string,
+    commitment: string,
+    name: string
 }
 
-// TODO: Account display needs to be island because it fetches the data from the blockchain
 function AccountDisplayElement(props: AccountDisplayElementProps) {
-    return <a href="/app/virtualaccount" class="cardshadow mt-2 mb-2 mx-auto cursor-pointer max-w-xs w-full">
+    const accountQuery = JSON.stringify(
+        {
+            networkId: props.networkId,
+            commitment: props.commitment,
+            name: props.name,
+            currency: props.currency
+        }
+    )
+    return <a href={`/app/account?q=${accountQuery}`} class="cardshadow mt-2 mb-2 mx-auto cursor-pointer max-w-xs w-full">
         <div class="flex flex-row items-center">
             <div class="text-3xl p-4">💰</div>
             <div class="p-2">
-                <p class="text-xl font-bold">{props.amount}{props.currency}</p>
                 <p class="text-gray-500 font-medium">Virtual Account</p>
-                <p class="text-gray-500 text-sm">{props.network}</p>
+                <p class="text-base">{props.name}</p>
+                <p class="text-base font-bold">{props.amount}{" "}{props.currency}</p>
+                <p class="text-gray-500 text-sm">{props.networkName}</p>
             </div>
         </div>
     </a>
@@ -25,36 +37,42 @@ function AccountDisplayElement(props: AccountDisplayElementProps) {
 
 export const handler: Handlers<any, State> = {
     async GET(_req, ctx) {
-
+        //TODO: pagination
+        const { data: accountsData, error: accountsError } = await ctx.state.supabaseClient
+            .from("Accounts")
+            .select()
+            .eq("user_id", ctx.state.userid)
+            .eq("closed", false);
         // fetch here the data from supabase first
         // then fetch the balances from blockchain
 
         // I also need to fetch the payment intents here!
 
         // Add pagination for both!
-        return ctx.render(ctx.state)
+        return ctx.render({ ...ctx.state, accountsData })
     }
 }
 
-export default function Accounts() {
-    //TODO: The url needs to have current and total pages 
+export default function Accounts(props: PageProps) {
+    //TODO: The url needs to have current and total pages for pagination
 
     return (
-        <Layout isLoggedIn={true}>
-            {/* <h1 class="text-2xl font-bold mb-5 text-center">Accounts</h1> */}
+        <Layout isLoggedIn={props.data.token}>
             <section class="flex flex-row">
                 <a href={"/app/addNewAccount"} class="mb-8 bg-gradient-to-b w-max mx-auto text-indigo-500 font-semibold from-slate-50 to-indigo-100 px-10 py-3 rounded-2xl shadow-indigo-400 shadow-md border-b-4 hover border-b border-indigo-200 hover:shadow-sm transition-all duration-500">Create New Account</a>
             </section>
 
             <section class="flex flex-row px-4 flex-wrap" >
-                {AccountDisplayElement({ amount: "100", currency: "ETH", createdDate: "2023.07.09", network: "Ethereum" })}
-                {AccountDisplayElement({ amount: "100", currency: "ETH", createdDate: "2023.07.09", network: "Ethereum" })}
-                {AccountDisplayElement({ amount: "100", currency: "ETH", createdDate: "2023.07.09", network: "Ethereum" })}
-                {AccountDisplayElement({ amount: "100", currency: "ETH", createdDate: "2023.07.09", network: "Ethereum" })}
-                {AccountDisplayElement({ amount: "100", currency: "ETH", createdDate: "2023.07.09", network: "Ethereum" })}
-                {AccountDisplayElement({ amount: "100", currency: "ETH", createdDate: "2023.07.09", network: "Ethereum" })}
-                {AccountDisplayElement({ amount: "100", currency: "ETH", createdDate: "2023.07.09", network: "Ethereum" })}
-                {AccountDisplayElement({ amount: "100", currency: "ETH", createdDate: "2023.07.09", network: "Ethereum" })}
+                {props.data.accountsData.map((data: any) => AccountDisplayElement(
+                    {
+                        amount: data.balance,
+                        currency: data.currency,
+                        createdDate: data.created_at,
+                        networkName: networkNameFromId[data.network_id as ChainIds],
+                        networkId: data.network_id,
+                        commitment: data.commitment,
+                        name: data.name
+                    }))}
             </section>
 
             <div class="flex items-center justify-between mt-6 px-4">
