@@ -1,7 +1,12 @@
 import { ethers } from "../../ethers.min.js";
-import { ChainIds, explorerUrl, networkNameFromId, rpcUrl, walletCurrency } from "../shared/web3.ts";
+import {
+  ChainIds,
+  explorerUrl,
+  networkNameFromId,
+  rpcUrl,
+  walletCurrency,
+} from "../shared/web3.ts";
 import { SolidityProof } from "./directdebitlib.ts";
-
 
 export function isEthereumUndefined() {
   //@ts-ignore This runs in the browser only. Checking if the browser has window.ethereum
@@ -170,7 +175,12 @@ export async function depositToken(
   token: string,
   encryptedNote: string,
 ) {
-  return await contract.depositToken(commitment, balance, token, encryptedNote);
+  return await contract.depositToken(
+    commitment,
+    ethers.parseEther(balance),
+    token,
+    encryptedNote,
+  );
 }
 
 export async function topUpETH(
