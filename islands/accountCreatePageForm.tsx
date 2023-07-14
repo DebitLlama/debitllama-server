@@ -141,7 +141,11 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
         if (depositTx !== undefined) {
             await depositTx.wait().then((receipt: any) => {
                 if (receipt.status === 1) {
-                    redirectToAccountPage(chainId, virtualaccount.commitment, name);
+                    redirectToAccountPage(
+                        chainId,
+                        virtualaccount.commitment,
+                        name,
+                        selectedCurrency.name);
                 }
             })
         }
@@ -218,7 +222,11 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
             if (tx !== undefined) {
                 await tx.wait().then((receipt: any) => {
                     if (receipt.status === 1) {
-                        redirectToAccountPage(chainId, virtualaccount.commitment, name);
+                        redirectToAccountPage(
+                            chainId,
+                            virtualaccount.commitment,
+                            name,
+                            selectedCurrency.name);
                     }
                 })
             }
