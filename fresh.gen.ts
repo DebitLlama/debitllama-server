@@ -2,49 +2,53 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $0 from "./routes/_middleware.ts";
-import * as $1 from "./routes/app/_middleware.ts";
-import * as $2 from "./routes/app/account.tsx";
-import * as $3 from "./routes/app/accounts.tsx";
-import * as $4 from "./routes/app/addNewAccount.tsx";
-import * as $5 from "./routes/app/debit.tsx";
-import * as $6 from "./routes/app/feedback.tsx";
-import * as $7 from "./routes/app/paymentIntents.ts";
-import * as $8 from "./routes/app/profile.tsx";
-import * as $9 from "./routes/app/secret.tsx";
-import * as $10 from "./routes/app/virtualaccount.tsx";
-import * as $11 from "./routes/buy-button.tsx";
-import * as $12 from "./routes/index.tsx";
-import * as $13 from "./routes/logout.tsx";
-import * as $14 from "./routes/signup.tsx";
-import * as $$0 from "./islands/CurrencySelectDropdown.tsx";
-import * as $$1 from "./islands/WalletAddressSelector.tsx";
-import * as $$2 from "./islands/accountCreatePageForm.tsx";
-import * as $$3 from "./islands/accountPasswordInput.tsx";
+import * as $0 from "./routes/_500.tsx";
+import * as $1 from "./routes/_middleware.ts";
+import * as $2 from "./routes/app/_middleware.ts";
+import * as $3 from "./routes/app/account.tsx";
+import * as $4 from "./routes/app/accounts.tsx";
+import * as $5 from "./routes/app/addNewAccount.tsx";
+import * as $6 from "./routes/app/debit.tsx";
+import * as $7 from "./routes/app/feedback.tsx";
+import * as $8 from "./routes/app/paymentIntents.ts";
+import * as $9 from "./routes/app/profile.tsx";
+import * as $10 from "./routes/app/secret.tsx";
+import * as $11 from "./routes/app/virtualaccount.tsx";
+import * as $12 from "./routes/buy-button.tsx";
+import * as $13 from "./routes/index.tsx";
+import * as $14 from "./routes/logout.tsx";
+import * as $15 from "./routes/signup.tsx";
+import * as $$0 from "./islands/AccountTopupOrClose.tsx";
+import * as $$1 from "./islands/CurrencySelectDropdown.tsx";
+import * as $$2 from "./islands/WalletAddressSelector.tsx";
+import * as $$3 from "./islands/accountCreatePageForm.tsx";
+import * as $$4 from "./islands/accountPasswordInput.tsx";
 
 const manifest = {
   routes: {
-    "./routes/_middleware.ts": $0,
-    "./routes/app/_middleware.ts": $1,
-    "./routes/app/account.tsx": $2,
-    "./routes/app/accounts.tsx": $3,
-    "./routes/app/addNewAccount.tsx": $4,
-    "./routes/app/debit.tsx": $5,
-    "./routes/app/feedback.tsx": $6,
-    "./routes/app/paymentIntents.ts": $7,
-    "./routes/app/profile.tsx": $8,
-    "./routes/app/secret.tsx": $9,
-    "./routes/app/virtualaccount.tsx": $10,
-    "./routes/buy-button.tsx": $11,
-    "./routes/index.tsx": $12,
-    "./routes/logout.tsx": $13,
-    "./routes/signup.tsx": $14,
+    "./routes/_500.tsx": $0,
+    "./routes/_middleware.ts": $1,
+    "./routes/app/_middleware.ts": $2,
+    "./routes/app/account.tsx": $3,
+    "./routes/app/accounts.tsx": $4,
+    "./routes/app/addNewAccount.tsx": $5,
+    "./routes/app/debit.tsx": $6,
+    "./routes/app/feedback.tsx": $7,
+    "./routes/app/paymentIntents.ts": $8,
+    "./routes/app/profile.tsx": $9,
+    "./routes/app/secret.tsx": $10,
+    "./routes/app/virtualaccount.tsx": $11,
+    "./routes/buy-button.tsx": $12,
+    "./routes/index.tsx": $13,
+    "./routes/logout.tsx": $14,
+    "./routes/signup.tsx": $15,
   },
   islands: {
-    "./islands/CurrencySelectDropdown.tsx": $$0,
-    "./islands/WalletAddressSelector.tsx": $$1,
-    "./islands/accountCreatePageForm.tsx": $$2,
-    "./islands/accountPasswordInput.tsx": $$3,
+    "./islands/AccountTopupOrClose.tsx": $$0,
+    "./islands/CurrencySelectDropdown.tsx": $$1,
+    "./islands/WalletAddressSelector.tsx": $$2,
+    "./islands/accountCreatePageForm.tsx": $$3,
+    "./islands/accountPasswordInput.tsx": $$4,
   },
   baseUrl: import.meta.url,
 };
