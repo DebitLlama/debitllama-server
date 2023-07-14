@@ -29,15 +29,6 @@ export const handler: Handlers<any, State> = {
             redirect = `/?error=${error.message}`
         }
 
-        // Check if the user already added Profile Data
-        // If they did then redirect to accounts else profile
-        const { data: profileData, error: profileError } = await ctx.state.supabaseClient.from("Profiles").select().eq("userid", data.user.id);
-
-        if (profileData.length === 0) {
-            redirect = "/app/profile"
-        }
-
-
         headers.set("location", redirect);
         return new Response(null, {
             status: 303,
