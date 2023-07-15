@@ -1,12 +1,30 @@
 import { ethers } from "../../ethers.min.js";
 import {
   ChainIds,
+  DonauTestnetTokens,
   explorerUrl,
   networkNameFromId,
   rpcUrl,
   walletCurrency,
 } from "../shared/web3.ts";
 import { SolidityProof } from "./directdebitlib.ts";
+
+export type SelectableCurrency = {
+  name: string;
+  native: boolean;
+  contractAddress: string;
+};
+
+export const ethereumCurrencies = [
+  { name: "ETH", native: true, contractAddress: "" },
+  { name: "USDC", native: false, contractAddress: "" },
+];
+
+export const bittorrentCurrencies = [{
+  name: "BTT",
+  native: true,
+  contractAddress: "",
+}, { name: "USDTM", native: false, contractAddress: DonauTestnetTokens.USDTM }];
 
 export function isEthereumUndefined() {
   //@ts-ignore This runs in the browser only. Checking if the browser has window.ethereum
