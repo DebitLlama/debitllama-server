@@ -6,7 +6,7 @@ export default function Nav({ loggedIn }: NavProps) {
 
     const loggedInMenus = [
         { name: "Accounts", href: "/app/accounts" },
-        { name: "Debit", href: "/app/debit" },
+        { name: "Debit", href: "/app/debitItems" },
         { name: "Profile", href: "/app/profile" },
         { name: "Logout", href: "/logout" },
     ];
