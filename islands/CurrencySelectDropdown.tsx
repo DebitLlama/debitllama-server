@@ -1,6 +1,5 @@
 
-import { useEffect, useState } from 'preact/hooks';
-import { SelectableCurrency } from './accountCreatePageForm.tsx';
+import { SelectableCurrency } from "../lib/frontend/web3.ts";
 
 
 interface CurrencySelectDropdownProps {
