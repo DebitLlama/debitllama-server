@@ -2,7 +2,7 @@ import { useState } from 'preact/hooks';
 
 import CurrencySelectDropdown from "./CurrencySelectDropdown.tsx";
 import AccountPasswordInput from "./accountPasswordInput.tsx";
-import { approveSpend, depositEth, depositToken, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts } from "../lib/frontend/web3.ts";
+import { SelectableCurrency, approveSpend, bittorrentCurrencies, depositEth, depositToken, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts } from "../lib/frontend/web3.ts";
 import { decodeAccountSecrets, ethEncryptData, newAccountSecrets, packEncryptedMessage, toNoteHex } from '../lib/frontend/directdebitlib.ts';
 import { aesEncryptData } from '../lib/frontend/encryption.ts';
 import { redirectToAccountPage } from '../lib/frontend/fetch.ts';
@@ -16,16 +16,6 @@ const strength = [
     "Strong ☻"
 ]
 
-export type SelectableCurrency =
-    { name: string, native: boolean, contractAddress: string }
-
-
-const ethereumCurrencies = [
-    { name: "ETH", native: true, contractAddress: "" },
-    { name: "USDC", native: false, contractAddress: "" }
-]
-
-const bittorrentCurrencies = [{ name: "BTT", native: true, contractAddress: "" }, { name: "USDTM", native: false, contractAddress: DonauTestnetTokens.USDTM }]
 
 interface AccountCreatePageFormProps {
     ethEncryptPublicKey: string,
