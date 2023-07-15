@@ -13,7 +13,7 @@ export const handler: Handlers<any, State> = {
         const userid = ctx.state.userid;
         const { data: profileData, error: profileError } = await ctx.state.supabaseClient.from("Profiles").select().eq("userid", userid);
 
-        if (profileData[0] === undefined) {
+        if (profileData === null || profileData.length === 0) {
             headers.set("location", "/app/profile");
             return new Response(null, { status: 303, headers })
         } else {

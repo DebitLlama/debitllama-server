@@ -65,7 +65,7 @@ export const handler: Handlers<any, State> = {
     // Get the data and use it to populate the fields!
     const { data: profileData, error: profileError } = await ctx.state.supabaseClient.from("Profiles").select().eq("userid", userid);
 
-    if (profileData[0] === undefined) {
+    if (profileData === null || profileData.length === 0) {
       return ctx.render(
         {
           ...ctx.state,
