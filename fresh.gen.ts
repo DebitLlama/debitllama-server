@@ -17,15 +17,17 @@ import * as $11 from "./routes/app/profile.tsx";
 import * as $12 from "./routes/app/secret.tsx";
 import * as $13 from "./routes/app/virtualaccount.tsx";
 import * as $14 from "./routes/buy-button.tsx";
-import * as $15 from "./routes/index.tsx";
-import * as $16 from "./routes/logout.tsx";
-import * as $17 from "./routes/signup.tsx";
+import * as $15 from "./routes/buyitnow.tsx";
+import * as $16 from "./routes/index.tsx";
+import * as $17 from "./routes/logout.tsx";
+import * as $18 from "./routes/signup.tsx";
 import * as $$0 from "./islands/AccountTopupOrClose.tsx";
 import * as $$1 from "./islands/CurrencySelectDropdown.tsx";
 import * as $$2 from "./islands/WalletAddressSelector.tsx";
 import * as $$3 from "./islands/accountCreatePageForm.tsx";
 import * as $$4 from "./islands/accountPasswordInput.tsx";
 import * as $$5 from "./islands/addNewDebitItemPageForm.tsx";
+import * as $$6 from "./islands/copyButton.tsx";
 
 const manifest = {
   routes: {
@@ -44,9 +46,10 @@ const manifest = {
     "./routes/app/secret.tsx": $12,
     "./routes/app/virtualaccount.tsx": $13,
     "./routes/buy-button.tsx": $14,
-    "./routes/index.tsx": $15,
-    "./routes/logout.tsx": $16,
-    "./routes/signup.tsx": $17,
+    "./routes/buyitnow.tsx": $15,
+    "./routes/index.tsx": $16,
+    "./routes/logout.tsx": $17,
+    "./routes/signup.tsx": $18,
   },
   islands: {
     "./islands/AccountTopupOrClose.tsx": $$0,
@@ -55,6 +58,7 @@ const manifest = {
     "./islands/accountCreatePageForm.tsx": $$3,
     "./islands/accountPasswordInput.tsx": $$4,
     "./islands/addNewDebitItemPageForm.tsx": $$5,
+    "./islands/copyButton.tsx": $$6,
   },
   baseUrl: import.meta.url,
 };
