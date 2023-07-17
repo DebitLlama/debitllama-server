@@ -1,6 +1,7 @@
 import Layout from "../../components/Layout.tsx";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
+import CopyButton from "../../islands/copyButton.tsx";
 
 export const handler: Handlers<any, State> = {
     async GET(req: any, ctx: any) {
@@ -14,16 +15,13 @@ export const handler: Handlers<any, State> = {
     }
 }
 
-// TODO: buy button link
 
 // TODO: Show the payment intents related to this item!
-//TODO: redo the columns withdths so they look even
-//TODO: render a copyable code to link to the buy button!!
-// Add a copy button for the code snippet!
-//Go to buy page should show the buy button!
 export default function item(props: PageProps) {
     const itemData = props.data.itemData[0];
-    console.log(itemData)
+
+    const embeddedCode = `<a href="https://app.debitllama.com/buyitnow/?q=${itemData.button_id}"><img width="140px" src={"https://app.debitllama.com/buyitnow.png"}/></a>`
+
     return <Layout isLoggedIn={props.data.token}>
         <div class="container mx-auto py-8">
             {!props.data.notfound ?
@@ -89,8 +87,14 @@ export default function item(props: PageProps) {
                             </div>
 
                             <div class="flex flex-col">
-                                <a class="cursor-pointer w-full text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">
-                                    Go to Buy page</a>
+                                <small class={"mx-auto"}>Navigate to the checkout page:</small>
+                                <a href={`/buyitnow/?q=${itemData.button_id}`} class={"cursor-pointer mx-auto"}>
+                                    <img
+                                        width="140px"
+
+                                        src={"/buyitnow.png"}
+                                    />
+                                </a>
                             </div>
 
 
@@ -99,47 +103,19 @@ export default function item(props: PageProps) {
                     <hr
                         class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
                     <div>
-                        Embedd the buy Button on your Website
+                        Embedd the buy Button on your Website <CopyButton str={embeddedCode}></CopyButton>
                     </div>
-                    <div class="mx-5 lg:w-6/12 bg-gray-800 shadow-2xl rounded-lg overflow-hidden">
+                    <div class="overflow-scroll mx-5 lg:w-6/12 bg-gray-800 shadow-2xl rounded-lg overflow-hidden">
                         <div id="header-buttons" class="py-3 px-4 flex">
                             <div class="rounded-full w-3 h-3 bg-red-500 mr-2"></div>
                             <div class="rounded-full w-3 h-3 bg-yellow-500 mr-2"></div>
                             <div class="rounded-full w-3 h-3 bg-green-500"></div>
                         </div>
 
-                        <div id="code-area" class="py-4 px-4 mt-1 text-white text-xl">
-                            <div class="mb-2">
-                                <span class="text-yellow-300">const</span> <span class="text-blue-400">pluckDeep</span> <span class="text-green-400">=</span> <span class="text-blue-400">key</span> <span class="text-green-400">=&gt;</span> <span class="text-blue-400">obj</span> <span class="text-green-400">=&gt;</span> <span class="text-purple-600">key</span>.<span class="text-purple-600">split</span>(<span class="text-blue-400">'.'</span>).<span class="text-purple-600">reduce</span>((<span class="text-blue-400">accum</span>, <span class="text-blue-400">key</span>) <span class="text-green-400">=&gt;</span> <span class="text-purple-600">accum</span>[<span class="text-purple-600">key</span>], <span class="text-purple-600">obj</span>)
-                            </div>
-
-                            <div class="mb-2">
-                                <span class="text-yellow-300">const</span> <span class="text-blue-400">compose</span> <span class="text-green-400">=</span> (<span class="cm-meta">...</span><span class="text-blue-400">fns</span>) <span class="text-green-400">=&gt;</span> <span class="text-blue-400">res</span> <span class="text-green-400">=&gt;</span> <span class="text-purple-600">fns</span>.<span class="text-purple-600">reduce</span>((<span class="text-blue-400">accum</span>, <span class="text-blue-400">next</span>) <span class="text-green-400">=&gt;</span> <span class="text-purple-600">next</span>(<span class="text-purple-600">accum</span>), <span class="text-purple-600">res</span>)
-                            </div>
-
-                            <div class="mb-2">
-                                <div class="sub-line">
-                                    <span class="text-yellow-300">const</span> <span class="text-blue-400">unfold</span> <span class="text-green-400">=</span> (<span class="text-blue-400">f</span>, <span class="text-blue-400">seed</span>) <span class="text-green-400">=&gt;</span>
-                                </div>
-                                <div class="sub-line ml-8">
-                                    <span class="text-yellow-300">const</span> <span class="text-blue-400">go</span> <span class="text-green-400">=</span> (<span class="text-blue-400">f</span>, <span class="text-blue-400">seed</span>, <span class="text-blue-400">acc</span>) <span class="text-green-400">=&gt;</span>
-                                </div>
-                                <div class="sub-line ml-16">
-                                    <span class="text-yellow-300">const</span> <span class="text-blue-400">res</span> <span class="text-green-400">=</span> <span class="text-purple-600">f</span>(<span class="text-purple-600">seed</span>)
-                                </div>
-                                <div class="sub-line ml-16">
-                                    <span class="text-yellow-300">return</span> <span class="text-purple-600">res</span> <span class="text-green-400">?</span> <span class="text-purple-600">go</span>(<span class="text-purple-600">f</span>, <span class="text-purple-600">res</span>[<span class="text-red-600">1</span>], <span class="text-purple-600">acc</span>.<span class="text-purple-600">concat</span>([<span class="text-purple-600">res</span>[<span class="text-red-600">0</span>]])) : <span class="text-purple-600">acc</span>
-                                </div>
-                                <div class="sub-line ml-8">
-
-                                </div>
-                                <div class="sub-line ml-8">
-                                    <span class="text-yellow-300">return</span> <span class="text-purple-600">go</span>(<span class="text-purple-600">f</span>, <span class="text-purple-600">seed</span>, [])
-                                </div>
-                                <div class="sub-line">
-
-                                </div>
-                            </div>
+                        <div class="py-4 px-4 mt-1 text-white">
+                            <pre class="text-sm">
+                                {embeddedCode}
+                            </pre>
                         </div>
                     </div>
                 </div>
