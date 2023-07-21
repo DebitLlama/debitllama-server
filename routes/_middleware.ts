@@ -33,6 +33,7 @@ export async function handler(
     ctx.state.token = null;
   } else {
     ctx.state.token = supaCreds;
+    //@ts-ignore user is not null
     ctx.state.userid = user.id;
   }
 
