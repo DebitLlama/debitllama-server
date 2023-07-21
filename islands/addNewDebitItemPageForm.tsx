@@ -6,7 +6,7 @@ import CurrencySelectDropdown from './CurrencySelectDropdown.tsx';
 
 export const debitTypes = ["Singe-Time", "Subscription"]
 
-export const debitAmount = ["Fixed", "Dynamic"]
+export const debitPricing = ["Fixed", "Dynamic"]
 
 interface AddNewDebitItemFormProps {
     creatorAddress: string
@@ -55,7 +55,7 @@ export default function AddNewDebitItemPageForm(props: AddNewDebitItemFormProps)
             <label class="block text-gray-700 text-sm font-bold mb-2" for="pricing">Pricing</label>
 
             <select name="pricing" class="w-full h-9 rounded-lg">
-                {debitAmount.map((t) => <option value={t}>{t}</option>)}
+                {debitPricing.map((t) => <option value={t}>{t}</option>)}
             </select>
         </div>
 
