@@ -8,7 +8,7 @@ import { aesEncryptData } from '../lib/frontend/encryption.ts';
 import { redirectToAccountPage } from '../lib/frontend/fetch.ts';
 import { ChainIds, DonauTestnetTokens, NetworkNames, availableNetworks, chainIdFromNetworkName, getDirectDebitContractAddress } from "../lib/shared/web3.ts";
 
-const strength = [
+export const strength = [
     "Worst ☹",
     "Bad ☹",
     "Weak ☹",
