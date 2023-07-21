@@ -96,16 +96,26 @@ export default function item(props: PageProps) {
                                     />
                                 </a>
                             </div>
+                            <div class="mb-4 mt-4">
+                                <div class="flex flex-row justify-center w-full">
+                                    <p class="text-sm">Identifier: </p>
+                                </div>
+                                <div class="flex flex-row justify-center w-full">
+                                    <p class="text-xs mt-1"> {itemData.button_id} </p>
+                                    <CopyButton str={itemData.button_id}></CopyButton>
+                                </div>
+                            </div>
 
 
                         </div>
                     </div>
                     <hr
                         class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
-                    <div>
-                        Embedd the buy Button on your Website <CopyButton str={embeddedCode}></CopyButton>
+                    <div class="flex flex-row justify-center w-full">
+                        <p class="text-xs mt-1">Embedd the buy Button on your Website </p>
+                        <CopyButton str={embeddedCode}></CopyButton>
                     </div>
-                    <div class="overflow-scroll mx-5 lg:w-6/12 bg-gray-800 shadow-2xl rounded-lg overflow-hidden">
+                    <div class="overflow-scroll w-80 mx-5 bg-gray-800 shadow-2xl rounded-lg overflow-hidden">
                         <div id="header-buttons" class="py-3 px-4 flex">
                             <div class="rounded-full w-3 h-3 bg-red-500 mr-2"></div>
                             <div class="rounded-full w-3 h-3 bg-yellow-500 mr-2"></div>
@@ -120,7 +130,7 @@ export default function item(props: PageProps) {
                     </div>
                 </div>
                 : <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
-                    <h1 class="text-2xl font-bold mb-6 text-center">Account Not Found</h1>
+                    <h1 class="text-2xl font-bold mb-6 text-center">Not Found</h1>
                 </div>}
         </div>
     </Layout>
