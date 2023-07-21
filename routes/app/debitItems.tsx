@@ -20,7 +20,7 @@ function DebitItemRows(props: DebitItemsDataProps) {
 
     if (props.data.length === 0 || props.data === null) {
         return <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
-            <h1 class="text-2xl font-bold mb-6 text-center">Account Not Found</h1>
+            <h1 class="text-2xl font-bold mb-6 text-center">Create your first item</h1>
         </div>
     } else {
         console.log(props.data);
