@@ -1,8 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 
-// NEEDS TO DISPLAY MESSAGE TO SHOW IF PASSWORD IS STRONG OR WEAK OR IF THEY MATCH
 
-interface AccountPasswordInputProps {
+export interface AccountPasswordInputProps {
     password: string,
     setPassword: (to: string) => void;
     passwordAgain: string;
