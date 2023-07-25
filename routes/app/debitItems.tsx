@@ -1,6 +1,7 @@
 import Layout from "../../components/Layout.tsx";
 import { State } from "../_middleware.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
+import { ChainIds, networkNameFromId } from "../../lib/shared/web3.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(_req, ctx) {
@@ -19,11 +20,8 @@ interface DebitItemsDataProps {
 function DebitItemRows(props: DebitItemsDataProps) {
 
     if (props.data.length === 0 || props.data === null) {
-        return <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
-            <h1 class="text-2xl font-bold mb-6 text-center">Create your first item</h1>
-        </div>
+        return <div></div>
     } else {
-        console.log(props.data);
         return props.data.map((d: any) => <div class="flex flex-col">
             <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
@@ -37,11 +35,6 @@ function DebitItemRows(props: DebitItemsDataProps) {
 
                                     <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
                                         Network
-                                    </th>
-
-
-                                    <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                        Type
                                     </th>
                                     <th scope="col" class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
                                         Pricing
@@ -71,7 +64,6 @@ function DebitItemRows(props: DebitItemsDataProps) {
                                     currency={JSON.parse(d.currency).name}
                                     maxDebitAmount={d.max_price}
                                     network={d.network}
-                                    type={d.debitType}
                                     pricing={d.pricing}
                                     name={d.name}
                                     button_id={d.button_id}
@@ -107,11 +99,11 @@ interface DebitItemTableRowProps {
     debitInterval: string,
     debitTimes: string,
     pricing: string,
-    type: string,
     button_id: string
 }
 
 function DebitItemTableRow(props: DebitItemTableRowProps) {
+    const network = networkNameFromId[props.network as ChainIds];
     return <tr>
 
         <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
@@ -124,14 +116,7 @@ function DebitItemTableRow(props: DebitItemTableRowProps) {
         <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
             <div class="flex items-center gap-x-2">
                 <div>
-                    <p class="text-xs font-normal text-gray-600 dark:text-gray-400">{props.network}</p>
-                </div>
-            </div>
-        </td>
-        <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
-            <div class="flex items-center gap-x-2">
-                <div>
-                    <p class="text-xs font-normal text-gray-600 dark:text-gray-400">{props.type}</p>
+                    <p class="text-xs font-normal text-gray-600 dark:text-gray-400">{network}</p>
                 </div>
             </div>
         </td>
