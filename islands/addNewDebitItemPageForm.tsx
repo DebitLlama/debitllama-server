@@ -4,7 +4,6 @@ import { SelectableCurrency, bittorrentCurrencies } from "../lib/frontend/web3.t
 import CurrencySelectDropdown from './CurrencySelectDropdown.tsx';
 
 
-export const debitTypes = ["Singe-Time", "Subscription"]
 
 export const debitPricing = ["Fixed", "Dynamic"]
 
@@ -46,12 +45,6 @@ export default function AddNewDebitItemPageForm(props: AddNewDebitItemFormProps)
         ></CurrencySelectDropdown>
 
         <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="debitType">Payment Type</label>
-
-            <select name="debitType" class="w-full h-9 rounded-lg">
-                {debitTypes.map((t) => <option value={t}>{t}</option>)}
-            </select>
-
             <label class="block text-gray-700 text-sm font-bold mb-2" for="pricing">Pricing</label>
 
             <select name="pricing" class="w-full h-9 rounded-lg">
