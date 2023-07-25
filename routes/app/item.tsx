@@ -17,6 +17,7 @@ export const handler: Handlers<any, State> = {
 
 
 // TODO: Show the payment intents related to this item!
+// TODO: Item Delete button!
 export default function item(props: PageProps) {
     const itemData = props.data.itemData[0];
 
@@ -73,12 +74,6 @@ export default function item(props: PageProps) {
                                     <p class="text-center text-xs text-gray-700">Pricing</p>
                                     <p class="text-center">{itemData.pricing}</p>
                                 </div>
-
-                                <div class="flex flex-col w-1/3">
-                                    <p class="text-center text-xs text-gray-700">Type</p>
-                                    <p class="text-center">{itemData.debitType}</p>
-                                </div>
-
                             </div>
 
                             <div class="flex flex-col mb-6">
