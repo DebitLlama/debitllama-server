@@ -4,6 +4,10 @@ import { useState } from 'preact/hooks';
 import AccountPasswordInput, { AccountPasswordInputProps } from "./accountPasswordInput.tsx";
 import { strength } from "./accountCreatePageForm.tsx";
 import BuyPageProfile, { ProfileProps } from "../components/BuyPageProfile.tsx";
+import { approveSpend, depositEth, depositToken, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts, topUpETH, topUpTokens } from "../lib/frontend/web3.ts";
+import { ChainIds, getDirectDebitContractAddress } from "../lib/shared/web3.ts";
+import { requestBalanceRefresh, uploadProfileData } from "../lib/frontend/fetch.ts";
+import { setUpAccount } from "../lib/frontend/directdebitlib.ts";
 
 export interface Currency {
     name: string,
@@ -22,7 +26,6 @@ export interface ItemProps {
     pricing: string,
     network: string,
     name: string,
-    debitType: string
 }
 
 export interface BuyButtonPageProps {
@@ -31,6 +34,7 @@ export interface BuyButtonPageProps {
     url: URL,
     accounts: any,
     profileExists: boolean
+    ethEncryptPublicKey: string
 }
 
 
@@ -45,6 +49,7 @@ export interface RenderPurchaseDetails {
 }
 
 export interface LoggedInUiProps {
+    item: ItemProps
     accounts: any;
     selectedAccount: number;
     setSelectedAccount: (to: number) => void;
@@ -54,6 +59,7 @@ export interface LoggedInUiProps {
 
     newAccountPasswordProps: AccountPasswordInputProps,
     setNewAccountPasswordStrengthNotification: (to: string) => void;
+    newAccountPasswordScore: number;
     setNewAccountPasswordScore: (to: number) => void;
     setNewAccountPasswordMatchError: (to: string) => void;
     profileExists: boolean
@@ -62,24 +68,303 @@ export interface LoggedInUiProps {
     // used for the selected account!
     selectedAccountPassword: string
     setSelectedAccountPassword: (to: string) => void
+
+    // used for topping up the account
+    topupAmount: number,
+    setTopupAmount: (to: number) => void;
+    ethEncryptPublicKey: string
 }
 
 
 
 export interface ButtonsBasedOnSelectionProps {
+    item: ItemProps
     selected: number,
     accounts: any,
     paymentAmount: string,
     newAccountPasswordProps: AccountPasswordInputProps,
     setNewAccountPasswordStrengthNotification: (to: string) => void;
+    newAccountPasswordScore: number,
     setNewAccountPasswordScore: (to: number) => void;
     setNewAccountPasswordMatchError: (to: string) => void;
     profileExists: boolean
     profile: ProfileProps
+    topupAmount: number,
+    setTopupAmount: (to: number) => void;
+    ethEncryptPublicKey: string
+
 }
 
-async function onCreateAccountSubmit() {
+async function createPaymentIntent() { }
 
+interface TopupBalanceArgs {
+    topupAmount: number,
+    commitment: string,
+    chainId: string,
+    handleError: (msg: string) => void;
+    currency: Currency;
+}
+
+async function handleEthTopup(
+    contract: any,
+    commitment: string,
+    amount: string,
+    chainId: string,
+    handleError: CallableFunction) {
+
+    const topuptx = await topUpETH(
+        contract,
+        commitment,
+        amount
+    )
+    if (topuptx !== undefined) {
+        await topuptx.wait().then(async (receipt: any) => {
+            if (receipt.status === 1) {
+                const res = await requestBalanceRefresh(commitment, chainId);
+                if (res !== 200) {
+                    handleError("An error occured saving the balance!");
+                } else {
+                    location.reload();
+                }
+            }
+        })
+    }
+}
+
+async function handleTokenTopup(
+    contract: any,
+    commitment: string,
+    amount: string,
+    chainId: string,
+    handleError: CallableFunction
+) {
+    const topuptx = await topUpTokens(
+        contract,
+        commitment,
+        amount
+    );
+
+    if (topuptx !== undefined) {
+        await topuptx.wait().then(async (receipt: any) => {
+            if (receipt.status === 1) {
+                const res = await requestBalanceRefresh(commitment, chainId);
+                if (res !== 200) {
+                    handleError("An error occured saving the balance!");
+                } else {
+                    location.reload();
+                }
+            }
+        })
+    }
+}
+
+
+function topupbalance(args: TopupBalanceArgs) {
+    const debitContractAddress = getDirectDebitContractAddress[args.chainId as ChainIds];
+    return async () => {
+
+        // I need to connect the wallet do the onboarding and then do the transaction if all the conditions are met!
+        const provider = await handleNetworkSelect(args.chainId, args.handleError)
+        if (!provider) {
+            return;
+        }
+        const address = await requestAccounts();
+
+        if (args.currency.native) {
+            const contract = await getContract(
+                provider,
+                debitContractAddress,
+                "/DirectDebit.json");
+
+            await handleEthTopup(
+                contract,
+                args.commitment,
+                args.topupAmount.toString(),
+                args.chainId,
+                args.handleError
+            )
+        } else {
+            const erc20Contract = await getContract(
+                provider,
+                args.currency.contractAddress,
+                "/ERC20.json");
+
+            const allowance: bigint = await getAllowance(erc20Contract, address, debitContractAddress);
+            const contract = await getContract(
+                provider,
+                debitContractAddress,
+                "/DirectDebit.json");
+
+            if (allowance >= parseEther(args.topupAmount.toString())) {
+                // Just do the top up
+                await handleTokenTopup(
+                    contract,
+                    args.commitment,
+                    args.topupAmount.toString(),
+                    args.chainId,
+                    args.handleError
+                );
+            } else {
+                // Add allowance and then deposit
+                const approveTx = await approveSpend(
+                    args.currency.contractAddress,
+                    debitContractAddress,
+                    args.topupAmount.toString()
+                )
+
+                if (approveTx !== undefined) {
+                    await approveTx.wait().then(async (receipt: any) => {
+                        if (receipt.status === 1) {
+                            await handleTokenTopup(
+                                contract,
+                                args.commitment,
+                                args.topupAmount.toString(),
+                                args.chainId,
+                                args.handleError);
+                        }
+                    })
+                }
+            }
+
+        }
+    }
+}
+
+interface onCreateAccountSubmitArgs {
+    chainId: string,
+    handleError: CallableFunction,
+    profileExists: boolean,
+    profile: ProfileProps,
+    selectedCurrency: Currency,
+    depositAmount: string,
+    passwordProps: AccountPasswordInputProps,
+    ethEncryptPublicKey: string,
+}
+
+async function handleTokenDeposit(
+    contractAddress: string,
+    virtualaccount: {
+        encryptedNote: any;
+        commitment: any;
+    },
+    erc20Contract: string,
+    chainId: string,
+    depositAmount: string
+) {
+    const depositTx = await depositToken(
+        contractAddress,
+        virtualaccount.commitment,
+        depositAmount,
+        erc20Contract,
+        virtualaccount.encryptedNote)
+
+    if (depositTx !== undefined) {
+        await depositTx.wait().then((receipt: any) => {
+            if (receipt.status === 1) {
+                //TODO: Upload the account data and refresh the page
+            }
+        })
+    }
+}
+
+
+function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
+    // I need to check if the wallet is connected and change the network
+    // I need the account ChainId, I really need to refactor to store the account chainId on the Debit Item now!!!
+    return async (e: any) => {
+        e.preventDefault();
+
+        //TODO: Check so password is strong!
+        //TODO: check so passwords match!
+
+        const provider = await handleNetworkSelect(args.chainId, args.handleError);
+
+        if (!provider) {
+            return;
+        }
+        const address = await requestAccounts();
+
+        if (!args.profileExists) {
+            const uploadProfileStatus = await uploadProfileData({
+                walletaddress: address,
+                firstname: args.profile.firstname,
+                lastname: args.profile.lastname,
+                addressline1: args.profile.addressLine1,
+                addressline2: args.profile.addressLine2,
+                city: args.profile.city,
+                postcode: args.profile.postcode,
+                country: args.profile.country
+            });
+
+            if (uploadProfileStatus !== 200) {
+                handleError("Unable to upload profile");
+                return;
+            }
+        }
+        const virtualaccount = await setUpAccount(args.passwordProps.password, args.ethEncryptPublicKey);
+        const debitContractAddress = getDirectDebitContractAddress[args.chainId as ChainIds];
+
+        if (!args.selectedCurrency?.native) {
+            //Approve spending, Then do the deposit
+
+            const erc20Contract = await getContract(
+                provider,
+                args.selectedCurrency.contractAddress,
+                "/ERC20.json");
+
+
+            const allowance: bigint = await getAllowance(erc20Contract, address, debitContractAddress);
+
+            // TODO: Need to disable the button and maybe show a popup so people don't navigate away!
+
+            if (allowance >= parseEther(args.depositAmount)) {
+                // Just deposit
+                await handleTokenDeposit(debitContractAddress, virtualaccount, erc20Contract, args.chainId, args.depositAmount)
+            } else {
+                // Add allowance and then deposit 
+                const approveTx = await approveSpend(
+                    erc20Contract,
+                    debitContractAddress,
+                    args.depositAmount);
+
+                if (approveTx !== undefined) {
+                    await approveTx.wait().then(async (receipt: any) => {
+                        if (receipt.status === 1) {
+                            await handleTokenDeposit(debitContractAddress, virtualaccount, erc20Contract, args.chainId, args.depositAmount)
+                        }
+                    })
+                }
+            }
+        } else {
+            // Do the deposit
+            const contract = await getContract(
+                provider,
+                debitContractAddress,
+                "/DirectDebit.json");
+
+            const tx = await depositEth(
+                contract,
+                virtualaccount.commitment,
+                args.depositAmount,
+                virtualaccount.encryptedNote
+            );
+
+            if (tx !== undefined) {
+                await tx.wait().then((receipt: any) => {
+                    if (receipt.status === 1) {
+                        //TODO: Save account data and refresh the page!
+
+                    }
+                })
+            }
+        }
+    }
+}
+
+//TODO: Do the handle error properly! Display an error in the DOM! maybe a snackbar?
+
+function handleError(msg: string) {
+    console.error(msg)
 }
 
 function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
@@ -117,13 +402,37 @@ function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
             props.setNewAccountPasswordMatchError("")
         }
     }
+    function isButtonDisabled(): boolean {
+        console.log("trigger isButtonDisabled")
+        if (props.newAccountPasswordScore < 3) {
+            return true;
+        }
+
+        if (props.newAccountPasswordProps.passwordAgain == "") {
+            return true;
+        }
+
+        if (props.newAccountPasswordProps.passwordMatchError !== "") {
+            return true;
+        }
+        return false;
+    }
+
 
     if (props.selected === 1) {
-        return <form class="mx-auto p-2" onSubmit={onCreateAccountSubmit}>
+        return <form class="mx-auto p-2" onSubmit={onCreateAccountSubmit({
+            chainId: props.item.network,
+            handleError,
+            profileExists: props.profileExists,
+            profile: props.profile,
+            passwordProps: props.newAccountPasswordProps,
+            selectedCurrency: props.item.currency,
+            depositAmount: props.paymentAmount,
+            ethEncryptPublicKey: props.ethEncryptPublicKey
+        })}>
             <BuyPageProfile
                 profileExists={props.profileExists}
                 profile={props.profile}></BuyPageProfile>
-
             <div class="bg-white  px-3 py-[0.25rem]">
                 <h4 class="text-xl text-center mb-2">Create New Account</h4>
                 <div class="mb-4">
@@ -132,7 +441,8 @@ function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
                         type="text" id="accountName" name="accountName" placeholder="" />
                 </div>
                 <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="amount">Deposit Amount</label>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="amount">Deposit Amount in ({props.item.currency.name})</label>
+                    {!props.item.currency.native ? <span class="text-sm text-gray-300">{props.item.currency.contractAddress}</span> : null}
                     <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
                         value={props.paymentAmount} type="number" id="amount" name="amount" placeholder="0" />
                 </div>
@@ -146,13 +456,12 @@ function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
                 ></AccountPasswordInput>
                 <div class="text-center">
                     <button
+                        disabled={isButtonDisabled()}
                         type="submit"
-                        class="text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
+                        class="mb-4 mt-2 bg-indigo-500 text-white text-sm font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
                     >Create account</button>
                 </div>
             </div>
-
-
         </form>
     }
 
@@ -161,9 +470,23 @@ function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
         const selectedAccount = props.accounts[accIndex];
 
         if (parseFloat(selectedAccount.balance) < parseFloat(props.paymentAmount)) {
+            const amountToTopUp = parseFloat(props.paymentAmount) - parseFloat(selectedAccount.balance);
+            const inputValue = props.topupAmount < amountToTopUp ? amountToTopUp : props.topupAmount;
             return <>
                 <div class="mx-auto mt-4 bt-4">
-                    <p class="text-xl text-slate-600">Not Enough Account Balance</p>
+                    <p class="text-xl text-slate-600">Top Up Balance</p>
+                    <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+                        value={inputValue} onChange={(event: any) => props.setTopupAmount(parseFloat(event.target.value))} type="number" id="amount" name="amount" placeholder="Amount" />
+                    <button
+                        onClick={topupbalance({
+                            topupAmount: inputValue,
+                            commitment: selectedAccount.commitment,
+                            chainId: props.item.network,
+                            handleError,
+                            currency: props.item.currency
+                        })}
+                        class="mb-4 mt-2 w-full bg-indigo-500 text-white text-sm font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
+                        type="submit">Top Up</button>
                 </div></>
         }
 
@@ -172,12 +495,11 @@ function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
                 <label for="password" class="block mb-2 text-sm font-medium">Account Password</label>
                 <input type="password" name="password" id="password" placeholder="••••••••" class="border border-gray-300 sm:text-sm rounded-lg focus:ring-indigo-600 focus:border-indigo-600 block w-full p-2.5 dark:focus:ring-indigo-500 dark:focus:border-indigo-500" />
             </div>
-            <button class="w-60 mb-4 mt-4 mx-auto text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">Pay</button>
+            <button onClick={createPaymentIntent} class="w-60 mb-4 mt-4 mx-auto text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">Pay</button>
         </>
     }
 
     return <div></div>
-
 
 }
 
@@ -215,6 +537,8 @@ function LoggedInUi(props: LoggedInUiProps) {
 
             </div>
             <UIBasedOnSelection
+                newAccountPasswordScore={props.newAccountPasswordScore}
+                item={props.item}
                 selected={props.selectedAccount}
                 accounts={props.accounts}
                 paymentAmount={props.paymentAmount}
@@ -224,10 +548,11 @@ function LoggedInUi(props: LoggedInUiProps) {
                 setNewAccountPasswordMatchError={props.setNewAccountPasswordMatchError}
                 profileExists={props.profileExists}
                 profile={props.profile}
+                topupAmount={props.topupAmount}
+                setTopupAmount={props.setTopupAmount}
+                ethEncryptPublicKey={props.ethEncryptPublicKey}
 
             ></UIBasedOnSelection>
-            {/* {UIBasedOnSelection(props.selectedAccount, props.accounts, props.paymentAmount)} */}
-
 
         </div>
     </div>
@@ -280,7 +605,12 @@ export default function BuyButtonPage(props: BuyButtonPageProps) {
     const [newAccountPasswordMatchError, setNewAccountPasswordMatchError] = useState("");
     const [newAccountPasswordScore, setNewAccountPasswordScore] = useState(0);
 
+    // Selected account password to pay 
     const [selectedAccountPassword, setSelectedAccountPassword] = useState("")
+
+    //Top up account state
+    const [topupAmount, setTopupAmount] = useState(0);
+
 
     // profile state
     const [firstname, setFirstName] = useState("");
@@ -291,10 +621,13 @@ export default function BuyButtonPage(props: BuyButtonPageProps) {
     const [postcode, setPostcode] = useState("");
     const [country, setCountry] = useState("");
 
+
+
     return <BuyPageLayout
         isLoggedIn={props.isLoggedIn}
         item={props.item}>
         {props.isLoggedIn ? <LoggedInUi
+            item={props.item}
             paymentAmount={props.item.maxPrice}
             selectedAccount={selectedAccount}
             setSelectedAccount={setSelectedAccount}
@@ -312,6 +645,7 @@ export default function BuyButtonPage(props: BuyButtonPageProps) {
             setNewAccountPasswordStrengthNotification={setNewAccountPasswordStrengthNotification}
             setNewAccountPasswordScore={setNewAccountPasswordScore}
             setNewAccountPasswordMatchError={setNewAccountPasswordMatchError}
+            newAccountPasswordScore={newAccountPasswordScore}
 
             selectedAccountPassword={selectedAccountPassword}
             setSelectedAccountPassword={setSelectedAccountPassword}
@@ -332,6 +666,9 @@ export default function BuyButtonPage(props: BuyButtonPageProps) {
                 setPostcode,
                 setCountry
             }}
+            topupAmount={topupAmount}
+            setTopupAmount={setTopupAmount}
+            ethEncryptPublicKey={props.ethEncryptPublicKey}
 
         ></LoggedInUi> : <LoggedOutUi buttonid={props.item.buttonId} url={props.url} ></LoggedOutUi>}
     </BuyPageLayout>
