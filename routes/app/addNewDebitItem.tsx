@@ -2,6 +2,7 @@ import Layout from "../../components/Layout.tsx";
 import { State } from "../_middleware.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import AddNewDebitItemPageForm from "../../islands/addNewDebitItemPageForm.tsx";
+import { NetworkNames, chainIdFromNetworkName } from "../../lib/shared/web3.ts";
 
 
 
@@ -36,12 +37,19 @@ export const handler: Handlers<any, State> = {
         const name = form.get("name") as string;
         const network = form.get("network") as string;
         const currency = form.get("currency") as string;
-        const debitType = form.get("debitType") as string;
         const pricing = form.get("pricing") as string;
         const maxAmount = form.get("maxamount") as string;
         const debitTimes = form.get("debitTimes") as string;
         const debitInterval = form.get("debitInterval") as string;
         const redirectto = form.get("redirectto") as string;
+
+
+        if (chainIdFromNetworkName[network as NetworkNames] === undefined) {
+            headers.set("location", "/app/profile");
+            return new Response(null, { status: 303, headers })
+        }
+        // TODO: More Input verification!!
+
 
         await ctx.state.supabaseClient.from("Items").insert({
             created_at: new Date().toISOString(),
@@ -53,9 +61,8 @@ export const handler: Handlers<any, State> = {
             debit_interval: debitInterval,
             redirect_url: redirectto,
             pricing,
-            network,
-            name,
-            debitType
+            network: chainIdFromNetworkName[network as NetworkNames],
+            name
         })
 
         headers.set("location", "/app/debitItems");
