@@ -34,16 +34,7 @@ export type ProfileData = {
   country: string;
   userid: string;
 };
-export async function saveProfileData(data: ProfileData) {
-  return await fetch("/app/buyItNowProfileSave", {
-    credentials: "same-origin",
-    method: "POST",
-    body: JSON.stringify(data),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  }).then((response) => response.status);
-}
+
 
 export async function requestBalanceRefresh(
   commitment: string,
