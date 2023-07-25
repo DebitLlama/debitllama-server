@@ -10,8 +10,7 @@ function doesProfileExists(profileData: any) {
     }
     return true;
 }
-
-//TODO: Add a logout also!
+const ethEncryptPublicKey = Deno.env.get("ETHENCRYPTPUBLICKEY") || "";
 
 export const handler: Handlers<any, State> = {
     async GET(req, ctx) {
@@ -26,19 +25,18 @@ export const handler: Handlers<any, State> = {
 
         // I need to fetch the accounts for this user and then display the ones on the same network and currency
 
-        const networkId = chainIdFromNetworkName[itemData[0].network as NetworkNames] as ChainIds
         const currency = JSON.parse(itemData[0].currency);
         const { data: accountData, error: accountError } = await ctx.state.supabaseClient
             .from("Accounts")
             .select()
             .eq("closed", false)
             .eq("user_id", ctx.state.userid)
-            .eq("network_id", networkId)
+            .eq("network_id", itemData[0].network)
             .eq("currency", currency.name)
-
         const { data: profileData, error: profileError } = await ctx.state.supabaseClient.from("Profiles").select().eq("userid", ctx.state.userid);
 
-        return ctx.render({ ...ctx.state, notfound: false, itemData, accountData, profileExists: doesProfileExists(profileData) })
+        return ctx.render({ ...ctx.state, notfound: false, itemData, accountData, profileExists: doesProfileExists(profileData), ethEncryptPublicKey })
+
     },
     async POST(req, ctx) {
         //THIS POST IS USED FOR LOGGING IN!
@@ -74,11 +72,8 @@ export const handler: Handlers<any, State> = {
 
 }
 
-export default function BuyItNow(props: PageProps) {
-    const notfound = props.data.notfound;
-    const item = props.data.itemData[0];
-
-    const itemProps: ItemProps = {
+function getItemProps(item: any): ItemProps {
+    return {
         payeeAddress: item.payee_address,
         currency: JSON.parse(item.currency),
         maxPrice: item.max_price,
@@ -89,16 +84,20 @@ export default function BuyItNow(props: PageProps) {
         pricing: item.pricing,
         network: item.network,
         name: item.name,
-        debitType: item.debitType
 
-    }
+    };
+}
+
+export default function BuyItNow(props: PageProps) {
+    const notfound = props.data.notfound;
+    const item = props.data.itemData[0];
     return <>
         {!notfound ? <BuyButtonPage
-
+            ethEncryptPublicKey={props.data.ethEncryptPublicKey}
             profileExists={props.data.profileExists}
             accounts={props.data.accountData}
             url={props.url}
-            item={itemProps}
+            item={getItemProps(item)}
             isLoggedIn={props.data.token}></BuyButtonPage> : <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
             <h1 class="text-2xl font-bold mb-6 text-center">Not Found</h1>
         </div>} </>

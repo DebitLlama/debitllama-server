@@ -7,7 +7,6 @@ import { ChainIds, getDirectDebitContractAddress, networkNameFromId, rpcUrl } fr
 import { getAccount } from "../../lib/backend/web3.ts";
 import { ZeroAddress, formatEther } from "../../ethers.min.js";
 import AccountTopupOrClose from "../../islands/AccountTopupOrClose.tsx";
-import { format } from "https://deno.land/std@0.190.0/path/win32.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(req: any, ctx: any) {
@@ -23,7 +22,6 @@ export const handler: Handlers<any, State> = {
             }
             const accountData = await getAccount(commitment, networkId);
             if (accountData.exists) {
-                // write a stored function for this select also!
                 const { data, error } = await ctx.state.supabaseClient.from("Accounts").select().eq("commitment", commitment);
 
                 if (data.length === 0) {
