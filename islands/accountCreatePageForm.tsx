@@ -3,10 +3,9 @@ import { useState } from 'preact/hooks';
 import CurrencySelectDropdown from "./CurrencySelectDropdown.tsx";
 import AccountPasswordInput from "./accountPasswordInput.tsx";
 import { SelectableCurrency, approveSpend, bittorrentCurrencies, depositEth, depositToken, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts } from "../lib/frontend/web3.ts";
-import { decodeAccountSecrets, ethEncryptData, newAccountSecrets, packEncryptedMessage, toNoteHex } from '../lib/frontend/directdebitlib.ts';
-import { aesEncryptData } from '../lib/frontend/encryption.ts';
+import { setUpAccount } from '../lib/frontend/directdebitlib.ts';
 import { redirectToAccountPage } from '../lib/frontend/fetch.ts';
-import { ChainIds, DonauTestnetTokens, NetworkNames, availableNetworks, chainIdFromNetworkName, getDirectDebitContractAddress } from "../lib/shared/web3.ts";
+import { ChainIds, NetworkNames, availableNetworks, chainIdFromNetworkName, getDirectDebitContractAddress } from "../lib/shared/web3.ts";
 
 export const strength = [
     "Worst ☹",
@@ -21,6 +20,7 @@ interface AccountCreatePageFormProps {
     ethEncryptPublicKey: string,
     walletaddress: string
 }
+
 
 export default function AccountCreatePageForm(props: AccountCreatePageFormProps) {
     const [name, setName] = useState("");
@@ -94,19 +94,6 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
         }
     }
 
-    async function setUpAccount() {
-        const note = newAccountSecrets();
-        const secrets = decodeAccountSecrets(note);
-        const commitment = toNoteHex(secrets.commitment);
-        //Password encrypt the note!
-        const passwdEncryptedNote = await aesEncryptData(note, password);
-        //Encrypt the note with a public key
-        const encryptedNote = await ethEncryptData(props.ethEncryptPublicKey, passwdEncryptedNote);
-
-        const packed = await packEncryptedMessage(encryptedNote);
-
-        return { encryptedNote: packed, commitment };
-    }
 
     function handleError(msg: string) {
         console.log(msg);
@@ -161,7 +148,8 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
             return
         }
 
-        const virtualaccount = await setUpAccount();
+        const virtualaccount = await setUpAccount(password, props.ethEncryptPublicKey);
+
         const contractAddress = getDirectDebitContractAddress[chainId as ChainIds];
 
         if (!selectedCurrency?.native) {

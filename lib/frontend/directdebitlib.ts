@@ -1,5 +1,23 @@
-export const ETHENCRYPTPUBLICKEY = ""
+import { aesEncryptData } from "./encryption.ts";
 
+export const ETHENCRYPTPUBLICKEY = "";
+
+export async function setUpAccount(password: string, ethEncryptPublicKey: string) {
+  const note = newAccountSecrets();
+  const secrets = decodeAccountSecrets(note);
+  const commitment = toNoteHex(secrets.commitment);
+  //Password encrypt the note!
+  const passwdEncryptedNote = await aesEncryptData(note, password);
+  //Encrypt the note with a public key
+  const encryptedNote = await ethEncryptData(
+    ethEncryptPublicKey,
+    passwdEncryptedNote,
+  );
+
+  const packed = await packEncryptedMessage(encryptedNote);
+
+  return { encryptedNote: packed, commitment };
+}
 
 export function newAccountSecrets() {
   //@ts-ignore this dependency is imported through a browser script tag
