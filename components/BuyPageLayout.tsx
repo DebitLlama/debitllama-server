@@ -1,17 +1,17 @@
 import type { ComponentChildren } from "preact";
-import { ItemProps, RenderPurchaseDetails } from "../islands/buyButtonPage.tsx";
-import { debitPricing, debitTypes } from "../islands/addNewDebitItemPageForm.tsx";
+import { ItemProps } from "../islands/buyButtonPage.tsx";
+import { debitPricing } from "../islands/addNewDebitItemPageForm.tsx";
 import { Head } from "$fresh/runtime.ts";
+import { ChainIds, networkNameFromId } from "../lib/shared/web3.ts";
 
 interface BuyPagelayoutProps {
     children: ComponentChildren,
     item: ItemProps,
-    isLoggedIn: boolean
+    isLoggedIn: boolean,
+    // triggerSnackbar: boolean
 }
 
-function isSubscription(debitType: string) {
-    return debitType === debitTypes[1];
-}
+
 function isDynamic(pricing: string) {
     return pricing === debitPricing[1];
 }
@@ -34,8 +34,7 @@ function getDebitIntervalText(debitInterval: number, debitTimes: number) {
 
 export default function BuyPageLayout(props: BuyPagelayoutProps) {
 
-    const type = props.item.debitType;
-
+    const networkName = networkNameFromId[props.item.network as ChainIds];
     return <>
         <Head>
             <title>DebitLlama</title>
@@ -66,16 +65,14 @@ export default function BuyPageLayout(props: BuyPagelayoutProps) {
                     <div class="border flex flex-row flex-wrap  p-3 justify-between rounded-xl" style="background-color:white;">
                         <div class="flex flex-col">
                             <span class="p-2 font-light text-xl">{props.item.name}</span>
-                            {isSubscription(type) ?
-                                <span class="p-2 font-semibold ">Approved amount: {props.item.maxPrice} {props.item.currency.name}</span>
-                                : <span class="p-2 font-semibold ">Price: {props.item.maxPrice} {props.item.currency.name}</span>
-                            }
-                            <span class="p-2">{props.item.network}</span>
+                            <span class="p-2 font-semibold ">Approved amount: {props.item.maxPrice} {props.item.currency.name}</span>
+
+                            <span class="p-2">{networkName}</span>
                         </div>
                         <div class="flex flex-col">
-                            <span class="p-2 font-light font-sans antialiased">{props.item.pricing} {"Priced "} {props.item.debitType} {" Payment"}</span>
-                            {isSubscription(type) ? <span class="p-2 font-sans text-slate-600">Approving {props.item.debitTimes} payment{props.item.debitTimes === 1 ? "" : "s"}</span> : null}
-                            {isSubscription(type) ? <span class="p-2 font-sans text-slate-600">{getDebitIntervalText(props.item.debitInterval, props.item.debitTimes)}</span> : null}
+                            <span class="p-2 font-light font-sans antialiased">{props.item.pricing} {"Priced "} {" Payment"}</span>
+                            <span class="p-2 font-sans text-slate-600">Approving {props.item.debitTimes} payment{props.item.debitTimes === 1 ? "" : "s"}</span>
+                            <span class="p-2 font-sans text-slate-600">{getDebitIntervalText(props.item.debitInterval, props.item.debitTimes)}</span>
                         </div>
                     </div>
                 </div>
