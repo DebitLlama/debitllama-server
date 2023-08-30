@@ -22,7 +22,7 @@ function DebitItemRows(props: DebitItemsDataProps) {
     if (props.data.length === 0 || props.data === null) {
         return <div></div>
     } else {
-        return props.data.map((d: any) => <div class="flex flex-col">
+        return <div class="flex flex-col">
             <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
                     <div class="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
@@ -58,7 +58,7 @@ function DebitItemRows(props: DebitItemsDataProps) {
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
-                                <DebitItemTableRow
+                              {props.data.map((d: any) =>   <DebitItemTableRow
                                     debitTimes={d.debit_times}
                                     debitInterval={d.debit_interval}
                                     currency={JSON.parse(d.currency).name}
@@ -67,13 +67,13 @@ function DebitItemRows(props: DebitItemsDataProps) {
                                     pricing={d.pricing}
                                     name={d.name}
                                     button_id={d.button_id}
-                                ></DebitItemTableRow>
+                                ></DebitItemTableRow>)}
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-        </div>);
+        </div>;
     }
 }
 
