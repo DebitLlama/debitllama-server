@@ -2,7 +2,6 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import BuyButtonPage, { ItemProps } from "../islands/buyButtonPage.tsx";
 import { State } from "./_middleware.ts";
 import { setCookie } from "$std/http/cookie.ts";
-import { ChainIds, NetworkNames, chainIdFromNetworkName } from "../lib/shared/web3.ts";
 
 function doesProfileExists(profileData: any) {
     if (profileData === null || profileData.length === 0) {
