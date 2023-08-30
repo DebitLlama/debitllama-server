@@ -58,7 +58,7 @@ export default function BuyPageLayout(props: BuyPagelayoutProps) {
                         Logout
                     </a> : null}
             </div>
-            <div class="flex flex-row flex-wrap shadow-lg rounded-xl mt-3" style="	background-color: rgb(248 250 252);">
+            <div class="flex flex-row flex-wrap shadow-lg rounded-xl mt-3">
                 <div class="p-3 w-full"  >
 
                     <div class="text-center"><h1 class="text-2xl font-bold mb-2">Checkout</h1></div>
