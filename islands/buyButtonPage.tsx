@@ -6,7 +6,7 @@ import { strength } from "./accountCreatePageForm.tsx";
 import BuyPageProfile, { ProfileProps } from "../components/BuyPageProfile.tsx";
 import { approveSpend, depositEth, depositToken, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts, topUpETH, topUpTokens } from "../lib/frontend/web3.ts";
 import { ChainIds, getDirectDebitContractAddress } from "../lib/shared/web3.ts";
-import { requestBalanceRefresh, uploadProfileData } from "../lib/frontend/fetch.ts";
+import { requestBalanceRefresh, saveAccountData, uploadProfileData } from "../lib/frontend/fetch.ts";
 import { setUpAccount } from "../lib/frontend/directdebitlib.ts";
 
 export interface Currency {
@@ -239,6 +239,7 @@ interface onCreateAccountSubmitArgs {
     depositAmount: string,
     passwordProps: AccountPasswordInputProps,
     ethEncryptPublicKey: string,
+    accountCurrency: string
 }
 
 async function handleTokenDeposit(
@@ -249,7 +250,9 @@ async function handleTokenDeposit(
     },
     erc20Contract: string,
     chainId: string,
-    depositAmount: string
+    depositAmount: string,
+    accountName: string,
+    accountCurrency: string
 ) {
     const depositTx = await depositToken(
         contractAddress,
@@ -259,9 +262,14 @@ async function handleTokenDeposit(
         virtualaccount.encryptedNote)
 
     if (depositTx !== undefined) {
-        await depositTx.wait().then((receipt: any) => {
+        await depositTx.wait().then(async (receipt: any) => {
             if (receipt.status === 1) {
-                //TODO: Upload the account data and refresh the page
+                const saveStatus = await saveAccountData(chainId, virtualaccount.commitment, accountName, accountCurrency)
+                if (saveStatus === 500) {
+                    //TODO: Should display an error
+                } else {
+                    location.reload();
+                }
             }
         })
     }
@@ -269,13 +277,10 @@ async function handleTokenDeposit(
 
 
 function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
-    // I need to check if the wallet is connected and change the network
-    // I need the account ChainId, I really need to refactor to store the account chainId on the Debit Item now!!!
     return async (e: any) => {
         e.preventDefault();
 
-        //TODO: Check so password is strong!
-        //TODO: check so passwords match!
+        const accountName = e.target.accountName.value;
 
         const provider = await handleNetworkSelect(args.chainId, args.handleError);
 
@@ -319,7 +324,14 @@ function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
 
             if (allowance >= parseEther(args.depositAmount)) {
                 // Just deposit
-                await handleTokenDeposit(debitContractAddress, virtualaccount, erc20Contract, args.chainId, args.depositAmount)
+                await handleTokenDeposit(
+                    debitContractAddress,
+                    virtualaccount,
+                    erc20Contract,
+                    args.chainId,
+                    args.depositAmount,
+                    accountName,
+                    args.accountCurrency)
             } else {
                 // Add allowance and then deposit 
                 const approveTx = await approveSpend(
@@ -330,7 +342,15 @@ function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
                 if (approveTx !== undefined) {
                     await approveTx.wait().then(async (receipt: any) => {
                         if (receipt.status === 1) {
-                            await handleTokenDeposit(debitContractAddress, virtualaccount, erc20Contract, args.chainId, args.depositAmount)
+                            //TODO: Test tokens 
+                            await handleTokenDeposit(
+                                debitContractAddress,
+                                virtualaccount,
+                                erc20Contract,
+                                args.chainId,
+                                args.depositAmount,
+                                accountName,
+                                args.accountCurrency)
                         }
                     })
                 }
@@ -350,9 +370,19 @@ function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
             );
 
             if (tx !== undefined) {
-                await tx.wait().then((receipt: any) => {
+                await tx.wait().then(async (receipt: any) => {
                     if (receipt.status === 1) {
-                        //TODO: Save account data and refresh the page!
+
+                        const saveStatus = await saveAccountData(
+                            args.chainId,
+                            virtualaccount.commitment,
+                            accountName,
+                            args.accountCurrency)
+                        if (saveStatus === 500) {
+                            //TODO: Should display an error
+                        } else {
+                            location.reload();
+                        }
 
                     }
                 })
@@ -365,6 +395,10 @@ function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
 
 function handleError(msg: string) {
     console.error(msg)
+}
+
+async function testCreatedAccountAPiEndpoint(chainId: any, name: any) {
+    await saveAccountData(chainId, "", name, "");
 }
 
 function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
@@ -403,7 +437,6 @@ function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
         }
     }
     function isButtonDisabled(): boolean {
-        console.log("trigger isButtonDisabled")
         if (props.newAccountPasswordScore < 3) {
             return true;
         }
@@ -428,7 +461,8 @@ function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
             passwordProps: props.newAccountPasswordProps,
             selectedCurrency: props.item.currency,
             depositAmount: props.paymentAmount,
-            ethEncryptPublicKey: props.ethEncryptPublicKey
+            ethEncryptPublicKey: props.ethEncryptPublicKey,
+            accountCurrency: props.item.currency.name
         })}>
             <BuyPageProfile
                 profileExists={props.profileExists}
