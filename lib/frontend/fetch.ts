@@ -2,11 +2,12 @@ export async function saveAccountData(
   networkId: string,
   commitment: string,
   name: string,
+  currency: string,
 ): Promise<number> {
-  return await fetch("/app/addNewAccount", {
+  return await fetch("/app/createdNewAccountApi", {
     credentials: "same-origin",
     method: "POST",
-    body: JSON.stringify({ networkId, commitment, name }),
+    body: JSON.stringify({ networkId, commitment, name, currency }),
     headers: {
       "Content-Type": "application/json",
     },
@@ -23,6 +24,10 @@ export function redirectToAccountPage(
   window.location.href = `/app/account?q=${params}`;
 }
 
+export function redirectToAccountsPage(){
+  window.location.href = "/app/accounts"
+}
+
 export type ProfileData = {
   walletaddress: string;
   firstname: string;
@@ -34,7 +39,6 @@ export type ProfileData = {
   country: string;
   userid: string;
 };
-
 
 export async function requestBalanceRefresh(
   commitment: string,
