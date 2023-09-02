@@ -16,7 +16,9 @@
     "twind/": "https://esm.sh/twind@0.16.19/",
     "$std/": "https://deno.land/std@0.190.0/",
     "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.21.0",
-    "$ethers": "https://esm.sh/ethers@6.5.1"
+    "$ethers": "https://esm.sh/ethers@6.5.1",
+    "@metamask/eth-sig-util": "https://esm.sh/@metamask/eth-sig-util@6.0.0",
+    "buffer": "http://deno.land/x/node_buffer@1.1.0/mod.ts"
   },
   "compilerOptions": {
     "jsx": "react-jsx",
