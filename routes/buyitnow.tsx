@@ -71,7 +71,7 @@ export const handler: Handlers<any, State> = {
 
 }
 
-function getItemProps(item: any): ItemProps {
+export function getItemProps(item: any): ItemProps {
     return {
         payeeAddress: item.payee_address,
         currency: JSON.parse(item.currency),
