@@ -34,12 +34,12 @@ export function toNoteHex(number: any) {
   return directdebitlib.toNoteHex(number);
 }
 
-export function createPaymentIntent({ paymentIntentSecret, snarkArtifacts }: {
+export async function createPaymentIntent({ paymentIntentSecret, snarkArtifacts }: {
   paymentIntentSecret: PaymentIntentSecret;
   snarkArtifacts?: SnarkArtifacts;
 }) {
   //@ts-ignore this dependency is imported through a browser script tag
-  return directdebitlib.createPaymentIntent({
+  return await directdebitlib.createPaymentIntent({
     paymentIntentSecret,
     snarkArtifacts,
   });
