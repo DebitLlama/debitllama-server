@@ -24,8 +24,15 @@ export function redirectToAccountPage(
   window.location.href = `/app/account?q=${params}`;
 }
 
-export function redirectToAccountsPage(){
-  window.location.href = "/app/accounts"
+export function redirectToAccountsPage() {
+  window.location.href = "/app/accounts";
+}
+
+export function redirectToRedirectPage(
+  redirectUrl: string,
+  paymentIntent: string,
+) {
+  window.location.href = `${redirectUrl}?paymentIntent=${paymentIntent}`;
 }
 
 export type ProfileData = {
@@ -67,6 +74,28 @@ export interface UpdateProfileDataArgs {
 
 export async function uploadProfileData(args: UpdateProfileDataArgs) {
   return await fetch("app/checkoutprofiledata", {
+    credentials: "same-origin",
+    method: "POST",
+    body: JSON.stringify(args),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((response) => response.status);
+}
+
+export interface UploadPaymentIntentArgs {
+  button_id: string;
+  proof: string;
+  publicSignals: string;
+  maxDebitAmount: string;
+  debitTimes: number;
+  debitInterval: number;
+  paymentIntent: string;
+  commitment: string;
+}
+
+export async function uploadPaymentIntent(args: UploadPaymentIntentArgs) {
+  return await fetch("/app/savePaymentIntent", {
     credentials: "same-origin",
     method: "POST",
     body: JSON.stringify(args),
