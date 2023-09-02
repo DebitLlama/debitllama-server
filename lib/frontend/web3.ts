@@ -5,6 +5,7 @@ import {
   explorerUrl,
   networkNameFromId,
   rpcUrl,
+  RPCURLS,
   walletCurrency,
 } from "../shared/web3.ts";
 import { SolidityProof } from "./directdebitlib.ts";
@@ -160,6 +161,15 @@ export async function handleNetworkSelect(chainId: string, handleError: any) {
   }
 }
 
+export function getJsonRpcProvider(chainId: string): any {
+  const getProvider = (url: RPCURLS) => new ethers.JsonRpcProvider(url);
+  const url = rpcUrl[chainId as ChainIds];
+  if (!url) {
+    return undefined;
+  }
+  return getProvider(url);
+}
+
 export async function getContract(
   provider: any,
   at: string,
@@ -293,4 +303,8 @@ export async function withdraw(contract: any, commitment: string) {
 
 export function parseEther(input: string) {
   return ethers.parseEther(input);
+}
+
+export async function topupRelayer(contract: any, amount: string) {
+  return await contract.topUpRelayer({ value: parseEther(amount) });
 }
