@@ -198,11 +198,268 @@
 	padding: 5px 0;
 	/* Position the tooltip */
 	position: absolute;
-	z-index: 1;
+	z-index: 3;
 	top: -5px;
 	right: 105%;
 }
 
 .tooltip:hover .tooltiptext {
 	visibility: visible;
+}
+
+
+/*Account Card */
+
+.accountCard_container {
+	user-select: none;
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-o-user-select: none;
+	border-radius: 10px;
+	width: 320px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-image: linear-gradient(109.6deg,
+			rgba(62, 161, 219, 1) 11.2%,
+			rgba(93, 52, 236, 1) 100.2%);
+}
+
+
+
+.account_card {
+	width: 320px;
+	height: 230px;
+	border: 2px solid rgba(255, 255, 255, 0.2);
+	background: rgba(255, 255, 255, 0.4);
+	border-radius: 10px;
+	z-index: 1;
+	overflow: hidden;
+	backdrop-filter: blur(5px);
+	-webkit-backdrop-filter: blur(5px);
+	position: relative;
+}
+
+.visa_logo {
+	float: right;
+	padding: 10px;
+}
+
+.visa_logo img {
+	width: 70px;
+	height: 40px;
+}
+
+.visa_info {
+	padding: 10px;
+	margin: 30px 0;
+}
+
+.visa_info img {
+	width: 60px;
+	height: 45px;
+}
+
+.visa_info p {
+	font-size: 22px;
+	padding: 10px 0;
+	letter-spacing: 2px;
+	color: #ffffff;
+}
+
+.visa_crinfo {
+	display: flex;
+	justify-content: space-between;
+	padding: 0 10px;
+	color: #ffffff;
+}
+
+
+.checkout_accountCard_container {
+	user-select: none;
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-o-user-select: none;
+	border-radius: 10px;
+	width: 9rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-image: linear-gradient(109.6deg,
+			rgba(62, 161, 219, 1) 11.2%,
+			rgba(93, 52, 236, 1) 100.2%);
+}
+
+
+
+.checkout_account_card {
+	width: 9rem;
+	height: 9rem;
+	border: 2px solid rgba(255, 255, 255, 0.2);
+	background: rgba(255, 255, 255, 0.4);
+	border-radius: 10px;
+	z-index: 1;
+	overflow: hidden;
+	backdrop-filter: blur(5px);
+	-webkit-backdrop-filter: blur(5px);
+	position: relative;
+}
+
+
+.checkout_visa_logo {
+	float: right;
+	padding-top: 3px;
+}
+
+.checkout_visa_logo img {
+	width: 70px;
+	height: 40px;
+}
+
+.checkout_visa_info {
+	padding: 1px;
+	margin: 10px 0;
+}
+
+.checkout_visa_info img {
+	width: 60px;
+	height: 45px;
+}
+
+.checkout_visa_info p {
+	font-size: 15px;
+	padding: 10px 0;
+	letter-spacing: 2px;
+	color: #ffffff;
+}
+
+.checkout_visa_crinfo {
+	display: flex;
+	justify-content: space-between;
+	padding: 0 10px;
+	color: #ffffff;
+}
+
+
+
+.fade-out-element {
+	animation: fadeOut 0.5s;
+	-webkit-animation: fadeOut 0.5s;
+	-moz-animation: fadeOut 0.5s;
+	-o-animation: fadeOut 0.5s;
+	-ms-animation: fadeOut 0.5s;
+}
+
+@keyframes fadeOut {
+	0% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0;
+	}
+}
+
+@-moz-keyframes fadeOut {
+	0% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0;
+	}
+}
+
+@-webkit-keyframes fadeOut {
+	0% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0;
+	}
+}
+
+@-o-keyframes fadeOut {
+	0% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0;
+	}
+}
+
+@-ms-keyframes fadeOut {
+	0% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0;
+	}
+}
+
+.fade-in-element {
+	animation: fadeIn 0.5s;
+	-webkit-animation: fadeIn 0.5s;
+	-moz-animation: fadeIn 0.5s;
+	-o-animation: fadeIn 0.5s;
+	-ms-animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+	0% {
+		opacity: 0;
+	}
+
+	100% {
+		opacity: 1;
+	}
+}
+
+@-moz-keyframes fadeIn {
+	0% {
+		opacity: 0;
+	}
+
+	100% {
+		opacity: 1;
+	}
+}
+
+@-webkit-keyframes fadeIn {
+	0% {
+		opacity: 0;
+	}
+
+	100% {
+		opacity: 1;
+	}
+}
+
+@-o-keyframes fadeIn {
+	0% {
+		opacity: 0;
+	}
+
+	100% {
+		opacity: 1;
+	}
+}
+
+@-ms-keyframes fadeIn {
+	0% {
+		opacity: 0;
+	}
+
+	100% {
+		opacity: 1;
+	}
+}
+
+.margin_0_auto {
+	margin: 0 auto;
 }
