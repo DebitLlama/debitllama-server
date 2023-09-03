@@ -8,6 +8,7 @@ import { approveSpend, depositEth, depositToken, getAllowance, getContract, getJ
 import { ChainIds, getDirectDebitContractAddress } from "../lib/shared/web3.ts";
 import { requestBalanceRefresh, saveAccountData, uploadProfileData } from "../lib/frontend/fetch.ts";
 import { setUpAccount } from "../lib/frontend/directdebitlib.ts";
+import { AccountCardElement, CheckoutAccountCardElement } from "../components/AccountCardElement.tsx";
 
 export interface Currency {
     name: string,
@@ -241,7 +242,7 @@ interface onCreateAccountSubmitArgs {
 }
 
 async function handleTokenDeposit(
-    contractAddress: string,
+    debitcontract: any,
     virtualaccount: {
         encryptedNote: any;
         commitment: any;
@@ -252,9 +253,8 @@ async function handleTokenDeposit(
     accountName: string,
     accountCurrency: string
 ) {
-    //TODO: THIS IS BUGGY AS CONTRACT ADDRESS IS A STRING BUT DEPOSIT TOKEN HANDLES IT AS CONTRACT
     const depositTx = await depositToken(
-        contractAddress,
+        debitcontract,
         virtualaccount.commitment,
         depositAmount,
         erc20Contract,
@@ -307,7 +307,10 @@ function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
         }
         const virtualaccount = await setUpAccount(args.passwordProps.password, args.ethEncryptPublicKey);
         const debitContractAddress = getDirectDebitContractAddress[args.chainId as ChainIds];
-
+        const debitContract = await getContract(
+            provider,
+            debitContractAddress,
+            "/DirectDebit.json");
         if (!args.selectedCurrency?.native) {
             //Approve spending, Then do the deposit
 
@@ -324,7 +327,7 @@ function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
             if (allowance >= parseEther(args.depositAmount)) {
                 // Just deposit
                 await handleTokenDeposit(
-                    debitContractAddress,
+                    debitContract,
                     virtualaccount,
                     erc20Contract,
                     args.chainId,
@@ -343,7 +346,7 @@ function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
                         if (receipt.status === 1) {
                             //TODO: Test tokens 
                             await handleTokenDeposit(
-                                debitContractAddress,
+                                debitContract,
                                 virtualaccount,
                                 erc20Contract,
                                 args.chainId,
@@ -355,14 +358,9 @@ function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
                 }
             }
         } else {
-            // Do the deposit
-            const contract = await getContract(
-                provider,
-                debitContractAddress,
-                "/DirectDebit.json");
 
             const tx = await depositEth(
-                contract,
+                debitContract,
                 virtualaccount.commitment,
                 args.depositAmount,
                 virtualaccount.encryptedNote
@@ -545,33 +543,30 @@ function LoggedInUi(props: LoggedInUiProps) {
     return <div class="flex flex-col">
         <div class="flex flex-col flex-wrap"></div>
         <div class="flex flex-col justify-center">
-            <div class="flex flex-row ml-4">
+            <div class="flex flex-row justify-center mb-8" >
+                <CardOutline setSelected={props.setSelectedAccount} id={1} selected={props.selectedAccount} extraCss="margin_0_auto mb-8 bg-gradient-to-b w-max mx-auto text-indigo-500 font-semibold from-slate-50 to-indigo-100 px-10 py-3 rounded-2xl shadow-indigo-400 shadow-md border-b-4 hover border-b border-indigo-200 hover:shadow-sm transition-all duration-500">
+                    New Account
+                </CardOutline>
+            </div>
+            <div class="flex flex-row flex-wrap ml-4 justify-center">
                 {props.accounts.map(
                     (acc: any) =>
                         <CardOutline
+                            extraCss=""
                             setSelected={props.setSelectedAccount}
                             id={props.accounts.indexOf(acc) + 2}
                             selected={props.selectedAccount}
                         >
-                            <div class="flex flex-col text-center mt-2">
-                                <p class="font-sans subpixel-antialiased font-light	text-slate-500">{acc.name}</p>
-                                <div class="flex flex-row justify-center mt-4 font-bold">
-                                    {acc.balance} {" "} {acc.currency}
-                                </div>
-                            </div>
+                            <AccountCardElement
+                                network={""}
+                                balance={acc.balance}
+                                currency={acc.currency}
+                                name={acc.name}
+                            ></AccountCardElement>
                         </CardOutline>
                 )}
-
-                <CardOutline setSelected={props.setSelectedAccount} id={1} selected={props.selectedAccount}>
-                    <div class="flex flex-col text-center mt-2">
-                        <p class="font-sans subpixel-antialiased font-light	text-slate-500">New Account</p>
-                        <div class="flex flex-row justify-center">
-                            <img class={"mt-4"} src="/add.svg" width="60px" />
-                        </div>
-                    </div>
-                </CardOutline>
-
             </div>
+
             <UIBasedOnSelection
                 newAccountPasswordScore={props.newAccountPasswordScore}
                 item={props.item}
