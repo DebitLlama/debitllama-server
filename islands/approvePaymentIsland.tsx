@@ -1,3 +1,4 @@
+import { AccountCardElement } from "../components/AccountCardElement.tsx";
 import { createPaymentIntent, toNoteHex } from "../lib/frontend/directdebitlib.ts";
 import { aesDecryptData } from "../lib/frontend/encryption.ts";
 import { redirectToRedirectPage, uploadPaymentIntent } from "../lib/frontend/fetch.ts";
@@ -9,7 +10,9 @@ interface ApprovePaymentIslandProps {
     symmetricEncryptedNote: string,
     itemData: ItemProps,
     accountcommitment: string,
-    accountName: string
+    accountName: string,
+    accountBalance: string,
+    accountCurrency: string
 }
 
 
@@ -71,7 +74,12 @@ export default function ApprovePaymentIsland(props: ApprovePaymentIslandProps) {
         <div class="flex flex-col flex-wrap">
         </div>
         {success ? <SuccessAnimation></SuccessAnimation> : <><div class="flex flex-row justify-center text-xl">
-            {props.accountName}
+            <AccountCardElement
+                name={props.accountName}
+                balance={props.accountBalance}
+                currency={props.accountCurrency}
+                network={""}
+            ></AccountCardElement>
         </div>
             <div class="w-60 mx-auto mt-4">
                 <label for="password" class="block mb-2 text-sm font-medium">Account Password</label>
@@ -83,7 +91,6 @@ export default function ApprovePaymentIsland(props: ApprovePaymentIslandProps) {
             <button
                 onClick={payClicked}
                 class="w-60 mb-4 mt-4 mx-auto text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">Pay</button></>}
-
     </div>
 }
 
