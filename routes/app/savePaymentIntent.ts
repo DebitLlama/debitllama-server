@@ -21,7 +21,6 @@ export const handler: Handlers<any, State> = {
     const { data: itemData, error: itemError } = await ctx.state.supabaseClient
       .from("Items").select().eq("button_id", item_button_id);
 
-
     if (itemData === null || itemData.length === 0) {
       return new Response(null, { status: 500 });
     }
@@ -44,7 +43,7 @@ export const handler: Handlers<any, State> = {
     }, itemData[0].network);
 
     // Now I save it to the database and return ok
-    const { data, error } = await ctx.state.supabaseClient.from(
+    const { data, error: insertError } = await ctx.state.supabaseClient.from(
       "PaymentIntents",
     ).insert({
       created_at: new Date().toISOString(),
@@ -62,10 +61,19 @@ export const handler: Handlers<any, State> = {
       lastPaymentDate: null,
       nextPaymentDate: null,
       pricing: itemData[0].pricing,
+      currency: itemData[0].currency,
+      network: itemData[0].network,
+      debit_item_id: itemData[0].id,
     });
-    if (error !== null) {
+
+    if (insertError !== null) {
       return new Response(null, { status: 500 });
     }
+
+    //Update the debit item with how many payment intents are related to it
+    const { error } = await ctx.state.supabaseClient.from("Items").update({
+      payment_intents_count: itemData[0].payment_intents_count + 1,
+    }).eq("button_id", item_button_id);
 
     return new Response(null, { status: 200 });
   },
