@@ -18,7 +18,7 @@ export default function Layout(props: LayoutProps) {
         <script src="/directdebit_bundle.js"></script>
       </Head>
       <Nav loggedIn={props.isLoggedIn} />
-      <div class="p-4 mx-auto max-w-screen-md">
+      <div class="p-2 mx-auto">
         {props.children}
       </div>
       <footer
