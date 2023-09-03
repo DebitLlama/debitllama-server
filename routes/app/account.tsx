@@ -7,6 +7,7 @@ import { ChainIds, getDirectDebitContractAddress, networkNameFromId, rpcUrl } fr
 import { getAccount } from "../../lib/backend/web3.ts";
 import { ZeroAddress, formatEther } from "../../ethers.min.js";
 import AccountTopupOrClose from "../../islands/AccountTopupOrClose.tsx";
+import { AccountCardElement } from "../../components/AccountCardElement.tsx";
 
 export const handler: Handlers<any, State> = {
     async GET(req: any, ctx: any) {
@@ -70,19 +71,12 @@ export default function Account(props: PageProps) {
                 <div class="flex items-center justify-center h-full">
                     <div class="bg-white shadow-2xl p-6 rounded-2xl border-2 border-gray-50 w-96">
                         <div class="flex flex-col">
-                            <div>
-                                <h2 class="font-bold text-gray-600 text-center">{props.data.name}</h2>
-                            </div>
-                            <div class="my-6">
-                                <div class="flex flex-col justify-items-center">
-                                    <div class="mx-auto">
-                                        <h4 class="text-xl">{formatEther(balance)} {props.data.currency}</h4>
-                                    </div>
-                                    <div class="mx-auto">
-                                        <p class="text-xs text-gray-500">{networkNameFromId[props.data.networkId as ChainIds]}</p>
-                                    </div>
-                                </div>
-                            </div>
+                            <AccountCardElement
+                                name={props.data.name}
+                                balance={formatEther(balance)}
+                                network={networkNameFromId[props.data.networkId as ChainIds]}
+                                currency={props.data.currency}
+                            ></AccountCardElement>
                             <AccountTopupOrClose
                                 currencyName={props.data.currency}
                                 accountName={props.data.name}
