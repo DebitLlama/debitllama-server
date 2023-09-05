@@ -89,3 +89,13 @@ export function mapNetworkNameToDBColumnNameString(
       return "";
   }
 }
+
+export function getChainExplorerForChainId(chainId: ChainIds, tx: string) {
+  switch (chainId) {
+    case ChainIds.BTT_TESTNET_ID:
+      return `https://testnet.bttcscan.com/tx/${tx}`;
+
+    default:
+      return ``;
+  }
+}
