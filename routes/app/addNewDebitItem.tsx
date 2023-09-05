@@ -50,7 +50,6 @@ export const handler: Handlers<any, State> = {
         }
         // TODO: More Input verification!!
 
-
         await ctx.state.supabaseClient.from("Items").insert({
             created_at: new Date().toISOString(),
             payee_id: userid,
@@ -62,7 +61,7 @@ export const handler: Handlers<any, State> = {
             redirect_url: redirectto,
             pricing,
             network: chainIdFromNetworkName[network as NetworkNames],
-            name
+            name,
         })
 
         headers.set("location", "/app/debitItems");

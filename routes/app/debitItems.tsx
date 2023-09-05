@@ -87,11 +87,11 @@ export default function DebitItems(props: PageProps) {
     return <Layout isLoggedIn={props.data.token}>
         <section class="flex flex-row">
             <a href={"/app/addNewDebitItem"} class="mb-8 bg-gradient-to-b w-max mx-auto text-indigo-500 font-semibold from-slate-50 to-indigo-100 px-10 py-3 rounded-2xl shadow-indigo-400 shadow-md border-b-4 hover border-b border-indigo-200 hover:shadow-sm transition-all duration-500">New Debit Item</a>
+            <a href={"/app/relayer"} class="mb-8 bg-gradient-to-b w-max mx-auto text-indigo-500 font-semibold from-slate-50 to-indigo-100 px-10 py-3 rounded-2xl shadow-indigo-400 shadow-md border-b-4 hover border-b border-indigo-200 hover:shadow-sm transition-all duration-500">Relayer</a>
         </section>
         <section class="container px-4 mx-auto">
             <DebitItemRows data={debitItemsData}></DebitItemRows>
         </section>
-
     </Layout>
 }
 
