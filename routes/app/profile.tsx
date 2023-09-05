@@ -4,6 +4,7 @@ import Layout from "../../components/Layout.tsx";
 import { State } from "../_middleware.ts";
 import WalletAddressSelector from "../../islands/WalletAddressSelector.tsx"
 import { validateAddress } from "../../lib/backend/web3.ts";
+import { selectProfileByUserId, upsertProfile } from "../../lib/backend/supabaseQueries.ts";
 
 
 export const handler: Handlers<any, State> = {
@@ -33,21 +34,19 @@ export const handler: Handlers<any, State> = {
     const country = form.get("country") as string;
     const userid = ctx.state.userid;
 
-    const { error } = await ctx.state.supabaseClient
-      .from("Profiles").upsert(
-        {
-          id,
-          walletaddress,
-          firstname,
-          lastname,
-          addressline1,
-          addressline2,
-          city,
-          postcode,
-          country,
-          userid
-        },
-        { ignoreDuplicates: false }).select();
+    const { error } = await upsertProfile(
+      ctx.state.supabaseClient,
+      id,
+      walletaddress,
+      firstname,
+      lastname,
+      addressline1,
+      addressline2,
+      city,
+      postcode,
+      country,
+      userid
+    );
 
 
     if (error) {
@@ -63,7 +62,7 @@ export const handler: Handlers<any, State> = {
     const userid = ctx.state.userid;
 
     // Get the data and use it to populate the fields!
-    const { data: profileData, error: profileError } = await ctx.state.supabaseClient.from("Profiles").select().eq("userid", userid);
+    const { data: profileData, error: profileError } = await selectProfileByUserId(ctx.state.supabaseClient, userid);
 
     if (profileData === null || profileData.length === 0) {
       return ctx.render(

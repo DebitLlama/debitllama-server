@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { formatEther } from "../../ethers.min.js";
+import { selectAccountByCommitment, updateAccount } from "../../lib/backend/supabaseQueries.ts";
 import { getAccount } from "../../lib/backend/web3.ts";
 import { ChainIds, rpcUrl } from "../../lib/shared/web3.ts";
 import { State } from "../_middleware.ts";
@@ -17,13 +17,15 @@ export const handler: Handlers<any, State> = {
         }
         const accountData = await getAccount(commitment, networkId);
         if (accountData.exists) {
-            const { data, error } = await ctx.state.supabaseClient.from("Accounts").select().eq("commitment", commitment);
+            const { data, error } = await selectAccountByCommitment(ctx.state.supabaseClient, commitment);
             if (data === null || data.length === 0) {
                 return new Response(null, { status: 500 })
             } else {
-                await ctx.state.supabaseClient
-                    .from("Accounts")
-                    .update({ balance: formatEther(accountData.account[3]), closed: !accountData.account[0] }).eq("id", data[0].id);
+                await updateAccount(
+                    ctx.state.supabaseClient,
+                    accountData.account[3],
+                    !accountData.account[0],
+                    data[0].id);
                 return new Response(null, { status: 200 })
             }
         } else {

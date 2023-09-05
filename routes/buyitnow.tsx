@@ -2,6 +2,7 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import BuyButtonPage, { ItemProps } from "../islands/buyButtonPage.tsx";
 import { State } from "./_middleware.ts";
 import { setCookie } from "$std/http/cookie.ts";
+import { selectItemByButtonId, selectOpenAccountsFromUserByNetworkAndCurrency, selectProfileByUserId, signInWithPassword } from "../lib/backend/supabaseQueries.ts";
 
 function doesProfileExists(profileData: any) {
     if (profileData === null || profileData.length === 0) {
@@ -16,7 +17,7 @@ export const handler: Handlers<any, State> = {
         const url = new URL(req.url);
         const query = url.searchParams.get("q") || "";
 
-        const { data: itemData, error: itemError } = await ctx.state.supabaseClient.from("Items").select().eq("button_id", query);
+        const { data: itemData, error: itemError } = await selectItemByButtonId(ctx.state.supabaseClient, query);
 
         if (itemData === null || itemData.length === 0) {
             return ctx.render({ ...ctx.state, notfound: true, itemData: [] });
@@ -25,14 +26,14 @@ export const handler: Handlers<any, State> = {
         // I need to fetch the accounts for this user and then display the ones on the same network and currency
 
         const currency = JSON.parse(itemData[0].currency);
-        const { data: accountData, error: accountError } = await ctx.state.supabaseClient
-            .from("Accounts")
-            .select()
-            .eq("closed", false)
-            .eq("user_id", ctx.state.userid)
-            .eq("network_id", itemData[0].network)
-            .eq("currency", currency.name)
-        const { data: profileData, error: profileError } = await ctx.state.supabaseClient.from("Profiles").select().eq("userid", ctx.state.userid);
+
+        const { data: accountData, error: accountError } = await selectOpenAccountsFromUserByNetworkAndCurrency(
+            ctx.state.supabaseClient,
+            ctx.state.userid,
+            itemData[0].network,
+            currency.name);
+
+        const { data: profileData, error: profileError } = await selectProfileByUserId(ctx.state.supabaseClient, ctx.state.userid);
 
         return ctx.render({ ...ctx.state, notfound: false, itemData, accountData, profileExists: doesProfileExists(profileData), ethEncryptPublicKey })
 
@@ -44,7 +45,7 @@ export const handler: Handlers<any, State> = {
         const email = form.get("email") as string;
         const password = form.get("password") as string;
 
-        const { data, error } = await ctx.state.supabaseClient.auth.signInWithPassword({ email, password });
+        const { data, error } = await signInWithPassword(ctx.state.supabaseClient, email, password);
 
         const headers = new Headers();
 

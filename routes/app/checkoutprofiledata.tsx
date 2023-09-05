@@ -1,4 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
+import { insertProfile, selectProfileByUserId } from "../../lib/backend/supabaseQueries.ts";
 import { State } from "../_middleware.ts";
 
 
@@ -14,12 +15,13 @@ export const handler: Handlers<any, State> = {
         const postcode = json.postcode;
         const country = json.country;
 
-        const { data: profileData, error: profileError } = await ctx.state.supabaseClient.from("Profiles").select().eq("userid", ctx.state.userid);
+        const { data: profileData, error: profileError } = await selectProfileByUserId(ctx.state.supabaseClient, ctx.state.userid);
 
         if (profileData === null || profileData.length === 0) {
             // Do the insert here
-            const { error } = await ctx.state.supabaseClient.from("Profiles").insert({
-                userid: ctx.state.userid,
+            const { error } = await insertProfile(
+                ctx.state.supabaseClient,
+                ctx.state.userid,
                 walletaddress,
                 firstname,
                 lastname,
@@ -28,7 +30,7 @@ export const handler: Handlers<any, State> = {
                 city,
                 postcode,
                 country
-            })
+            );
             if (error) {
                 return new Response(null, { status: 500 })
             }

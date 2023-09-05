@@ -2,11 +2,12 @@ import Layout from "../../components/Layout.tsx";
 import { State } from "../_middleware.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { ChainIds, networkNameFromId } from "../../lib/shared/web3.ts";
+import { selectItemsByPayeeIdDesc } from "../../lib/backend/supabaseQueries.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(_req, ctx) {
         const userid = ctx.state.userid;
-        const { data: debitItemsData, error: debitItemsError } = await ctx.state.supabaseClient.from("Items").select().eq("payee_id", userid).order("created_at", { ascending: false })
+        const { data: debitItemsData, error: debitItemsError } = await selectItemsByPayeeIdDesc(ctx.state.supabaseClient, userid)
         return ctx.render({ ...ctx.state, debitItemsData })
     }
 }

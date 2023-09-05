@@ -3,6 +3,7 @@ import { State } from "../_middleware.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import AddNewDebitItemPageForm from "../../islands/addNewDebitItemPageForm.tsx";
 import { NetworkNames, chainIdFromNetworkName } from "../../lib/shared/web3.ts";
+import { insertNewItem, selectProfileByUserId } from "../../lib/backend/supabaseQueries.ts";
 
 
 
@@ -13,7 +14,7 @@ export const handler: Handlers<any, State> = {
         const userid = ctx.state.userid;
 
         // Get the data and use it to populate the fields!
-        const { data: profileData, error: profileError } = await ctx.state.supabaseClient.from("Profiles").select().eq("userid", userid);
+        const { data: profileData, error: profileError } = await selectProfileByUserId(ctx.state.supabaseClient, userid);
 
         if (profileData === null || profileData.length === 0) {
             headers.set("location", "/app/profile");
@@ -28,7 +29,7 @@ export const handler: Handlers<any, State> = {
 
         const form = await _req.formData();
 
-        const { data: profileData, error: profileError } = await ctx.state.supabaseClient.from("Profiles").select().eq("userid", userid);
+        const { data: profileData, error: profileError } = await selectProfileByUserId(ctx.state.supabaseClient, userid);
 
         if (profileData === null || profileData.length === 0) {
             headers.set("location", "/app/profile");
@@ -50,19 +51,19 @@ export const handler: Handlers<any, State> = {
         }
         // TODO: More Input verification!!
 
-        await ctx.state.supabaseClient.from("Items").insert({
-            created_at: new Date().toISOString(),
-            payee_id: userid,
-            payee_address: profileData[0].walletaddress,
+        await insertNewItem(
+            ctx.state.supabaseClient,
+            userid,
+            profileData[0].walletaddress,
             currency,
-            max_price: maxAmount,
-            debit_times: debitTimes,
-            debit_interval: debitInterval,
-            redirect_url: redirectto,
+            maxAmount,
+            debitTimes,
+            debitInterval,
+            redirectto,
             pricing,
-            network: chainIdFromNetworkName[network as NetworkNames],
+            chainIdFromNetworkName[network as NetworkNames],
             name,
-        })
+        )
 
         headers.set("location", "/app/debitItems");
         return new Response(null, { status: 303, headers })

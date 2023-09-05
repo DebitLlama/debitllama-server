@@ -1,4 +1,9 @@
 import { Handlers } from "$fresh/server.ts";
+import {
+  insertPaymentIntent,
+  selectAccountByCommitment,
+  selectItemByButtonId,
+} from "../../lib/backend/supabaseQueries.ts";
 import { estimateRelayerGas } from "../../lib/backend/web3.ts";
 import { PaymentIntentStatus } from "../../lib/paymentIntentStatus.ts";
 import { State } from "../_middleware.ts";
@@ -18,15 +23,20 @@ export const handler: Handlers<any, State> = {
     const commitment = json.commitment;
 
     // Get the debit item using th button_id
-    const { data: itemData, error: itemError } = await ctx.state.supabaseClient
-      .from("Items").select().eq("button_id", item_button_id);
+    const { data: itemData, error: itemError } = await selectItemByButtonId(
+      ctx.state.supabaseClient,
+      item_button_id,
+    );
 
     if (itemData === null || itemData.length === 0) {
       return new Response(null, { status: 500 });
     }
 
-    const { data: accountData, error: accountError } = await ctx.state
-      .supabaseClient.from("Accounts").select().eq("commitment", commitment);
+    const { data: accountData, error: accountError } =
+      await selectAccountByCommitment(
+        ctx.state.supabaseClient,
+        commitment,
+      );
 
     if (accountData === null || accountData.length === 0) {
       return new Response(null, { status: 500 });
@@ -43,28 +53,24 @@ export const handler: Handlers<any, State> = {
     }, itemData[0].network);
 
     // Now I save it to the database and return ok
-    const { data, error: insertError } = await ctx.state.supabaseClient.from(
-      "PaymentIntents",
-    ).insert({
-      created_at: new Date().toISOString(),
-      creator_user_id: userid,
-      payee_user_id: itemData[0].payee_id,
-      account_id: accountData[0].id,
-      payee_address: itemData[0].payee_address,
-      maxDebitAmount: maxDebitAmount,
+    const { data, error: insertError } = await insertPaymentIntent(
+      ctx.state.supabaseClient,
+      userid,
+      itemData[0].payee_id,
+      accountData[0].id,
+      itemData[0].payee_address,
+      maxDebitAmount,
       debitTimes,
       debitInterval,
       paymentIntent,
       commitment,
-      estimatedGas: estimatedGas.toString(),
-      statusText: PaymentIntentStatus.CREATED,
-      lastPaymentDate: null,
-      nextPaymentDate: null,
-      pricing: itemData[0].pricing,
-      currency: itemData[0].currency,
-      network: itemData[0].network,
-      debit_item_id: itemData[0].id,
-    });
+      estimatedGas.toString(),
+      PaymentIntentStatus.CREATED,
+      itemData[0].pricing,
+      itemData[0].currency,
+      itemData[0].network,
+      itemData[0].id,
+    );
 
     if (insertError !== null) {
       return new Response(null, { status: 500 });

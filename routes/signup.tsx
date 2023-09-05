@@ -1,5 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 import { Handlers, PageProps } from "$fresh/server.ts";
+import { signUp } from "../lib/backend/supabaseQueries.ts";
 import { State } from "./_middleware.ts";
 
 export const handler: Handlers<any, State> = {
@@ -9,7 +10,7 @@ export const handler: Handlers<any, State> = {
         const email = form.get("email") as string;
         const password = form.get("password") as string;
 
-        const { error } = await ctx.state.supabaseClient.auth.signUp({ email, password });
+        const { error } = await signUp(ctx.state.supabaseClient, email, password);
 
         const headers = new Headers();
 

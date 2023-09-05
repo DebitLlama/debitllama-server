@@ -8,6 +8,7 @@ import { getAccount } from "../../lib/backend/web3.ts";
 import { ZeroAddress, formatEther } from "../../ethers.min.js";
 import AccountTopupOrClose from "../../islands/AccountTopupOrClose.tsx";
 import { AccountCardElement } from "../../components/AccountCardElement.tsx";
+import { insertNewAccount, selectAccountByCommitment, updateAccount } from "../../lib/backend/supabaseQueries.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(req: any, ctx: any) {
@@ -23,28 +24,25 @@ export const handler: Handlers<any, State> = {
             }
             const accountData = await getAccount(commitment, networkId);
             if (accountData.exists) {
-                const { data, error } = await ctx.state.supabaseClient.from("Accounts").select().eq("commitment", commitment);
+                const { data, error } = await selectAccountByCommitment(ctx.state.supabaseClient, commitment);
 
                 if (data.length === 0) {
 
-                    const { data: savedAccountData, error: accountError } = await ctx.state.supabaseClient.from("Accounts").insert({
-                        created_at: new Date().toISOString(),
-                        user_id: ctx.state.userid,
-                        network_id: networkId,
-                        commitment: commitment,
-                        name: name,
-                        closed: false,
+                    const { data: savedAccountData, error: accountError } = await insertNewAccount(
+                        ctx.state.supabaseClient,
+                        ctx.state.userid,
+                        networkId,
+                        commitment,
+                        name,
                         currency,
-                        balance: formatEther(accountData.account[3])
-                    })
+                        accountData.account[3]
+                    )
                     // Here I return the data from the query string because that is what was saved!
                     return ctx.render({ notfound: false, ...ctx.state, currency, name, commitment, closed: false, networkId, accountData });
                 } else {
 
                     if (data[0].balance !== formatEther(accountData.account[3])) {
-                        const res = await ctx.state.supabaseClient
-                            .from("Accounts")
-                            .update({ balance: formatEther(accountData.account[3]), closed: !accountData.account[0] }).eq("id", data[0].id)
+                        const res = await updateAccount(ctx.state.supabaseClient, accountData.account[3], !accountData.account[0], data[0].id)
                     }
 
                     // Here I return the data from the database because the account was saved

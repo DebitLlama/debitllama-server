@@ -1,12 +1,14 @@
 import Layout from "../../components/Layout.tsx";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
+import { selectPaymentIntentByPaymentIntentAndCreatorUserId } from "../../lib/backend/supabaseQueries.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(req: any, ctx: any) {
         const url = new URL(req.url);
         const query = url.searchParams.get("q") || "";
-        const { data: paymentIntentData, error: paymentIntentError } = await ctx.state.supabaseClient.from("PaymentIntents").select().eq("paymentIntent", query).eq("creator_user_id", ctx.state.userid);
+        const { data: paymentIntentData, error: paymentIntentError } = await selectPaymentIntentByPaymentIntentAndCreatorUserId(
+            ctx.state.supabaseClient, query, ctx.state.userid);
 
         if (paymentIntentData === null || paymentIntentData.length === 0) {
             return ctx.render({ ...ctx.state, notfound: true });

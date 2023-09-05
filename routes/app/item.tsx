@@ -4,18 +4,21 @@ import { State } from "../_middleware.ts";
 import CopyButton from "../../islands/copyButton.tsx";
 import { ChainIds, networkNameFromId } from "../../lib/shared/web3.ts";
 import DebitItemIsland from "../../islands/DebitItemIsland.tsx";
+import { selectItemByButtonId, selectPaymentIntentsByPayeeAndItem, updateItem } from "../../lib/backend/supabaseQueries.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(req: any, ctx: any) {
         const url = new URL(req.url);
         const query = url.searchParams.get("q") || "";
-        const { data: itemData, error: itemError } = await ctx.state.supabaseClient.from("Items").select().eq("button_id", query);
+        const { data: itemData, error: itemError } = await selectItemByButtonId(ctx.state.supabaseClient, query);
         if (itemData === null || itemData.length === 0) {
             return ctx.render({ ...ctx.state, notfound: true });
         }
 
-        const { data: paymentIntentData, error: paymentIntentError } = await ctx.state.supabaseClient.from("PaymentIntents")
-            .select("*,account_id(balance,currency)").eq("payee_user_id", ctx.state.userid).eq("debit_item_id", itemData[0].id);
+        const { data: paymentIntentData, error: paymentIntentError } = await selectPaymentIntentsByPayeeAndItem(
+            ctx.state.supabaseClient,
+            ctx.state.userid,
+            itemData[0].id);
 
         return ctx.render({ ...ctx.state, notfound: false, itemData, paymentIntentData });
     },
@@ -24,8 +27,7 @@ export const handler: Handlers<any, State> = {
         const deleted = form.get("deleted") as boolean;
         const button_id = form.get("button_id") as string;
 
-        const { error: deleteError } = await ctx.state.supabaseClient.from("Items")
-            .update({ deleted }).eq("payee_id", ctx.state.userid).eq("button_id", button_id);
+        const { error: deleteError } = await updateItem(ctx.state.supabaseClient, deleted, ctx.state.userid, button_id);
 
         console.log(deleteError)
 

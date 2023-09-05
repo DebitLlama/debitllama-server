@@ -1,6 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { setCookie } from "$std/http/cookie.ts";
+import { signInWithPassword } from "../lib/backend/supabaseQueries.ts";
 import { State } from "./_middleware.ts";
 
 export const handler: Handlers<any, State> = {
@@ -10,7 +11,7 @@ export const handler: Handlers<any, State> = {
         const email = form.get("email") as string;
         const password = form.get("password") as string;
 
-        const { data, error } = await ctx.state.supabaseClient.auth.signInWithPassword({ email, password });
+        const { data, error } = await signInWithPassword(ctx.state.supabaseClient, email, password);
 
         const headers = new Headers();
 

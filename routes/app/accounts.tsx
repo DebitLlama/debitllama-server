@@ -3,21 +3,16 @@ import { State } from "../_middleware.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { AccountCardElement } from "../../components/AccountCardElement.tsx";
 import AccountCardCarousel from "../../islands/accountCardCarousel.tsx";
+import { selectOpenAccountsByIdDESC, selectPaymentIntentsByUserIdDESC } from "../../lib/backend/supabaseQueries.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(_req, ctx) {
-        const { data: accountsData, error: accountsError } = await ctx.state.supabaseClient
-            .from("Accounts")
-            .select()
-            .eq("user_id", ctx.state.userid)
-            .eq("closed", false)
-            .order("created_at", { ascending: false })
-            ;
+        const { data: accountsData, error: accountsError } = await selectOpenAccountsByIdDESC(ctx.state.supabaseClient, ctx.state.userid);
+        ;
 
         // I also need to fetch the payment intents here!
 
-        const { data: paymentIntentData, error: paymentIntentError } = await ctx.state.supabaseClient
-            .from("PaymentIntents").select().eq("creator_user_id", ctx.state.userid).order("created_at", { ascending: false });
+        const { data: paymentIntentData, error: paymentIntentError } = await selectPaymentIntentsByUserIdDESC(ctx.state.supabaseClient, ctx.state.userid);
 
         // Add pagination for both!
         return ctx.render({ ...ctx.state, accountsData, paymentIntentData })

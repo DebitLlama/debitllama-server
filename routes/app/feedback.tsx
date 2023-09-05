@@ -1,6 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 import { Handlers, PageProps } from "$fresh/server.ts";
 import Layout from "../../components/Layout.tsx";
+import { insertFeedback } from "../../lib/backend/supabaseQueries.ts";
 import { State } from "../_middleware.ts";
 export const handler: Handlers<any, State> = {
     async POST(req, ctx) {
@@ -9,12 +10,7 @@ export const handler: Handlers<any, State> = {
         const message = form.get("message") as string;
         const userid = ctx.state.userid;
 
-        const { error } = await ctx.state.supabaseClient
-            .from("Feedback").insert(
-                {
-                    creator_id: userid,
-                    subject, message
-                }).select();
+        const { error } = await insertFeedback(ctx.state.supabaseClient, userid, subject, message);
         const headers = new Headers();
 
         if (error) {
