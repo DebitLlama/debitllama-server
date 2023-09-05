@@ -3,7 +3,8 @@
   "tasks": {
     "start": "deno run -A --watch=static/,routes/ dev.ts",
     "update": "deno run -A -r https://fresh.deno.dev/update .",
-    "test": "deno test tests/encryption.ts"
+    "test_enc": "deno test tests/encryption.ts",
+    "test_queryFilter": "deno run -A tests/queryFilter.ts --allow-net"
   },
   "imports": {
     "$fresh/": "https://deno.land/x/fresh@1.2.0/",
