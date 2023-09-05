@@ -463,3 +463,10 @@
 .margin_0_auto {
 	margin: 0 auto;
 }
+
+/* When the browser is  530px or smaller */
+@media screen and (max-width: 530px) {
+  .overflowingTableData {
+    width: 10em;
+  }
+}
