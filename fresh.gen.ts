@@ -21,24 +21,24 @@ import * as $15 from "./routes/app/profile.tsx";
 import * as $16 from "./routes/app/refreshbalance.tsx";
 import * as $17 from "./routes/app/relayer.tsx";
 import * as $18 from "./routes/app/savePaymentIntent.ts";
-import * as $19 from "./routes/app/secret.tsx";
-import * as $20 from "./routes/buyitnow.tsx";
-import * as $21 from "./routes/buyitnowlogout.tsx";
-import * as $22 from "./routes/index.tsx";
-import * as $23 from "./routes/logout.tsx";
-import * as $24 from "./routes/signup.tsx";
+import * as $19 from "./routes/buyitnow.tsx";
+import * as $20 from "./routes/buyitnowlogout.tsx";
+import * as $21 from "./routes/index.tsx";
+import * as $22 from "./routes/logout.tsx";
+import * as $23 from "./routes/signup.tsx";
 import * as $$0 from "./islands/AccountTopupOrClose.tsx";
 import * as $$1 from "./islands/CurrencySelectDropdown.tsx";
 import * as $$2 from "./islands/DebitItemIsland.tsx";
 import * as $$3 from "./islands/RelayerDetailsCard.tsx";
-import * as $$4 from "./islands/WalletAddressSelector.tsx";
-import * as $$5 from "./islands/accountCardCarousel.tsx";
-import * as $$6 from "./islands/accountCreatePageForm.tsx";
-import * as $$7 from "./islands/accountPasswordInput.tsx";
-import * as $$8 from "./islands/addNewDebitItemPageForm.tsx";
-import * as $$9 from "./islands/approvePaymentIsland.tsx";
-import * as $$10 from "./islands/buyButtonPage.tsx";
-import * as $$11 from "./islands/copyButton.tsx";
+import * as $$4 from "./islands/RelayerTopupHistory.tsx";
+import * as $$5 from "./islands/WalletAddressSelector.tsx";
+import * as $$6 from "./islands/accountCardCarousel.tsx";
+import * as $$7 from "./islands/accountCreatePageForm.tsx";
+import * as $$8 from "./islands/accountPasswordInput.tsx";
+import * as $$9 from "./islands/addNewDebitItemPageForm.tsx";
+import * as $$10 from "./islands/approvePaymentIsland.tsx";
+import * as $$11 from "./islands/buyButtonPage.tsx";
+import * as $$12 from "./islands/copyButton.tsx";
 
 const manifest = {
   routes: {
@@ -61,26 +61,26 @@ const manifest = {
     "./routes/app/refreshbalance.tsx": $16,
     "./routes/app/relayer.tsx": $17,
     "./routes/app/savePaymentIntent.ts": $18,
-    "./routes/app/secret.tsx": $19,
-    "./routes/buyitnow.tsx": $20,
-    "./routes/buyitnowlogout.tsx": $21,
-    "./routes/index.tsx": $22,
-    "./routes/logout.tsx": $23,
-    "./routes/signup.tsx": $24,
+    "./routes/buyitnow.tsx": $19,
+    "./routes/buyitnowlogout.tsx": $20,
+    "./routes/index.tsx": $21,
+    "./routes/logout.tsx": $22,
+    "./routes/signup.tsx": $23,
   },
   islands: {
     "./islands/AccountTopupOrClose.tsx": $$0,
     "./islands/CurrencySelectDropdown.tsx": $$1,
     "./islands/DebitItemIsland.tsx": $$2,
     "./islands/RelayerDetailsCard.tsx": $$3,
-    "./islands/WalletAddressSelector.tsx": $$4,
-    "./islands/accountCardCarousel.tsx": $$5,
-    "./islands/accountCreatePageForm.tsx": $$6,
-    "./islands/accountPasswordInput.tsx": $$7,
-    "./islands/addNewDebitItemPageForm.tsx": $$8,
-    "./islands/approvePaymentIsland.tsx": $$9,
-    "./islands/buyButtonPage.tsx": $$10,
-    "./islands/copyButton.tsx": $$11,
+    "./islands/RelayerTopupHistory.tsx": $$4,
+    "./islands/WalletAddressSelector.tsx": $$5,
+    "./islands/accountCardCarousel.tsx": $$6,
+    "./islands/accountCreatePageForm.tsx": $$7,
+    "./islands/accountPasswordInput.tsx": $$8,
+    "./islands/addNewDebitItemPageForm.tsx": $$9,
+    "./islands/approvePaymentIsland.tsx": $$10,
+    "./islands/buyButtonPage.tsx": $$11,
+    "./islands/copyButton.tsx": $$12,
   },
   baseUrl: import.meta.url,
 };
