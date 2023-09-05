@@ -177,7 +177,6 @@ export async function getContract(
 ): Promise<any> {
   const artifact = await fetchAbi(abiPath);
   const signer = await provider.getSigner();
-  console.log(signer);
   return new ethers.Contract(at, artifact.abi, signer);
 }
 // Smart contract functions start here
