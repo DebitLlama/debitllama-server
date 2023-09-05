@@ -5,7 +5,7 @@ import { postRelayerTopup } from '../lib/frontend/fetch.ts';
 
 export interface RelayerDetailsCardProps {
     relayerData: any;
-    walletAddress: string
+    walletAddress: string;
 }
 
 
@@ -53,6 +53,8 @@ export default function RelayerDetailsCard(props: RelayerDetailsCardProps) {
         )
 
         const tx = await topupRelayer(contract, topUpAmount).catch(err => {
+            console.log(err)
+
             handleError("Unable to submit transaction!")
         });
 
@@ -115,7 +117,7 @@ export default function RelayerDetailsCard(props: RelayerDetailsCardProps) {
         <hr
             class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
         <div class={"mb-4"}>
-            <p class="text-sm text-gray-600">The relayer needs to pay for gas when submitting transacitons! Pay for the gas by topping up the relayer!</p>
+            <p class="text-sm text-gray-600">The relayer needs to pay for gas when submitting transactions! Pay for the gas by topping up the relayer!</p>
         </div>
         <form onSubmit={topupClicked}>
             <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
