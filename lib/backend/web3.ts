@@ -2,9 +2,14 @@ import { ethers, ZeroAddress } from "$ethers";
 import DirectDebitArtifact from "../../static/DirectDebit.json" assert {
   type: "json",
 };
+import RelayerGasTracker from "../../static/RelayerGasTracker.json" assert {
+  type: "json",
+};
+
 import {
   ChainIds,
   getDirectDebitContractAddress,
+  getRelayerGasTrackerContractAddress,
   rpcUrl,
 } from "../shared/web3.ts";
 import { Buffer } from "https://deno.land/x/node_buffer@1.1.0/mod.ts";
@@ -27,6 +32,12 @@ export function getContract(provider: any, networkId: string) {
     DirectDebitArtifact.abi,
     provider,
   );
+}
+
+export function getRelayerTopUpContract(networkId: string) {
+  const provider = getProvider(networkId);
+  const addr = getRelayerGasTrackerContractAddress[networkId as ChainIds];
+  return new ethers.Contract(addr, RelayerGasTracker.abi, provider);
 }
 
 export async function getAccount(commitment: string, networkId: string) {
@@ -97,4 +108,18 @@ function toNoteHex(number: any, length = 32) {
     ? number.toString("hex")
     : BigInt(number).toString(16);
   return "0x" + str.padStart(length * 2, "0");
+}
+
+export function parseEther(input: string) {
+  return ethers.parseEther(input);
+}
+
+export async function fetchTopUpEvent(
+  contract: any,
+  from: string,
+  amount: string,
+  fromBlockOrHash: any,
+) {
+  const filter = contract.filters.TopUpEvent(from, parseEther(amount));
+  return await contract.queryFilter(filter, fromBlockOrHash);
 }
