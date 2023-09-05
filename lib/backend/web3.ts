@@ -113,6 +113,9 @@ function toNoteHex(number: any, length = 32) {
 export function parseEther(input: string) {
   return ethers.parseEther(input);
 }
+export function formatEther(input: any){
+  return ethers.formatEther(input);
+}
 
 export async function fetchTopUpEvent(
   contract: any,
