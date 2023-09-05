@@ -1,3 +1,4 @@
+import CopyButton from "../islands/copyButton.tsx";
 import { PaymentIntentStatus } from "../lib/paymentIntentStatus.ts";
 import { ChainIds, networkNameFromId } from "../lib/shared/web3.ts";
 
@@ -27,7 +28,9 @@ export function PaymentIntentsTableForAccounts(props: PaymentIntentsTableProps) 
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead class="bg-gray-50 dark:bg-gray-800">
                             <tr>
-
+                                <th scope="col" class="w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                    Identifier
+                                </th>
                                 <th scope="col" class="w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
                                     Status
                                 </th>
@@ -55,6 +58,9 @@ export function PaymentIntentsTableForAccounts(props: PaymentIntentsTableProps) 
                                 const currency = JSON.parse(data.currency);
                                 const currencyName = currency.name;
                                 return <tr class="cursor-pointer bg-white hover:bg-gray-300" onClick={paymentIntentRowClicked(data.paymentIntent)}>
+                                    <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
+                                        {RenderIdentifier(data.paymentIntent)}
+                                    </td>
                                     <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
                                         {getStatusLogo(data.statusText)}
                                     </td>
@@ -84,6 +90,10 @@ export function PaymentIntentsTableForAccounts(props: PaymentIntentsTableProps) 
     </>
 }
 
+export function RenderIdentifier(id: string) {
+    // /?TODO: Copy icon and copy the text
+    return <span>{`${id.substring(0, 5)}...${id.substring(id.length - 5, id.length)}`}</span>
+}
 
 export function getStatusLogo(status: PaymentIntentStatus | string) {
     switch (status) {
