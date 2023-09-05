@@ -308,3 +308,7 @@ export function parseEther(input: string) {
 export async function topupRelayer(contract: any, amount: string) {
   return await contract.topUpRelayer({ value: parseEther(amount) });
 }
+
+export async function relayerAddress(contract: any) {
+  return await contract.relayer();
+}
