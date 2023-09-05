@@ -104,3 +104,22 @@ export async function uploadPaymentIntent(args: UploadPaymentIntentArgs) {
     },
   }).then((response) => response.status);
 }
+
+export interface PostRelayerTopup {
+  chainId: string;
+  blockNumber: string;
+  transactionHash: string;
+  from: string;
+  amount: string;
+}
+
+export async function postRelayerTopup(args: PostRelayerTopup) {
+  return await fetch("/app/relayer", {
+    credentials: "same-origin",
+    method: "POST",
+    body: JSON.stringify(args),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((response) => response.status);
+}
