@@ -52,73 +52,65 @@ export default function Item(props: PageProps) {
                                 <h1 class="text-2xl font-bold text-center">Debit Item</h1>
                             </div>
 
-                            <div class="flex flex-col mb-3">
-                                <p class="text-xs text-gray-700 text-center">Payee Address:</p>
-                                <pre class="overflow-hidden text-xs text-gray-700 text-center">{itemData.payee_address}</pre>
-                            </div>
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead>
+                                    <tr>
+                                        <th class="w-1/3"></th>
+                                        <th class="w-2/3"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Payee Address:</td>
+                                        <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData"> <small>{itemData.payee_address}</small> </div></td>
+                                    </tr>
+                                    <tr>
+                                        <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Name:</td>
+                                        <td class={"px-4 py-4 text-sm whitespace-nowrap"}>{itemData.name}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Network:</td>
+                                        <td class={"px-4 py-4 text-sm whitespace-nowrap"}>{networkNameFromId[itemData.network as ChainIds]}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Max Debited:</td>
+                                        <td class={"px-4 py-4 text-sm whitespace-nowrap"}>{itemData.max_price} {JSON.parse(itemData.currency).name}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Debit Times:</td>
+                                        <td class={"px-4 py-4 text-sm whitespace-nowrap"}>{itemData.debit_times}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Debit Interval (Days):</td>
+                                        <td class={"px-4 py-4 text-sm whitespace-nowrap"}>{itemData.debit_interval}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Pricing</td>
+                                        <td class={"px-4 py-4 text-sm whitespace-nowrap"}>{itemData.pricing}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Redirect URL:</td>
+                                        <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class={"overflow-x-auto overflowingTableData"}>{itemData.redirect_url}</div></td>
+                                    </tr>
+                                    <tr>
+                                        <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Checkout:</td>
+                                        <td class={"px-4 py-4 text-sm whitespace-nowrap"}> <a href={`/buyitnow/?q=${itemData.button_id}`} class={"cursor-pointer mx-auto"}>
+                                            <img
+                                                width="140px"
 
-
-                            <div class="flex flex-row justify-between mb-3">
-                                <div class="flex flex-col mb-3 w-1/3">
-                                    <p class="text-center text-xs text-gray-700">Name:</p>
-                                    <p class="text-center">{itemData.name}</p>
-                                </div>
-                                <div class="flex flex-col mb-3 w-1/3">
-                                    <p class="text-center text-xs text-gray-700">Network:</p>
-                                    <p class="text-center">{networkNameFromId[itemData.network as ChainIds]}</p>
-                                </div>
-                            </div>
-
-
-                            <div class="flex flex-row justify-between mb-3">
-
-                                <div class="flex flex-col mb-3 w-1/3">
-                                    <p class="text-center text-xs text-gray-700">Max Debited:</p>
-                                    <p class="text-center">{itemData.max_price} {JSON.parse(itemData.currency).name}</p>
-                                </div>
-
-                                <div class="flex flex-col w-1/3">
-                                    <p class="text-center text-xs text-gray-700">Debit Times:</p>
-                                    <p class="text-center">{itemData.debit_times}</p>
-                                </div>
-
-                                <div class="flex flex-col w-1/3">
-                                    <p class="text-center text-xs text-gray-700">Debit Interval (Days)</p>
-                                    <p class="text-center">{itemData.debit_interval}</p>
-                                </div>
-                            </div>
-                            <div class="flex flex-row justify-between mb-3">
-
-                                <div class="flex flex-col mb-3 w-1/3">
-                                    <p class="text-center text-xs text-gray-700">Pricing</p>
-                                    <p class="text-center">{itemData.pricing}</p>
-                                </div>
-                            </div>
-
-                            <div class="flex flex-col mb-6">
-                                <p class="text-center text-xs text-gray-700">Redirect Url</p>
-                                <p class="text-center">{itemData.redirect_url}</p>
-                            </div>
-
-                            <div class="flex flex-col">
-                                <small class={"mx-auto"}>Navigate to the checkout page:</small>
-                                <a href={`/buyitnow/?q=${itemData.button_id}`} class={"cursor-pointer mx-auto"}>
-                                    <img
-                                        width="140px"
-
-                                        src={"/buyitnow.png"}
-                                    />
-                                </a>
-                            </div>
-                            <div class="mb-4 mt-4">
-                                <div class="flex flex-row justify-center w-full">
-                                    <p class="text-sm">Identifier: </p>
-                                </div>
-                                <div class="flex flex-row justify-center w-full">
-                                    <p class="text-xs mt-1"> {itemData.button_id} </p>
-                                    <CopyButton str={itemData.button_id}></CopyButton>
-                                </div>
-                            </div>
+                                                src={"/buyitnow.png"}
+                                            />
+                                        </a></td>
+                                    </tr>
+                                    <tr>
+                                        <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Identifier:</td>
+                                        <td class={"px-4 py-4 text-sm whitespace-nowrap flex flex-row"}><div class="overflow-x-auto overflowingTableData"> <p class="text-xs mt-1"> {itemData.button_id} </p>
+                                            <CopyButton str={itemData.button_id}></CopyButton>
+                                        </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                             <DeactivateComponent itemData={itemData}></DeactivateComponent>
                         </div>
                     </div>
@@ -135,7 +127,7 @@ export default function Item(props: PageProps) {
                             <div class="rounded-full w-3 h-3 bg-green-500"></div>
                         </div>
 
-                        <div class="py-4 px-4 mt-1 text-white">
+                        <div class="py-4 px-4 mt-1 text-white overflow-auto">
                             <pre class="text-sm">
                                 {embeddedCode}
                             </pre>
