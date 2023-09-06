@@ -1,7 +1,7 @@
 import { AccountCardElement } from "../components/AccountCardElement.tsx";
 import { createPaymentIntent, toNoteHex } from "../lib/frontend/directdebitlib.ts";
 import { aesDecryptData } from "../lib/frontend/encryption.ts";
-import { redirectToRedirectPage, uploadPaymentIntent } from "../lib/frontend/fetch.ts";
+import { logoutRequest, redirectToRedirectPage, uploadPaymentIntent } from "../lib/frontend/fetch.ts";
 import { parseEther } from "../lib/frontend/web3.ts";
 import { ItemProps } from "./buyButtonPage.tsx";
 import { useState } from 'preact/hooks';
@@ -54,9 +54,13 @@ export default function ApprovePaymentIsland(props: ApprovePaymentIslandProps) {
                 paymentIntent: toNoteHex(paymentIntent.publicSignals[0]),
                 commitment: toNoteHex(paymentIntent.publicSignals[1])
 
-            }).then((status) => {
+            }).then(async (status) => {
                 if (status === 200) {
+                    // Success is true!
                     setSuccess(true)
+                    // Log out so the back button will not reload the page
+                    await logoutRequest();
+                    // navigate to the redirect page
                     setTimeout(() => {
                         redirectToRedirectPage(
                             props.itemData.redirectUrl,
