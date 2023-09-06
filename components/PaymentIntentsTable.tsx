@@ -1,5 +1,5 @@
 import CopyButton from "../islands/copyButton.tsx";
-import { PaymentIntentStatus } from "../lib/paymentIntentStatus.ts";
+import { PaymentIntentStatus } from "../lib/enums.ts";
 import { ChainIds, networkNameFromId } from "../lib/shared/web3.ts";
 
 export interface PaymentIntentsTableProps {

@@ -4,3 +4,8 @@ export enum PaymentIntentStatus {
   RECURRING = "Recurring",
   PAID = "Paid",
 }
+
+export enum Pricing {
+  Fixed = "Fixed",
+  Dynamic = "Dynamic",
+}

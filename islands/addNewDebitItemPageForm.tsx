@@ -2,10 +2,11 @@ import { useState } from 'preact/hooks';
 import { availableNetworks } from "../lib/shared/web3.ts";
 import { SelectableCurrency, bittorrentCurrencies } from "../lib/frontend/web3.ts";
 import CurrencySelectDropdown from './CurrencySelectDropdown.tsx';
+import { Pricing } from "../lib/enums.ts";
 
 
 
-export const debitPricing = ["Fixed", "Dynamic"]
+export const debitPricing = [Pricing.Fixed, Pricing.Dynamic]
 
 interface AddNewDebitItemFormProps {
     creatorAddress: string
