@@ -1,11 +1,13 @@
 import { Handlers } from "$fresh/server.ts";
 import {
+  broadcastNewPayment,
   insertPaymentIntent,
   selectAccountByCommitment,
   selectItemByButtonId,
+  updateItemPaymentIntentsCount,
 } from "../../lib/backend/supabaseQueries.ts";
 import { estimateRelayerGas } from "../../lib/backend/web3.ts";
-import { PaymentIntentStatus } from "../../lib/paymentIntentStatus.ts";
+import { PaymentIntentStatus, Pricing } from "../../lib/enums.ts";
 import { State } from "../_middleware.ts";
 
 export const handler: Handlers<any, State> = {
@@ -51,7 +53,6 @@ export const handler: Handlers<any, State> = {
       debitTimes,
       debitInterval,
     }, itemData[0].network);
-
     // Now I save it to the database and return ok
     const { data, error: insertError } = await insertPaymentIntent(
       ctx.state.supabaseClient,
@@ -70,6 +71,8 @@ export const handler: Handlers<any, State> = {
       itemData[0].currency,
       itemData[0].network,
       itemData[0].id,
+      proof,
+      publicSignals,
     );
 
     if (insertError !== null) {
@@ -77,9 +80,16 @@ export const handler: Handlers<any, State> = {
     }
 
     //Update the debit item with how many payment intents are related to it
-    const { error } = await ctx.state.supabaseClient.from("Items").update({
-      payment_intents_count: itemData[0].payment_intents_count + 1,
-    }).eq("button_id", item_button_id);
+    const { error } = await updateItemPaymentIntentsCount(
+      ctx.state.supabaseClient,
+      itemData[0].payment_intents_count + 1,
+      item_button_id,
+    );
+
+    // Only Fixed priced subscriptions are relayed instantly, for dynamic pricing the API will need to be manually triggered with the price!
+    if (itemData[0].pricing === Pricing.Fixed) {
+      broadcastNewPayment(ctx.state.channel, { paymentIntent });
+    }
 
     return new Response(null, { status: 200 });
   },
