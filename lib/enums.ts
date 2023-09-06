@@ -3,6 +3,7 @@ export enum PaymentIntentStatus {
   CANCELLED = "Cancelled",
   RECURRING = "Recurring",
   PAID = "Paid",
+  BALANCETOOLOWTORELAY = "Balance too low to relay",
 }
 
 export enum Pricing {
