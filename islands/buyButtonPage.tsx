@@ -548,9 +548,22 @@ function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
 
 }
 
+function sortAccounts(accounts: Array<any>): Array<any> {
+    return accounts.sort((a, b) => {
+        const abalance = parseEther(a.balance);
+        const bbalance = parseEther(b.balance);
+        if (abalance > bbalance) {
+            return -1;
+        }
+        if (abalance < bbalance) {
+            return 1;
+        }
+        return 0;
+    })
+}
+
 function LoggedInUi(props: LoggedInUiProps) {
     // I need to display the accounts as cards, they must be selectable so I need state here and a button to approve payment after typing the account password
-
     return <div class="flex flex-col">
         <div class="flex flex-col flex-wrap"></div>
         <div class="flex flex-col justify-center">
@@ -560,7 +573,7 @@ function LoggedInUi(props: LoggedInUiProps) {
                 </CardOutline>
             </div>
             <div class="flex flex-row flex-wrap ml-4 justify-center">
-                {props.accounts.map(
+                {sortAccounts(props.accounts).map(
                     (acc: any) =>
                         <CardOutline
                             extraCss="mt-3"
