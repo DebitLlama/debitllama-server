@@ -264,6 +264,8 @@ export async function insertPaymentIntent(
   currency: string,
   network: string,
   debit_item_id: string,
+  proof: string,
+  publicSignals: string,
 ) {
   return await supabaseClient.from(
     "PaymentIntents",
@@ -286,6 +288,8 @@ export async function insertPaymentIntent(
     currency,
     network,
     debit_item_id,
+    proof,
+    publicSignals,
   });
 }
 
@@ -323,6 +327,16 @@ export async function updateItem(
       "button_id",
       button_id,
     );
+}
+
+export async function updateItemPaymentIntentsCount(
+  supabaseClient: any,
+  payment_intents_count: number,
+  button_id: string,
+) {
+  return await supabaseClient.from("Items").update({
+    payment_intents_count,
+  }).eq("button_id", button_id);
 }
 
 export async function updateRelayerBalanceAndHistorySwitchNetwork(
@@ -398,4 +412,25 @@ export async function upsertProfile(
       },
       { ignoreDuplicates: false },
     ).select();
+}
+
+//REALTIME
+
+interface BroadcastNewPaymentPayload {
+  paymentIntent: string;
+}
+
+export function broadcastNewPayment(
+  channel: any,
+  payload: BroadcastNewPaymentPayload,
+) {
+  channel.subscribe((status: string) => {
+    if (status === "SUBSCRIBED") {
+      channel.send({
+        type: "broadcast",
+        event: "newFixedPayment",
+        payload,
+      });
+    }
+  });
 }

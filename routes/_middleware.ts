@@ -7,6 +7,7 @@ export interface State {
   token: string | null;
   userid: string | null;
   supabaseClient: SupabaseClient<any, "public", any>;
+  channel: any;
 }
 
 export async function handler(
@@ -20,6 +21,8 @@ export async function handler(
   );
 
   ctx.state.supabaseClient = client;
+
+  ctx.state.channel = client.channel("relayer_1");
 
   const supaCreds = getCookies(req.headers)["supaLogin"];
 
