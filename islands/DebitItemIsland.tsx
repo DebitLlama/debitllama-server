@@ -34,7 +34,7 @@ export function PaymentIntentsTableForDebitItem(props: PaymentIntentsTableProps)
                                     Next payment
                                 </th>
                                 <th scope="col" class="w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                    Account Balance
+                                    Customer Account Balance
                                 </th>
                                 <th scope="col" class="w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
                                     Created Date
