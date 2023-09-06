@@ -394,12 +394,20 @@ function handleError(msg: string) {
     console.error(msg)
 }
 
+function NextIcon(props: { width: string }) {
+    // Same width as height
+    return <img class="blink" src={"/whiteArrowRight.svg"} width={props.width} />
+}
+
+function TopUpIcon(props: { width: string }) {
+    return <img style="margin-left: 10px;" src="/topupLogo.svg" width={props.width} />
+}
 
 function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
 
     if (props.selected === 0 || props.selected < 0) {
         return <div class="mx-auto mt-4 mb-10 bt-4">
-            <p class="text-xl text-slate-600">Select an account</p>
+            <p class="bg-gray-50 dark:bg-gray-800 px-4 py-4 text-xl text-slate-600">Select an account</p>
         </div>
     }
 
@@ -462,7 +470,7 @@ function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
                 profileExists={props.profileExists}
                 profile={props.profile}></BuyPageProfile>
             <div class="bg-white  px-3 py-[0.25rem]">
-                <h4 class="text-xl text-center mb-2">Create New Account</h4>
+                <h4 class="bg-gray-50 dark:bg-gray-800 px-4 py-4 text-xl text-center mb-2">Create New Account</h4>
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="accountName">Account Name</label>
                     <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
@@ -486,7 +494,7 @@ function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
                     <button
                         disabled={isButtonDisabled()}
                         type="submit"
-                        class="mb-4 mt-2 bg-indigo-500 text-white text-sm font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
+                        class="mb-4 mt-2 bg-indigo-500 text-white text-xl font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
                     >Create account</button>
                 </div>
             </div>
@@ -502,7 +510,7 @@ function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
             const inputValue = props.topupAmount < amountToTopUp ? amountToTopUp : props.topupAmount;
             return <>
                 <div class="mx-auto mt-4 bt-4">
-                    <p class="text-xl text-slate-600">Top Up Balance</p>
+                    <p class="bg-gray-50 dark:bg-gray-800 px-4 py-4  text-xl text-slate-600">Top Up Balance</p>
                     <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
                         value={inputValue} onChange={(event: any) => props.setTopupAmount(parseFloat(event.target.value))} type="number" id="amount" name="amount" placeholder="Amount" />
                     <button
@@ -513,8 +521,11 @@ function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
                             handleError,
                             currency: props.item.currency
                         })}
-                        class="mb-4 mt-2 w-full bg-indigo-500 text-white text-sm font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
-                        type="submit">Top Up</button>
+                        class="flex flex-row justify-center  text-2xl mb-4 mt-2 w-full bg-indigo-500 text-white font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
+                        type="submit">
+                        <p>Top Up</p>
+                        <TopUpIcon width="35" />
+                    </button>
                 </div></>
         }
 
@@ -528,7 +539,7 @@ function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
                 <input type="hidden" value={selectedAccount.commitment} name="accountcommitment" />
                 <button
                     type={"submit"}
-                    class="w-60 mb-4 mt-4 mx-auto text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">Next</button>
+                    class="flex flex-row justify-center text-2xl font-bold w-60 mb-4 mt-4 mx-auto text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"><p>Next</p><NextIcon width={"35"} /></button>
             </form>
         </>
     }
@@ -552,7 +563,7 @@ function LoggedInUi(props: LoggedInUiProps) {
                 {props.accounts.map(
                     (acc: any) =>
                         <CardOutline
-                            extraCss=""
+                            extraCss="mt-3"
                             setSelected={props.setSelectedAccount}
                             id={props.accounts.indexOf(acc) + 2}
                             selected={props.selectedAccount}
