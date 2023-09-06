@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks';
-import { NetworkNames, availableNetworks, chainIdFromNetworkName, getRelayerGasTrackerContractAddress, mapNetworkNameToDBColumn, walletCurrency } from '../lib/shared/web3.ts';
-import { getContract, handleNetworkSelect, requestAccounts, topupRelayer } from '../lib/frontend/web3.ts';
+import { NetworkNames, availableNetworks, chainIdFromNetworkName, getRelayerGasTrackerContractAddress, mapNetworkNameToDBColumn, mapNetworkNameToMissingBalanceColumn, walletCurrency } from '../lib/shared/web3.ts';
+import { getContract, handleNetworkSelect, parseEther, requestAccounts, topupRelayer } from '../lib/frontend/web3.ts';
 import { postRelayerTopup } from '../lib/frontend/fetch.ts';
 
 export interface RelayerDetailsCardProps {
@@ -119,6 +119,7 @@ export default function RelayerDetailsCard(props: RelayerDetailsCardProps) {
         <div class={"mb-4"}>
             <p class="text-sm text-gray-600">The relayer needs to pay for gas when submitting transactions! Pay for the gas by topping up the relayer!</p>
         </div>
+        {IsBalanceMissing(networkSelected as NetworkNames, props.relayerData)}
         <form onSubmit={topupClicked}>
             <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
                 value={topUpAmount} onChange={(event: any) => setTopupAmount(event.target.value)} type="number" id="amount" name="amount" placeholder="Amount" />
@@ -128,4 +129,18 @@ export default function RelayerDetailsCard(props: RelayerDetailsCardProps) {
                 type="submit">Top Up</button>
         </form>
     </>
+}
+
+export function IsBalanceMissing(networkName: NetworkNames, relayerData: any) {
+    const missingBalance = mapNetworkNameToMissingBalanceColumn(networkName, relayerData);
+
+    if (parseEther(missingBalance) !== BigInt("0")) {
+        return <div class={`mb-4 border-solid border-2 border-red-600 flex flex-col justify-center`}>
+            <div><h4 class="text-xl mx-auto text-center">{"Missing Balance"}</h4></div>
+            <p class="p-5 text-center">The Relayer is missing balance and can't relay transactions!</p>
+            <p class="p-5 text-center">Top up the Relayer with at least {missingBalance} {walletCurrency[chainIdFromNetworkName[networkName as NetworkNames]]}</p>
+        </div>
+    } else {
+        return null;
+    }
 }
