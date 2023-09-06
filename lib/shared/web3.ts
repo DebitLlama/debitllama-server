@@ -78,6 +78,18 @@ export function mapNetworkNameToDBColumn(
   }
 }
 
+export function mapNetworkNameToMissingBalanceColumn(
+  selectedNetwork: NetworkNames,
+  relayerData: any,
+) {
+  switch (selectedNetwork) {
+    case NetworkNames.BTT_TESTNET:
+      return relayerData.Missing_BTT_Donau_Testnet_Balance;
+    default:
+      break;
+  }
+}
+
 //This is used with the RelayerBalance DB Table!
 export function mapNetworkNameToDBColumnNameString(
   selectedNetwork: NetworkNames,
