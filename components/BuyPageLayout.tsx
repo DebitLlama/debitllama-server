@@ -72,33 +72,33 @@ export default function BuyPageLayout(props: BuyPagelayoutProps) {
                             </thead>
                             <tbody>
                                 <tr>
-                                    <UnderlinedTd extraStyles="text-slate-400 dark:text-slate-200 text-sm" >Subscription:</UnderlinedTd>
-                                    <UnderlinedTd extraStyles="font-semibold">{props.item.name}</UnderlinedTd>
+                                    <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm" >Subscription:</UnderlinedTd>
+                                    <UnderlinedTd extraStyles="font-semibold"><p>{props.item.name}</p></UnderlinedTd>
                                     <UnderlinedTd extraStyles=""><Tooltip message="The name of subscription"></Tooltip></UnderlinedTd>
                                 </tr>
                                 <tr>
-                                    <UnderlinedTd extraStyles="text-slate-400 dark:text-slate-200 text-sm" >Approved Payment:</UnderlinedTd>
-                                    <UnderlinedTd extraStyles="font-semibold" >{props.item.maxPrice} {props.item.currency.name}</UnderlinedTd>
+                                    <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm" >Approved Payment:</UnderlinedTd>
+                                    <UnderlinedTd extraStyles="font-semibold"><p> {props.item.maxPrice} {props.item.currency.name} </p></UnderlinedTd>
                                     <UnderlinedTd extraStyles=""><Tooltip message="The maximum amount that can be debited from the account"></Tooltip></UnderlinedTd>
                                 </tr>
                                 <tr>
-                                    <UnderlinedTd extraStyles="text-slate-400 dark:text-slate-200 text-sm">Network:</UnderlinedTd>
-                                    <UnderlinedTd extraStyles="font-semibold" >{networkName}</UnderlinedTd>
+                                    <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Network:</UnderlinedTd>
+                                    <UnderlinedTd extraStyles="font-semibold" ><p>{networkName}</p></UnderlinedTd>
                                     <UnderlinedTd extraStyles=""><Tooltip message="The network used for this payment"></Tooltip></UnderlinedTd>
                                 </tr>
                                 <tr>
-                                    <UnderlinedTd extraStyles="text-slate-400 dark:text-slate-200 text-sm">Pricing:</UnderlinedTd>
-                                    <UnderlinedTd extraStyles="font-semibold" >{props.item.pricing}</UnderlinedTd>
+                                    <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Pricing:</UnderlinedTd>
+                                    <UnderlinedTd extraStyles="font-semibold" ><p> {props.item.pricing}</p></UnderlinedTd>
                                     <UnderlinedTd extraStyles=""><Tooltip message={getSubscriptionTooltipMessage(props.item.pricing)}></Tooltip></UnderlinedTd>
                                 </tr>
                                 <tr>
-                                    <UnderlinedTd extraStyles="text-slate-400 dark:text-slate-200 text-sm" >Debit Times:</UnderlinedTd>
-                                    <UnderlinedTd extraStyles="font-semibold">{props.item.debitTimes} payment{props.item.debitTimes === 1 ? "" : "s"}</UnderlinedTd>
+                                    <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm" >Debit Times:</UnderlinedTd>
+                                    <UnderlinedTd extraStyles="font-semibold"><p> {props.item.debitTimes} payment{props.item.debitTimes === 1 ? "" : "s"}</p> </UnderlinedTd>
                                     <UnderlinedTd extraStyles=""><Tooltip message="The amount of times this approval lets the payee debit the account"></Tooltip></UnderlinedTd>
                                 </tr>
                                 <tr>
-                                    <UnderlinedTd extraStyles="text-slate-400 dark:text-slate-200 text-sm">Debit Interval (Days):</UnderlinedTd>
-                                    <UnderlinedTd extraStyles="font-semibold">{getDebitIntervalText(props.item.debitInterval, props.item.debitTimes)}</UnderlinedTd>
+                                    <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Debit Interval (Days):</UnderlinedTd>
+                                    <UnderlinedTd extraStyles="font-semibold"><p> {getDebitIntervalText(props.item.debitInterval, props.item.debitTimes)}</p></UnderlinedTd>
                                     <UnderlinedTd extraStyles=""><Tooltip message="The amount of days that needs to pass before the account can be debited again, counted from the last payment date"></Tooltip></UnderlinedTd>
                                 </tr>
                             </tbody>
