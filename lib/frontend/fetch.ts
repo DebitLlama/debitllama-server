@@ -123,3 +123,10 @@ export async function postRelayerTopup(args: PostRelayerTopup) {
     },
   }).then((response) => response.status);
 }
+
+export async function logoutRequest() {
+  return await fetch("/logout", {
+    credentials: "same-origin",
+    method: "GET",
+  }).then((response) => response.status);
+}
