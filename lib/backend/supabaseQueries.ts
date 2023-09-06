@@ -69,7 +69,7 @@ export async function selectOpenAccountsByIdDESC(
     .select()
     .eq("user_id", userId)
     .eq("closed", false)
-    .order("created_at", { ascending: false });
+    .order("last_modified", { ascending: false });
 }
 
 export async function selectPaymentIntentsByUserIdDESC(
@@ -77,7 +77,10 @@ export async function selectPaymentIntentsByUserIdDESC(
   userId: string | null,
 ) {
   return await supabaseClient
-    .from("PaymentIntents").select().eq("creator_user_id", userId).order(
+    .from("PaymentIntents").select("*,debit_item_id(*)").eq(
+      "creator_user_id",
+      userId,
+    ).order(
       "created_at",
       { ascending: false },
     );
@@ -122,7 +125,7 @@ export async function selectPaymentIntentsByPayeeAndItem(
     .select("*,account_id(balance,currency)").eq("payee_user_id", userId).eq(
       "debit_item_id",
       debit_item_id,
-    );
+    ).order("created_at", { ascending: false });
 }
 
 export async function selectRelayerBalanceByUserId(
@@ -152,7 +155,7 @@ export async function selectRelayerTopUpHistoryDataByUserId(
   return await supabaseClient.from("RelayerTopUpHistory").select().eq(
     "user_id",
     userId,
-  );
+  ).order("created_at", { ascending: false });
 }
 
 //INSERTS
@@ -175,6 +178,7 @@ export async function insertNewAccount(
     closed: false,
     currency,
     balance: formatEther(balance),
+    last_modified: new Date().toISOString(),
   });
 }
 
@@ -283,7 +287,7 @@ export async function insertPaymentIntent(
     estimatedGas,
     statusText,
     lastPaymentDate: null,
-    nextPaymentDate: null,
+    nextPaymentDate: new Date().toDateString(),
     pricing,
     currency,
     network,
@@ -313,7 +317,11 @@ export async function updateAccount(
 ) {
   return await supabaseClient
     .from("Accounts")
-    .update({ balance: formatEther(balance), closed }).eq("id", id);
+    .update({
+      balance: formatEther(balance),
+      closed,
+      last_modified: new Date().toISOString(),
+    }).eq("id", id);
 }
 
 export async function updateItem(
@@ -358,11 +366,21 @@ export async function updateRelayerBalanceAndHistorySwitchNetwork(
         `${relayerBalance[0].BTT_Donau_Testnet_Balance}`,
       );
       const newBalance = parseEther(addedBalance) + bttBalance;
+
+      const missingBalance = parseEther(
+        relayerBalance[0].Missing_BTT_Donau_Testnet_Balance,
+      );
+      const newMissingBalance = calculateNewMissingBalance(
+        missingBalance,
+        parseEther(addedBalance),
+      );
+
       const id = relayerBalance[0].id;
 
       await supabaseClient.from("RelayerBalance").update({
         BTT_Donau_Testnet_Balance: formatEther(newBalance),
         last_topup: new Date().toISOString(),
+        Missing_BTT_Donau_Testnet_Balance: formatEther(newMissingBalance),
       }).eq("id", id);
 
       await supabaseClient.from("RelayerTopUpHistory").insert({
@@ -378,6 +396,21 @@ export async function updateRelayerBalanceAndHistorySwitchNetwork(
     default:
       console.log("default case triggers");
       break;
+  }
+}
+
+function calculateNewMissingBalance(
+  missingBalance: bigint,
+  addedBalance: bigint,
+): bigint {
+  if (missingBalance === BigInt(0)) {
+    return BigInt(0);
+  }
+  const newBalance = missingBalance - addedBalance;
+  if (newBalance < 0) {
+    return BigInt(0);
+  } else {
+    return newBalance;
   }
 }
 
