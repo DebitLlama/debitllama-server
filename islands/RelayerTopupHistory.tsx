@@ -1,5 +1,6 @@
 import { ShorthandPropertyAssignment } from "https://deno.land/x/ts_morph@17.0.1/ts_morph.js";
 import { ChainIds, getChainExplorerForChainId, networkNameFromId, walletCurrency } from "../lib/shared/web3.ts";
+import { formatTxHash } from "../components/components.tsx";
 
 export interface RelayerTopupHistoryProps {
     topUpHistoryData: Array<any>
@@ -46,8 +47,4 @@ export default function RelayerTopupHistory(props: RelayerTopupHistoryProps) {
             </tbody>
         </table>
     </div>
-}
-
-function formatTxHash(tx: string) {
-    return `${tx.substring(0, 5)}...${tx.substring(tx.length - 5, tx.length)}`
 }

@@ -1,4 +1,5 @@
-import { PaymentIntentsTableProps, RenderIdentifier, getNextPaymentDateDisplay, getStatusLogo } from "../components/PaymentIntentsTable.tsx";
+import { PaymentIntentsTableProps, getNextPaymentDateDisplay, getStatusLogo } from "../components/PaymentIntentsTable.tsx";
+import { RenderIdentifier } from "../components/components.tsx";
 
 interface DebitItemIsland {
     paymentIntentData: Array<any>

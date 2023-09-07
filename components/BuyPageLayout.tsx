@@ -3,6 +3,7 @@ import { ItemProps } from "../islands/buyButtonPage.tsx";
 import { debitPricing } from "../islands/addNewDebitItemPageForm.tsx";
 import { Head } from "$fresh/runtime.ts";
 import { ChainIds, networkNameFromId } from "../lib/shared/web3.ts";
+import { Tooltip, UnderlinedTd, getDebitIntervalText, getSubscriptionTooltipMessage } from "./components.tsx";
 
 interface BuyPagelayoutProps {
     children: ComponentChildren,
@@ -16,21 +17,7 @@ function isDynamic(pricing: string) {
     return pricing === debitPricing[1];
 }
 
-function getDebitIntervalText(debitInterval: number, debitTimes: number) {
-    if (debitTimes === 1) {
-        return "Unspecified";
-    }
-    if (debitInterval === 0) {
-        return "Unspecified"
-    }
 
-    if (debitInterval === 1) {
-        return "The payment can be withdrawn every day"
-    }
-
-    return `The payment can be withdrawn only every ${debitInterval} days`
-
-}
 
 export default function BuyPageLayout(props: BuyPagelayoutProps) {
 
@@ -113,30 +100,3 @@ export default function BuyPageLayout(props: BuyPagelayoutProps) {
     </>
 }
 
-function getSubscriptionTooltipMessage(pricing: string) {
-    if (pricing === "Fixed") {
-        return "Fixed priced subscriptions will always debit the approved amount."
-    } else {
-        return "Metered subscriptions have dynamic pricing where the approved amount represents a maximum";
-    }
-}
-
-interface TooltipProps {
-    message: string
-}
-
-function Tooltip(props: TooltipProps) {
-    return <div class="tooltip">
-        ?
-        <span aria-label="Tooltip helptext" class="tooltiptext">{props.message}</span>
-    </div>
-}
-
-interface UnderlinedTdProps {
-    children: ComponentChildren
-    extraStyles: string
-}
-
-function UnderlinedTd(props: UnderlinedTdProps) {
-    return <td class={`${props.extraStyles} border-b border-slate-100 dark:border-slate-700 p-4 text-slate-500 dark:text-slate-400`}>{props.children}</td>
-}

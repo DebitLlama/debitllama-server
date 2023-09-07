@@ -1,6 +1,7 @@
 import CopyButton from "../islands/copyButton.tsx";
-import { PaymentIntentStatus } from "../lib/enums.ts";
+import { PaymentIntentStatus, Pricing } from "../lib/enums.ts";
 import { ChainIds, networkNameFromId } from "../lib/shared/web3.ts";
+import { RenderIdentifier } from "./components.tsx";
 
 export interface PaymentIntentsTableProps {
     paymentIntentData: Array<any>
@@ -10,12 +11,19 @@ export function getNextPaymentDateDisplay(nextPaymentDate: any) {
     return new Date(nextPaymentDate).toDateString()
 }
 
+function getPaymentColValue(pricing: string, maxDebitAmount: string, currencyName: string) {
+    if (pricing === Pricing.Fixed) {
+        return `${maxDebitAmount} ${currencyName}`
+    } else {
+        return `Maximum ${maxDebitAmount} ${currencyName}`
+    }
+}
+
 export function PaymentIntentsTableForAccounts(props: PaymentIntentsTableProps) {
 
     function paymentIntentRowClicked(paymentIntent: string) {
         return () => location.href = `/app/createdPaymentIntents?q=${paymentIntent}`
     }
-
 
     return <><div class="flex flex-col">
         <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -32,11 +40,7 @@ export function PaymentIntentsTableForAccounts(props: PaymentIntentsTableProps) 
                                 </th>
 
                                 <th scope="col" class="w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                    Amount
-                                </th>
-
-                                <th scope="col" class="w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                    Pricing
+                                    Payment
                                 </th>
                                 <th scope="col" class="w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
                                     Payments left
@@ -63,12 +67,10 @@ export function PaymentIntentsTableForAccounts(props: PaymentIntentsTableProps) 
                                     <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
                                         <div class="flex items-center gap-x-2">
                                             <div>
-                                                <p class="text-xs font-normal text-gray-600 dark:text-gray-400">{data.maxDebitAmount} {currencyName}</p>
+                                                <p class="text-xs font-normal text-gray-600 dark:text-gray-400">{getPaymentColValue(data.pricing, data.maxDebitAmount, currencyName)}</p>
                                             </div>
                                         </div>
                                     </td>
-
-                                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{data.pricing}</td>
                                     <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{data.debitTimes - data.used_for}</td>
                                     <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{getNextPaymentDateDisplay(data.nextPaymentDate)}</td>
                                     <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
@@ -86,10 +88,6 @@ export function PaymentIntentsTableForAccounts(props: PaymentIntentsTableProps) 
     </>
 }
 
-export function RenderIdentifier(id: string) {
-    // /?TODO: Copy icon and copy the text
-    return <span>{`${id.substring(0, 5)}...${id.substring(id.length - 5, id.length)}`}</span>
-}
 
 export function getStatusLogo(status: PaymentIntentStatus | string) {
     switch (status) {
@@ -131,8 +129,12 @@ export function getStatusLogo(status: PaymentIntentStatus | string) {
 
                 <h2 class="text-sm font-normal">Relayer balance too low</h2>
             </div>
+        case PaymentIntentStatus.ACCOUNTBALANCETOOLOW:
+            return <div class="inline-flex items-center px-3 py-1 rounded-full gap-x-2 text-emerald-500 bg-emerald-100/60 dark:bg-gray-800">
+                <svg xmlns="http://www.w3.org/2000/svg" height="12" viewBox="0 -960 960 960" width="12"><path d="M480-120q-33 0-56.5-23.5T400-200q0-33 23.5-56.5T480-280q33 0 56.5 23.5T560-200q0 33-23.5 56.5T480-120Zm-80-240v-480h160v480H400Z" /></svg>
+                <h2 class="text-sm font-normal">Account balance too low</h2>
+            </div>
         default:
             return <div></div>
     }
-
 }
