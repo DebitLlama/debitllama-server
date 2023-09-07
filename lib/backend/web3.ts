@@ -113,7 +113,7 @@ function toNoteHex(number: any, length = 32) {
 export function parseEther(input: string) {
   return ethers.parseEther(input);
 }
-export function formatEther(input: any){
+export function formatEther(input: any) {
   return ethers.formatEther(input);
 }
 
@@ -125,4 +125,13 @@ export async function fetchTopUpEvent(
 ) {
   const filter = contract.filters.TopUpEvent(from, parseEther(amount));
   return await contract.queryFilter(filter, fromBlockOrHash);
+}
+
+export async function getPaymentIntentHistory(
+  chainId: ChainIds,
+  paymentIntent: string,
+) {
+  const provider = getProvider(chainId);
+  const contract = getContract(provider, chainId);
+  return await contract.paymentIntents(paymentIntent);
 }
