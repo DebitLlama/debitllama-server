@@ -3,8 +3,10 @@ import { State } from "../_middleware.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import RelayerDetailsCard from "../../islands/RelayerDetailsCard.tsx";
 import { fetchTopUpEvent, getRelayerTopUpContract } from "../../lib/backend/web3.ts";
-import { insertNewRelayerBalance, selectProfileByUserId, selectRelayerBalanceByUserId, selectRelayerTopUpHistoryDataByTransactionHash, selectRelayerTopUpHistoryDataByUserId, updateRelayerBalanceAndHistorySwitchNetwork } from "../../lib/backend/supabaseQueries.ts";
+import { insertNewRelayerBalance, selectProfileByUserId, selectRelayerBalanceByUserId, selectRelayerHistoryByUserId, selectRelayerTopUpHistoryDataByTransactionHash, selectRelayerTopUpHistoryDataByUserId, updateRelayerBalanceAndHistorySwitchNetwork } from "../../lib/backend/supabaseQueries.ts";
 import RelayerTopupHistory from "../../islands/RelayerTopupHistory.tsx";
+import RelayedTxHistory from "../../islands/RelayedTxHistory.tsx";
+import RelayerUISwitcher from "../../islands/RelayerUISwitcher.tsx";
 
 export const handler: Handlers<any, State> = {
     async GET(_req, ctx) {
@@ -30,7 +32,10 @@ export const handler: Handlers<any, State> = {
 
         const { data: relayerTopUpHistoryData, error: relayerTopUpHistoryDataError } = await selectRelayerTopUpHistoryDataByUserId(ctx.state.supabaseClient, userid);
 
-        return ctx.render({ ...ctx.state, relayerBalanceData, profileData, relayerTopUpHistoryData });
+        const { data: relayerTxHistoryData, error: relayerTxHistoryDataError } = await selectRelayerHistoryByUserId(ctx.state.supabaseClient, userid);
+
+
+        return ctx.render({ ...ctx.state, relayerBalanceData, profileData, relayerTopUpHistoryData, relayerTxHistoryData });
     },
     async POST(_req, ctx) {
         const userid = ctx.state.userid;
@@ -90,25 +95,6 @@ export const handler: Handlers<any, State> = {
 
 export default function Relayer(props: PageProps) {
     return <Layout isLoggedIn={props.data.token}>
-        <div class="container mx-auto py-8">
-            <div class="flex items-center justify-center h-full">
-                <div class="bg-white shadow-2xl p-6 rounded-2xl border-2 border-gray-50 w-96">
-                    <div class="flex flex-col">
-                        <div class={"flex flex-row justify-start"}>
-                            <img src="/blockchain.png" width="40px" />
-                            <p class={"text-xl font-extrabold leading-10 pl-6"}>Relayer</p>
-                        </div>
-                        <RelayerDetailsCard
-                            walletAddress={props.data.profileData[0].walletaddress}
-                            relayerData={props.data.relayerBalanceData[0]}></RelayerDetailsCard>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex flex-col items-center justify-center h-full w-full">
-                <h4>Top Up History</h4>
-                <RelayerTopupHistory topUpHistoryData={props.data.relayerTopUpHistoryData}></RelayerTopupHistory>
-            </div>
-        </div>
+        <RelayerUISwitcher data={props.data}></RelayerUISwitcher>
     </Layout>
 }

@@ -1,4 +1,3 @@
-import { ShorthandPropertyAssignment } from "https://deno.land/x/ts_morph@17.0.1/ts_morph.js";
 import { ChainIds, getChainExplorerForChainId, networkNameFromId, walletCurrency } from "../lib/shared/web3.ts";
 import { formatTxHash } from "../components/components.tsx";
 
@@ -12,7 +11,11 @@ export default function RelayerTopupHistory(props: RelayerTopupHistoryProps) {
             window.open(url, "_blank")
         }
     }
-    return <div>
+    return <div class={`${props.topUpHistoryData.length === 0 || props.topUpHistoryData === null ? "" : "overflow-auto"} border border-gray-200 dark:border-gray-700 md:rounded-lg`}>
+        <div class={"flex flex-row justify-center"}>
+            <h4 class="mx-auto text-gray-500 dark:text-gray-40">Topup History</h4>
+        </div>
+
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead class="bg-gray-50 dark:bg-gray-800">
                 <tr>
