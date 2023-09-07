@@ -1,5 +1,5 @@
-import { PaymentIntentsTableProps, getNextPaymentDateDisplay, getStatusLogo } from "../components/PaymentIntentsTable.tsx";
-import { RenderIdentifier } from "../components/components.tsx";
+import { PaymentIntentsTableProps, getNextPaymentDateDisplay } from "../components/PaymentIntentsTable.tsx";
+import { RenderIdentifier, getPaymentIntentStatusLogo } from "../components/components.tsx";
 
 interface DebitItemIsland {
     paymentIntentData: Array<any>
@@ -12,8 +12,8 @@ export default function DebitItemIsland(props: DebitItemIsland) {
 export function PaymentIntentsTableForDebitItem(props: PaymentIntentsTableProps) {
 
     function paymentIntentRowClicked(paymentIntent: string) {
-        
-        return () => location.href = `/app/createdPaymentIntents?q=${paymentIntent}`
+
+        return () => location.href = `/app/payeePaymentIntents?q=${paymentIntent}`
     }
 
 
@@ -53,7 +53,7 @@ export function PaymentIntentsTableForDebitItem(props: PaymentIntentsTableProps)
                                         {RenderIdentifier(data.paymentIntent)}
                                     </td>
                                     <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
-                                        {getStatusLogo(data.statusText)}
+                                        {getPaymentIntentStatusLogo(data.statusText)}
                                     </td>
                                     <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{data.debitTimes - data.used_for}</td>
                                     <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{getNextPaymentDateDisplay(data.nextPaymentDate)}</td>

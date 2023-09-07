@@ -2,9 +2,8 @@ import Layout from "../../components/Layout.tsx";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
 import { selectPaymentIntentByPaymentIntentAndCreatorUserId, selectRelayerHistoryById, updatePaymentItemStatus } from "../../lib/backend/supabaseQueries.ts";
-import { RenderIdentifier, Tooltip, UnderlinedTd, getDebitIntervalText, getSubscriptionTooltipMessage } from "../../components/components.tsx";
+import { RenderIdentifier, Tooltip, UnderlinedTd, getDebitIntervalText, getPaymentIntentStatusLogo, getSubscriptionTooltipMessage } from "../../components/components.tsx";
 import { PaymentIntentRow, PaymentIntentStatus } from "../../lib/enums.ts";
-import { getStatusLogo } from "../../components/PaymentIntentsTable.tsx";
 import RelayedTxHistory from "../../islands/RelayedTxHistory.tsx";
 import CancelPaymentIntentButton from "../../islands/CancelPaymentIntentButton.tsx";
 import { ChainIds, rpcUrl } from "../../lib/shared/web3.ts";
@@ -73,7 +72,7 @@ export default function CreatedPaymentIntents(props: PageProps) {
                             </tr>
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm" >Status:</UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><p> {getStatusLogo(pi.statusText)}</p></UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><p> {getPaymentIntentStatusLogo(pi.statusText)}</p></UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><Tooltip message="The current status of the payment"></Tooltip></UnderlinedTd>
                             </tr>
                             <tr>
