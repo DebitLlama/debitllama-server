@@ -5,6 +5,7 @@ import DirectDebitArtifact from "../../static/DirectDebit.json" assert {
 import RelayerGasTracker from "../../static/RelayerGasTracker.json" assert {
   type: "json",
 };
+import { RelayerBalance } from "../enums.ts";
 
 import {
   ChainIds,
@@ -134,4 +135,81 @@ export async function getPaymentIntentHistory(
   const provider = getProvider(chainId);
   const contract = getContract(provider, chainId);
   return await contract.paymentIntents(paymentIntent);
+}
+
+/**
+ * increase the gas limit by 30 percent to make sure the value we use is enough!
+ * @param estimatedGasLimit
+ * @returns bigint
+ */
+
+export const increaseGasLimit = (estimatedGasLimit: bigint) => {
+  return (estimatedGasLimit * BigInt(130)) / BigInt(100); // increase by 30%
+};
+
+/**
+ *  get the gas price for the chainId
+ * @param chainId
+ * @returns feeData
+ */
+
+export async function getGasPrice(chainId: ChainIds) {
+  const provider = getProvider(chainId);
+
+  const feeData = await provider.getFeeData();
+
+  return {
+    gasPrice: feeData.gasPrice,
+    maxFeePerGas: feeData.maxFeePerGas === null
+      ? BigInt(0)
+      : feeData.maxFeePerGas,
+    maxPriorityFeePerGas: feeData.maxPriorityFeePerGas === null
+      ? BigInt(0)
+      : feeData.maxPriorityFeePerGas,
+  };
+}
+
+/**
+ * Calculate the gas estimation for a dynamic payment request using the chainid and fee data and an increased gas limit
+ * @param chainId
+ */
+
+export function calculateGasEstimationPerChain(
+  chainId: ChainIds,
+  feeData: {
+    gasPrice: bigint | null;
+    maxFeePerGas: bigint;
+    maxPriorityFeePerGas: bigint;
+  },
+  increasedEstimatedGas: bigint,
+) {
+  if (feeData.gasPrice === null) {
+    return null;
+  }
+  switch (chainId) {
+    case ChainIds.BTT_TESTNET_ID:
+      return feeData.gasPrice * increasedEstimatedGas;
+    default:
+      break;
+  }
+}
+
+/**
+ * Different chains have different rows in the DB for relayer balance!
+ * Use this function to access them!
+ * @param chainId
+ * @param relayerBalance
+ * @returns string relayer balance
+ */
+
+export function getRelayerBalanceForChainId(
+  chainId: ChainIds,
+  relayerBalance: RelayerBalance,
+) {
+  switch (chainId) {
+    case ChainIds.BTT_TESTNET_ID:
+      return relayerBalance.BTT_Donau_Testnet_Balance;
+    default:
+      return "0";
+  }
 }
