@@ -1,3 +1,5 @@
+import { ChainIds } from "../shared/web3.ts";
+
 export async function saveAccountData(
   networkId: string,
   commitment: string,
@@ -128,5 +130,18 @@ export async function logoutRequest() {
   return await fetch("/logout", {
     credentials: "same-origin",
     method: "GET",
+  }).then((response) => response.status);
+}
+
+export async function updatePaymentIntentToClosed(
+  args: { chainId: ChainIds; paymentIntent: string },
+) {
+  return await fetch("/app/createdPaymentIntents", {
+    credentials: "same-origin",
+    method: "POST",
+    body: JSON.stringify(args),
+    headers: {
+      "Content-Type": "application/json",
+    },
   }).then((response) => response.status);
 }
