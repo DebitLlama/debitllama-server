@@ -2,7 +2,10 @@ import { aesEncryptData } from "./encryption.ts";
 
 export const ETHENCRYPTPUBLICKEY = "";
 
-export async function setUpAccount(password: string, ethEncryptPublicKey: string) {
+export async function setUpAccount(
+  password: string,
+  ethEncryptPublicKey: string,
+) {
   const note = newAccountSecrets();
   const secrets = decodeAccountSecrets(note);
   const commitment = toNoteHex(secrets.commitment);
@@ -29,15 +32,17 @@ export function decodeAccountSecrets(note: string) {
   return directdebitlib.decodeAccountSecrets(note);
 }
 
-export function toNoteHex(number: any) {
+export function toNoteHex(number: any): string {
   //@ts-ignore this dependency is imported through a browser script tag
   return directdebitlib.toNoteHex(number);
 }
 
-export async function createPaymentIntent({ paymentIntentSecret, snarkArtifacts }: {
-  paymentIntentSecret: PaymentIntentSecret;
-  snarkArtifacts?: SnarkArtifacts;
-}) {
+export async function createPaymentIntent(
+  { paymentIntentSecret, snarkArtifacts }: {
+    paymentIntentSecret: PaymentIntentSecret;
+    snarkArtifacts?: SnarkArtifacts;
+  },
+) {
   //@ts-ignore this dependency is imported through a browser script tag
   return await directdebitlib.createPaymentIntent({
     paymentIntentSecret,
