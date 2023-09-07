@@ -120,6 +120,15 @@ export async function selectRelayerHistoryById(
     .eq("paymentIntent_id", paymentIntentId);
 }
 
+export async function selectRelayerHistoryByUserId(
+  supabaseClient: any,
+  user_id: string | null,
+) {
+  return await supabaseClient.from("RelayerHistory")
+    .select("*")
+    .eq("payee_user_id", user_id);
+}
+
 export async function selectPaymentIntentByPaymentIntentAndPayeeUserId(
   supabaseClient: any,
   paymentIntent: string,
