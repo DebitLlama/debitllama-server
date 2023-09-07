@@ -11,9 +11,11 @@ export default function DebitItemIsland(props: DebitItemIsland) {
 
 export function PaymentIntentsTableForDebitItem(props: PaymentIntentsTableProps) {
 
-    function paymentIntentRowClicked() {
-        console.log("click")
+    function paymentIntentRowClicked(paymentIntent: string) {
+        
+        return () => location.href = `/app/createdPaymentIntents?q=${paymentIntent}`
     }
+
 
     return <><div class="flex flex-col w-full p-2">
         <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -46,7 +48,7 @@ export function PaymentIntentsTableForDebitItem(props: PaymentIntentsTableProps)
                             {props.paymentIntentData.map((data) => {
                                 const currency = JSON.parse(data.currency);
                                 const currencyName = currency.name;
-                                return <tr class="cursor-pointer bg-white hover:bg-gray-300" onClick={paymentIntentRowClicked}>
+                                return <tr class="cursor-pointer bg-white hover:bg-gray-300" onClick={paymentIntentRowClicked(data.paymentIntent)}>
                                     <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
                                         {RenderIdentifier(data.paymentIntent)}
                                     </td>
