@@ -108,7 +108,7 @@ export default function RelayerDetailsCard(props: RelayerDetailsCardProps) {
                     <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Balance</td>
                     <td class={"px-4 py-4 text-sm whitespace-nowrap"}>
                         <div class="overflow-x-auto overflowingTableData">
-                            <pre class={"text-sm"}>{mapNetworkNameToDBColumn(networkSelected as NetworkNames, props.relayerData)} {walletCurrency[chainIdFromNetworkName[networkSelected as NetworkNames]]}</pre>
+                            <pre class={"text-sm"}>{parseFloat(mapNetworkNameToDBColumn(networkSelected as NetworkNames, props.relayerData)).toFixed(4)} {walletCurrency[chainIdFromNetworkName[networkSelected as NetworkNames]]}</pre>
                         </div>
                     </td>
                 </tr>
