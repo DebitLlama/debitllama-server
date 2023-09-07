@@ -1,11 +1,14 @@
 import { useState } from 'preact/hooks';
-import { ChainIds, networkNameFromId } from "../lib/shared/web3.ts";
+import { ChainIds, NetworkNames, chainIdFromNetworkName, networkNameFromId, walletCurrency } from "../lib/shared/web3.ts";
 import { PaymentIntentsTableForAccounts } from "../components/PaymentIntentsTable.tsx";
 import { AccountDisplayElement } from "../components/AccountDisplayElement.tsx";
+import { parseEther } from "../lib/frontend/web3.ts";
+import { formatEther } from "../ethers.min.js";
 
 interface AccountCardCarouselProps {
     accountData: Array<any>,
-    paymentIntents: Array<any>
+    paymentIntents: Array<any>,
+    missedPayments: Array<any>
 }
 
 function getPaymentIntentsForCurrentAccount(currentAccountCommitment: string, paymentIntents: Array<any>) {
@@ -99,11 +102,38 @@ export default function AccountCardCarousel(props: AccountCardCarouselProps) {
                 </div>
             </div>
         </div>
+        <MissedPaymentsNotification chainId={data.network_id} missedPayments={getPaymentIntentsForCurrentAccount(data.commitment, props.missedPayments)}></MissedPaymentsNotification>
         <hr
             class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
         <h1 class="text-2xl font-bold mb-5 text-center">Payment Intents</h1>
         <section class="container px-4 mx-auto">
             <PaymentIntentsTableForAccounts paymentIntentData={getPaymentIntentsForCurrentAccount(data.commitment, currentPaymentIntents)}></PaymentIntentsTableForAccounts>
         </section>
+    </>
+}
+
+interface MissedPaymentsNotificationProps {
+    missedPayments: Array<any>;
+    chainId: ChainIds
+}
+
+function MissedPaymentsNotification(props: MissedPaymentsNotificationProps) {
+
+    if (props.missedPayments.length === 0 || props.missedPayments === null) {
+        return null;
+    }
+
+    const missedPaymentsSum = props.missedPayments.reduce((acc, currentValue) => {
+        return acc + parseEther(currentValue.maxDebitAmount)
+    }, parseEther("0"))
+
+    return <>
+        <hr
+            class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
+        <div class={`mx-auto max-w-sm mb-4 border-solid border-2 border-red-600 flex flex-col justify-center`}>
+            <div><h4 class="text-xl mx-auto text-center">{"Missed Payments!"}</h4></div>
+            <p class="p-5 text-center">Your account missed {props.missedPayments.length} {props.missedPayments.length === 1 ? `payment` : `payments`}!</p>
+            <p class="p-5 text-center">Top up your account with at least {formatEther(missedPaymentsSum)} {walletCurrency[props.chainId]}</p>
+        </div>
     </>
 }
