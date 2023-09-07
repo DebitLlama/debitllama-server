@@ -36,7 +36,7 @@ export default function RelayedTxHistory(props: RelayedTxHistoryProps) {
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
                     {props.paymentIntentHistory.map((data: any) => {
-                        return <tr class="cursor-pointer bg-white hover:bg-gray-300" onClick={onRowClicked(getChainExplorerForChainId(data.network, data.transactionHash))}>
+                        return <tr class="cursor-pointer bg-white hover:bg-gray-300" onClick={onRowClicked(getChainExplorerForChainId(data.network, data.submittedTransaction))}>
                             <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
                                 {formatTxHash(data.submittedTransaction)}
                             </td>
