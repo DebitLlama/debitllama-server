@@ -274,7 +274,7 @@ export async function directDebit(
 export async function cancelPaymentIntent(
   contract: any,
   proof: SolidityProof,
-  hashes: string[2],
+  hashes: Array<string>,
   payee: string,
   debit: {
     maxDebitAmount: string;
@@ -311,3 +311,4 @@ export async function topupRelayer(contract: any, amount: string) {
 export async function relayerAddress(contract: any) {
   return await contract.relayer();
 }
+
