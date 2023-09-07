@@ -27,7 +27,8 @@ export const handler: Handlers<any, State> = {
 
 
         if (error) {
-            redirect = `/?error=${error.message}`
+            console.log(error);
+            redirect = `/?error=${`Unable to Log in!`}`
         }
 
         headers.set("location", redirect);
