@@ -4,6 +4,7 @@ import { ChainIds, getChainExplorerForChainId, walletCurrency } from "../lib/sha
 export interface RelayedTxHistoryProps {
     paymentIntentHistory: any;
 }
+//TODO: for dynamic payments the history should show the actual amount debited! and the max amount too!
 
 export default function RelayedTxHistory(props: RelayedTxHistoryProps) {
     function onRowClicked(url: string) {
@@ -11,7 +12,7 @@ export default function RelayedTxHistory(props: RelayedTxHistoryProps) {
             window.open(url, "_blank")
         }
     }
-    return <div class={`${props.paymentIntentHistory.length === 0 || props.paymentIntentHistory === null ? "" : "overflow-auto"} border border-gray-200 dark:border-gray-700 md:rounded-lg`}>
+    return <div class={`${props.paymentIntentHistory.length === 0 || props.paymentIntentHistory === null ? "" : "overflow-auto"} border border-gray-200 dark:border-gray-700 md:rounded-lg mt-4`}>
         <div class={"flex flex-row justify-center"}>
             <h4 class="mx-auto text-gray-500 dark:text-gray-40">Transaction History</h4>
         </div>
