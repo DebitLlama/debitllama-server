@@ -12,6 +12,13 @@ export enum Pricing {
   Dynamic = "Dynamic",
 }
 
+export enum DynamicPaymentRequestJobsStatus {
+  CREATED = "Created",
+  LOCKED = "Locked",
+  COMPLETED = "Completed",
+  REJECETED = "Rejected",
+}
+
 export type PaymentIntentRow = {
   id: number;
   created_at: string;
@@ -65,4 +72,13 @@ export type DebitItem = {
   name: string;
   deleted: boolean;
   payment_intents_count: number;
+};
+
+export type RelayerBalance = {
+  id: number;
+  created_at: string;
+  BTT_Donau_Testnet_Balance: string;
+  Missing_BTT_Donau_Testnet_Balance: string;
+  user_id: string;
+  last_topup: string;
 };
