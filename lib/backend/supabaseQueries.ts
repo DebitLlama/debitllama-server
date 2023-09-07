@@ -1,5 +1,9 @@
 import { formatEther } from "$ethers";
-import { PaymentIntentStatus } from "../enums.ts";
+import {
+  DynamicPaymentRequestJobsStatus,
+  PaymentIntentRow,
+  PaymentIntentStatus,
+} from "../enums.ts";
 import { ChainIds } from "../shared/web3.ts";
 import { parseEther } from "./web3.ts";
 
@@ -134,7 +138,9 @@ export async function selectPaymentIntentByPaymentIntentAndPayeeUserId(
   paymentIntent: string,
   payee_user_id: string | null,
 ) {
-  return await supabaseClient.from("PaymentIntents").select().eq(
+  return await supabaseClient.from("PaymentIntents").select(
+    "*,debit_item_id(*),account_id(*)",
+  ).eq(
     "paymentIntent",
     paymentIntent,
   ).eq("payee_user_id", payee_user_id);
@@ -188,6 +194,25 @@ export async function selectRelayerTopUpHistoryDataByUserId(
     "user_id",
     userId,
   ).order("created_at", { ascending: false });
+}
+
+export async function selectDynamicPaymentRequestJobByPaymentIntentIdAndUserId(
+  supabaseClient: any,
+  userid: string | null,
+  paymentIntent_id: number,
+) {
+  return await supabaseClient.from("DynamicPaymentRequestJobs")
+    .select("*,paymentIntent_id(*)")
+    .eq("paymentIntent_id", paymentIntent_id)
+    .eq("request_creator_id", userid);
+}
+
+export async function selectDynamicPaymentRequestJobById(
+  supabaseClient: any,
+  id: number,
+) {
+  return await supabaseClient.from("DynamicPaymentRequestJobs")
+    .select().eq("id", id);
 }
 
 //INSERTS
@@ -334,8 +359,32 @@ export async function insertNewRelayerBalance(
   userid: string | null,
 ) {
   return await supabaseClient.from("RelayerBalance").insert({
-    created_at: new Date().toUTCString(),
+    created_at: new Date().toISOString(),
     user_id: userid,
+  });
+}
+
+/**
+ * There should be only one dynamic payment request job per paymentIntent
+ * @param supabaseClient
+ * @param userid
+ * @param paymentIntent_id
+ * @param requestedAmount
+ * @returns
+ */
+
+export async function insertDynamicPaymentRequestJob(
+  supabaseClient: any,
+  userid: string | null,
+  paymentIntent_id: number,
+  requestedAmount: string,
+) {
+  return await supabaseClient.from("DynamicPaymentRequestJobs").insert({
+    created_at: new Date().toISOString(),
+    paymentIntent_id,
+    requestedAmount,
+    status: DynamicPaymentRequestJobsStatus.CREATED,
+    request_creator_id: userid,
   });
 }
 
@@ -441,6 +490,43 @@ export async function updateRelayerBalanceAndHistorySwitchNetwork(
   }
 }
 
+/**
+ * There should be only one dynamic payment request job per paymentIntent, we updating that!
+ * @param supabaseClient
+ * @param userid
+ * @param paymentIntent_id
+ * @param requestedAmount
+ * @returns
+ */
+
+export async function updateDynamicPaymentRequestJob(
+  supabaseClient: any,
+  userid: string | null,
+  paymentIntent_id: number,
+  requestedAmount: string,
+) {
+  return await supabaseClient.from("DynamicPaymentRequestJobs").update({
+    created_at: new Date().toISOString(),
+    requestedAmount,
+    status: DynamicPaymentRequestJobsStatus.CREATED,
+  }).eq("paymentIntent_id", paymentIntent_id)
+    .eq("request_creator_id", userid);
+}
+
+export async function updatePaymentIntentAccountBalanceTooLowDynamicPayment(
+  arg: {
+    chainId: ChainIds;
+    supabaseClient: any;
+    paymentIntentRow: PaymentIntentRow;
+  },
+) {
+  // TODO: Could send an email after this, to notify the user about account balance too low!
+  // Also notify the merchant! Maybe hit a webhook too and send an email!
+  await arg.supabaseClient.from("PaymentIntents").update({
+    statusText: PaymentIntentStatus.ACCOUNTBALANCETOOLOW,
+  }).eq("id", arg.paymentIntentRow.id);
+}
+
 function calculateNewMissingBalance(
   missingBalance: bigint,
   addedBalance: bigint,
@@ -487,6 +573,23 @@ export async function upsertProfile(
       },
       { ignoreDuplicates: false },
     ).select();
+}
+
+//DELETE
+export async function deleteDynamicPaymentRequestJobById(
+  supabaseClient: any,
+  id: number,
+  user_id: string | null,
+) {
+  // Delete dynamic payment request job by id where status is not locked
+  return await supabaseClient.from("DynamicPaymentRequestJobs")
+    .delete()
+    .eq("request_creator_id", user_id)
+    .eq("id", id)
+    .neq(
+      "status",
+      DynamicPaymentRequestJobsStatus.LOCKED,
+    );
 }
 
 //REALTIME
