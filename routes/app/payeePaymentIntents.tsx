@@ -1,13 +1,18 @@
 import Layout from "../../components/Layout.tsx";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
-import { selectPaymentIntentByPaymentIntentAndPayeeUserId, selectRelayerHistoryById } from "../../lib/backend/supabaseQueries.ts";
-import { RenderIdentifier, Tooltip, UnderlinedTd, getDebitIntervalText, getSubscriptionTooltipMessage } from "../../components/components.tsx";
-import { getStatusLogo } from "../../components/PaymentIntentsTable.tsx";
+import { insertDynamicPaymentRequestJob, selectDynamicPaymentRequestJobByPaymentIntentIdAndUserId, selectPaymentIntentByPaymentIntentAndPayeeUserId, selectRelayerBalanceByUserId, selectRelayerHistoryById, updateDynamicPaymentRequestJob, updatePaymentIntentAccountBalanceTooLowDynamicPayment } from "../../lib/backend/supabaseQueries.ts";
+import { RenderIdentifier, Tooltip, UnderlinedTd, getDebitIntervalText, getPaymentIntentStatusLogo, getPaymentRequestJobStatusTooltipMessage, getPaymentRequestStatusLogo, getSubscriptionTooltipMessage } from "../../components/components.tsx";
 import CancelPaymentIntentButton from "../../islands/CancelPaymentIntentButton.tsx";
 import { ChainIds } from "../../lib/shared/web3.ts";
 import RelayedTxHistory from "../../islands/RelayedTxHistory.tsx";
-import { PaymentIntentRow } from "../../lib/enums.ts";
+import { DynamicPaymentRequestJobsStatus, PaymentIntentRow, Pricing } from "../../lib/enums.ts";
+import TriggerDirectDebitButton from "../../islands/TriggerDirectDebitButton.tsx";
+import { calculateGasEstimationPerChain, estimateRelayerGas, formatEther, getGasPrice, getRelayerBalanceForChainId, increaseGasLimit, parseEther } from "../../lib/backend/web3.ts";
+import { errorResponseBuilder, successResponseBuilder } from "../../lib/backend/responseBuilders.ts";
+import CancelDynamicPaymentRequestButton from "../../islands/CancelDynamicPaymentRequestButton.tsx";
+
+
 
 export const handler: Handlers<any, State> = {
     async GET(req: any, ctx: any) {
@@ -26,19 +31,224 @@ export const handler: Handlers<any, State> = {
             paymentIntentData[0].id
         );
 
-        return ctx.render({ ...ctx.state, notfound: false, paymentIntentData, paymentIntentHistory });
+        if (paymentIntentData[0].pricing === Pricing.Dynamic) {
+            const { data: dynamicPaymentRequestJobArr, error: dynamicPaymentRequestJobErr } = await selectDynamicPaymentRequestJobByPaymentIntentIdAndUserId(
+                ctx.state.supabaseClient,
+                ctx.state.userid,
+                paymentIntentData[0].id
+            );
+            return ctx.render({ ...ctx.state, notfound: false, paymentIntentData, paymentIntentHistory, dynamicPaymentRequestJobArr });
+        } else {
+            return ctx.render({ ...ctx.state, notfound: false, paymentIntentData, paymentIntentHistory, dynamicPaymentRequestJobArr: [] });
+        }
+
+    },
+    async POST(req: any, ctx: any) {
+        // Request Dynamic Payments using this POST request handler!
+        const json = await req.json();
+        const paymentIntent = json.paymentIntent;
+        const requestedDebitAmount = json.requestedDebitAmount;
+
+        const { data: paymentIntentDataArray, error: paymentIntentError } = await selectPaymentIntentByPaymentIntentAndPayeeUserId(
+            ctx.state.supabaseClient,
+            paymentIntent,
+            ctx.state.userid);
+
+        if (paymentIntentDataArray === null || paymentIntentDataArray.length === 0) {
+            return errorResponseBuilder("Invalid Payment Intent");
+        }
+        const paymentIntentData = paymentIntentDataArray[0];
+        if (parseEther(requestedDebitAmount) > parseEther(paymentIntentData.maxDebitAmount)) {
+            return errorResponseBuilder("Requested Amount Too High!");
+        }
+
+        if (parseEther(requestedDebitAmount) <= 0) {
+            return errorResponseBuilder("Zero or negative payments are not accepted!");
+        }
+
+
+        if (paymentIntentData.nextPaymentDate !== null &&
+            new Date().getTime() < new Date(paymentIntentData.nextPaymentDate).getTime()) {
+            // If next payment date is set, I check if the current date exceeds it or not.
+            // If not, then it might be too early to send this transaction and it would fail...
+            return errorResponseBuilder("Payment not due! Check next payment date. If you try to debit too early the transaction will fail!");
+        }
+
+
+        const estimation = await estimateRelayerGas({
+            proof: paymentIntentData.proof,
+            publicSignals: paymentIntentData.publicSignals,
+            payeeAddress: paymentIntentData.payee_address,
+            maxDebitAmount: paymentIntentData.maxDebitAmount,
+            actualDebitedAmount: requestedDebitAmount,
+            debitTimes: paymentIntentData.debitTimes,
+            debitInterval: paymentIntentData.debitInterval
+        }, paymentIntentData.network).catch(err => {
+            console.log(err)
+        });
+
+        if (estimation === null || estimation === undefined) {
+            return errorResponseBuilder("Unable to Create Debit Request.")
+        }
+
+        const { data: relayerBalanceDataArr, error: relayerBalanceDataErr } = await selectRelayerBalanceByUserId(
+            ctx.state.supabaseClient,
+            ctx.state.userid
+        )
+
+        if (relayerBalanceDataArr === null || relayerBalanceDataArr.length === 0) {
+            return errorResponseBuilder("Relayer balance not found!");
+        }
+
+        const relayerBalance = getRelayerBalanceForChainId(paymentIntentData.network, relayerBalanceDataArr[0]);
+        const feeData = await getGasPrice(paymentIntentData.network);
+
+
+        const estimationForChain = calculateGasEstimationPerChain(paymentIntentData.network, feeData, increaseGasLimit(estimation));
+
+        if (!estimationForChain) {
+            return errorResponseBuilder("Unable to estimate gas!");
+        }
+
+        if (parseEther(relayerBalance) < estimationForChain) {
+            return errorResponseBuilder(`Relayer balance too low. You need to top up the relayer with at least ${formatEther(estimationForChain)} ${JSON.parse(paymentIntentData.currency).name}`)
+        }
+
+        const { data: dynamicPaymentRequestJobDataArr, error: dynamicPaymentRequestJobDataErr } = await selectDynamicPaymentRequestJobByPaymentIntentIdAndUserId(
+            ctx.state.supabaseClient,
+            ctx.state.userid,
+            paymentIntentData.id
+        )
+
+        if (dynamicPaymentRequestJobDataArr === null || dynamicPaymentRequestJobDataArr.length === 0) {
+            // I need to insert an new job!
+            await insertDynamicPaymentRequestJob(
+                ctx.state.supabaseClient,
+                ctx.state.userid,
+                paymentIntentData.id,
+                requestedDebitAmount
+            );
+        } else {
+
+            if (dynamicPaymentRequestJobDataArr[0].status === DynamicPaymentRequestJobsStatus.LOCKED) {
+                return errorResponseBuilder("Payment request is locked. You can't update it anymore!")
+            }
+
+            // I update the existing job!
+            await updateDynamicPaymentRequestJob(
+                ctx.state.supabaseClient,
+                ctx.state.userid,
+                paymentIntentData.id,
+                requestedDebitAmount
+            );
+        }
+
+        if (parseEther(requestedDebitAmount) > parseEther(paymentIntentData.account_id.balance)) {
+            await updatePaymentIntentAccountBalanceTooLowDynamicPayment({
+                chainId: paymentIntentData.network as ChainIds,
+                supabaseClient: ctx.state.supabaseClient,
+                paymentIntentRow: paymentIntentData
+            });
+            return successResponseBuilder("Request Created but customer balance too low! We notified the customer about the pending payment!");
+        }
+
+        return successResponseBuilder("Request Created!")
     }
 }
 
 
-
 export default function CreatedPaymentIntents(props: PageProps) {
     const pi = props.data.paymentIntentData[0] as PaymentIntentRow;
+    const dynamicPaymentRequestJobArr = props.data.dynamicPaymentRequestJobArr;
+
+    function IfDynamicAddDebitTrigger(props: { pricing: Pricing, maxDebitAmount: string, dynamicPaymentRequestJob: any }) {
+        if (props.pricing === Pricing.Dynamic) {
+            return <tr>
+                <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Request Payment:</UnderlinedTd>
+                <UnderlinedTd extraStyles="">
+                    {props.dynamicPaymentRequestJob !== undefined && props.dynamicPaymentRequestJob.status === DynamicPaymentRequestJobsStatus.LOCKED
+                        ? <p>Your last payment request is locked for processing! Come back in a few minutes!</p>
+                        : <TriggerDirectDebitButton chainId={pi.network as ChainIds} paymentIntent={pi} transactionsLeft={pi.debit_item_id.debit_times - pi.used_for}></TriggerDirectDebitButton>}
+                </UnderlinedTd>
+                <UnderlinedTd extraStyles=""><Tooltip message="For dynamic payments you need to specify how much to debit!"></Tooltip></UnderlinedTd>
+            </tr>
+        } else {
+            return null;
+        }
+    }
+
+    function IfPaymentRequestJobExists(props: {
+        dynamicPaymentRequestJobArr: Array<any>,
+        currency: string
+    }) {
+        if (dynamicPaymentRequestJobArr === null || dynamicPaymentRequestJobArr.length === 0) {
+            return null;
+        } else {
+            return <tr>
+                <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Latest Payment Request:</UnderlinedTd>
+                <UnderlinedTd extraStyles="paddingZero" >
+                    <table>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200  text-sm" >
+                                    <p>Status:</p>
+                                </UnderlinedTd>
+                                <UnderlinedTd extraStyles="">{getPaymentRequestStatusLogo(props.dynamicPaymentRequestJobArr[0].status)}</UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><Tooltip message={getPaymentRequestJobStatusTooltipMessage(props.dynamicPaymentRequestJobArr[0].status)}></Tooltip></UnderlinedTd>
+                            </tr>
+                            <tr>
+                                <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200  text-sm" >
+                                    <p>
+                                        Amount:
+                                    </p>
+                                </UnderlinedTd>
+                                <UnderlinedTd extraStyles="">
+                                    {props.dynamicPaymentRequestJobArr[0].requestedAmount} {props.currency}
+                                </UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><Tooltip message={"The amount debited from the customers account."}></Tooltip></UnderlinedTd>
+                            </tr>
+                            <tr>
+                                <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200  text-sm" >
+                                    <p>
+                                        Created Date:
+                                    </p>
+                                </UnderlinedTd>
+                                <UnderlinedTd extraStyles="">
+                                    {new Date(props.dynamicPaymentRequestJobArr[0].created_at).toLocaleString()}
+                                </UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><Tooltip message="The date your request was created. The payment will be processed in approx 60 minutes!"></Tooltip></UnderlinedTd>
+                            </tr>
+                            {props.dynamicPaymentRequestJobArr[0].status === DynamicPaymentRequestJobsStatus.CREATED ? <tr>
+                                <UnderlinedTd extraStyles="borderNone bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200  text-sm" >
+                                </UnderlinedTd>
+                                <UnderlinedTd extraStyles="paddingZero borderNone">
+                                    <CancelDynamicPaymentRequestButton
+                                        dynamicPaymentRequest={props.dynamicPaymentRequestJobArr[0]}
+                                        chainId={pi.network as ChainIds}
+                                        paymentIntent={pi}></CancelDynamicPaymentRequestButton>
+                                </UnderlinedTd>
+                                <UnderlinedTd extraStyles="borderNone">
+                                </UnderlinedTd>
+                            </tr> : null}
+                        </tbody>
+                    </table>
+                </UnderlinedTd>
+                <UnderlinedTd extraStyles="">{""}</UnderlinedTd>
+            </tr>
+        }
+    }
 
     return <Layout isLoggedIn={props.data.token}>
         <div class="container mx-auto py-8">
-            {!props.data.notfound ? <div>
-                <div class="text-center"><h1 class="text-2xl font-bold mb-2">Payment Intent</h1></div>
+            {!props.data.notfound ? <>  <div class="bg-gray-100 border border-gray-200 dark:border-gray-700 md:rounded-lg">
+                <div class="text-center"><h1 class="text-2xl font-bold mb-2 text-gray-500 dark:text-gray-40">Payment Intent</h1></div>
                 <div class="flex rounded-xl" style="background-color:white;">
                     <table class="table-fixed w-full  border border-gray-200 dark:border-gray-700 md:rounded-lg">
                         <thead>
@@ -55,7 +265,7 @@ export default function CreatedPaymentIntents(props: PageProps) {
                             </tr>
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm" >Status:</UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><p> {getStatusLogo(pi.statusText)}</p></UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><p> {getPaymentIntentStatusLogo(pi.statusText)}</p></UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><Tooltip message="The current status of the payment"></Tooltip></UnderlinedTd>
                             </tr>
                             <tr>
@@ -68,6 +278,10 @@ export default function CreatedPaymentIntents(props: PageProps) {
                                 <UnderlinedTd extraStyles=""><p> {pi.debit_item_id.max_price} {JSON.parse(pi.debit_item_id.currency).name} </p></UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><Tooltip message="The maximum amount that can be debited from the account"></Tooltip></UnderlinedTd>
                             </tr>
+                            <IfDynamicAddDebitTrigger dynamicPaymentRequestJob={dynamicPaymentRequestJobArr[0]} pricing={pi.debit_item_id.pricing as Pricing} maxDebitAmount={pi.debit_item_id.max_price}></IfDynamicAddDebitTrigger>
+                            <IfPaymentRequestJobExists
+                                dynamicPaymentRequestJobArr={props.data.dynamicPaymentRequestJobArr}
+                                currency={JSON.parse(pi.debit_item_id.currency).name}></IfPaymentRequestJobExists>
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Network:</UnderlinedTd>
                                 <UnderlinedTd extraStyles="" ><p>{pi.debit_item_id.network}</p></UnderlinedTd>
@@ -123,9 +337,9 @@ export default function CreatedPaymentIntents(props: PageProps) {
                         </tbody>
                     </table>
                 </div>
+            </div>
                 <RelayedTxHistory paymentIntentHistory={props.data.paymentIntentHistory}></RelayedTxHistory>
-
-            </div> : <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
+            </> : <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
                 <h1 class="text-2xl font-bold mb-6 text-center">Not Found</h1>
             </div>}
         </div>
