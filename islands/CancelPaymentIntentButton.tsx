@@ -75,9 +75,9 @@ export default function CancelPaymentIntentButton(props: CancelPaymentIntentButt
         {props.paymentIntent.statusText === PaymentIntentStatus.CANCELLED ? <p class="text-sm text-red-500">Payment Intent Cancelled!</p> :
             <button
                 disabled={props.paymentIntent.statusText === PaymentIntentStatus.CANCELLED}
-                class="bg-gradient-to-b w-max text-indigo-500 font-semibold from-slate-50 to-indigo-100 px-10 py-3 rounded-2xl shadow-indigo-400 shadow-md border-b-4 hover border-b border-indigo-200 hover:shadow-sm transition-all duration-500"
+                class="bg-gradient-to-b w-max text-red-500 font-semibold from-slate-50 to-red-100 px-10 py-3 rounded-2xl shadow-red-400 shadow-md border-b-4 hover border-b border-red-200 hover:shadow-sm transition-all duration-500"
                 onClick={cancelClicked}
-            >Cancel</button>}
+            >Cancel All</button>}
         <p class="text-sm text-red-500">{showError ? errorMessage : ""}</p>
     </div>
 }
