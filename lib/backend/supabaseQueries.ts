@@ -1,4 +1,5 @@
 import { formatEther } from "$ethers";
+import { PaymentIntentStatus } from "../enums.ts";
 import { ChainIds } from "../shared/web3.ts";
 import { parseEther } from "./web3.ts";
 
@@ -86,15 +87,37 @@ export async function selectPaymentIntentsByUserIdDESC(
     );
 }
 
+export async function selectPaymentIntentsByAccountBalanceTooLow(
+  supabaseClient: any,
+  userId: string | null,
+) {
+  return await supabaseClient
+    .from("PaymentIntents").select("*,debit_item_id(*)").eq(
+      "creator_user_id",
+      userId,
+    ).eq("statusText", PaymentIntentStatus.ACCOUNTBALANCETOOLOW).order(
+      "created_at",
+      { ascending: false },
+    );
+}
+
 export async function selectPaymentIntentByPaymentIntentAndCreatorUserId(
   supabaseClient: any,
   paymentIntent: string,
   userId: string | null,
 ) {
   return await supabaseClient.from("PaymentIntents")
-    .select()
+    .select("*,debit_item_id(*),account_id(*)")
     .eq("paymentIntent", paymentIntent)
     .eq("creator_user_id", userId);
+}
+export async function selectRelayerHistoryById(
+  supabaseClient: any,
+  paymentIntentId: number,
+) {
+  return await supabaseClient.from("RelayerHistory")
+    .select("*")
+    .eq("paymentIntent_id", paymentIntentId);
 }
 
 export async function selectPaymentIntentByPaymentIntentAndPayeeUserId(
@@ -337,6 +360,16 @@ export async function updateItem(
     );
 }
 
+export async function updatePaymentItemStatus(
+  supabaseClient: any,
+  status: PaymentIntentStatus,
+  paymentIntent: string,
+) {
+  return await supabaseClient.from("PaymentIntents").update({
+    statusText: status,
+  }).eq("paymentIntent", paymentIntent);
+}
+
 export async function updateItemPaymentIntentsCount(
   supabaseClient: any,
   payment_intents_count: number,
@@ -462,6 +495,26 @@ export function broadcastNewPayment(
       channel.send({
         type: "broadcast",
         event: "newFixedPayment",
+        payload,
+      });
+    }
+  });
+}
+
+interface BroadcastDynamicPaymentPayload {
+  paymentIntent: string;
+  debitedAmount: string;
+}
+
+export function broadcastDynamicPayment(
+  channel: any,
+  payload: BroadcastDynamicPaymentPayload,
+) {
+  channel.subscribe((status: string) => {
+    if (status === "SUBSCRIBED") {
+      channel.send({
+        type: "broadcast",
+        event: "processDynamicPayment",
         payload,
       });
     }
