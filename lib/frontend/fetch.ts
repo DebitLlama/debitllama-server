@@ -145,3 +145,35 @@ export async function updatePaymentIntentToClosed(
     },
   }).then((response) => response.status);
 }
+
+export async function requestDynamicPayment(
+  args: {
+    paymentIntent: string;
+    chainId: ChainIds;
+    requestedDebitAmount: string;
+  },
+) {
+  return await fetch("/app/payeePaymentIntents", {
+    credentials: "same-origin",
+    method: "POST",
+    body: JSON.stringify(args),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((response) => response);
+}
+
+export async function cancelDynamicPaymentRequest(
+  args: {
+    dynamicPaymentRequestId: number;
+  },
+) {
+  return await fetch("/app/cancelDynamicPayment", {
+    credentials: "same-origin",
+    method: "POST",
+    body: JSON.stringify(args),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((response) => response);
+}
