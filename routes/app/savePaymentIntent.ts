@@ -6,7 +6,7 @@ import {
   updateItemPaymentIntentsCount,
 } from "../../lib/backend/supabaseQueries.ts";
 import { estimateRelayerGas } from "../../lib/backend/web3.ts";
-import { PaymentIntentStatus, Pricing } from "../../lib/enums.ts";
+import { PaymentIntentStatus } from "../../lib/enums.ts";
 import { State } from "../_middleware.ts";
 
 export const handler: Handlers<any, State> = {
@@ -72,6 +72,7 @@ export const handler: Handlers<any, State> = {
       itemData[0].id,
       proof,
       publicSignals,
+      itemData[0].relayerBalance_id.id,
     );
 
     if (insertError !== null) {
