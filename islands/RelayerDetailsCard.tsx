@@ -122,7 +122,7 @@ export default function RelayerDetailsCard(props: RelayerDetailsCardProps) {
         {IsBalanceMissing(networkSelected as NetworkNames, props.relayerData)}
         <form onSubmit={topupClicked}>
             <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
-                value={topUpAmount} onChange={(event: any) => setTopupAmount(event.target.value)} type="number" id="amount" name="amount" placeholder="Amount" />
+                value={topUpAmount} onChange={(event: any) => setTopupAmount(event.target.value)} type="number" id="amount" name="amount" placeholder="Amount" step="any" />
             {showError ? <p class="text-sm text-red-500">{errorMessage}</p> : null}
             <button
                 class="mt-2 w-full bg-indigo-500 text-white text-sm font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
