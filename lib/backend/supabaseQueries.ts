@@ -5,7 +5,12 @@ import {
   PaymentIntentStatus,
 } from "../enums.ts";
 import { ChainIds } from "../shared/web3.ts";
-import { parseEther } from "./web3.ts";
+import {
+  calculateGasEstimationPerChain,
+  getGasPrice,
+  increaseGasLimit,
+  parseEther,
+} from "./web3.ts";
 
 //AUTH
 export async function signUp(
@@ -30,7 +35,10 @@ export async function selectItemByButtonId(
   supabaseClient: any,
   buttonId: string,
 ) {
-  return await supabaseClient.from("Items").select().eq("button_id", buttonId);
+  return await supabaseClient.from("Items").select("*,relayerBalance_id(*)").eq(
+    "button_id",
+    buttonId,
+  );
 }
 
 export async function selectOpenAccountsFromUserByNetworkAndCurrency(
@@ -103,6 +111,18 @@ export async function selectPaymentIntentsByAccountBalanceTooLow(
       "created_at",
       { ascending: false },
     );
+}
+
+export async function selectPaymentIntentsByRelayerBalanceTooLow(
+  supabaseClient: any,
+  userId: string | null,
+  network: ChainIds,
+) {
+  return await supabaseClient
+    .from("PaymentIntents").select("*")
+    .eq("payee_user_id", userId)
+    .eq("network", network)
+    .eq("statusText", PaymentIntentStatus.BALANCETOOLOWTORELAY);
 }
 
 export async function selectPaymentIntentByPaymentIntentAndCreatorUserId(
@@ -212,9 +232,8 @@ export async function selectDynamicPaymentRequestJobById(
   id: number,
 ) {
   return await supabaseClient.from("DynamicPaymentRequestJobs")
-    .select().eq("id", id);
+    .select("*,relayerBalance_id(*),paymentIntent_id(*)").eq("id", id);
 }
-
 //INSERTS
 
 export async function insertNewAccount(
@@ -251,6 +270,7 @@ export async function insertNewItem(
   pricing: string,
   network: string,
   name: string,
+  relayerBalance_id: string,
 ) {
   return await supabaseClient.from("Items").insert({
     created_at: new Date().toISOString(),
@@ -264,6 +284,7 @@ export async function insertNewItem(
     pricing,
     network,
     name,
+    relayerBalance_id,
   });
 }
 
@@ -327,6 +348,7 @@ export async function insertPaymentIntent(
   debit_item_id: string,
   proof: string,
   publicSignals: string,
+  relayerBalance_id: number,
 ) {
   return await supabaseClient.from(
     "PaymentIntents",
@@ -351,6 +373,7 @@ export async function insertPaymentIntent(
     debit_item_id,
     proof,
     publicSignals,
+    relayerBalance_id,
   });
 }
 
@@ -378,6 +401,8 @@ export async function insertDynamicPaymentRequestJob(
   userid: string | null,
   paymentIntent_id: number,
   requestedAmount: string,
+  allocatedGas: string,
+  relayerBalance_id: number,
 ) {
   return await supabaseClient.from("DynamicPaymentRequestJobs").insert({
     created_at: new Date().toISOString(),
@@ -385,6 +410,8 @@ export async function insertDynamicPaymentRequestJob(
     requestedAmount,
     status: DynamicPaymentRequestJobsStatus.CREATED,
     request_creator_id: userid,
+    allocatedGas,
+    relayerBalance_id,
   });
 }
 
@@ -438,6 +465,30 @@ export async function updateItemPaymentIntentsCount(
   }).eq("button_id", button_id);
 }
 
+export async function updateRelayerBalanceWithAllocatedAmount(
+  supabaseClient: any,
+  relayerBalance_id: number,
+  chainId: ChainIds,
+  currentRelayerBalance: string,
+  oldAllocatedBalance: string,
+  newAllocatedBalance: string,
+) {
+  switch (chainId) {
+    case ChainIds.BTT_TESTNET_ID: {
+      const current = parseEther(currentRelayerBalance);
+      const oldAllocation = parseEther(oldAllocatedBalance);
+      const newAllocation = parseEther(newAllocatedBalance);
+
+      const newRelayerBalance = (current + oldAllocation) - newAllocation;
+      return await supabaseClient.from("RelayerBalance").update({
+        BTT_Donau_Testnet_Balance: formatEther(newRelayerBalance),
+      }).eq("id", relayerBalance_id);
+    }
+    default:
+      break;
+  }
+}
+
 export async function updateRelayerBalanceAndHistorySwitchNetwork(
   chainId: ChainIds,
   supabaseClient: any,
@@ -482,12 +533,83 @@ export async function updateRelayerBalanceAndHistorySwitchNetwork(
         Amount: addedBalance,
       });
 
+      // Find payment intents that I can set to Created or recurring depending on if it's the first transaction
+      // Depending on How much balance was added to the relayer and how much was the missing balance
+      // TODO: TEST THIS
+      const {
+        data: paymentIntentsWithLowBalance,
+        error: paymentIntentsWIlLowBalanceError,
+      } = await selectPaymentIntentsByRelayerBalanceTooLow(
+        supabaseClient,
+        userId,
+        chainId,
+      );
+
+      const feeData = await getGasPrice(
+        ChainIds.BTT_TESTNET_ID,
+      );
+      const resetablePaymentIntents = await findPaymentIntentsThatCanBeReset(
+        addedBalance,
+        paymentIntentsWithLowBalance,
+        feeData,
+      );
+
+      console.log(resetablePaymentIntents);
+      // /?TODO: TEST THIS!
+      //set these resetable payment intents to created or recurring
+
+      for (let i = 0; i < resetablePaymentIntents.length; i++) {
+        const piToReset = resetablePaymentIntents[i];
+        if (piToReset.used_for === 0) {
+          // Set to created!
+          await updatePaymentItemStatus(
+            supabaseClient,
+            PaymentIntentStatus.CREATED,
+            piToReset.paymentIntent,
+          );
+        } else {
+          // set to recurring!
+          await updatePaymentItemStatus(
+            supabaseClient,
+            PaymentIntentStatus.RECURRING,
+            piToReset.paymentIntent,
+          );
+        }
+      }
+
       break;
     }
     default:
       console.log("default case triggers");
       break;
   }
+}
+
+function findPaymentIntentsThatCanBeReset(
+  addedBalance: string,
+  paymentIntentsRows: Array<PaymentIntentRow>,
+  feeData: any,
+) {
+  const parsedAddedBalance = parseEther(addedBalance);
+  const resumablePaymentIntents = new Array<PaymentIntentRow>();
+
+  let addedBalanceLeft = parsedAddedBalance;
+
+  for (let i = 0; i < paymentIntentsRows.length; i++) {
+    const pi = paymentIntentsRows[i];
+    const totalFee = calculateGasEstimationPerChain(
+      pi.network as ChainIds,
+      feeData,
+      increaseGasLimit(BigInt(pi.estimatedGas)),
+    );
+    if (totalFee) {
+      if (addedBalanceLeft - totalFee >= 0) {
+        resumablePaymentIntents.push(pi);
+        addedBalanceLeft -= totalFee;
+      }
+    }
+  }
+  return resumablePaymentIntents;
 }
 
 /**
@@ -504,11 +626,13 @@ export async function updateDynamicPaymentRequestJob(
   userid: string | null,
   paymentIntent_id: number,
   requestedAmount: string,
+  allocatedGas: string,
 ) {
   return await supabaseClient.from("DynamicPaymentRequestJobs").update({
     created_at: new Date().toISOString(),
     requestedAmount,
     status: DynamicPaymentRequestJobsStatus.CREATED,
+    allocatedGas,
   }).eq("paymentIntent_id", paymentIntent_id)
     .eq("request_creator_id", userid);
 }
