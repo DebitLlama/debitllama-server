@@ -508,7 +508,6 @@ export async function updateRelayerBalanceAndHistorySwitchNetwork(
         `${relayerBalance[0].BTT_Donau_Testnet_Balance}`,
       );
       const newBalance = parseEther(addedBalance) + bttBalance;
-
       const missingBalance = parseEther(
         relayerBalance[0].Missing_BTT_Donau_Testnet_Balance,
       );
@@ -516,26 +515,23 @@ export async function updateRelayerBalanceAndHistorySwitchNetwork(
         missingBalance,
         parseEther(addedBalance),
       );
-
       const id = relayerBalance[0].id;
 
-      await supabaseClient.from("RelayerBalance").update({
+      const res = await supabaseClient.from("RelayerBalance").update({
         BTT_Donau_Testnet_Balance: formatEther(newBalance),
         last_topup: new Date().toISOString(),
         Missing_BTT_Donau_Testnet_Balance: formatEther(newMissingBalance),
       }).eq("id", id);
-
-      await supabaseClient.from("RelayerTopUpHistory").insert({
-        created_at: new Date().toISOString(),
-        transactionHash,
-        user_id: userId,
-        network: chainId,
-        Amount: addedBalance,
-      });
-
+      const relayerTopUpH = await supabaseClient.from("RelayerTopUpHistory")
+        .insert({
+          created_at: new Date().toISOString(),
+          transactionHash,
+          user_id: userId,
+          network: chainId,
+          Amount: addedBalance,
+        });
       // Find payment intents that I can set to Created or recurring depending on if it's the first transaction
       // Depending on How much balance was added to the relayer and how much was the missing balance
-      // TODO: TEST THIS
       const {
         data: paymentIntentsWithLowBalance,
         error: paymentIntentsWIlLowBalanceError,
@@ -553,9 +549,6 @@ export async function updateRelayerBalanceAndHistorySwitchNetwork(
         paymentIntentsWithLowBalance,
         feeData,
       );
-
-      console.log(resetablePaymentIntents);
-      // /?TODO: TEST THIS!
       //set these resetable payment intents to created or recurring
 
       for (let i = 0; i < resetablePaymentIntents.length; i++) {
@@ -585,7 +578,7 @@ export async function updateRelayerBalanceAndHistorySwitchNetwork(
   }
 }
 
-function findPaymentIntentsThatCanBeReset(
+export function findPaymentIntentsThatCanBeReset(
   addedBalance: string,
   paymentIntentsRows: Array<PaymentIntentRow>,
   feeData: any,
@@ -594,7 +587,7 @@ function findPaymentIntentsThatCanBeReset(
   const resumablePaymentIntents = new Array<PaymentIntentRow>();
 
   let addedBalanceLeft = parsedAddedBalance;
-
+  let missingGas = BigInt(0);
   for (let i = 0; i < paymentIntentsRows.length; i++) {
     const pi = paymentIntentsRows[i];
     const totalFee = calculateGasEstimationPerChain(
@@ -602,6 +595,7 @@ function findPaymentIntentsThatCanBeReset(
       feeData,
       increaseGasLimit(BigInt(pi.estimatedGas)),
     );
+    missingGas += totalFee === null ? BigInt(0) : totalFee;
     if (totalFee) {
       if (addedBalanceLeft - totalFee >= 0) {
         resumablePaymentIntents.push(pi);
