@@ -1,11 +1,8 @@
 import Layout from "../../components/Layout.tsx";
 import { State } from "../_middleware.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
-import RelayerDetailsCard from "../../islands/RelayerDetailsCard.tsx";
 import { fetchTopUpEvent, getRelayerTopUpContract } from "../../lib/backend/web3.ts";
 import { insertNewRelayerBalance, selectProfileByUserId, selectRelayerBalanceByUserId, selectRelayerHistoryByUserId, selectRelayerTopUpHistoryDataByTransactionHash, selectRelayerTopUpHistoryDataByUserId, updateRelayerBalanceAndHistorySwitchNetwork } from "../../lib/backend/supabaseQueries.ts";
-import RelayerTopupHistory from "../../islands/RelayerTopupHistory.tsx";
-import RelayedTxHistory from "../../islands/RelayedTxHistory.tsx";
 import RelayerUISwitcher from "../../islands/RelayerUISwitcher.tsx";
 
 export const handler: Handlers<any, State> = {
@@ -13,10 +10,10 @@ export const handler: Handlers<any, State> = {
         const userid = ctx.state.userid;
 
         const { data: relayerBalanceData, error: relayerBalanceDataError } = await selectRelayerBalanceByUserId(ctx.state.supabaseClient, userid);
-
         if (relayerBalanceData === null || relayerBalanceData.length === 0) {
             // If it doesn't exist I create a new one!
-            const res = await insertNewRelayerBalance(ctx.state.supabaseClient, userid)
+            //TODO: It should insert().select(). I should select the insert and not run a select again!
+            await insertNewRelayerBalance(ctx.state.supabaseClient, userid)
             const { data: relayerBalanceData, error: relayerBalanceDataError } = await selectRelayerBalanceByUserId(ctx.state.supabaseClient, userid);
             return ctx.render({ ...ctx.state, relayerBalanceData })
         }
@@ -33,7 +30,6 @@ export const handler: Handlers<any, State> = {
         const { data: relayerTopUpHistoryData, error: relayerTopUpHistoryDataError } = await selectRelayerTopUpHistoryDataByUserId(ctx.state.supabaseClient, userid);
 
         const { data: relayerTxHistoryData, error: relayerTxHistoryDataError } = await selectRelayerHistoryByUserId(ctx.state.supabaseClient, userid);
-
 
         return ctx.render({ ...ctx.state, relayerBalanceData, profileData, relayerTopUpHistoryData, relayerTxHistoryData });
     },
