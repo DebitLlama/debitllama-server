@@ -28,7 +28,7 @@ export const handler: Handlers<any, State> = {
 
                 if (data.length === 0) {
 
-                    const { data: savedAccountData, error: accountError } = await insertNewAccount(
+                    await insertNewAccount(
                         ctx.state.supabaseClient,
                         ctx.state.userid,
                         networkId,
