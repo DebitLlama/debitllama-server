@@ -3,7 +3,7 @@ import { State } from "../_middleware.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import AddNewDebitItemPageForm from "../../islands/addNewDebitItemPageForm.tsx";
 import { NetworkNames, chainIdFromNetworkName } from "../../lib/shared/web3.ts";
-import { insertNewItem, selectProfileByUserId } from "../../lib/backend/supabaseQueries.ts";
+import { insertNewItem, insertNewRelayerBalance, selectProfileByUserId, selectRelayerBalanceByUserId } from "../../lib/backend/supabaseQueries.ts";
 
 
 
@@ -35,6 +35,22 @@ export const handler: Handlers<any, State> = {
             headers.set("location", "/app/profile");
             return new Response(null, { status: 303, headers })
         }
+
+        let relayerBalanceId = null;
+
+        const { data: relayerBalanceData, error: relayerBalanceDataError } = await selectRelayerBalanceByUserId(ctx.state.supabaseClient, userid);
+        // I'm gonna add the id of the relayerBalance to the debit item so I can join tables later more easily
+        if (relayerBalanceData === null || relayerBalanceData.length === 0) {
+            // If it doesn't exist I create a new one!
+            //TODO: It should insert().select(). I should select the insert and not run a select again!
+            await insertNewRelayerBalance(ctx.state.supabaseClient, userid)
+            const { data: relayerBalanceData2, error: relayerBalanceDataError2 } = await selectRelayerBalanceByUserId(ctx.state.supabaseClient, userid);
+            relayerBalanceId = relayerBalanceData2[0].id;
+        } else {
+            relayerBalanceId = relayerBalanceData[0].id
+        }
+
+
         const name = form.get("name") as string;
         const network = form.get("network") as string;
         const currency = form.get("currency") as string;
@@ -43,7 +59,6 @@ export const handler: Handlers<any, State> = {
         const debitTimes = form.get("debitTimes") as string;
         const debitInterval = form.get("debitInterval") as string;
         const redirectto = form.get("redirectto") as string;
-
 
         if (chainIdFromNetworkName[network as NetworkNames] === undefined) {
             headers.set("location", "/app/profile");
@@ -63,6 +78,7 @@ export const handler: Handlers<any, State> = {
             pricing,
             chainIdFromNetworkName[network as NetworkNames],
             name,
+            relayerBalanceId
         )
 
         headers.set("location", "/app/debitItems");
