@@ -56,7 +56,7 @@ export function RenderIdentifier(id: string) {
     return <span>{`${id.substring(0, 5)}...${id.substring(id.length - 5, id.length)}`}</span>
 }
 
-export function getPaymentIntentStatusLogo(status: PaymentIntentStatus | string) {
+export function getPaymentIntentStatusLogo(status: PaymentIntentStatus | string, forPage: "payee" | "account") {
     switch (status) {
         case PaymentIntentStatus.CREATED:
             return <div class="inline-flex items-center py-1 rounded-full gap-x-2 text-emerald-500 bg-emerald-100/60 dark:bg-gray-800">
@@ -76,7 +76,7 @@ export function getPaymentIntentStatusLogo(status: PaymentIntentStatus | string)
                 <h2 class="text-sm font-normal">Cancelled</h2>
             </div>
         case PaymentIntentStatus.RECURRING:
-            return <div class="inline-flex items-center py-1 text-gray-500 rounded-full gap-x-2 bg-gray-100/60 dark:bg-gray-800">
+            return <div class="inline-flex items-center py-1 rounded-full gap-x-2 bg-gray-100/60 dark:bg-gray-800">
                 <svg xmlns="http://www.w3.org/2000/svg" height="12" viewBox="0 -960 960 960" width="12"><path d="M280-80 120-240l160-160 56 58-62 62h406v-160h80v240H274l62 62-56 58Zm-80-440v-240h486l-62-62 56-58 160 160-160 160-56-58 62-62H280v160h-80Z" /></svg>
 
                 <h2 class="text-sm font-normal">Recurring</h2>
@@ -94,7 +94,7 @@ export function getPaymentIntentStatusLogo(status: PaymentIntentStatus | string)
             return <div class="inline-flex items-center py-1 rounded-full gap-x-2 text-emerald-500 bg-emerald-100/60 dark:bg-gray-800">
                 <svg xmlns="http://www.w3.org/2000/svg" height="12" viewBox="0 -960 960 960" width="12"><path d="M600-160q-134 0-227-93t-93-227q0-134 93-227t227-93q134 0 227 93t93 227q0 134-93 227t-227 93Zm-320-10q-106-28-173-114T40-480q0-110 67-196t173-114v84q-72 25-116 87t-44 139q0 77 44 139t116 87v84Zm320-310Zm0 240q100 0 170-70t70-170q0-100-70-170t-170-70q-100 0-170 70t-70 170q0 100 70 170t170 70Z" /></svg>
 
-                <h2 class="text-sm font-normal">Relayer balance too low</h2>
+                <h2 class="text-sm font-normal">{forPage === "payee" ? "Relayer balance too low" : "Relaying started"}</h2>
             </div>
         case PaymentIntentStatus.ACCOUNTBALANCETOOLOW:
             return <div class="inline-flex items-center py-1 rounded-full gap-x-2 text-emerald-500 bg-emerald-100/60 dark:bg-gray-800">

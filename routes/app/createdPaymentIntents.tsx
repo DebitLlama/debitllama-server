@@ -72,7 +72,7 @@ export default function CreatedPaymentIntents(props: PageProps) {
                             </tr>
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm" >Status:</UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><p> {getPaymentIntentStatusLogo(pi.statusText)}</p></UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><p> {getPaymentIntentStatusLogo(pi.statusText, "account")}</p></UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><Tooltip message="The current status of the payment"></Tooltip></UnderlinedTd>
                             </tr>
                             <tr>

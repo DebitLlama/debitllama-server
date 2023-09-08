@@ -53,7 +53,7 @@ export function PaymentIntentsTableForDebitItem(props: PaymentIntentsTableProps)
                                         {RenderIdentifier(data.paymentIntent)}
                                     </td>
                                     <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
-                                        {getPaymentIntentStatusLogo(data.statusText)}
+                                        {getPaymentIntentStatusLogo(data.statusText,"payee")}
                                     </td>
                                     <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{data.debitTimes - data.used_for}</td>
                                     <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{getNextPaymentDateDisplay(data.nextPaymentDate)}</td>
