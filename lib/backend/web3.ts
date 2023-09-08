@@ -190,7 +190,7 @@ export function calculateGasEstimationPerChain(
     case ChainIds.BTT_TESTNET_ID:
       return feeData.gasPrice * increasedEstimatedGas;
     default:
-      break;
+      return null;
   }
 }
 
