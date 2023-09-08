@@ -1,7 +1,7 @@
 import Layout from "../../components/Layout.tsx";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
-import { insertDynamicPaymentRequestJob, selectDynamicPaymentRequestJobByPaymentIntentIdAndUserId, selectPaymentIntentByPaymentIntentAndPayeeUserId, selectRelayerBalanceByUserId, selectRelayerHistoryById, updateDynamicPaymentRequestJob, updatePaymentIntentAccountBalanceTooLowDynamicPayment } from "../../lib/backend/supabaseQueries.ts";
+import { insertDynamicPaymentRequestJob, selectDynamicPaymentRequestJobByPaymentIntentIdAndUserId, selectPaymentIntentByPaymentIntentAndPayeeUserId, selectRelayerBalanceByUserId, selectRelayerHistoryById, updateDynamicPaymentRequestJob, updatePaymentIntentAccountBalanceTooLowDynamicPayment, updateRelayerBalanceWithAllocatedAmount } from "../../lib/backend/supabaseQueries.ts";
 import { RenderIdentifier, Tooltip, UnderlinedTd, getDebitIntervalText, getPaymentIntentStatusLogo, getPaymentRequestJobStatusTooltipMessage, getPaymentRequestStatusLogo, getSubscriptionTooltipMessage } from "../../components/components.tsx";
 import CancelPaymentIntentButton from "../../islands/CancelPaymentIntentButton.tsx";
 import { ChainIds } from "../../lib/shared/web3.ts";
@@ -60,6 +60,10 @@ export const handler: Handlers<any, State> = {
         const paymentIntentData = paymentIntentDataArray[0];
         if (parseEther(requestedDebitAmount) > parseEther(paymentIntentData.maxDebitAmount)) {
             return errorResponseBuilder("Requested Amount Too High!");
+        }
+
+        if (paymentIntentData.pricing !== Pricing.Dynamic) {
+            return errorResponseBuilder("Only accepting dynamic priced payment intents!");
         }
 
         if (parseEther(requestedDebitAmount) <= 0) {
@@ -126,21 +130,41 @@ export const handler: Handlers<any, State> = {
                 ctx.state.supabaseClient,
                 ctx.state.userid,
                 paymentIntentData.id,
-                requestedDebitAmount
+                requestedDebitAmount,
+                formatEther(estimationForChain),
+                relayerBalanceDataArr[0].id
             );
+            await updateRelayerBalanceWithAllocatedAmount(
+                ctx.state.supabaseClient,
+                relayerBalanceDataArr[0].id,
+                paymentIntentData.network,
+                relayerBalance,
+                "0",
+                formatEther(estimationForChain)
+            )
         } else {
 
             if (dynamicPaymentRequestJobDataArr[0].status === DynamicPaymentRequestJobsStatus.LOCKED) {
                 return errorResponseBuilder("Payment request is locked. You can't update it anymore!")
             }
 
+
             // I update the existing job!
             await updateDynamicPaymentRequestJob(
                 ctx.state.supabaseClient,
                 ctx.state.userid,
                 paymentIntentData.id,
-                requestedDebitAmount
+                requestedDebitAmount,
+                formatEther(estimationForChain)
             );
+            await updateRelayerBalanceWithAllocatedAmount(
+                ctx.state.supabaseClient,
+                relayerBalanceDataArr[0].id,
+                paymentIntentData.network,
+                relayerBalance,
+                dynamicPaymentRequestJobDataArr[0].allocatedGas,
+                formatEther(estimationForChain)
+            )
         }
 
         if (parseEther(requestedDebitAmount) > parseEther(paymentIntentData.account_id.balance)) {
