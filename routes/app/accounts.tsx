@@ -8,7 +8,7 @@ export const handler: Handlers<any, State> = {
     async GET(_req, ctx) {
         const { data: accountsData, error: accountsError } = await selectOpenAccountsByIdDESC(ctx.state.supabaseClient, ctx.state.userid);
 
-        // I also need to fetch the payment intents here!
+     
 
         const { data: paymentIntentData, error: paymentIntentError } = await selectPaymentIntentsByUserIdDESC(ctx.state.supabaseClient, ctx.state.userid);
 
