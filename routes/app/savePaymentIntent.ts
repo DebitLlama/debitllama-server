@@ -1,6 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
 import {
-  broadcastNewPayment,
   insertPaymentIntent,
   selectAccountByCommitment,
   selectItemByButtonId,
@@ -53,7 +52,7 @@ export const handler: Handlers<any, State> = {
       debitTimes,
       debitInterval,
     }, itemData[0].network);
-    // Now I save it to the database and return ok
+    // Now I save it to the database if it succeeds I return ok afterwards!
     const { data, error: insertError } = await insertPaymentIntent(
       ctx.state.supabaseClient,
       userid,
@@ -85,11 +84,6 @@ export const handler: Handlers<any, State> = {
       itemData[0].payment_intents_count + 1,
       item_button_id,
     );
-
-    // Only Fixed priced subscriptions are relayed instantly, for dynamic pricing the API will need to be manually triggered with the price!
-    if (itemData[0].pricing === Pricing.Fixed) {
-      broadcastNewPayment(ctx.state.channel, { paymentIntent });
-    }
 
     return new Response(null, { status: 200 });
   },
