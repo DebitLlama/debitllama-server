@@ -75,7 +75,7 @@ export default function TriggerDirectDebitButton(props: TriggerDirectDebitButton
         {props.paymentIntent.statusText === PaymentIntentStatus.CANCELLED ? <p class="text-sm text-red-500">Payment Intent Cancelled!</p> :
             <div class={"flex flex-col justify-center"}>
                 <input required class="max-w-xs px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
-                    value={requestedAmount} onChange={(event: any) => setRequestedAmount(event.target.value)} type="number" id="requestedAmount" name="requestedAmount" placeholder="Debit" />
+                    value={requestedAmount} onChange={(event: any) => setRequestedAmount(event.target.value)} type="number" id="requestedAmount" name="requestedAmount" placeholder="Debit" step="any" />
                 <button
                     disabled={props.paymentIntent.statusText === PaymentIntentStatus.CANCELLED}
                     class="bg-gradient-to-b w-max text-green-500 font-semibold from-slate-50 to-green-100 px-10 py-3 rounded-2xl shadow-green-400 shadow-md border-b-4 hover border-b border-green-200 hover:shadow-sm transition-all duration-500"

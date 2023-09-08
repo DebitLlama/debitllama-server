@@ -133,7 +133,7 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
         <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Add Balance</label>
         <form onSubmit={topupClicked}>
             <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
-                value={amount} onChange={(event: any) => setAmount(event.target.value)} type="number" id="amount" name="amount" placeholder="Amount" />
+                value={amount} onChange={(event: any) => setAmount(event.target.value)} type="number" id="amount" name="amount" placeholder="Amount" step="any" />
             <button
                 class="mt-2 w-full bg-indigo-500 text-white text-sm font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
                 disabled={props.accountClosed}
