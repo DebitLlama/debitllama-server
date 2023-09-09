@@ -5,32 +5,12 @@ import {
   PaymentIntentStatus,
 } from "../enums.ts";
 import { ChainIds } from "../shared/web3.ts";
-import {
-  calculateGasEstimationPerChain,
-  getGasPrice,
-  increaseGasLimit,
-  parseEther,
-} from "./web3.ts";
 
-//AUTH
-export async function signUp(
-  supabaseClient: any,
-  email: string,
-  password: string,
-) {
-  return await supabaseClient.auth.signUp({ email, password });
-}
 
-export async function signInWithPassword(
-  supabaseClient: any,
-  email: string,
-  password: string,
-) {
-  return await supabaseClient.auth.signInWithPassword({ email, password });
-}
+//$ Comment means I added it to the query builder!
 
 //SELECTS
-
+//$
 export async function selectItemByButtonId(
   supabaseClient: any,
   buttonId: string,
@@ -40,7 +20,7 @@ export async function selectItemByButtonId(
     buttonId,
   );
 }
-
+//$
 export async function selectOpenAccountsFromUserByNetworkAndCurrency(
   supabaseClient: any,
   userId: string | null,
@@ -55,14 +35,14 @@ export async function selectOpenAccountsFromUserByNetworkAndCurrency(
     .eq("network_id", networkId)
     .eq("currency", currency);
 }
-
+//$
 export async function selectProfileByUserId(
   supabaseClient: any,
   userId: string | null,
 ) {
   return await supabaseClient.from("Profiles").select().eq("userid", userId);
 }
-
+//$
 export async function selectAccountByCommitment(
   supabaseClient: any,
   commitment: string,
@@ -72,7 +52,7 @@ export async function selectAccountByCommitment(
     commitment,
   );
 }
-
+//$
 export async function selectOpenAccountsByIdDESC(
   supabaseClient: any,
   userId: string | null,
@@ -84,7 +64,7 @@ export async function selectOpenAccountsByIdDESC(
     .eq("closed", false)
     .order("last_modified", { ascending: false });
 }
-
+//$
 export async function selectPaymentIntentsByUserIdDESC(
   supabaseClient: any,
   userId: string | null,
@@ -98,7 +78,7 @@ export async function selectPaymentIntentsByUserIdDESC(
       { ascending: false },
     );
 }
-
+//$
 export async function selectPaymentIntentsByAccountBalanceTooLow(
   supabaseClient: any,
   userId: string | null,
@@ -112,7 +92,7 @@ export async function selectPaymentIntentsByAccountBalanceTooLow(
       { ascending: false },
     );
 }
-
+//$
 export async function selectPaymentIntentsByRelayerBalanceTooLow(
   supabaseClient: any,
   userId: string | null,
@@ -124,7 +104,7 @@ export async function selectPaymentIntentsByRelayerBalanceTooLow(
     .eq("network", network)
     .eq("statusText", PaymentIntentStatus.BALANCETOOLOWTORELAY);
 }
-
+//$
 export async function selectPaymentIntentByPaymentIntentAndCreatorUserId(
   supabaseClient: any,
   paymentIntent: string,
@@ -135,6 +115,7 @@ export async function selectPaymentIntentByPaymentIntentAndCreatorUserId(
     .eq("paymentIntent", paymentIntent)
     .eq("creator_user_id", userId);
 }
+//$
 export async function selectRelayerHistoryById(
   supabaseClient: any,
   paymentIntentId: number,
@@ -143,7 +124,7 @@ export async function selectRelayerHistoryById(
     .select("*")
     .eq("paymentIntent_id", paymentIntentId);
 }
-
+//$
 export async function selectRelayerHistoryByUserId(
   supabaseClient: any,
   user_id: string | null,
@@ -152,7 +133,7 @@ export async function selectRelayerHistoryByUserId(
     .select("*")
     .eq("payee_user_id", user_id);
 }
-
+//$
 export async function selectPaymentIntentByPaymentIntentAndPayeeUserId(
   supabaseClient: any,
   paymentIntent: string,
@@ -165,7 +146,7 @@ export async function selectPaymentIntentByPaymentIntentAndPayeeUserId(
     paymentIntent,
   ).eq("payee_user_id", payee_user_id);
 }
-
+//$
 export async function selectItemsByPayeeIdDesc(
   supabaseClient: any,
   payeeId: string | null,
@@ -174,6 +155,7 @@ export async function selectItemsByPayeeIdDesc(
     .order("created_at", { ascending: false });
 }
 
+//$
 export async function selectPaymentIntentsByPayeeAndItem(
   supabaseClient: any,
   userId: string | null,
@@ -185,7 +167,7 @@ export async function selectPaymentIntentsByPayeeAndItem(
       debit_item_id,
     ).order("created_at", { ascending: false });
 }
-
+//$
 export async function selectRelayerBalanceByUserId(
   supabaseClient: any,
   userId: string | null,
@@ -195,7 +177,7 @@ export async function selectRelayerBalanceByUserId(
     userId,
   );
 }
-
+//$
 export async function selectRelayerTopUpHistoryDataByTransactionHash(
   supabaseClient: any,
   transactionHash: string,
@@ -205,7 +187,7 @@ export async function selectRelayerTopUpHistoryDataByTransactionHash(
     .select()
     .eq("transactionHash", transactionHash);
 }
-
+//$
 export async function selectRelayerTopUpHistoryDataByUserId(
   supabaseClient: any,
   userId: string | null,
@@ -215,7 +197,7 @@ export async function selectRelayerTopUpHistoryDataByUserId(
     userId,
   ).order("created_at", { ascending: false });
 }
-
+//$
 export async function selectDynamicPaymentRequestJobByPaymentIntentIdAndUserId(
   supabaseClient: any,
   userid: string | null,
@@ -226,7 +208,7 @@ export async function selectDynamicPaymentRequestJobByPaymentIntentIdAndUserId(
     .eq("paymentIntent_id", paymentIntent_id)
     .eq("request_creator_id", userid);
 }
-
+//$
 export async function selectDynamicPaymentRequestJobById(
   supabaseClient: any,
   id: number,
@@ -235,7 +217,7 @@ export async function selectDynamicPaymentRequestJobById(
     .select("*,relayerBalance_id(*),paymentIntent_id(*)").eq("id", id);
 }
 //INSERTS
-
+//$
 export async function insertNewAccount(
   supabaseClient: any,
   user_id: string | null,
@@ -257,7 +239,7 @@ export async function insertNewAccount(
     last_modified: new Date().toISOString(),
   });
 }
-
+//$
 export async function insertNewItem(
   supabaseClient: any,
   payee_id: string | null,
@@ -287,7 +269,7 @@ export async function insertNewItem(
     relayerBalance_id,
   });
 }
-
+//$
 export async function insertProfile(
   supabaseClient: any,
   userid: string | null,
@@ -312,7 +294,7 @@ export async function insertProfile(
     country,
   });
 }
-
+//$
 export async function insertFeedback(
   supabaseClient: any,
   creator_id: string | null,
@@ -328,7 +310,7 @@ export async function insertFeedback(
       },
     ).select();
 }
-
+//$
 export async function insertPaymentIntent(
   supabaseClient: any,
   creator_user_id: string | null,
@@ -376,7 +358,7 @@ export async function insertPaymentIntent(
     relayerBalance_id,
   });
 }
-
+//$
 export async function insertNewRelayerBalance(
   supabaseClient: any,
   userid: string | null,
@@ -385,6 +367,23 @@ export async function insertNewRelayerBalance(
     created_at: new Date().toISOString(),
     user_id: userid,
   });
+}
+//$
+export async function insertNewRelayerTopUpHistory(
+  supabaseClient: any,
+  userid: string | null,
+  transactionHash: string,
+  chainId: ChainIds,
+  addedBalance: string,
+) {
+  return await supabaseClient.from("RelayerTopUpHistory")
+    .insert({
+      created_at: new Date().toISOString(),
+      transactionHash,
+      user_id: userid,
+      network: chainId,
+      Amount: addedBalance,
+    });
 }
 
 /**
@@ -395,7 +394,7 @@ export async function insertNewRelayerBalance(
  * @param requestedAmount
  * @returns
  */
-
+//$
 export async function insertDynamicPaymentRequestJob(
   supabaseClient: any,
   userid: string | null,
@@ -416,7 +415,7 @@ export async function insertDynamicPaymentRequestJob(
 }
 
 //UPDATES
-
+//$
 export async function updateAccount(
   supabaseClient: any,
   balance: string,
@@ -431,7 +430,7 @@ export async function updateAccount(
       last_modified: new Date().toISOString(),
     }).eq("id", id);
 }
-
+//$
 export async function updateItem(
   supabaseClient: any,
   deleted: boolean,
@@ -444,7 +443,7 @@ export async function updateItem(
       button_id,
     );
 }
-
+//$
 export async function updatePaymentItemStatus(
   supabaseClient: any,
   status: PaymentIntentStatus,
@@ -454,7 +453,7 @@ export async function updatePaymentItemStatus(
     statusText: status,
   }).eq("paymentIntent", paymentIntent);
 }
-
+//$
 export async function updateItemPaymentIntentsCount(
   supabaseClient: any,
   payment_intents_count: number,
@@ -464,147 +463,31 @@ export async function updateItemPaymentIntentsCount(
     payment_intents_count,
   }).eq("button_id", button_id);
 }
-
-export async function updateRelayerBalanceWithAllocatedAmount(
+//$
+export async function updateBTT_Donau_Testnet_Balance(
   supabaseClient: any,
+  newRelayerBalance: bigint,
   relayerBalance_id: number,
-  chainId: ChainIds,
-  currentRelayerBalance: string,
-  oldAllocatedBalance: string,
-  newAllocatedBalance: string,
 ) {
-  switch (chainId) {
-    case ChainIds.BTT_TESTNET_ID: {
-      const current = parseEther(currentRelayerBalance);
-      const oldAllocation = parseEther(oldAllocatedBalance);
-      const newAllocation = parseEther(newAllocatedBalance);
-
-      const newRelayerBalance = (current + oldAllocation) - newAllocation;
-      return await supabaseClient.from("RelayerBalance").update({
-        BTT_Donau_Testnet_Balance: formatEther(newRelayerBalance),
-      }).eq("id", relayerBalance_id);
-    }
-    default:
-      break;
-  }
+  await supabaseClient.from("RelayerBalance").update({
+    BTT_Donau_Testnet_Balance: formatEther(newRelayerBalance),
+  }).eq("id", relayerBalance_id);
 }
-
-export async function updateRelayerBalanceAndHistorySwitchNetwork(
-  chainId: ChainIds,
+//$
+export async function updateMissing_BTT_Donau_Testnet_Balance(
   supabaseClient: any,
-  userId: string | null,
-  addedBalance: string,
-  transactionHash: string,
+  newBalance: bigint,
+  newMissingBalance: bigint,
+  id: number,
 ) {
-  const { data: relayerBalance, error: relayerBalanceError } =
-    await selectRelayerBalanceByUserId(
-      supabaseClient,
-      userId,
-    );
-
-  switch (chainId) {
-    case ChainIds.BTT_TESTNET_ID: {
-      const bttBalance = parseEther(
-        `${relayerBalance[0].BTT_Donau_Testnet_Balance}`,
-      );
-      const newBalance = parseEther(addedBalance) + bttBalance;
-      const missingBalance = parseEther(
-        relayerBalance[0].Missing_BTT_Donau_Testnet_Balance,
-      );
-      const newMissingBalance = calculateNewMissingBalance(
-        missingBalance,
-        parseEther(addedBalance),
-      );
-      const id = relayerBalance[0].id;
-
-      const res = await supabaseClient.from("RelayerBalance").update({
-        BTT_Donau_Testnet_Balance: formatEther(newBalance),
-        last_topup: new Date().toISOString(),
-        Missing_BTT_Donau_Testnet_Balance: formatEther(newMissingBalance),
-      }).eq("id", id);
-      const relayerTopUpH = await supabaseClient.from("RelayerTopUpHistory")
-        .insert({
-          created_at: new Date().toISOString(),
-          transactionHash,
-          user_id: userId,
-          network: chainId,
-          Amount: addedBalance,
-        });
-      // Find payment intents that I can set to Created or recurring depending on if it's the first transaction
-      // Depending on How much balance was added to the relayer and how much was the missing balance
-      const {
-        data: paymentIntentsWithLowBalance,
-        error: paymentIntentsWIlLowBalanceError,
-      } = await selectPaymentIntentsByRelayerBalanceTooLow(
-        supabaseClient,
-        userId,
-        chainId,
-      );
-
-      const feeData = await getGasPrice(
-        ChainIds.BTT_TESTNET_ID,
-      );
-      const resetablePaymentIntents = await findPaymentIntentsThatCanBeReset(
-        addedBalance,
-        paymentIntentsWithLowBalance,
-        feeData,
-      );
-      //set these resetable payment intents to created or recurring
-
-      for (let i = 0; i < resetablePaymentIntents.length; i++) {
-        const piToReset = resetablePaymentIntents[i];
-        if (piToReset.used_for === 0) {
-          // Set to created!
-          await updatePaymentItemStatus(
-            supabaseClient,
-            PaymentIntentStatus.CREATED,
-            piToReset.paymentIntent,
-          );
-        } else {
-          // set to recurring!
-          await updatePaymentItemStatus(
-            supabaseClient,
-            PaymentIntentStatus.RECURRING,
-            piToReset.paymentIntent,
-          );
-        }
-      }
-
-      break;
-    }
-    default:
-      console.log("default case triggers");
-      break;
-  }
+  return await supabaseClient.from("RelayerBalance").update({
+    BTT_Donau_Testnet_Balance: formatEther(newBalance),
+    last_topup: new Date().toISOString(),
+    Missing_BTT_Donau_Testnet_Balance: formatEther(newMissingBalance),
+  }).eq("id", id);
 }
 
-export function findPaymentIntentsThatCanBeReset(
-  addedBalance: string,
-  paymentIntentsRows: Array<PaymentIntentRow>,
-  feeData: any,
-) {
-  const parsedAddedBalance = parseEther(addedBalance);
-  const resumablePaymentIntents = new Array<PaymentIntentRow>();
 
-  let addedBalanceLeft = parsedAddedBalance;
-  let missingGas = BigInt(0);
-  for (let i = 0; i < paymentIntentsRows.length; i++) {
-    const pi = paymentIntentsRows[i];
-    const totalFee = calculateGasEstimationPerChain(
-      pi.network as ChainIds,
-      feeData,
-      increaseGasLimit(BigInt(pi.estimatedGas)),
-    );
-    missingGas += totalFee === null ? BigInt(0) : totalFee;
-    if (totalFee) {
-      if (addedBalanceLeft - totalFee >= 0) {
-        resumablePaymentIntents.push(pi);
-        addedBalanceLeft -= totalFee;
-      }
-    }
-  }
-  return resumablePaymentIntents;
-}
 
 /**
  * There should be only one dynamic payment request job per paymentIntent, we updating that!
@@ -614,7 +497,7 @@ export function findPaymentIntentsThatCanBeReset(
  * @param requestedAmount
  * @returns
  */
-
+//$
 export async function updateDynamicPaymentRequestJob(
   supabaseClient: any,
   userid: string | null,
@@ -630,7 +513,7 @@ export async function updateDynamicPaymentRequestJob(
   }).eq("paymentIntent_id", paymentIntent_id)
     .eq("request_creator_id", userid);
 }
-
+//$
 export async function updatePaymentIntentAccountBalanceTooLowDynamicPayment(
   arg: {
     chainId: ChainIds;
@@ -645,23 +528,9 @@ export async function updatePaymentIntentAccountBalanceTooLowDynamicPayment(
   }).eq("id", arg.paymentIntentRow.id);
 }
 
-function calculateNewMissingBalance(
-  missingBalance: bigint,
-  addedBalance: bigint,
-): bigint {
-  if (missingBalance === BigInt(0)) {
-    return BigInt(0);
-  }
-  const newBalance = missingBalance - addedBalance;
-  if (newBalance < 0) {
-    return BigInt(0);
-  } else {
-    return newBalance;
-  }
-}
 
 // UPSERT
-
+//$
 export async function upsertProfile(
   supabaseClient: any,
   id: string,
@@ -694,6 +563,7 @@ export async function upsertProfile(
 }
 
 //DELETE
+//$
 export async function deleteDynamicPaymentRequestJobById(
   supabaseClient: any,
   id: number,

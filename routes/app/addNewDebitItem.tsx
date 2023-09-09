@@ -3,18 +3,17 @@ import { State } from "../_middleware.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import AddNewDebitItemPageForm from "../../islands/addNewDebitItemPageForm.tsx";
 import { NetworkNames, chainIdFromNetworkName } from "../../lib/shared/web3.ts";
-import { insertNewItem, insertNewRelayerBalance, selectProfileByUserId, selectRelayerBalanceByUserId } from "../../lib/backend/supabaseQueries.ts";
+import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 
 
 
 export const handler: Handlers<any, State> = {
     async GET(_req, ctx) {
         const headers = new Headers();
-
-        const userid = ctx.state.userid;
-
+        const queryBuilder = new QueryBuilder(ctx);
+        const select = queryBuilder.select();
         // Get the data and use it to populate the fields!
-        const { data: profileData, error: profileError } = await selectProfileByUserId(ctx.state.supabaseClient, userid);
+        const { data: profileData } = await select.Profiles.byUserId();
 
         if (profileData === null || profileData.length === 0) {
             headers.set("location", "/app/profile");
@@ -26,10 +25,12 @@ export const handler: Handlers<any, State> = {
     async POST(_req, ctx) {
         const headers = new Headers();
         const userid = ctx.state.userid;
-
+        const queryBuilder = new QueryBuilder(ctx);
+        const select = queryBuilder.select();
+        const insert = queryBuilder.insert();
         const form = await _req.formData();
 
-        const { data: profileData, error: profileError } = await selectProfileByUserId(ctx.state.supabaseClient, userid);
+        const { data: profileData } = await select.Profiles.byUserId();
 
         if (profileData === null || profileData.length === 0) {
             headers.set("location", "/app/profile");
@@ -38,13 +39,11 @@ export const handler: Handlers<any, State> = {
 
         let relayerBalanceId = null;
 
-        const { data: relayerBalanceData, error: relayerBalanceDataError } = await selectRelayerBalanceByUserId(ctx.state.supabaseClient, userid);
+        const { data: relayerBalanceData } = await select.RelayerBalance.byUserId();
         // I'm gonna add the id of the relayerBalance to the debit item so I can join tables later more easily
         if (relayerBalanceData === null || relayerBalanceData.length === 0) {
-            // If it doesn't exist I create a new one!
-            //TODO: It should insert().select(). I should select the insert and not run a select again!
-            await insertNewRelayerBalance(ctx.state.supabaseClient, userid)
-            const { data: relayerBalanceData2, error: relayerBalanceDataError2 } = await selectRelayerBalanceByUserId(ctx.state.supabaseClient, userid);
+            await insert.RelayerBalance.newRelayerBalance()
+            const { data: relayerBalanceData2, error: relayerBalanceDataError2 } = await select.RelayerBalance.byUserId();
             relayerBalanceId = relayerBalanceData2[0].id;
         } else {
             relayerBalanceId = relayerBalanceData[0].id
@@ -66,9 +65,7 @@ export const handler: Handlers<any, State> = {
         }
         // TODO: More Input verification!!
 
-        await insertNewItem(
-            ctx.state.supabaseClient,
-            userid,
+        await insert.Items.newItem(
             profileData[0].walletaddress,
             currency,
             maxAmount,

@@ -5,7 +5,7 @@ import { getItemProps } from "../buyitnow.tsx";
 import { getAccount, getEncryptedNote } from "../../lib/backend/web3.ts";
 import { decryptData } from "../../lib/backend/decryption.ts";
 import ApprovePaymentIsland from "../../islands/approvePaymentIsland.tsx";
-import { selectAccountByCommitment, selectItemByButtonId } from "../../lib/backend/supabaseQueries.ts";
+import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 
 const ethEncryptPrivateKey = Deno.env.get("ETHENCRYPTPRIVATEKEY") || "";
 
@@ -16,14 +16,15 @@ export const handler: Handlers<any, State> = {
     const debititem_buttonId = form.get("debititem") as string;
     const accountcommitment = form.get("accountcommitment") as string;
     const userid = ctx.state.userid;
-
-    const { data: itemData, error: itemError } = await selectItemByButtonId(ctx.state.supabaseClient, debititem_buttonId);
+    const queryBuilder = new QueryBuilder(ctx);
+    const select = queryBuilder.select();
+    const { data: itemData } = await select.Items.byButtonId(debititem_buttonId);
 
     if (itemData === null || itemData.length === 0) {
       return ctx.render({ ...ctx.state, notfound: true, itemData: [] });
     }
 
-    const { data: accountdata, error: accountError } = await selectAccountByCommitment(ctx.state.supabaseClient, accountcommitment);
+    const { data: accountdata } = await select.Accounts.byCommitment(accountcommitment);
 
     if (accountdata === null || accountcommitment === null) {
 

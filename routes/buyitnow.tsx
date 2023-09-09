@@ -2,7 +2,8 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import BuyButtonPage, { ItemProps } from "../islands/buyButtonPage.tsx";
 import { State } from "./_middleware.ts";
 import { setCookie } from "$std/http/cookie.ts";
-import { selectItemByButtonId, selectOpenAccountsFromUserByNetworkAndCurrency, selectProfileByUserId, signInWithPassword } from "../lib/backend/supabaseQueries.ts";
+import QueryBuilder from "../lib/backend/queryBuilder.ts";
+import { signInWithPassword } from "../lib/backend/auth.ts";
 
 function doesProfileExists(profileData: any) {
     if (profileData === null || profileData.length === 0) {
@@ -16,8 +17,9 @@ export const handler: Handlers<any, State> = {
     async GET(req, ctx) {
         const url = new URL(req.url);
         const query = url.searchParams.get("q") || "";
-
-        const { data: itemData, error: itemError } = await selectItemByButtonId(ctx.state.supabaseClient, query);
+        const queryBuilder = new QueryBuilder(ctx);
+        const select = queryBuilder.select();
+        const { data: itemData, error: itemError } = await select.Items.byButtonId(query);
 
         if (itemData === null || itemData.length === 0) {
             return ctx.render({ ...ctx.state, notfound: true, itemData: [] });
@@ -27,13 +29,10 @@ export const handler: Handlers<any, State> = {
 
         const currency = JSON.parse(itemData[0].currency);
 
-        const { data: accountData, error: accountError } = await selectOpenAccountsFromUserByNetworkAndCurrency(
-            ctx.state.supabaseClient,
-            ctx.state.userid,
-            itemData[0].network,
+        const { data: accountData, error: accountError } = await select.Accounts.whereOpenByNetworkAndCurrencyAndUserId(itemData[0].network,
             currency.name);
 
-        const { data: profileData, error: profileError } = await selectProfileByUserId(ctx.state.supabaseClient, ctx.state.userid);
+        const { data: profileData, error: profileError } = await select.Profiles.byUserId();
 
         return ctx.render({ ...ctx.state, notfound: false, itemData, accountData, profileExists: doesProfileExists(profileData), ethEncryptPublicKey })
 

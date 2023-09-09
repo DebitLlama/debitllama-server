@@ -1,29 +1,28 @@
 import Layout from "../../components/Layout.tsx";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
-import { selectPaymentIntentByPaymentIntentAndCreatorUserId, selectRelayerHistoryById, updatePaymentItemStatus } from "../../lib/backend/supabaseQueries.ts";
 import { RenderIdentifier, Tooltip, UnderlinedTd, getDebitIntervalText, getPaymentIntentStatusLogo, getSubscriptionTooltipMessage } from "../../components/components.tsx";
 import { PaymentIntentRow, PaymentIntentStatus } from "../../lib/enums.ts";
 import RelayedTxHistory from "../../islands/RelayedTxHistory.tsx";
 import CancelPaymentIntentButton from "../../islands/CancelPaymentIntentButton.tsx";
 import { ChainIds, rpcUrl } from "../../lib/shared/web3.ts";
 import { getPaymentIntentHistory } from "../../lib/backend/web3.ts";
+import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(req: any, ctx: any) {
         const url = new URL(req.url);
         const query = url.searchParams.get("q") || "";
-        const { data: paymentIntentData, error: paymentIntentError } = await selectPaymentIntentByPaymentIntentAndCreatorUserId(
-            ctx.state.supabaseClient, query, ctx.state.userid);
+        const queryBuilder = new QueryBuilder(ctx);
+        const select = queryBuilder.select();
+        const { data: paymentIntentData } = await select.PaymentIntents.byPaymentIntentAndUserIdForCreator(query);
 
         if (paymentIntentData === null || paymentIntentData.length === 0) {
             return ctx.render({ ...ctx.state, notfound: true });
         }
 
-        const { data: paymentIntentHistory, error: paymentIntentHistoryError } = await selectRelayerHistoryById(
-            ctx.state.supabaseClient,
-            paymentIntentData[0].id
-        );
+        const { data: paymentIntentHistory } = await select.RelayerHistory
+            .byPaymentIntentId(paymentIntentData[0].id);
 
         return ctx.render({ ...ctx.state, notfound: false, paymentIntentData, paymentIntentHistory });
     },
@@ -38,9 +37,11 @@ export const handler: Handlers<any, State> = {
 
         const paymentIntentHistory = await getPaymentIntentHistory(chainId, paymentIntent);
         if (paymentIntentHistory.isNullified) {
+            const queryBuilder = new QueryBuilder(ctx);
+            const update = queryBuilder.update();
             // Update the database if it's nullified
             // set the payment intent to closed!
-            await updatePaymentItemStatus(ctx.state.supabaseClient, PaymentIntentStatus.CANCELLED, paymentIntent);
+            await update.PaymentIntents.statusByPaymentIntent(PaymentIntentStatus.CANCELLED, paymentIntent);
             return new Response(null, { status: 200 })
         } else {
             return new Response(null, { status: 500 })

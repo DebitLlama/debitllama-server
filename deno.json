@@ -5,7 +5,8 @@
     "update": "deno run -A -r https://fresh.deno.dev/update .",
     "test_enc": "deno test tests/encryption.ts",
     "test_queryFilter": "deno run -A tests/queryFilter.ts --allow-net",
-    "livetest": "deno run -A tests/paymentIntentResetting.ts --allow-net"
+    "livetest_paymentIntentResetting": "deno run -A tests/paymentIntentResetting.ts --allow-net",
+    "livetest_queryBuilderTests": "deno run -A tests/queryBuilderTests.ts --allow-new"
   },
   "imports": {
     "$fresh/": "https://deno.land/x/fresh@1.2.0/",

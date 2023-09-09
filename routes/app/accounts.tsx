@@ -2,17 +2,17 @@ import Layout from "../../components/Layout.tsx";
 import { State } from "../_middleware.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import AccountCardCarousel from "../../islands/accountCardCarousel.tsx";
-import { selectOpenAccountsByIdDESC, selectPaymentIntentsByAccountBalanceTooLow, selectPaymentIntentsByUserIdDESC } from "../../lib/backend/supabaseQueries.ts";
+import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(_req, ctx) {
-        const { data: accountsData, error: accountsError } = await selectOpenAccountsByIdDESC(ctx.state.supabaseClient, ctx.state.userid);
+        const queryBuilder = new QueryBuilder(ctx);
+        const select = queryBuilder.select();
+        const { data: accountsData } = await select.Accounts.whereOpenByUserIdOrderDesc();
 
-     
+        const { data: paymentIntentData } = await select.PaymentIntents.byUserIdForCreatorDesc();
 
-        const { data: paymentIntentData, error: paymentIntentError } = await selectPaymentIntentsByUserIdDESC(ctx.state.supabaseClient, ctx.state.userid);
-
-        const { data: missedPayments, error: missedPaymentsError } = await selectPaymentIntentsByAccountBalanceTooLow(ctx.state.supabaseClient, ctx.state.userid);
+        const { data: missedPayments } = await select.PaymentIntents.byAccountBalanceTooLowByUserIdForCreatorDesc();
 
         // Add pagination for both!
         return ctx.render({ ...ctx.state, accountsData, paymentIntentData, missedPayments })

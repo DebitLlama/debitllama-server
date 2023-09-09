@@ -1,16 +1,16 @@
 // deno-lint-ignore-file no-explicit-any
 import { Handlers, PageProps } from "$fresh/server.ts";
 import Layout from "../../components/Layout.tsx";
-import { insertFeedback } from "../../lib/backend/supabaseQueries.ts";
+import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 import { State } from "../_middleware.ts";
 export const handler: Handlers<any, State> = {
     async POST(req, ctx) {
         const form = await req.formData();
         const subject = form.get("subject") as string;
         const message = form.get("message") as string;
-        const userid = ctx.state.userid;
-
-        const { error } = await insertFeedback(ctx.state.supabaseClient, userid, subject, message);
+        const queryBuilder = new QueryBuilder(ctx);
+        const insert = queryBuilder.insert();
+        const { error } = await insert.Feedback.newFeedback(subject, message);
         const headers = new Headers();
 
         if (error) {

@@ -8,12 +8,14 @@ import { getAccount } from "../../lib/backend/web3.ts";
 import { ZeroAddress, formatEther } from "../../ethers.min.js";
 import AccountTopupOrClose from "../../islands/AccountTopupOrClose.tsx";
 import { AccountCardElement } from "../../components/AccountCardElement.tsx";
-import { insertNewAccount, selectAccountByCommitment, updateAccount } from "../../lib/backend/supabaseQueries.ts";
+import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(req: any, ctx: any) {
         const url = new URL(req.url);
         const query = url.searchParams.get("q") || "";
+        const queryBuilder = new QueryBuilder(ctx);
+        const select = queryBuilder.select();
         try {
             const { networkId, commitment, name, currency } = JSON.parse(query);
 
@@ -24,13 +26,12 @@ export const handler: Handlers<any, State> = {
             }
             const accountData = await getAccount(commitment, networkId);
             if (accountData.exists) {
-                const { data, error } = await selectAccountByCommitment(ctx.state.supabaseClient, commitment);
+                const { data, error } = await select.Accounts.byCommitment(commitment);
 
                 if (data.length === 0) {
+                    const insert = queryBuilder.insert();
 
-                    await insertNewAccount(
-                        ctx.state.supabaseClient,
-                        ctx.state.userid,
+                    await insert.Accounts.newAccount(
                         networkId,
                         commitment,
                         name,
@@ -42,7 +43,9 @@ export const handler: Handlers<any, State> = {
                 } else {
 
                     if (data[0].balance !== formatEther(accountData.account[3])) {
-                        const res = await updateAccount(ctx.state.supabaseClient, accountData.account[3], !accountData.account[0], data[0].id)
+                        const update = queryBuilder.update();
+
+                        const res = await update.Accounts.balanceAndClosedById(accountData.account[3], !accountData.account[0], data[0].id)
                     }
 
                     // Here I return the data from the database because the account was saved

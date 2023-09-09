@@ -4,21 +4,21 @@ import { State } from "../_middleware.ts";
 import CopyButton from "../../islands/copyButton.tsx";
 import { ChainIds, networkNameFromId } from "../../lib/shared/web3.ts";
 import DebitItemIsland from "../../islands/DebitItemIsland.tsx";
-import { selectItemByButtonId, selectPaymentIntentsByPayeeAndItem, updateItem } from "../../lib/backend/supabaseQueries.ts";
+import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(req: any, ctx: any) {
         const url = new URL(req.url);
         const query = url.searchParams.get("q") || "";
-        const { data: itemData, error: itemError } = await selectItemByButtonId(ctx.state.supabaseClient, query);
+        const queryBuilder = new QueryBuilder(ctx);
+        const select = queryBuilder.select();
+
+        const { data: itemData } = await select.Items.byButtonId(query);
         if (itemData === null || itemData.length === 0) {
             return ctx.render({ ...ctx.state, notfound: true });
         }
 
-        const { data: paymentIntentData, error: paymentIntentError } = await selectPaymentIntentsByPayeeAndItem(
-            ctx.state.supabaseClient,
-            ctx.state.userid,
-            itemData[0].id);
+        const { data: paymentIntentData, error: paymentIntentError } = await select.PaymentIntents.byItemIdAndUserIdForPayeeOrderDesc(itemData[0].id);
 
         return ctx.render({ ...ctx.state, notfound: false, itemData, paymentIntentData });
     },
@@ -26,10 +26,11 @@ export const handler: Handlers<any, State> = {
         const form = await req.formData();
         const deleted = form.get("deleted") as boolean;
         const button_id = form.get("button_id") as string;
+        const queryBuilder = new QueryBuilder(ctx);
+        const update = queryBuilder.update();
 
-        const { error: deleteError } = await updateItem(ctx.state.supabaseClient, deleted, ctx.state.userid, button_id);
+        await update.Items.deletedByButtonIdForPayee(deleted, button_id);
 
-        console.log(deleteError)
 
         return new Response("", {
             status: 301,

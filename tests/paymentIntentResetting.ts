@@ -1,24 +1,31 @@
 import { createClient } from "@supabase/supabase-js";
-import {
-  findPaymentIntentsThatCanBeReset,
-  selectPaymentIntentsByRelayerBalanceTooLow,
-} from "../lib/backend/supabaseQueries.ts";
 import { ChainIds } from "../lib/shared/web3.ts";
 import "$std/dotenv/load.ts";
 import { getGasPrice } from "../lib/backend/web3.ts";
+import { findPaymentIntentsThatCanBeReset } from "../lib/backend/businessLogic.ts";
+import QueryBuilder from "../lib/backend/queryBuilder.ts";
+
+// Integration tests on a live database for the query builder!
 
 async function main() {
+  //TODO: change this to test db keys!
   const client = createClient(
     Deno.env.get("SUPABASE_URL") || "",
     Deno.env.get("SUPABASE_KEY") || "",
     { auth: { persistSession: false } },
   );
+  const queryBuilder = new QueryBuilder({
+    state: {
+      supabaseClient: client,
+      userid: "10224224-3f34-4781-85bf-04f7529a5196",
+    },
+  });
+  const select = queryBuilder.select();
+
   const {
     data: paymentIntentsWithLowBalance,
     error: paymentIntentsWIlLowBalanceError,
-  } = await selectPaymentIntentsByRelayerBalanceTooLow(
-    client,
-    "10224224-3f34-4781-85bf-04f7529a5196",
+  } = await select.PaymentIntents.byRelayerBalanceTooLowAndUserIdForPayee(
     ChainIds.BTT_TESTNET_ID,
   );
   console.log(

@@ -1,16 +1,17 @@
 import Layout from "../../components/Layout.tsx";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
-import { insertDynamicPaymentRequestJob, selectDynamicPaymentRequestJobByPaymentIntentIdAndUserId, selectPaymentIntentByPaymentIntentAndPayeeUserId, selectRelayerBalanceByUserId, selectRelayerHistoryById, updateDynamicPaymentRequestJob, updatePaymentIntentAccountBalanceTooLowDynamicPayment, updateRelayerBalanceWithAllocatedAmount } from "../../lib/backend/supabaseQueries.ts";
 import { RenderIdentifier, Tooltip, UnderlinedTd, getDebitIntervalText, getPaymentIntentStatusLogo, getPaymentRequestJobStatusTooltipMessage, getPaymentRequestStatusLogo, getSubscriptionTooltipMessage } from "../../components/components.tsx";
 import CancelPaymentIntentButton from "../../islands/CancelPaymentIntentButton.tsx";
 import { ChainIds } from "../../lib/shared/web3.ts";
 import RelayedTxHistory from "../../islands/RelayedTxHistory.tsx";
 import { DynamicPaymentRequestJobsStatus, PaymentIntentRow, Pricing } from "../../lib/enums.ts";
 import TriggerDirectDebitButton from "../../islands/TriggerDirectDebitButton.tsx";
-import { calculateGasEstimationPerChain, estimateRelayerGas, formatEther, getGasPrice, getRelayerBalanceForChainId, increaseGasLimit, parseEther } from "../../lib/backend/web3.ts";
+import { estimateRelayerGas, formatEther, parseEther } from "../../lib/backend/web3.ts";
 import { errorResponseBuilder, successResponseBuilder } from "../../lib/backend/responseBuilders.ts";
 import CancelDynamicPaymentRequestButton from "../../islands/CancelDynamicPaymentRequestButton.tsx";
+import { calculateGasEstimationPerChain, getGasPrice, getRelayerBalanceForChainId, increaseGasLimit, updateRelayerBalanceWithAllocatedAmount } from "../../lib/backend/businessLogic.ts";
+import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 
 
 
@@ -18,25 +19,21 @@ export const handler: Handlers<any, State> = {
     async GET(req: any, ctx: any) {
         const url = new URL(req.url);
         const query = url.searchParams.get("q") || "";
-        const { data: paymentIntentData, error: paymentIntentError } = await selectPaymentIntentByPaymentIntentAndPayeeUserId(
-            ctx.state.supabaseClient,
-            query,
-            ctx.state.userid);
+        const queryBuilder = new QueryBuilder(ctx);
+        const select = queryBuilder.select();
+
+        const { data: paymentIntentData } = await select.PaymentIntents
+            .byPaymentIntentAndUserIdForPayee(query);
 
         if (paymentIntentData === null || paymentIntentData.length === 0) {
             return ctx.render({ ...ctx.state, notfound: true });
         }
-        const { data: paymentIntentHistory, error: paymentIntentHistoryError } = await selectRelayerHistoryById(
-            ctx.state.supabaseClient,
-            paymentIntentData[0].id
-        );
+        const { data: paymentIntentHistory } = await select.RelayerHistory
+            .byPaymentIntentId(paymentIntentData[0].id);
 
         if (paymentIntentData[0].pricing === Pricing.Dynamic) {
-            const { data: dynamicPaymentRequestJobArr, error: dynamicPaymentRequestJobErr } = await selectDynamicPaymentRequestJobByPaymentIntentIdAndUserId(
-                ctx.state.supabaseClient,
-                ctx.state.userid,
-                paymentIntentData[0].id
-            );
+            const { data: dynamicPaymentRequestJobArr } = await select.DynamicPaymentRequestJobs
+                .byPaymentIntentIdAndUserId(paymentIntentData[0].id);
             return ctx.render({ ...ctx.state, notfound: false, paymentIntentData, paymentIntentHistory, dynamicPaymentRequestJobArr });
         } else {
             return ctx.render({ ...ctx.state, notfound: false, paymentIntentData, paymentIntentHistory, dynamicPaymentRequestJobArr: [] });
@@ -48,11 +45,11 @@ export const handler: Handlers<any, State> = {
         const json = await req.json();
         const paymentIntent = json.paymentIntent;
         const requestedDebitAmount = json.requestedDebitAmount;
+        const queryBuilder = new QueryBuilder(ctx);
+        const select = queryBuilder.select();
 
-        const { data: paymentIntentDataArray, error: paymentIntentError } = await selectPaymentIntentByPaymentIntentAndPayeeUserId(
-            ctx.state.supabaseClient,
-            paymentIntent,
-            ctx.state.userid);
+        const { data: paymentIntentDataArray } = await select.PaymentIntents
+            .byPaymentIntentAndUserIdForPayee(paymentIntent);
 
         if (paymentIntentDataArray === null || paymentIntentDataArray.length === 0) {
             return errorResponseBuilder("Invalid Payment Intent");
@@ -95,10 +92,7 @@ export const handler: Handlers<any, State> = {
             return errorResponseBuilder("Unable to Create Debit Request.")
         }
 
-        const { data: relayerBalanceDataArr, error: relayerBalanceDataErr } = await selectRelayerBalanceByUserId(
-            ctx.state.supabaseClient,
-            ctx.state.userid
-        )
+        const { data: relayerBalanceDataArr } = await select.RelayerBalance.byUserId();
 
         if (relayerBalanceDataArr === null || relayerBalanceDataArr.length === 0) {
             return errorResponseBuilder("Relayer balance not found!");
@@ -118,24 +112,22 @@ export const handler: Handlers<any, State> = {
             return errorResponseBuilder(`Relayer balance too low. You need to top up the relayer with at least ${formatEther(estimationForChain)} ${JSON.parse(paymentIntentData.currency).name}`)
         }
 
-        const { data: dynamicPaymentRequestJobDataArr, error: dynamicPaymentRequestJobDataErr } = await selectDynamicPaymentRequestJobByPaymentIntentIdAndUserId(
-            ctx.state.supabaseClient,
-            ctx.state.userid,
-            paymentIntentData.id
-        )
+        const { data: dynamicPaymentRequestJobDataArr } = await select.DynamicPaymentRequestJobs
+            .byPaymentIntentIdAndUserId(paymentIntentData.id)
+
+        const insert = queryBuilder.insert();
+        const update = queryBuilder.update();
 
         if (dynamicPaymentRequestJobDataArr === null || dynamicPaymentRequestJobDataArr.length === 0) {
             // I need to insert an new job!
-            await insertDynamicPaymentRequestJob(
-                ctx.state.supabaseClient,
-                ctx.state.userid,
+            await insert.DynamicPaymentRequestJobs.newJob(
                 paymentIntentData.id,
                 requestedDebitAmount,
                 formatEther(estimationForChain),
                 relayerBalanceDataArr[0].id
             );
             await updateRelayerBalanceWithAllocatedAmount(
-                ctx.state.supabaseClient,
+                queryBuilder,
                 relayerBalanceDataArr[0].id,
                 paymentIntentData.network,
                 relayerBalance,
@@ -148,17 +140,16 @@ export const handler: Handlers<any, State> = {
                 return errorResponseBuilder("Payment request is locked. You can't update it anymore!")
             }
 
-
             // I update the existing job!
-            await updateDynamicPaymentRequestJob(
-                ctx.state.supabaseClient,
-                ctx.state.userid,
-                paymentIntentData.id,
-                requestedDebitAmount,
-                formatEther(estimationForChain)
-            );
+            await update.DynamicPaymentRequestJobs
+                .ByPaymentIntentIdAndRequestCreator(
+                    paymentIntentData.id,
+                    requestedDebitAmount,
+                    formatEther(estimationForChain)
+                );
+
             await updateRelayerBalanceWithAllocatedAmount(
-                ctx.state.supabaseClient,
+                queryBuilder,
                 relayerBalanceDataArr[0].id,
                 paymentIntentData.network,
                 relayerBalance,
@@ -168,11 +159,9 @@ export const handler: Handlers<any, State> = {
         }
 
         if (parseEther(requestedDebitAmount) > parseEther(paymentIntentData.account_id.balance)) {
-            await updatePaymentIntentAccountBalanceTooLowDynamicPayment({
-                chainId: paymentIntentData.network as ChainIds,
-                supabaseClient: ctx.state.supabaseClient,
-                paymentIntentRow: paymentIntentData
-            });
+            await update.PaymentIntents.statusTextToAccountBalanceTooLowById(
+                paymentIntentData
+            );
             return successResponseBuilder("Request Created but customer balance too low! We notified the customer about the pending payment!");
         }
 

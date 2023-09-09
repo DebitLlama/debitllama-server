@@ -1,6 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { formatEther } from "../../ethers.min.js";
-import { insertNewAccount, selectAccountByCommitment } from "../../lib/backend/supabaseQueries.ts";
+import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 import { getAccount } from "../../lib/backend/web3.ts";
 import { ChainIds, rpcUrl } from "../../lib/shared/web3.ts";
 import { State } from "../_middleware.ts";
@@ -14,6 +13,8 @@ export const handler: Handlers<any, State> = {
             const name = json.name;
             const currency = json.currency;
             const networkExists = rpcUrl[networkId as ChainIds];
+            const queryBuilder = new QueryBuilder(ctx);
+            const select = queryBuilder.select();
 
             if (!networkExists) {
                 return new Response(null, { status: 500 })
@@ -21,13 +22,12 @@ export const handler: Handlers<any, State> = {
             const accountData = await getAccount(commitment, networkId);
             if (accountData.exists) {
                 //checking if account is already saved into the database
-                const { data, error } = await selectAccountByCommitment(ctx.state.supabaseClient, commitment);
+                const { data, error } = await select.Accounts.byCommitment(commitment);
 
                 //@ts-ignore checking if it returns an empty array
                 if (data.length === 0) {
-                    const { data: savedAccountData, error: accountError } = await insertNewAccount(
-                        ctx.state.supabaseClient,
-                        ctx.state.userid,
+                    const insert = queryBuilder.insert();
+                    await insert.Accounts.newAccount(
                         networkId,
                         commitment,
                         name,

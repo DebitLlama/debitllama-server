@@ -4,7 +4,7 @@ import Layout from "../../components/Layout.tsx";
 import { State } from "../_middleware.ts";
 import WalletAddressSelector from "../../islands/WalletAddressSelector.tsx"
 import { validateAddress } from "../../lib/backend/web3.ts";
-import { selectProfileByUserId, upsertProfile } from "../../lib/backend/supabaseQueries.ts";
+import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 
 
 export const handler: Handlers<any, State> = {
@@ -34,8 +34,9 @@ export const handler: Handlers<any, State> = {
     const country = form.get("country") as string;
     const userid = ctx.state.userid;
 
-    const { error } = await upsertProfile(
-      ctx.state.supabaseClient,
+    const queryBuilder = new QueryBuilder(ctx);
+    const upsert = queryBuilder.upsert();
+    const { error } = await upsert.Profiles.all(
       id,
       walletaddress,
       firstname,
@@ -44,8 +45,7 @@ export const handler: Handlers<any, State> = {
       addressline2,
       city,
       postcode,
-      country,
-      userid
+      country
     );
 
 
@@ -59,10 +59,10 @@ export const handler: Handlers<any, State> = {
     return new Response(null, { status: 303, headers })
   },
   async GET(_req, ctx) {
-    const userid = ctx.state.userid;
-
+    const queryBuilder = new QueryBuilder(ctx);
+    const select = queryBuilder.select();
     // Get the data and use it to populate the fields!
-    const { data: profileData, error: profileError } = await selectProfileByUserId(ctx.state.supabaseClient, userid);
+    const { data: profileData } = await select.Profiles.byUserId();
 
     if (profileData === null || profileData.length === 0) {
       return ctx.render(
