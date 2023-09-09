@@ -1,9 +1,10 @@
 import { useState } from 'preact/hooks';
-import { ChainIds, NetworkNames, chainIdFromNetworkName, networkNameFromId, walletCurrency } from "../lib/shared/web3.ts";
+import { ChainIds, networkNameFromId, walletCurrency } from "../lib/shared/web3.ts";
 import { PaymentIntentsTableForAccounts } from "../components/PaymentIntentsTable.tsx";
 import { AccountDisplayElement } from "../components/AccountDisplayElement.tsx";
 import { parseEther } from "../lib/frontend/web3.ts";
 import { formatEther } from "../ethers.min.js";
+import { CarouselButtons } from '../components/components.tsx';
 
 interface AccountCardCarouselProps {
     accountData: Array<any>,
@@ -82,24 +83,7 @@ export default function AccountCardCarousel(props: AccountCardCarouselProps) {
                         name: data.name,
                         extraCSS: visible ? "fade-in-element" : "fade-out-element"
                     })}
-                <div class="flex flex-rw justify-center">
-
-                    <label onClick={backClicked}
-                        class="cursor-pointer bg-white rounded-full shadow-md active:translate-y-0.5"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.707-10.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L9.414 11H13a1 1 0 100-2H9.414l1.293-1.293z" clip-rule="evenodd" />
-                        </svg>
-                    </label>
-
-                    <label onClick={forwardClicked}
-                        class="cursor-pointer bg-white rounded-full shadow-md active:translate-y-0.5"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd" />
-                        </svg>
-                    </label>
-                </div>
+                <CarouselButtons backClicked={backClicked} forwardClicked={forwardClicked}></CarouselButtons>
             </div>
         </div>
         <MissedPaymentsNotification chainId={data.network_id} missedPayments={getPaymentIntentsForCurrentAccount(data.commitment, props.missedPayments)}></MissedPaymentsNotification>

@@ -9,6 +9,7 @@ import { ChainIds, getDirectDebitContractAddress } from "../lib/shared/web3.ts";
 import { requestBalanceRefresh, saveAccountData, uploadProfileData } from "../lib/frontend/fetch.ts";
 import { setUpAccount } from "../lib/frontend/directdebitlib.ts";
 import { AccountCardElement, CheckoutAccountCardElement } from "../components/AccountCardElement.tsx";
+import { CarouselButtons } from "../components/components.tsx";
 
 export interface Currency {
     name: string,
@@ -73,7 +74,14 @@ export interface LoggedInUiProps {
     // used for topping up the account
     topupAmount: number,
     setTopupAmount: (to: number) => void;
-    ethEncryptPublicKey: string
+    ethEncryptPublicKey: string;
+
+    // Used for the carousel that displays the accounts!
+    currentlyShowingAccount: number;
+    visible: boolean;
+    backClicked: () => void;
+    forwardClicked: () => void;
+
 }
 
 
@@ -548,22 +556,10 @@ function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
 
 }
 
-function sortAccounts(accounts: Array<any>): Array<any> {
-    return accounts.sort((a, b) => {
-        const abalance = parseEther(a.balance);
-        const bbalance = parseEther(b.balance);
-        if (abalance > bbalance) {
-            return -1;
-        }
-        if (abalance < bbalance) {
-            return 1;
-        }
-        return 0;
-    })
-}
 
 function LoggedInUi(props: LoggedInUiProps) {
     // I need to display the accounts as cards, they must be selectable so I need state here and a button to approve payment after typing the account password
+    const acc = props.accounts[props.currentlyShowingAccount];
     return <div class="flex flex-col">
         <div class="flex flex-col flex-wrap"></div>
         <div class="flex flex-col justify-center">
@@ -572,23 +568,25 @@ function LoggedInUi(props: LoggedInUiProps) {
                     New Account
                 </CardOutline>
             </div>
-            <div class="flex flex-row flex-wrap ml-4 justify-center">
-                {sortAccounts(props.accounts).map(
-                    (acc: any) =>
-                        <CardOutline
-                            extraCss="mt-3"
-                            setSelected={props.setSelectedAccount}
-                            id={props.accounts.indexOf(acc) + 2}
-                            selected={props.selectedAccount}
-                        >
-                            <AccountCardElement
-                                network={""}
-                                balance={acc.balance}
-                                currency={acc.currency}
-                                name={acc.name}
-                            ></AccountCardElement>
-                        </CardOutline>
-                )}
+            <div class={"flex flex-col justify-center"}>
+                <div class="flex flex-row flex-wrap ml-4 justify-center">
+                    <CardOutline
+                        extraCss={`mt-3 ${props.visible ? "fade-in-element" : "fade-out-elements"}`}
+                        setSelected={props.setSelectedAccount}
+                        id={props.accounts.indexOf(acc) + 2}
+                        selected={props.selectedAccount}
+                    >
+                        <AccountCardElement
+                            network={""}
+                            balance={acc.balance}
+                            currency={acc.currency}
+                            name={acc.name}
+                        ></AccountCardElement>
+                    </CardOutline>
+                </div>
+                <hr
+                    class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
+                {props.accounts.length > 1 ? <CarouselButtons backClicked={props.backClicked} forwardClicked={props.forwardClicked}></CarouselButtons> : null}
             </div>
 
             <UIBasedOnSelection
@@ -619,8 +617,7 @@ export interface LoggedOutUiProps {
     buttonid: string
 }
 function LoggedOutUi(props: LoggedOutUiProps) {
-    const err = props.url.searchParams.get("error");
-
+    const err = new URL(props.url).searchParams.get("error");
     return <div class="p-3 max-w-sm	mx-auto">
         {err && (
             <div class="bg-red-400 border-l-4 p-4" role="alert">
@@ -651,7 +648,7 @@ function LoggedOutUi(props: LoggedOutUiProps) {
 }
 
 export default function BuyButtonPage(props: BuyButtonPageProps) {
-    const [selectedAccount, setSelectedAccount] = useState(0);
+    const [selectedAccount, setSelectedAccount] = useState(props.accounts.length !== 0 ? 2 : 0);
 
     //New account creation state
     const [newAccountPassword, setNewAccountPassword] = useState("");
@@ -676,7 +673,52 @@ export default function BuyButtonPage(props: BuyButtonPageProps) {
     const [postcode, setPostcode] = useState("");
     const [country, setCountry] = useState("");
 
+    const [currentlyShowingAccount, setCurrentlyShowingAccount] = useState(0);
+    const [accountVisible, setAccountVisible] = useState(true);
 
+    function backClicked() {
+        if (currentlyShowingAccount === 0) {
+            if (props.accounts.length - 1 < 0) {
+                return;
+            }
+            setAccountVisible(false);
+            setTimeout(() => {
+                setCurrentlyShowingAccount(props.accounts.length - 1);
+                setAccountVisible(true);
+                // Selected account is +2 to the currently selected account always!
+                setSelectedAccount(props.accounts.length + 1);
+            }, 400)
+
+        } else {
+            setAccountVisible(false);
+            setTimeout(() => {
+                setCurrentlyShowingAccount(currentlyShowingAccount - 1);
+                setAccountVisible(true);
+                setSelectedAccount(currentlyShowingAccount + 1)
+            }, 400)
+        }
+
+    }
+    function forwardClicked() {
+        if (props.accounts.length - 1 === currentlyShowingAccount) {
+            setAccountVisible(false);
+            setTimeout(() => {
+                setCurrentlyShowingAccount(0);
+                setAccountVisible(true)
+                setSelectedAccount(2);
+
+            }, 400)
+
+        } else {
+            setAccountVisible(false)
+            setTimeout(() => {
+                setCurrentlyShowingAccount(currentlyShowingAccount + 1)
+                setAccountVisible(true)
+                setSelectedAccount(currentlyShowingAccount + 3);
+
+            }, 400)
+        }
+    }
 
     return <BuyPageLayout
         isLoggedIn={props.isLoggedIn}
@@ -724,7 +766,10 @@ export default function BuyButtonPage(props: BuyButtonPageProps) {
             topupAmount={topupAmount}
             setTopupAmount={setTopupAmount}
             ethEncryptPublicKey={props.ethEncryptPublicKey}
-
+            currentlyShowingAccount={currentlyShowingAccount}
+            visible={accountVisible}
+            backClicked={backClicked}
+            forwardClicked={forwardClicked}
         ></LoggedInUi> : <LoggedOutUi buttonid={props.item.buttonId} url={props.url} ></LoggedOutUi>}
     </BuyPageLayout>
 
