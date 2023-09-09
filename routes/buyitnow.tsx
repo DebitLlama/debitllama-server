@@ -4,6 +4,7 @@ import { State } from "./_middleware.ts";
 import { setCookie } from "$std/http/cookie.ts";
 import QueryBuilder from "../lib/backend/queryBuilder.ts";
 import { signInWithPassword } from "../lib/backend/auth.ts";
+import { parseEther } from "../lib/frontend/web3.ts";
 
 function doesProfileExists(profileData: any) {
     if (profileData === null || profileData.length === 0) {
@@ -29,12 +30,17 @@ export const handler: Handlers<any, State> = {
 
         const currency = JSON.parse(itemData[0].currency);
 
-        const { data: accountData, error: accountError } = await select.Accounts.whereOpenByNetworkAndCurrencyAndUserId(itemData[0].network,
+        //isLoggedOut?
+        if (!ctx.state.token) {
+            return ctx.render({ ...ctx.state, notfound: false, itemData, accountData: [], profileExists: false, ethEncryptPublicKey, url })
+        }
+
+
+        const { data: accountData } = await select.Accounts.whereOpenByNetworkAndCurrencyAndUserId(itemData[0].network,
             currency.name);
+        const { data: profileData } = await select.Profiles.byUserId();
 
-        const { data: profileData, error: profileError } = await select.Profiles.byUserId();
-
-        return ctx.render({ ...ctx.state, notfound: false, itemData, accountData, profileExists: doesProfileExists(profileData), ethEncryptPublicKey })
+        return ctx.render({ ...ctx.state, notfound: false, itemData, accountData, profileExists: doesProfileExists(profileData), ethEncryptPublicKey, url })
 
     },
     async POST(req, ctx) {
@@ -86,6 +92,23 @@ export function getItemProps(item: any): ItemProps {
 
     };
 }
+function sortAccounts(accounts: Array<any> | null): Array<any> | null {
+    if (accounts === null) {
+        return [];
+    }
+    return accounts.sort((a, b) => {
+        const abalance = parseEther(a.balance);
+        const bbalance = parseEther(b.balance);
+        if (abalance > bbalance) {
+            return -1;
+        }
+        if (abalance < bbalance) {
+            return 1;
+        }
+        return 0;
+    })
+}
+
 
 export default function BuyItNow(props: PageProps) {
     const notfound = props.data.notfound;
@@ -94,7 +117,7 @@ export default function BuyItNow(props: PageProps) {
         {!notfound ? <BuyButtonPage
             ethEncryptPublicKey={props.data.ethEncryptPublicKey}
             profileExists={props.data.profileExists}
-            accounts={props.data.accountData}
+            accounts={sortAccounts(props.data.accountData)}
             url={props.url}
             item={getItemProps(item)}
             isLoggedIn={props.data.token}></BuyButtonPage> : <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
