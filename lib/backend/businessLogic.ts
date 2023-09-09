@@ -83,7 +83,6 @@ export async function updateRelayerBalanceAndHistorySwitchNetwork(
       break;
     }
     default:
-      console.log("default case triggers");
       break;
   }
 }
