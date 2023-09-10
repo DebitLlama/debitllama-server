@@ -1,6 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { setCookie } from "$std/http/cookie.ts";
+import { Head } from "$fresh/runtime.ts";
 import { signInWithPassword } from "../lib/backend/auth.ts";
 import { State } from "./_middleware.ts";
 
@@ -42,8 +43,11 @@ export const handler: Handlers<any, State> = {
 export default function Login(props: PageProps) {
     const err = props.url.searchParams.get("error");
     return (
-        <>
-            <section class="bg-gray-200">
+        <> <Head>
+            <title>DebitLlama</title>
+            <link rel="stylesheet" href="/styles.css" />
+        </Head>
+            <section class="bg-gray-200 h-screen">
                 <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
                     <div class="mx-auto mb-5">
                         <img src="/logo.svg" width="100" />
@@ -83,7 +87,7 @@ export default function Login(props: PageProps) {
                     </div>
                 </div>
             </section>
-            <section class="fixed max-w-2xl p-4 mx-auto bg-white border border-gray-200 md:gap-x-4 left-12 bottom-16 dark:bg-gray-900 md:flex md:items-center dark:border-gray-700 rounded-2xl">
+            {/* <section class="fixed max-w-2xl p-4 mx-auto bg-white border border-gray-200 md:gap-x-4 left-12 bottom-16 dark:bg-gray-900 md:flex md:items-center dark:border-gray-700 rounded-2xl">
                 <div class="flex items-center gap-x-4">
                     <span class="inline-flex p-2 text-indigo-500 rounded-lg shrink-0 dark:bg-gray-800 bg-indigo-100/80">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -100,7 +104,7 @@ export default function Login(props: PageProps) {
                         Accept All Cookies
                     </button>
                 </div>
-            </section>
+            </section> */}
         </>
     );
 }
