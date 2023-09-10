@@ -283,7 +283,7 @@ export default function CreatedPaymentIntents(props: PageProps) {
                             </tr>
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm" >Identifier:</UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><p> {RenderIdentifier(pi.paymentIntent)}</p></UnderlinedTd>
+                                <UnderlinedTd extraStyles="truncate"><pre> {pi.paymentIntent}</pre></UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><Tooltip message="The unique identifier of the payment intent"></Tooltip></UnderlinedTd>
                             </tr>
                             <tr>
