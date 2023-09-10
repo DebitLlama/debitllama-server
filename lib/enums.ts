@@ -83,3 +83,35 @@ export type RelayerBalance = {
   user_id: string;
   last_topup: string;
 };
+
+// 10 Payment intents will be displayed in a
+export const PAYMENTINTENTSPAGESIZE = 10;
+
+export enum PaymentIntentsTableColNames {
+  Identifier = "Identifier",
+  Status = "Status",
+  Payment = "Payment",
+  DebitTimes = "DebitTimes",
+  UsedFor = "used_for",
+  NextPayment = "NextPayment",
+  CreatedDate = "CreatedDate",
+}
+
+export const MapPaymentIntentsTableColNamesToDbColNames: {
+  [key in PaymentIntentsTableColNames]: string;
+} = {
+  [PaymentIntentsTableColNames.Identifier]: "paymentIntent",
+  [PaymentIntentsTableColNames.Status]: "statusText",
+  [PaymentIntentsTableColNames.Payment]: "maxDebitAmount",
+  [PaymentIntentsTableColNames.DebitTimes]: "debitTimes",
+  [PaymentIntentsTableColNames.UsedFor]: "used_for", // Need to calculate it, with debit times - used_for
+  [PaymentIntentsTableColNames.NextPayment]: "nextPaymentDate",
+  [PaymentIntentsTableColNames.CreatedDate]: "created_at",
+};
+
+export enum FilterFor {
+  PaymentIntents,
+  TransactionHistory,
+  DebitItems,
+  RelayerTopupHistory,
+}
