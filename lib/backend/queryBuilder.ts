@@ -117,6 +117,14 @@ export default class QueryBuilder {
           );
           return this.responseHandler(res);
         },
+        forAccountbyAccountBalanceTooLow: async (account_id: number) => {
+          const res = await this.client.from("PaymentIntents")
+            .select("*,debit_item_id(*)")
+            .eq("creator_user_id", this.userid)
+            .eq("account_id", account_id)
+            .eq("statusText", PaymentIntentStatus.ACCOUNTBALANCETOOLOW);
+          return this.responseHandler(res);
+        },
         //selectPaymentIntentsByRelayerBalanceTooLow
         byRelayerBalanceTooLowAndUserIdForPayee: async (network: ChainIds) => {
           const res = await this.client.from("PaymentIntents").select("*")
@@ -482,6 +490,17 @@ export default class QueryBuilder {
             statusText: PaymentIntentStatus.ACCOUNTBALANCETOOLOW,
           }).eq("id", paymentIntentRow.id);
 
+          return this.responseHandler(res);
+        },
+        //This will set the failedDynamicPaymentAmount to zero, it's only used after account balance was added
+        updateForAccountBalanceNotLowAnymore: async (
+          statusText: string,
+          paymentIntentRow: PaymentIntentRow,
+        ) => {
+          const res = await this.client.from("PaymentIntents").update({
+            failedDynamicPaymentAmount: "0",
+            statusText,
+          }).eq("id", paymentIntentRow.id);
           return this.responseHandler(res);
         },
       },
