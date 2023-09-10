@@ -1,15 +1,14 @@
 import { useState } from 'preact/hooks';
 import { ChainIds, networkNameFromId, walletCurrency } from "../lib/shared/web3.ts";
-import { PaymentIntentsTableForAccounts } from "../components/PaymentIntentsTable.tsx";
 import { AccountDisplayElement } from "../components/AccountDisplayElement.tsx";
 import { parseEther } from "../lib/frontend/web3.ts";
 import { formatEther } from "../ethers.min.js";
 import { CarouselButtons } from '../components/components.tsx';
 import { Pricing } from '../lib/enums.ts';
+import PaymentIntentsPaginationForAccounts from './PaymentIntentsPaginationForAccounts.tsx';
 
 interface AccountCardCarouselProps {
     accountData: Array<any>,
-    paymentIntents: Array<any>,
     missedPayments: Array<any>
 }
 
@@ -68,7 +67,6 @@ export default function AccountCardCarousel(props: AccountCardCarouselProps) {
 
     const data = props.accountData[currentAccount];
 
-    const currentPaymentIntents = getPaymentIntentsForCurrentAccount(data.commitment, props.paymentIntents);
 
     return <>
         <div class="flex flex-row justify-center gap-y-px">
@@ -90,9 +88,8 @@ export default function AccountCardCarousel(props: AccountCardCarouselProps) {
         <MissedPaymentsNotification chainId={data.network_id} missedPayments={getPaymentIntentsForCurrentAccount(data.commitment, props.missedPayments)}></MissedPaymentsNotification>
         <hr
             class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
-        <h1 class="text-2xl font-bold mb-5 text-center">Payment Intents</h1>
         <section class="container px-4 mx-auto">
-            <PaymentIntentsTableForAccounts paymentIntentData={getPaymentIntentsForCurrentAccount(data.commitment, currentPaymentIntents)}></PaymentIntentsTableForAccounts>
+            <PaymentIntentsPaginationForAccounts accountId={data.id}></PaymentIntentsPaginationForAccounts>
         </section>
     </>
 }
