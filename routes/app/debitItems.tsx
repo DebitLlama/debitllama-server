@@ -1,8 +1,8 @@
 import Layout from "../../components/Layout.tsx";
 import { State } from "../_middleware.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
-import { ChainIds, networkNameFromId } from "../../lib/shared/web3.ts";
 import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import DebitItemTableRow from "../../islands/DebitItemTableRow.tsx";
 
 export const handler: Handlers<any, State> = {
     async GET(_req, ctx) {
@@ -95,102 +95,4 @@ export default function DebitItems(props: PageProps) {
             <DebitItemRows data={debitItemsData}></DebitItemRows>
         </section>
     </Layout>
-}
-
-interface DebitItemTableRowProps {
-    name: string,
-    network: string,
-    maxDebitAmount: string,
-    currency: string,
-    debitInterval: string,
-    debitTimes: string,
-    pricing: string,
-    button_id: string,
-    payment_intents_count: number
-    deleted: boolean
-}
-
-function GetRowIcon(isDeleted: boolean) {
-    if (isDeleted) {
-        return <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M440-320h80v-166l64 62 56-56-160-160-160 160 56 56 64-62v166ZM280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520Zm-400 0v520-520Z" /></svg>
-    } else {
-        return <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M570-104q-23 23-57 23t-57-23L104-456q-11-11-17.5-26T80-514v-286q0-33 23.5-56.5T160-880h286q17 0 32 6.5t26 17.5l352 353q23 23 23 56.5T856-390L570-104Zm-57-56 286-286-353-354H160v286l353 354ZM260-640q25 0 42.5-17.5T320-700q0-25-17.5-42.5T260-760q-25 0-42.5 17.5T200-700q0 25 17.5 42.5T260-640ZM160-800Z" /></svg>
-    }
-}
-
-function DebitItemTableRow(props: DebitItemTableRowProps) {
-    const network = networkNameFromId[props.network as ChainIds];
-    return <tr >
-        <td class="px-4 py-4 text-sm whitespace-nowrap">
-            <div class="flex items-center gap-x-6">
-                <a href={`/app/item?q=${props.button_id}`} class="text-indigo-500 transition-colors duration-200 hover:text-indigo-500 focus:outline-none">
-                    {GetRowIcon(props.deleted)} View
-                </a>
-            </div>
-        </td>
-        <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{props.payment_intents_count}</td>
-        <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
-            <div class="flex items-center gap-x-2">
-                <div>
-                    <p class="text-xs font-normal text-gray-600 dark:text-gray-400">{props.name}</p>
-                </div>
-            </div>
-        </td>
-        <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
-            <div class="flex items-center gap-x-2">
-                <div>
-                    <p class="text-xs font-normal text-gray-600 dark:text-gray-400">{network}</p>
-                </div>
-            </div>
-        </td>
-        <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
-            <div class="flex items-center gap-x-2">
-                <div>
-                    <p class="text-xs font-normal text-gray-600 dark:text-gray-400">{props.pricing}</p>
-                </div>
-            </div>
-        </td>
-        <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
-            <div class="flex items-center gap-x-2">
-                <div>
-                    <p class="text-xs font-normal text-gray-600 dark:text-gray-400">{props.maxDebitAmount} {props.currency}</p>
-                </div>
-            </div>
-        </td>
-        <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{props.debitInterval}</td>
-        <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{props.debitTimes}</td>
-    </tr>
-}
-
-function PaginationButtons() {
-    return <div class="flex items-center justify-between mt-6">
-        <a href="#" class="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 rtl:-scale-x-100">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18" />
-            </svg>
-
-            <span>
-                previous
-            </span>
-        </a>
-
-        <div class="items-center hidden md:flex gap-x-3">
-            <a href="#" class="px-2 py-1 text-sm text-indigo-500 rounded-md dark:bg-gray-800 bg-indigo-100/60">1</a>
-            <a href="#" class="px-2 py-1 text-sm text-gray-500 rounded-md dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100">2</a>
-            <a href="#" class="px-2 py-1 text-sm text-gray-500 rounded-md dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100">3</a>
-            <a href="#" class="px-2 py-1 text-sm text-gray-500 rounded-md dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100">...</a>
-            <a href="#" class="px-2 py-1 text-sm text-gray-500 rounded-md dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100">12</a>
-            <a href="#" class="px-2 py-1 text-sm text-gray-500 rounded-md dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100">13</a>
-            <a href="#" class="px-2 py-1 text-sm text-gray-500 rounded-md dark:hover:bg-gray-800 dark:text-gray-300 hover:bg-gray-100">14</a>
-        </div>
-
-        <a href="#" class="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800">
-            <span>
-                Next
-            </span>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 rtl:-scale-x-100">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
-            </svg>
-        </a>
-    </div>
 }
