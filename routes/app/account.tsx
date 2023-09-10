@@ -9,6 +9,7 @@ import { ZeroAddress, formatEther } from "../../ethers.min.js";
 import AccountTopupOrClose from "../../islands/AccountTopupOrClose.tsx";
 import { AccountCardElement } from "../../components/AccountCardElement.tsx";
 import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import { updatePaymentIntentsWhereAccountBalanceWasAdded } from "../../lib/backend/businessLogic.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(req: any, ctx: any) {
@@ -26,7 +27,7 @@ export const handler: Handlers<any, State> = {
             }
             const accountData = await getAccount(commitment, networkId);
             if (accountData.exists) {
-                const { data, error } = await select.Accounts.byCommitment(commitment);
+                const { data } = await select.Accounts.byCommitment(commitment);
 
                 if (data.length === 0) {
                     const insert = queryBuilder.insert();
@@ -44,8 +45,12 @@ export const handler: Handlers<any, State> = {
 
                     if (data[0].balance !== formatEther(accountData.account[3])) {
                         const update = queryBuilder.update();
+                        //Check if there were payment intents with account balance too low and 
+                        // calculate how much balance was added and set them to recurring or created where possible
+                        await updatePaymentIntentsWhereAccountBalanceWasAdded(queryBuilder, data[0], accountData.account[3]);
 
-                        const res = await update.Accounts.balanceAndClosedById(accountData.account[3], !accountData.account[0], data[0].id)
+                        // Update the account balance finally
+                        await update.Accounts.balanceAndClosedById(accountData.account[3], !accountData.account[0], data[0].id)
                     }
 
                     // Here I return the data from the database because the account was saved
