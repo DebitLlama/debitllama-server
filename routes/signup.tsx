@@ -1,5 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 import { Handlers, PageProps } from "$fresh/server.ts";
+import { Head } from "$fresh/runtime.ts";
 import { signUp } from "../lib/backend/auth.ts";
 import { State } from "./_middleware.ts";
 
@@ -30,14 +31,21 @@ export const handler: Handlers<any, State> = {
 export default function SignUp(props: PageProps) {
     const err = props.url.searchParams.get("error");
 
-    return (
-        <section class="bg-gray-200">
-            <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-                <div class="mx-auto">
-                    <h2 class="text-2xl font-bold mb-5 text-center">Create Account</h2>
-                </div>
+    return (<> <Head>
+        <title>DebitLlama</title>
+        <link rel="stylesheet" href="/styles.css" />
+    </Head>
+        <section class="bg-gray-200 fixed w-full h-full overflow-auto">
+            <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto">
 
-                <div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0">
+
+                <div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0" >
+                    <div class={"mx-auto"}>
+                        <img src="/ridingALlama.png" />
+                    </div>
+                    <div class="mx-auto">
+                        <h2 class="text-2xl font-bold mb-5 text-center">Sign Up</h2>
+                    </div>
                     <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
                         {err && (
                             <div class="bg-red-400 border-l-4 p-4" role="alert">
@@ -64,6 +72,6 @@ export default function SignUp(props: PageProps) {
 
                 </div>
             </div>
-        </section>
+        </section></>
     );
 }
