@@ -1,10 +1,13 @@
-import { PaymentIntentRow, PaymentIntentStatus, RelayerBalance } from "../enums.ts";
+import {
+  Account,
+  PaymentIntentRow,
+  PaymentIntentStatus,
+  Pricing,
+  RelayerBalance,
+} from "../enums.ts";
 import { ChainIds } from "../shared/web3.ts";
 import QueryBuilder from "./queryBuilder.ts";
-import {
-getProvider,
-  parseEther,
-} from "./web3.ts";
+import { getProvider, parseEther } from "./web3.ts";
 
 export async function updateRelayerBalanceAndHistorySwitchNetwork(
   chainId: ChainIds,
@@ -95,7 +98,6 @@ export function findPaymentIntentsThatCanBeReset(
   const resumablePaymentIntents = new Array<PaymentIntentRow>();
 
   let addedBalanceLeft = parsedAddedBalance;
-  let missingGas = BigInt(0);
   for (let i = 0; i < paymentIntentsRows.length; i++) {
     const pi = paymentIntentsRows[i];
     const totalFee = calculateGasEstimationPerChain(
@@ -103,7 +105,6 @@ export function findPaymentIntentsThatCanBeReset(
       feeData,
       increaseGasLimit(BigInt(pi.estimatedGas)),
     );
-    missingGas += totalFee === null ? BigInt(0) : totalFee;
     if (totalFee) {
       if (addedBalanceLeft - totalFee >= 0) {
         resumablePaymentIntents.push(pi);
@@ -229,5 +230,93 @@ export function getRelayerBalanceForChainId(
       return relayerBalance.BTT_Donau_Testnet_Balance;
     default:
       return "0";
+  }
+}
+
+function findPaymentIntentsWithAccountBalanceLowThatCanBeReset(
+  addedBalance: bigint,
+  paymentIntents: PaymentIntentRow[],
+) {
+  const paymentIntentsToReset = Array<any>();
+
+  let addedBalanceLeft = addedBalance;
+
+  for (let i = 0; i < paymentIntents.length; i++) {
+    const pi = paymentIntents[i];
+    if (pi.pricing === Pricing.Fixed) {
+      // with fixed pricing I consider the maxDebitAmount
+      const maxDebitAmount = parseEther(pi.maxDebitAmount);
+      if (addedBalanceLeft - maxDebitAmount >= 0) {
+        paymentIntentsToReset.push(pi);
+        addedBalanceLeft -= maxDebitAmount;
+      }
+    } else {
+      // with dynamic pricing I use failedDynamicPaymentAmount,
+      // a value the relayer saved in the db
+      const failedDynamicPaymentAmount = parseEther(
+        pi.failedDynamicPaymentAmount,
+      );
+      if (addedBalanceLeft - failedDynamicPaymentAmount >= 0) {
+        paymentIntentsToReset.push(pi);
+        addedBalanceLeft -= failedDynamicPaymentAmount;
+      }
+    }
+  }
+  return paymentIntentsToReset;
+}
+// /?TODO: TEST THIS!
+export async function updatePaymentIntentsWhereAccountBalanceWasAdded(
+  queryBuilder: QueryBuilder,
+  oldAccountData: Account,
+  fetchedAccountBalance_WEI: any,
+) {
+  if (fetchedAccountBalance_WEI === BigInt(0)) {
+    // Account was closed or it's just empty!
+    return;
+  }
+  const oldBalance = parseEther(oldAccountData.balance);
+  if (oldBalance >= fetchedAccountBalance_WEI) {
+    // The fetched balance is less or equals, we spent money, not topped up!
+    // I just return as there is nothing to do!
+    return;
+  }
+  //New balance - old balance is the balance that was added
+  const addedBalance = fetchedAccountBalance_WEI - oldBalance;
+
+  if (addedBalance <= BigInt(0)) {
+    // In case something went wrong with the above error check, this can't be negative!
+    return;
+  }
+
+  const select = queryBuilder.select();
+  const { data: paymentIntents } = await select.PaymentIntents
+    .forAccountbyAccountBalanceTooLow(
+      oldAccountData.id,
+    );
+  const paymentIntentsToReset =
+    findPaymentIntentsWithAccountBalanceLowThatCanBeReset(
+      addedBalance,
+      paymentIntents,
+    );
+  //Update payment intents
+  const update = queryBuilder.update();
+  for (let i = 0; i < paymentIntentsToReset.length; i++) {
+    const piToReset = paymentIntentsToReset[i];
+    if (piToReset.used_for === 0) {
+      // set to created
+      if (piToReset.used_for === 0) {
+        // Set to created!
+        await update.PaymentIntents.updateForAccountBalanceNotLowAnymore(
+          PaymentIntentStatus.CREATED,
+          piToReset.paymentIntent,
+        );
+      } else {
+        // set to recurring!
+        await update.PaymentIntents.updateForAccountBalanceNotLowAnymore(
+          PaymentIntentStatus.RECURRING,
+          piToReset.paymentIntent,
+        );
+      }
+    }
   }
 }
