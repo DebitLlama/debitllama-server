@@ -12,7 +12,7 @@ export default function RelayedTxHistory(props: RelayedTxHistoryProps) {
             window.open(url, "_blank")
         }
     }
-    return <div class={`${props.paymentIntentHistory.length === 0 || props.paymentIntentHistory === null ? "" : "overflow-auto"} border border-gray-200 dark:border-gray-700 md:rounded-lg mt-4`}>
+    return <div class={`${props.paymentIntentHistory.length === 0 || props.paymentIntentHistory === null ? "" : "overflow-auto"} border border-gray-200 dark:border-gray-700 md:rounded-lg`}>
         <div class={"flex flex-row justify-center"}>
             <h4 class="mx-auto text-gray-500 dark:text-gray-40">Transaction History</h4>
         </div>
