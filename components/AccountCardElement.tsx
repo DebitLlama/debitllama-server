@@ -13,11 +13,10 @@ export function AccountCardElement(props: AccountCardElementProps) {
                 <img src="/logo_white.svg" alt="" />
             </div>
             <div class="visa_info">
-                <img src="/chip.png" alt="" />
+                <p>{props.balance}{" "}{props.currency} </p>
                 <p>{props.name}</p>
             </div>
             <div class="visa_crinfo">
-                <p>{props.balance}{" "}{props.currency} </p>
                 <p>{props.network}</p>
             </div>
         </div>
