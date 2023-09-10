@@ -193,6 +193,64 @@ export default class QueryBuilder {
             .range(rangeFrom, rangeTo);
           return this.responseHandler(res);
         },
+        byPayeeUserIdPaginated: async (
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+        ) => {
+          const res = await this.client.from("PaymentIntents")
+            .select("*,account_id(*)", { count: "exact" })
+            .order(order, { ascending })
+            .eq("payee_user_id", this.userid)
+            .range(rangeFrom, rangeTo);
+          return this.responseHandler(res);
+        },
+        byPayeeUserIdPaginatedWithSearch: async (
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+          searchTerm: string,
+        ) => {
+          const res = await this.client.from("PaymentIntents")
+            .select("*,account_id(*)", { count: "exact" })
+            .order(order, { ascending })
+            .like("paymentIntent", searchTerm)
+            .eq("payee_user_id", this.userid)
+            .range(rangeFrom, rangeTo);
+          return this.responseHandler(res);
+        },
+        byDebitItemIdPaginated: async (
+          debit_item_id: number,
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+        ) => {
+          const res = await this.client.from("PaymentIntents")
+            .select("*,account_id(*)", { count: "exact" })
+            .order(order, { ascending })
+            .eq("debit_item_id", debit_item_id)
+            .range(rangeFrom, rangeTo);
+          return this.responseHandler(res);
+        },
+        byDebitItemIdPaginatedWithSearch: async (
+          debit_item_id: number,
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+          searchTerm: string,
+        ) => {
+          const res = await this.client.from("PaymentIntents")
+            .select("*,account_id(*)", { count: "exact" })
+            .order(order, { ascending })
+            .like("paymentIntent", searchTerm)
+            .eq("debit_item_id", debit_item_id)
+            .range(rangeFrom, rangeTo);
+          return this.responseHandler(res);
+        },
       },
 
       RelayerHistory: {

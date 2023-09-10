@@ -115,3 +115,9 @@ export enum FilterFor {
   DebitItems,
   RelayerTopupHistory,
 }
+
+export enum PaymentIntentsTablePages {
+  ACCOUNTS,
+  DEBITITEMS,
+  ITEM,
+}

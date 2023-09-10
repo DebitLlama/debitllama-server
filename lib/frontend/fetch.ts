@@ -186,7 +186,40 @@ export async function fetchPaginatedPaymentIntentsForAccount(args: {
   sortBy: PaymentIntentsTableColNames;
   sortDirection: "ASC" | "DESC";
 }) {
-  return await fetch("/app/pagination/paymentIntents", {
+  return await fetch("/app/pagination/accountPaymentIntents", {
+    credentials: "same-origin",
+    method: "POST",
+    body: JSON.stringify(args),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((response) => response);
+}
+
+export async function fetchPaginatedPaymentIntentsForDebitItems(args: {
+  currentPage: number;
+  searchTerm: string;
+  sortBy: PaymentIntentsTableColNames;
+  sortDirection: "ASC" | "DESC";
+}) {
+  return await fetch("/app/pagination/debitItemsPaymentIntents", {
+    credentials: "same-origin",
+    method: "POST",
+    body: JSON.stringify(args),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((response) => response);
+}
+
+export async function fetchPaginatedPaymentIntentsForItem(args: {
+  debit_item_id: number;
+  currentPage: number;
+  searchTerm: string;
+  sortBy: PaymentIntentsTableColNames;
+  sortDirection: "ASC" | "DESC";
+}) {
+  return await fetch("/app/pagination/itemPaymentIntents", {
     credentials: "same-origin",
     method: "POST",
     body: JSON.stringify(args),

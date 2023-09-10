@@ -1,10 +1,10 @@
-import { PaginationButtons } from "../components/Pagination.tsx";
-import { PaymentIntentsTableForAccounts } from "../components/PaymentIntentsTable.tsx";
+import { PaginationButtons } from "../../components/Pagination.tsx";
+import { PaymentIntentsTable } from "../../components/PaymentIntentsTable.tsx";
 import { useEffect, useState } from "preact/hooks";
-import { FilterFor, PaymentIntentsTableColNames } from "../lib/enums.ts";
-import { HourglassLoader } from "../components/loadingIndicators.tsx";
-import TableSearch from "../components/TableSearch.tsx";
-import { fetchPaginatedPaymentIntentsForAccount } from "../lib/frontend/fetch.ts";
+import { FilterFor, PaymentIntentsTableColNames, PaymentIntentsTablePages } from "../../lib/enums.ts";
+import { HourglassLoader } from "../../components/loadingIndicators.tsx";
+import TableSearch from "../../components/TableSearch.tsx";
+import { fetchPaginatedPaymentIntentsForAccount } from "../../lib/frontend/fetch.ts";
 
 interface PaymentIntentsPaginationForAccountsProps {
   accountId: number
@@ -113,13 +113,14 @@ export default function PaymentIntentsPaginationForAccounts(
         triggerSearch={triggerSearch}
         onEnterSearch={onEnterSearch}
       ></TableSearch>
-      <PaymentIntentsTableForAccounts
+      <PaymentIntentsTable
         headerClicked={headerClicked}
         paymentIntentData={currentPaymentIntents}
         sortBy={sortBy}
         sortDirection={sortDirection}
+        forPage={PaymentIntentsTablePages.ACCOUNTS}
 
-      ></PaymentIntentsTableForAccounts>
+      ></PaymentIntentsTable>
       <PaginationButtons
         currentPage={pageData.currentPage}
         totalPages={pageData.totalPages}

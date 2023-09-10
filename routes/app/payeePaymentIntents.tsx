@@ -3,7 +3,7 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
 import { RenderIdentifier, Tooltip, UnderlinedTd, getDebitIntervalText, getPaymentIntentStatusLogo, getPaymentRequestJobStatusTooltipMessage, getPaymentRequestStatusLogo, getSubscriptionTooltipMessage } from "../../components/components.tsx";
 import CancelPaymentIntentButton from "../../islands/CancelPaymentIntentButton.tsx";
-import { ChainIds } from "../../lib/shared/web3.ts";
+import { ChainIds, networkNameFromId } from "../../lib/shared/web3.ts";
 import RelayedTxHistory from "../../islands/RelayedTxHistory.tsx";
 import { DynamicPaymentRequestJobsStatus, PaymentIntentRow, Pricing } from "../../lib/enums.ts";
 import TriggerDirectDebitButton from "../../islands/TriggerDirectDebitButton.tsx";
@@ -297,7 +297,7 @@ export default function CreatedPaymentIntents(props: PageProps) {
                                 currency={JSON.parse(pi.debit_item_id.currency).name}></IfPaymentRequestJobExists>
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Network:</UnderlinedTd>
-                                <UnderlinedTd extraStyles="" ><p>{pi.debit_item_id.network}</p></UnderlinedTd>
+                                <UnderlinedTd extraStyles="" ><p>{networkNameFromId[pi.debit_item_id.network as ChainIds]}</p></UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><Tooltip message="The network used for this payment"></Tooltip></UnderlinedTd>
                             </tr>
                             <tr>

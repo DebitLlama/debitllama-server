@@ -1,6 +1,5 @@
 // Api endpoints for the pagination API
 import { Handlers } from "$fresh/server.ts";
-import { sort } from "$std/semver/mod.ts";
 import { getPagination, getTotalPages } from "../../../lib/backend/businessLogic.ts";
 import QueryBuilder from "../../../lib/backend/queryBuilder.ts";
 import { errorResponseBuilder } from "../../../lib/backend/responseBuilders.ts";
@@ -10,15 +9,11 @@ import { State } from "../../_middleware.ts";
 export const handler: Handlers<any, State> = {
     async POST(_req, ctx) {
         const json = await _req.json();
-        const accountId = json.accountId;
         const currentPage = json.currentPage;
         const searchTerm = json.searchTerm;
         const sortBy = json.sortBy; // The name of the field
         const sortDirection = json.sortDirection;// ASC or DESC
 
-        if (!accountId) {
-            return errorResponseBuilder("Missing Account Id");
-        }
         if (isNaN(currentPage)) {
             return errorResponseBuilder("Missing Current Page");
         }
@@ -42,8 +37,7 @@ export const handler: Handlers<any, State> = {
         let rowCount = 0;
 
         if (searchTerm === "") {
-            const { data: piRows, count } = await select.PaymentIntents.byAccountIdPaginated(
-                accountId,
+            const { data: piRows, count } = await select.PaymentIntents.byPayeeUserIdPaginated(
                 order,
                 sortDirection === "ASC",
                 from,
@@ -52,8 +46,7 @@ export const handler: Handlers<any, State> = {
             paymentIntentsRows = piRows;
             rowCount = count;
         } else {
-            const { data: piRows, count } = await select.PaymentIntents.byAccountIdPaginatedWithSearch(
-                accountId,
+            const { data: piRows, count } = await select.PaymentIntents.byPayeeUserIdPaginatedWithSearch(
                 order,
                 sortDirection === "ASC",
                 from,

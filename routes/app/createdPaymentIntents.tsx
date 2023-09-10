@@ -1,11 +1,11 @@
 import Layout from "../../components/Layout.tsx";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
-import { RenderIdentifier, Tooltip, UnderlinedTd, getDebitIntervalText, getPaymentIntentStatusLogo, getSubscriptionTooltipMessage } from "../../components/components.tsx";
+import { Tooltip, UnderlinedTd, getDebitIntervalText, getPaymentIntentStatusLogo, getSubscriptionTooltipMessage } from "../../components/components.tsx";
 import { PaymentIntentRow, PaymentIntentStatus } from "../../lib/enums.ts";
 import RelayedTxHistory from "../../islands/RelayedTxHistory.tsx";
 import CancelPaymentIntentButton from "../../islands/CancelPaymentIntentButton.tsx";
-import { ChainIds, rpcUrl } from "../../lib/shared/web3.ts";
+import { ChainIds, chainIdFromNetworkName, networkNameFromId, rpcUrl } from "../../lib/shared/web3.ts";
 import { getPaymentIntentHistory } from "../../lib/backend/web3.ts";
 import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 
@@ -88,7 +88,7 @@ export default function CreatedPaymentIntents(props: PageProps) {
                             </tr>
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Network:</UnderlinedTd>
-                                <UnderlinedTd extraStyles="" ><p>{pi.debit_item_id.network}</p></UnderlinedTd>
+                                <UnderlinedTd extraStyles="" ><p>{networkNameFromId[pi.debit_item_id.network as ChainIds]}</p></UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><Tooltip message="The network used for this payment"></Tooltip></UnderlinedTd>
                             </tr>
                             <tr>

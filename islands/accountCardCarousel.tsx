@@ -5,7 +5,7 @@ import { parseEther } from "../lib/frontend/web3.ts";
 import { formatEther } from "../ethers.min.js";
 import { CarouselButtons } from '../components/components.tsx';
 import { Pricing } from '../lib/enums.ts';
-import PaymentIntentsPaginationForAccounts from './PaymentIntentsPaginationForAccounts.tsx';
+import PaymentIntentsPaginationForAccounts from './pagination/PaymentIntentsPaginationForAccounts.tsx';
 
 interface AccountCardCarouselProps {
     accountData: Array<any>,
