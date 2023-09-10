@@ -262,7 +262,7 @@
 }
 
 .visa_info p {
-	font-size: 22px;
+	font-size: 19px;
 	padding: 10px 0;
 	letter-spacing: 2px;
 	color: #ffffff;
@@ -329,7 +329,7 @@
 }
 
 .checkout_visa_info p {
-	font-size: 15px;
+	font-size: 19px;
 	padding: 10px 0;
 	letter-spacing: 2px;
 	color: #ffffff;
@@ -350,6 +350,34 @@
 	-moz-animation: fadeOut 0.5s;
 	-o-animation: fadeOut 0.5s;
 	-ms-animation: fadeOut 0.5s;
+}
+
+.fade-in-element {
+	animation: fadeIn 0.5s;
+	-webkit-animation: fadeIn 0.5s;
+	-moz-animation: fadeIn 0.5s;
+	-o-animation: fadeIn 0.5s;
+	-ms-animation: fadeIn 0.5s;
+}
+
+.fade-out-element-checkout {
+	animation-timing-function: linear;
+
+	animation: fadeOut 0.3s;
+	-webkit-animation: fadeOut 0.3s;
+	-moz-animation: fadeOut 0.3s;
+	-o-animation: fadeOut 0.3s;
+	-ms-animation: fadeOut 0.3s;
+}
+
+.fade-in-element-checkout {
+	animation-timing-function: linear;
+
+	animation: fadeIn 0.8s;
+	-webkit-animation: fadeIn 0.8s;
+	-moz-animation: fadeIn 0.8s;
+	-o-animation: fadeIn 0.8s;
+	-ms-animation: fadeIn 0.8s;
 }
 
 @keyframes fadeOut {
@@ -402,13 +430,7 @@
 	}
 }
 
-.fade-in-element {
-	animation: fadeIn 0.5s;
-	-webkit-animation: fadeIn 0.5s;
-	-moz-animation: fadeIn 0.5s;
-	-o-animation: fadeIn 0.5s;
-	-ms-animation: fadeIn 0.5s;
-}
+
 
 @keyframes fadeIn {
 	0% {
