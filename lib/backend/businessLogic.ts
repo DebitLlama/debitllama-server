@@ -320,3 +320,36 @@ export async function updatePaymentIntentsWhereAccountBalanceWasAdded(
     }
   }
 }
+
+export const getPagination = (page: number, size: number) => {
+  const limit = size ? +size : 3;
+  const from = page ? page * limit : 0;
+  const to = page ? from + size - 1 : size - 1;
+
+  return { from, to };
+};
+
+export const getTotalPages = (rowCount: number, pageSize: number) => {
+  if (rowCount === 0) {
+    return 1;
+  }
+
+  const precision = 1000;
+  const paddedRowCount = BigInt(rowCount * precision);
+
+  const divided = paddedRowCount / BigInt(pageSize);
+
+  const unpadded = Number(divided) / precision;
+
+  const split = unpadded.toString().split(".");
+
+  if (split[0] === "0") {
+    return 1;
+  }
+
+  if (split[1] === undefined) {
+    return parseInt(split[0]);
+  }
+
+  return parseInt(split[0]) + 1;
+};
