@@ -163,6 +163,36 @@ export default class QueryBuilder {
             ).order("created_at", { ascending: false });
           return this.responseHandler(res);
         },
+        byAccountIdPaginated: async (
+          accountId: number,
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+        ) => {
+          const res = await this.client.from("PaymentIntents")
+            .select("*", { count: "exact" })
+            .order(order, { ascending })
+            .eq("account_id", accountId)
+            .range(rangeFrom, rangeTo);
+          return this.responseHandler(res);
+        },
+        byAccountIdPaginatedWithSearch: async (
+          accountId: number,
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+          searchTerm: string,
+        ) => {
+          const res = await this.client.from("PaymentIntents")
+            .select("*", { count: "exact" })
+            .order(order, { ascending })
+            .like("paymentIntent", searchTerm)
+            .eq("account_id", accountId)
+            .range(rangeFrom, rangeTo);
+          return this.responseHandler(res);
+        },
       },
 
       RelayerHistory: {
