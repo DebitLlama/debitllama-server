@@ -5,6 +5,7 @@ import { AccountDisplayElement } from "../components/AccountDisplayElement.tsx";
 import { parseEther } from "../lib/frontend/web3.ts";
 import { formatEther } from "../ethers.min.js";
 import { CarouselButtons } from '../components/components.tsx';
+import { Pricing } from '../lib/enums.ts';
 
 interface AccountCardCarouselProps {
     accountData: Array<any>,
@@ -108,7 +109,11 @@ function MissedPaymentsNotification(props: MissedPaymentsNotificationProps) {
     }
 
     const missedPaymentsSum = props.missedPayments.reduce((acc, currentValue) => {
-        return acc + parseEther(currentValue.maxDebitAmount)
+        if (currentValue.pricing === Pricing.Fixed) {
+            return acc + parseEther(currentValue.maxDebitAmount)
+        } else {
+            return acc + parseEther(currentValue.failedDynamicPaymentAmount)
+        }
     }, parseEther("0"))
 
     return <>
