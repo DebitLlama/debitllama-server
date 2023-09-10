@@ -1,3 +1,4 @@
+import { PaymentIntentsTableColNames } from "../enums.ts";
 import { ChainIds } from "../shared/web3.ts";
 
 export async function saveAccountData(
@@ -169,6 +170,23 @@ export async function cancelDynamicPaymentRequest(
   },
 ) {
   return await fetch("/app/cancelDynamicPayment", {
+    credentials: "same-origin",
+    method: "POST",
+    body: JSON.stringify(args),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((response) => response);
+}
+
+export async function fetchPaginatedPaymentIntentsForAccount(args: {
+  accountId: number;
+  currentPage: number;
+  searchTerm: string;
+  sortBy: PaymentIntentsTableColNames;
+  sortDirection: "ASC" | "DESC";
+}) {
+  return await fetch("/app/pagination/paymentIntents", {
     credentials: "same-origin",
     method: "POST",
     body: JSON.stringify(args),
