@@ -42,6 +42,7 @@ export type PaymentIntentRow = {
   used_for: number;
   proof: string;
   publicSignals: string;
+  failedDynamicPaymentAmount: string;
 };
 
 export type Account = {
