@@ -571,7 +571,7 @@ function LoggedInUi(props: LoggedInUiProps) {
             <div class={"flex flex-col justify-center"}>
                 <div class="flex flex-row flex-wrap ml-4 justify-center">
                     <CardOutline
-                        extraCss={`mt-3 ${props.visible ? "fade-in-element" : "fade-out-elements"}`}
+                        extraCss={`mt-3 ${props.visible ? "fade-in-element-checkout" : "fade-out-elements-checkout"}`}
                         setSelected={props.setSelectedAccount}
                         id={props.accounts.indexOf(acc) + 2}
                         selected={props.selectedAccount}
@@ -706,7 +706,6 @@ export default function BuyButtonPage(props: BuyButtonPageProps) {
                 setCurrentlyShowingAccount(0);
                 setAccountVisible(true)
                 setSelectedAccount(2);
-
             }, 400)
 
         } else {
@@ -715,7 +714,6 @@ export default function BuyButtonPage(props: BuyButtonPageProps) {
                 setCurrentlyShowingAccount(currentlyShowingAccount + 1)
                 setAccountVisible(true)
                 setSelectedAccount(currentlyShowingAccount + 3);
-
             }, 400)
         }
     }
