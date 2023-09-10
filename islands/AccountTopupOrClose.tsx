@@ -1,5 +1,4 @@
 import { useState } from 'preact/hooks';
-import { ChainIds, chainIdFromNetworkName } from '../lib/shared/web3.ts';
 import { approveSpend, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts, topUpETH, topUpTokens, withdraw } from '../lib/frontend/web3.ts';
 import { redirectToAccountPage } from '../lib/frontend/fetch.ts';
 
