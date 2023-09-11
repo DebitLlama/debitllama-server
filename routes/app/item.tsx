@@ -49,10 +49,8 @@ export default function Item(props: PageProps) {
         <div class="container mx-auto py-8">
             {!props.data.notfound ?
                 <div
-                // class="flex flex-col items-center justify-center h-full"
-
                 >
-                    <div class="bg-white shadow-2xl p-6 rounded-2xl border-2 border-gray-50 w-full">
+                    <div class="bg-white shadow-2xl rounded-2xl border-2 border-gray-50 w-full">
                         <div class="flex flex-col">
                             <div class="mb-5">
                                 <h1 class="text-2xl font-bold text-center">Debit Item</h1>
@@ -100,18 +98,21 @@ export default function Item(props: PageProps) {
                                     </tr>
                                     <tr>
                                         <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Checkout:</td>
-                                        <td class={"px-4 py-4 text-sm whitespace-nowrap"}> <a href={`/buyitnow/?q=${itemData.button_id}`} class={"cursor-pointer mx-auto"}>
-                                            <img
-                                                width="140px"
+                                        <td class={"px-4 py-4 text-sm whitespace-nowrap flex flex-row justify-start"}>
+                                            <a href={`/buyitnow/?q=${itemData.button_id}`} class={"cursor-pointer"}>
+                                                <img
+                                                    width="140px"
 
-                                                src={"/buyitnow.png"}
-                                            />
-                                        </a></td>
+                                                    src={"/buyitnow.png"}
+                                                />
+                                            </a>
+                                            <img class="blink mb-2" src="/arrowLeft.svg" width={"30"} />
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Identifier:</td>
                                         <td class={"px-4 py-4 text-sm whitespace-nowrap flex flex-row"}><div class="overflow-x-auto overflowingTableData"> <p class="text-xs mt-1"> {itemData.button_id} </p>
-                                            <CopyButton str={itemData.button_id}></CopyButton>
+                                            <CopyButton str={itemData.button_id} iconColor="black"></CopyButton>
                                         </div>
                                         </td>
                                     </tr>
@@ -122,15 +123,14 @@ export default function Item(props: PageProps) {
                     </div>
                     <hr
                         class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
-                    <div class="flex flex-row justify-center w-full">
-                        <p class="text-xs mt-1">Embed the buy Button on your Website </p>
-                        <CopyButton str={embeddedCode}></CopyButton>
-                    </div>
+
                     <div class="overflow-scroll w-full bg-gray-800 shadow-2xl rounded-lg overflow-hidden">
                         <div id="header-buttons" class="py-3 px-4 flex">
                             <div class="rounded-full w-3 h-3 bg-red-500 mr-2"></div>
                             <div class="rounded-full w-3 h-3 bg-yellow-500 mr-2"></div>
-                            <div class="rounded-full w-3 h-3 bg-green-500"></div>
+                            <div class="rounded-full w-3 h-3 bg-green-500 mr-2"></div>
+                            <p class="text-xs text-white">Embed the buy Button on your Website </p>
+                            <CopyButton str={embeddedCode} iconColor="white"></CopyButton>
                         </div>
                         <div class="py-4 px-4 mt-1 text-white overflow-auto">
                             <pre class="text-sm">
@@ -164,7 +164,7 @@ function DeactivateComponent(props: DeactivateComponentProps) {
     const buttonTitle = props.itemData.deleted ? "Reactivate Item" : "Deactivate Item";
     const description = props.itemData.deleted ? "Reactivating the item will resume the checkout. You will be able to accept payments again!" : "Deactivating the item will disable the checkout page. You will be still able to process the payment intents, however new ones can't be added!"
 
-    return <div class={`max-w-md border-solid border-2 border-${color}-600 flex flex-col justify-center`}>
+    return <div class={`flex flex-col justify-center `}>
         <div><h4 class="text-xl mx-auto text-center">{title}</h4></div>
 
         <p class="p-5 text-center">{description}</p>
