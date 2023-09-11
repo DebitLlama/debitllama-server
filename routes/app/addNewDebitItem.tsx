@@ -110,7 +110,7 @@ export const handler: Handlers<any, State> = {
             return errorResponseBuilder("Invalid redirect to URL!")
         }
 
-        await insert.Items.newItem(
+        const { data: item } = await insert.Items.newItem(
             profileData[0].walletaddress,
             currency,
             maxAmount,
@@ -123,7 +123,8 @@ export const handler: Handlers<any, State> = {
             relayerBalanceId
         )
 
-        headers.set("location", "/app/debitItems");
+        headers.set("location", `/app/item?q=${item[0].button_id}`);
+
         return new Response(null, { status: 303, headers })
     }
 }
