@@ -121,3 +121,7 @@ export enum PaymentIntentsTablePages {
   DEBITITEMS,
   ITEM,
 }
+
+export enum DocsLinks {
+  REDIRECTURLSPEC = "https://gitbook.com" 
+}
