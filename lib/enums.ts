@@ -1,3 +1,8 @@
+export enum AccountTypes {
+  VIRTUALACCOUNT,
+  CONNECTEDWALLET,
+}
+
 export enum PaymentIntentStatus {
   CREATED = "Created",
   CANCELLED = "Cancelled",
@@ -87,6 +92,8 @@ export type RelayerBalance = {
 // 10 Payment intents will be displayed in a
 export const PAYMENTINTENTSPAGESIZE = 10;
 
+export const DEBITITEMSTABLEPAGESIZE = 10;
+
 export enum PaymentIntentsTableColNames {
   Identifier = "Identifier",
   Status = "Status",
@@ -109,6 +116,31 @@ export const MapPaymentIntentsTableColNamesToDbColNames: {
   [PaymentIntentsTableColNames.CreatedDate]: "created_at",
 };
 
+export enum DebitItemTableColNames {
+  PaymentIntentsCount = "payment_intents_count",
+  Name = "name",
+  Network = "network",
+  Pricing = "pricing",
+  MaxPrice = "max_price",
+  DebitInterval = "debit_interval",
+  DebitTimes = "debit_times",
+  CreatedAt = "created_at",
+}
+
+// This is good for verifying the enum strings coming from the API are valid!
+export const MapDebitItemsTableColNamesToDbColNames: {
+  [key in DebitItemTableColNames]: string;
+} = {
+  [DebitItemTableColNames.PaymentIntentsCount]: "payment_intents_count",
+  [DebitItemTableColNames.Name]: "name",
+  [DebitItemTableColNames.Network]: "network",
+  [DebitItemTableColNames.Pricing]: "pricing",
+  [DebitItemTableColNames.MaxPrice]: "max_price",
+  [DebitItemTableColNames.DebitInterval]: "debit_interval",
+  [DebitItemTableColNames.DebitTimes]: "debit_times",
+  [DebitItemTableColNames.CreatedAt]: "created_at",
+};
+
 export enum FilterFor {
   PaymentIntents,
   TransactionHistory,
@@ -123,5 +155,5 @@ export enum PaymentIntentsTablePages {
 }
 
 export enum DocsLinks {
-  REDIRECTURLSPEC = "https://gitbook.com" 
+  REDIRECTURLSPEC = "https://gitbook.com",
 }
