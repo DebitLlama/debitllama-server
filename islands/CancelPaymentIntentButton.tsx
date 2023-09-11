@@ -2,7 +2,7 @@ import { PaymentIntentRow, PaymentIntentStatus } from "../lib/enums.ts";
 import { packToSolidityProof, toNoteHex } from "../lib/frontend/directdebitlib.ts";
 import { updatePaymentIntentToClosed } from "../lib/frontend/fetch.ts";
 import { cancelPaymentIntent, getContract, handleNetworkSelect } from "../lib/frontend/web3.ts";
-import { ChainIds, getDirectDebitContractAddress } from "../lib/shared/web3.ts";
+import { ChainIds, getVirtualAccountsContractAddress } from "../lib/shared/web3.ts";
 import { useState } from 'preact/hooks';
 
 export interface CancelPaymentIntentButtonProps {
@@ -37,8 +37,8 @@ export default function CancelPaymentIntentButton(props: CancelPaymentIntentButt
         if (!provider) {
             return;
         }
-        const contractAddress = getDirectDebitContractAddress[props.chainId];
-        const contract = await getContract(provider, contractAddress, "/DirectDebit.json");
+        const contractAddress = getVirtualAccountsContractAddress[props.chainId];
+        const contract = await getContract(provider, contractAddress, "/VirtualAccounts.json");
 
         const proof = JSON.parse(props.paymentIntent.proof);
         const publicSignals = JSON.parse(props.paymentIntent.publicSignals);

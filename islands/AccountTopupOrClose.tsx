@@ -70,7 +70,7 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
             const contract = await getContract(
                 provider,
                 props.debitContractAddress,
-                "/DirectDebit.json");
+                "/VirtualAccounts.json");
 
             if (allowance >= parseEther(amount)) {
                 // Just do the top up
@@ -96,7 +96,7 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
             const contract = await getContract(
                 provider,
                 props.debitContractAddress,
-                "/DirectDebit.json");
+                "/VirtualAccounts.json");
 
             await handleEthTopup(contract);
         }
@@ -112,7 +112,7 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
         const contract = await getContract(
             provider,
             props.debitContractAddress,
-            "/DirectDebit.json");
+            "/VirtualAccounts.json");
 
         const withdrawTx = await withdraw(contract, props.commitment);
 

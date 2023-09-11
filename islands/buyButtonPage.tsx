@@ -5,7 +5,7 @@ import AccountPasswordInput, { AccountPasswordInputProps } from "./accountPasswo
 import { strength } from "./accountCreatePageForm.tsx";
 import BuyPageProfile, { ProfileProps } from "../components/BuyPageProfile.tsx";
 import { approveSpend, depositEth, depositToken, getAllowance, getContract, getJsonRpcProvider, handleNetworkSelect, parseEther, requestAccounts, topUpETH, topUpTokens } from "../lib/frontend/web3.ts";
-import { ChainIds, getDirectDebitContractAddress } from "../lib/shared/web3.ts";
+import { ChainIds, getVirtualAccountsContractAddress } from "../lib/shared/web3.ts";
 import { requestBalanceRefresh, saveAccountData, uploadProfileData } from "../lib/frontend/fetch.ts";
 import { setUpAccount } from "../lib/frontend/directdebitlib.ts";
 import { AccountCardElement, CheckoutAccountCardElement } from "../components/AccountCardElement.tsx";
@@ -167,7 +167,7 @@ async function handleTokenTopup(
 
 
 function topupbalance(args: TopupBalanceArgs) {
-    const debitContractAddress = getDirectDebitContractAddress[args.chainId as ChainIds];
+    const debitContractAddress = getVirtualAccountsContractAddress[args.chainId as ChainIds];
     return async () => {
 
         // I need to connect the wallet do the onboarding and then do the transaction if all the conditions are met!
@@ -181,7 +181,7 @@ function topupbalance(args: TopupBalanceArgs) {
             const contract = await getContract(
                 provider,
                 debitContractAddress,
-                "/DirectDebit.json");
+                "/VirtualAccounts.json");
 
             await handleEthTopup(
                 contract,
@@ -200,7 +200,7 @@ function topupbalance(args: TopupBalanceArgs) {
             const contract = await getContract(
                 provider,
                 debitContractAddress,
-                "/DirectDebit.json");
+                "/VirtualAccounts.json");
 
             if (allowance >= parseEther(args.topupAmount.toString())) {
                 // Just do the top up
@@ -314,11 +314,11 @@ function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
             }
         }
         const virtualaccount = await setUpAccount(args.passwordProps.password, args.ethEncryptPublicKey);
-        const debitContractAddress = getDirectDebitContractAddress[args.chainId as ChainIds];
+        const debitContractAddress = getVirtualAccountsContractAddress[args.chainId as ChainIds];
         const debitContract = await getContract(
             provider,
             debitContractAddress,
-            "/DirectDebit.json");
+            "/VirtualAccounts.json");
         if (!args.selectedCurrency?.native) {
             //Approve spending, Then do the deposit
 
