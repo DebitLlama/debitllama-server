@@ -1,5 +1,5 @@
 import { ethers, ZeroAddress } from "$ethers";
-import DirectDebitArtifact from "../../static/DirectDebit.json" assert {
+import VirtualAccountsArtifact from "../../static/VirtualAccounts.json" assert {
   type: "json",
 };
 import RelayerGasTracker from "../../static/RelayerGasTracker.json" assert {
@@ -7,7 +7,7 @@ import RelayerGasTracker from "../../static/RelayerGasTracker.json" assert {
 };
 import {
   ChainIds,
-  getDirectDebitContractAddress,
+  getVirtualAccountsContractAddress,
   getRelayerGasTrackerContractAddress,
   rpcUrl,
 } from "../shared/web3.ts";
@@ -24,11 +24,11 @@ export function getProvider(networkId: string) {
 
 // I need to implement the server side Contract functions here with ethers js
 export function getContract(provider: any, networkId: string) {
-  const address = getDirectDebitContractAddress[networkId as ChainIds];
+  const address = getVirtualAccountsContractAddress[networkId as ChainIds];
 
   return new ethers.Contract(
     address,
-    DirectDebitArtifact.abi,
+    VirtualAccountsArtifact.abi,
     provider,
   );
 }

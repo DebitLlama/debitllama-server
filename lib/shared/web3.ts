@@ -17,6 +17,14 @@ export enum DirectDebitContractAddress {
   BTT_TESTNET = "0x003E9E692029118e110c9A73a37B62b04D3d79e9",
 }
 
+export enum VirtualAccountsContractAddress {
+  BTT_TESTNET = "0x12F85Dd36456088f46baD586923eF2eB13482bc3",
+}
+
+export enum ConnectedWalletsContractAddress {
+  BTT_TESTNET = "0xd14e897048cd38b9A1872959358B59A974FbACC1",
+}
+
 export enum RPCURLS {
   BTT_TESTNET = "https://pre-rpc.bt.io/",
 }
@@ -45,10 +53,16 @@ export const walletCurrency: { [key in ChainIds]: NetworkTickers } = {
   [ChainIds.BTT_TESTNET_ID]: NetworkTickers.BTT_TESTNET,
 };
 
-export const getDirectDebitContractAddress: {
-  [keys in ChainIds]: DirectDebitContractAddress;
+export const getVirtualAccountsContractAddress: {
+  [keys in ChainIds]: VirtualAccountsContractAddress;
 } = {
-  [ChainIds.BTT_TESTNET_ID]: DirectDebitContractAddress.BTT_TESTNET,
+  [ChainIds.BTT_TESTNET_ID]: VirtualAccountsContractAddress.BTT_TESTNET,
+};
+
+export const getConnectedWalletsContractAddress: {
+  [keys in ChainIds]: ConnectedWalletsContractAddress;
+} = {
+  [ChainIds.BTT_TESTNET_ID]: ConnectedWalletsContractAddress.BTT_TESTNET,
 };
 
 export const getRelayerGasTrackerContractAddress: {
@@ -111,3 +125,26 @@ export function getChainExplorerForChainId(chainId: ChainIds, tx: string) {
       return ``;
   }
 }
+
+export type SelectableCurrency = {
+  name: string;
+  native: boolean;
+  contractAddress: string;
+};
+
+export const ethereumCurrencies = [
+  { name: "ETH", native: true, contractAddress: "" },
+  { name: "USDC", native: false, contractAddress: "" },
+];
+
+export const bittorrentCurrencies = [{
+  name: "BTT",
+  native: true,
+  contractAddress: "",
+}, { name: "USDTM", native: false, contractAddress: DonauTestnetTokens.USDTM }];
+
+export const getCurrenciesForNetworkName: {
+  [key in NetworkNames]: SelectableCurrency[];
+} = {
+  [NetworkNames.BTT_TESTNET]: bittorrentCurrencies,
+};
