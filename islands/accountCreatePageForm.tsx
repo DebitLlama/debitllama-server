@@ -2,10 +2,10 @@ import { useState } from 'preact/hooks';
 
 import CurrencySelectDropdown from "./CurrencySelectDropdown.tsx";
 import AccountPasswordInput from "./accountPasswordInput.tsx";
-import { SelectableCurrency, approveSpend, bittorrentCurrencies, depositEth, depositToken, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts } from "../lib/frontend/web3.ts";
+import { approveSpend, depositEth, depositToken, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts } from "../lib/frontend/web3.ts";
 import { setUpAccount } from '../lib/frontend/directdebitlib.ts';
 import { redirectToAccountPage } from '../lib/frontend/fetch.ts';
-import { ChainIds, NetworkNames, availableNetworks, chainIdFromNetworkName, getDirectDebitContractAddress } from "../lib/shared/web3.ts";
+import { ChainIds, NetworkNames, SelectableCurrency, availableNetworks, bittorrentCurrencies, chainIdFromNetworkName, getVirtualAccountsContractAddress } from "../lib/shared/web3.ts";
 
 export const strength = [
     "Worst ☹",
@@ -150,7 +150,7 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
 
         const virtualaccount = await setUpAccount(password, props.ethEncryptPublicKey);
 
-        const contractAddress = getDirectDebitContractAddress[chainId as ChainIds];
+        const contractAddress = getVirtualAccountsContractAddress[chainId as ChainIds];
 
         if (!selectedCurrency?.native) {
             //Approve spending, Then do the deposit
@@ -188,7 +188,7 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
             const contract = await getContract(
                 provider,
                 contractAddress,
-                "/DirectDebit.json");
+                "/VirtualAccounts.json");
 
             const tx = await depositEth(
                 contract,
