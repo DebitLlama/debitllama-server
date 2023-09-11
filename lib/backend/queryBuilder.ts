@@ -324,6 +324,35 @@ export default class QueryBuilder {
             ).order("created_at", { ascending: false });
           return this.responseHandler(res);
         },
+        byUserIdDescPaginated: async (
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+        ) => {
+          const res = await this.client.from("RelayerTopUpHistory")
+            .select("*", { count: "exact" })
+            .order(order, { ascending })
+            .eq("user_id", this.userid)
+            .range(rangeFrom, rangeTo);
+
+          return this.responseHandler(res);
+        },
+        byUserIdDescPaginatedWithTxSearch: async (
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+          searchTerm: string,
+        ) => {
+          const res = await this.client.from("RelayerTopUpHistory")
+            .select("*", { count: "exact" })
+            .order(order, { ascending })
+            .textSearch("transactionHash", searchTerm)
+            .eq("user_id", this.userid)
+            .range(rangeFrom, rangeTo);
+          return this.responseHandler(res);
+        },
       },
       DynamicPaymentRequestJobs: {
         //selectDynamicPaymentRequestJobByPaymentIntentIdAndUserId

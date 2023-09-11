@@ -93,6 +93,9 @@ export type RelayerBalance = {
 export const PAYMENTINTENTSPAGESIZE = 10;
 
 export const DEBITITEMSTABLEPAGESIZE = 10;
+export const RELAYERTOPUPHISTORYPAGESIZE = 10;
+
+export const RELAYERTRANSACTIONHISTORYPAGESIZE = 10;
 
 export enum PaymentIntentsTableColNames {
   Identifier = "Identifier",
@@ -139,6 +142,20 @@ export const MapDebitItemsTableColNamesToDbColNames: {
   [DebitItemTableColNames.DebitInterval]: "debit_interval",
   [DebitItemTableColNames.DebitTimes]: "debit_times",
   [DebitItemTableColNames.CreatedAt]: "created_at",
+};
+
+export enum RelayerTopupHistoryColNames {
+  Amount = "Amount",
+  Date = "Date",
+  Network = "Network",
+}
+
+export const MapRelayerTopupHistoryColnamesToDbColNames: {
+  [key in RelayerTopupHistoryColNames]: string;
+} = {
+  [RelayerTopupHistoryColNames.Date]: "created_at",
+  [RelayerTopupHistoryColNames.Amount]: "Amount",
+  [RelayerTopupHistoryColNames.Network]: "network",
 };
 
 export enum FilterFor {
