@@ -3,8 +3,8 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
 import CopyButton from "../../islands/copyButton.tsx";
 import { ChainIds, networkNameFromId } from "../../lib/shared/web3.ts";
-import DebitItemIsland from "../../islands/DebitItemIsland.tsx";
 import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import PaymentIntentsPaginationForItemPage from "../../islands/pagination/PaymentIntentsPaginationForItemPage.tsx";
 
 export const handler: Handlers<any, State> = {
     async GET(req: any, ctx: any) {
@@ -48,7 +48,10 @@ export default function Item(props: PageProps) {
     return <Layout isLoggedIn={props.data.token}>
         <div class="container mx-auto py-8">
             {!props.data.notfound ?
-                <div class="flex flex-col items-center justify-center h-full">
+                <div
+                // class="flex flex-col items-center justify-center h-full"
+
+                >
                     <div class="bg-white shadow-2xl p-6 rounded-2xl border-2 border-gray-50 w-full">
                         <div class="flex flex-col">
                             <div class="mb-5">
@@ -69,7 +72,7 @@ export default function Item(props: PageProps) {
                                     </tr>
                                     <tr>
                                         <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Name:</td>
-                                        <td class={"px-4 py-4 text-sm whitespace-nowrap"}>{itemData.name}</td>
+                                        <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData"> {itemData.name}</div></td>
                                     </tr>
                                     <tr>
                                         <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Network:</td>
@@ -77,15 +80,15 @@ export default function Item(props: PageProps) {
                                     </tr>
                                     <tr>
                                         <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Max Debited:</td>
-                                        <td class={"px-4 py-4 text-sm whitespace-nowrap"}>{itemData.max_price} {JSON.parse(itemData.currency).name}</td>
+                                        <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData">  {itemData.max_price} {JSON.parse(itemData.currency).name}</div></td>
                                     </tr>
                                     <tr>
                                         <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Debit Times:</td>
-                                        <td class={"px-4 py-4 text-sm whitespace-nowrap"}>{itemData.debit_times}</td>
+                                        <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData"> {itemData.debit_times}</div></td>
                                     </tr>
                                     <tr>
                                         <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Debit Interval (Days):</td>
-                                        <td class={"px-4 py-4 text-sm whitespace-nowrap"}>{itemData.debit_interval}</td>
+                                        <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData"> {itemData.debit_interval}</div></td>
                                     </tr>
                                     <tr>
                                         <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Pricing</td>
@@ -123,13 +126,12 @@ export default function Item(props: PageProps) {
                         <p class="text-xs mt-1">Embed the buy Button on your Website </p>
                         <CopyButton str={embeddedCode}></CopyButton>
                     </div>
-                    <div class="overflow-scroll w-full mx-5 bg-gray-800 shadow-2xl rounded-lg overflow-hidden">
+                    <div class="overflow-scroll w-full bg-gray-800 shadow-2xl rounded-lg overflow-hidden">
                         <div id="header-buttons" class="py-3 px-4 flex">
                             <div class="rounded-full w-3 h-3 bg-red-500 mr-2"></div>
                             <div class="rounded-full w-3 h-3 bg-yellow-500 mr-2"></div>
                             <div class="rounded-full w-3 h-3 bg-green-500"></div>
                         </div>
-
                         <div class="py-4 px-4 mt-1 text-white overflow-auto">
                             <pre class="text-sm">
                                 {embeddedCode}
@@ -138,8 +140,9 @@ export default function Item(props: PageProps) {
                     </div>
                     <hr
                         class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
-                    <h1 class="text-2xl font-bold mb-5 text-center">Payment Intents</h1>
-                    <DebitItemIsland paymentIntentData={props.data.paymentIntentData}></DebitItemIsland>
+                    <section class="container px-4 mx-auto">
+                        <PaymentIntentsPaginationForItemPage debit_item_id={itemData.id}></PaymentIntentsPaginationForItemPage>
+                    </section>
                     <hr
                         class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
 
@@ -161,7 +164,7 @@ function DeactivateComponent(props: DeactivateComponentProps) {
     const buttonTitle = props.itemData.deleted ? "Reactivate Item" : "Deactivate Item";
     const description = props.itemData.deleted ? "Reactivating the item will resume the checkout. You will be able to accept payments again!" : "Deactivating the item will disable the checkout page. You will be still able to process the payment intents, however new ones can't be added!"
 
-    return <div class={`w-full border-solid border-2 border-${color}-600 flex flex-col justify-center`}>
+    return <div class={`max-w-md border-solid border-2 border-${color}-600 flex flex-col justify-center`}>
         <div><h4 class="text-xl mx-auto text-center">{title}</h4></div>
 
         <p class="p-5 text-center">{description}</p>
