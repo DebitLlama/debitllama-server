@@ -3,7 +3,7 @@
 import Layout from "../../components/Layout.tsx";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
-import { ChainIds, getDirectDebitContractAddress, networkNameFromId, rpcUrl } from "../../lib/shared/web3.ts";
+import { ChainIds, getVirtualAccountsContractAddress, networkNameFromId, rpcUrl } from "../../lib/shared/web3.ts";
 import { getAccount } from "../../lib/backend/web3.ts";
 import { ZeroAddress, formatEther } from "../../ethers.min.js";
 import AccountTopupOrClose from "../../islands/AccountTopupOrClose.tsx";
@@ -86,7 +86,7 @@ export default function Account(props: PageProps) {
                             <AccountTopupOrClose
                                 currencyName={props.data.currency}
                                 accountName={props.data.name}
-                                debitContractAddress={getDirectDebitContractAddress[props.data.networkId as ChainIds]}
+                                debitContractAddress={getVirtualAccountsContractAddress[props.data.networkId as ChainIds]}
                                 erc20ContractAddress={tokenAddress}
                                 commitment={props.data.commitment}
                                 chainId={props.data.networkId}
