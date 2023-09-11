@@ -1,6 +1,4 @@
-
-import { SelectableCurrency } from "../lib/frontend/web3.ts";
-
+import { SelectableCurrency } from "../lib/shared/web3.ts";
 
 interface CurrencySelectDropdownProps {
     selectedNetwork: string,
@@ -23,7 +21,7 @@ export default function CurrencySelectDropdown(props: CurrencySelectDropdownProp
     const onSelectCurrency = (event: any) => {
         props.setSelectedCurrency(JSON.parse(event.target.value))
     }
-
+// TODO: Implement this when using multiple networks!
     // useEffect(() => {
     //     if (selectedNetwork === availableNetworks[0]) {
     //         setSelectableCurrencyArray(ethereumCurrencies)
