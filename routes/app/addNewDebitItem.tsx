@@ -2,8 +2,10 @@ import Layout from "../../components/Layout.tsx";
 import { State } from "../_middleware.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import AddNewDebitItemPageForm from "../../islands/addNewDebitItemPageForm.tsx";
-import { NetworkNames, chainIdFromNetworkName } from "../../lib/shared/web3.ts";
+import { NetworkNames, chainIdFromNetworkName, getCurrenciesForNetworkName } from "../../lib/shared/web3.ts";
 import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import { Pricing } from "../../lib/enums.ts";
+import { errorResponseBuilder } from "../../lib/backend/responseBuilders.ts";
 
 
 
@@ -23,8 +25,8 @@ export const handler: Handlers<any, State> = {
         return ctx.render({ ...ctx.state, creatorAddress: profileData[0].walletaddress })
     },
     async POST(_req, ctx) {
+
         const headers = new Headers();
-        const userid = ctx.state.userid;
         const queryBuilder = new QueryBuilder(ctx);
         const select = queryBuilder.select();
         const insert = queryBuilder.insert();
@@ -65,6 +67,49 @@ export const handler: Handlers<any, State> = {
         }
         // TODO: More Input verification!!
 
+        if (isNaN(parseInt(debitTimes))) {
+            return errorResponseBuilder("Invalid Debit Time!")
+        }
+
+
+        if (pricing === Pricing.Fixed && Number(debitInterval) < 1) {
+            return errorResponseBuilder("Invalid Debit Interval! Fixed payments can't have unspecified interval!")
+        }
+
+        if (isNaN(parseFloat(maxAmount))) {
+            return errorResponseBuilder("Invalid maxAmount!")
+        }
+
+        if (isNaN(parseInt(debitInterval))) {
+            return errorResponseBuilder("Invalid interval!")
+        }
+
+        if (pricing !== Pricing.Fixed && pricing !== Pricing.Dynamic) {
+            return errorResponseBuilder("Invalid pricing");
+        }
+
+        try {
+            const parsedCurrency = JSON.parse(currency);
+
+            const name = parsedCurrency.name;
+            const native = parsedCurrency.native;
+            const contractAddress = parsedCurrency.contractAddress;
+
+            const chainCurrencies = getCurrenciesForNetworkName[network as NetworkNames];
+
+            const findSubmittedCurrency = chainCurrencies.filter((curr) => curr.name === name && curr.native === native && curr.contractAddress === contractAddress);
+            if (findSubmittedCurrency.length !== 1) {
+                throw new Error();
+            }
+
+        } catch (err) {
+            return errorResponseBuilder("Unable to parse currency!");
+        }
+
+        if (!isValidUrl(redirectto)) {
+            return errorResponseBuilder("Invalid redirect to URL!")
+        }
+
         await insert.Items.newItem(
             profileData[0].walletaddress,
             currency,
@@ -80,6 +125,15 @@ export const handler: Handlers<any, State> = {
 
         headers.set("location", "/app/debitItems");
         return new Response(null, { status: 303, headers })
+    }
+}
+
+const isValidUrl = (urlString: string) => {
+    try {
+        return Boolean(new URL(urlString));
+    }
+    catch (e) {
+        return false;
     }
 }
 
