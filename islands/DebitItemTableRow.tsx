@@ -10,7 +10,9 @@ interface DebitItemTableRowProps {
     pricing: string,
     button_id: string,
     payment_intents_count: number
-    deleted: boolean
+    deleted: boolean,
+    created_at: string,
+    index: number
 }
 export default function DebitItemTableRow(props: DebitItemTableRowProps) {
     const network = networkNameFromId[props.network as ChainIds];
@@ -19,7 +21,7 @@ export default function DebitItemTableRow(props: DebitItemTableRowProps) {
             window.open(location.origin + url, "_self")
         }
     }
-    return <tr class="cursor-pointer bg-white hover:bg-gray-300" onClick={onRowClicked(`/app/item?q=${props.button_id}`)}>
+    return <tr tabIndex={props.index} class="cursor-pointer bg-white hover:bg-gray-300" onClick={onRowClicked(`/app/item?q=${props.button_id}`)}>
         <td class="px-4 py-4 text-sm whitespace-nowrap">
             <div class="flex items-center gap-x-6">
                 {GetRowIcon(props.deleted)}
@@ -56,6 +58,7 @@ export default function DebitItemTableRow(props: DebitItemTableRowProps) {
         </td>
         <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{props.debitInterval}</td>
         <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{props.debitTimes}</td>
+        <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{new Date(props.created_at).toLocaleString()}</td>
     </tr>
 }
 

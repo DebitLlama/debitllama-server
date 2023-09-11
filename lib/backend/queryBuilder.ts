@@ -45,6 +45,34 @@ export default class QueryBuilder {
             .order("created_at", { ascending: false });
           return this.responseHandler(res);
         },
+        byUserIdForPayeePaginated: async (
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+        ) => {
+          const res = await this.client.from("Items")
+            .select("*", { count: "exact" })
+            .order(order, { ascending })
+            .eq("payee_id", this.userid)
+            .range(rangeFrom, rangeTo);
+          return this.responseHandler(res);
+        },
+        byUserIdForPayeePaginatedWithSearchName: async (
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+          searchTerm: string,
+        ) => {
+          const res = await this.client.from("Items")
+            .select("*", { count: "exact" })
+            .order(order, { ascending })
+            .textSearch("name", searchTerm)
+            .eq("payee_id", this.userid)
+            .range(rangeFrom, rangeTo);
+          return this.responseHandler(res);
+        },
       },
       Accounts: {
         // selectOpenAccountsFromUserByNetworkAndCurrency
@@ -372,7 +400,7 @@ export default class QueryBuilder {
             network,
             name,
             relayerBalance_id,
-          });
+          }).select();
           return this.responseHandler(res);
         },
       },
