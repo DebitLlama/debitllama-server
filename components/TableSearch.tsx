@@ -16,14 +16,25 @@ export default function TableSearch(props: TableSearchProps) {
         }
     }
 
+    const getIdentifierPlaceholder = () => {
+        switch (props.tableType) {
+            case FilterFor.PaymentIntents:
+                return "Search Identifier"
+            case FilterFor.DebitItems:
+                return "Search Name";
+            default:
+                return "Search";
+        }
+    }
 
-    return <div class={"flex flex-row flex-wrap gap-4 mb-4 justify-center"}>
+
+    return <div class={"flex flex-row mb-4 justify-center"}>
         <input
             onKeyDown={onEnterOnly}
             value={props.searchTerm}
             onChange={(event: any) => props.setSearchTerm(event.target.value)}
             class="w-64 mr-2 px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
-            type="text" id="searchTerm" name="searchTerm" placeholder="Search Identifier" />
+            type="text" id="searchTerm" name="searchTerm" placeholder={getIdentifierPlaceholder()} />
         <div class="w-64 flex flex-row">
             <button
                 id="searchButton"
