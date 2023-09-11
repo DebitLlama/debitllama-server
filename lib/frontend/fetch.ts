@@ -1,4 +1,7 @@
-import { PaymentIntentsTableColNames } from "../enums.ts";
+import {
+  DebitItemTableColNames,
+  PaymentIntentsTableColNames,
+} from "../enums.ts";
 import { ChainIds } from "../shared/web3.ts";
 
 export async function saveAccountData(
@@ -220,6 +223,22 @@ export async function fetchPaginatedPaymentIntentsForItem(args: {
   sortDirection: "ASC" | "DESC";
 }) {
   return await fetch("/app/pagination/itemPaymentIntents", {
+    credentials: "same-origin",
+    method: "POST",
+    body: JSON.stringify(args),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((response) => response);
+}
+
+export async function fetchPaginatedDebitItems(args: {
+  currentPage: number;
+  searchTerm: string;
+  sortBy: DebitItemTableColNames;
+  sortDirection: "ASC" | "DESC";
+}) {
+  return await fetch("/app/pagination/debitItems", {
     credentials: "same-origin",
     method: "POST",
     body: JSON.stringify(args),
