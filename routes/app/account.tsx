@@ -52,11 +52,19 @@ export const handler: Handlers<any, State> = {
                         // Update the account balance finally
                         await update.Accounts.balanceAndClosedById(accountData.account[3], !accountData.account[0], data[0].id)
                     }
+                    if (!data[0].closed[0]) {
+                        // If it's closed I redirect to accounts page!
+                        const headers = new Headers();
+                        headers.set("location", "/app/accounts");
+                        return new Response(null, {
+                            status: 303,
+                            headers,
+                        });
+                    }
 
                     // Here I return the data from the database because the account was saved
                     return ctx.render({ notfound: false, ...ctx.state, currency, name, commitment, closed: data[0].closed, networkId: networkId, accountData });
                 }
-
             } else {
                 // render a context not found page
                 return ctx.render({ ...ctx.state, notfound: true })
