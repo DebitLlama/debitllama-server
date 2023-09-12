@@ -36,7 +36,7 @@ export default function RelayerTopupHistory(props: RelayerTopupHistoryProps) {
         })
         if (res.status === 200) {
             const json = await res.json();
-            setCurrentTopupHistoryData(json.debitItemsData)
+            setCurrentTopupHistoryData(json.data)
             setPageData({
                 currentPage: json.currentPage,
                 totalPages: json.totalPages
