@@ -6,6 +6,7 @@ import { approveSpend, depositEth, depositToken, getAllowance, getContract, hand
 import { setUpAccount } from '../lib/frontend/directdebitlib.ts';
 import { redirectToAccountPage } from '../lib/frontend/fetch.ts';
 import { ChainIds, NetworkNames, SelectableCurrency, availableNetworks, bittorrentCurrencies, chainIdFromNetworkName, getVirtualAccountsContractAddress } from "../lib/shared/web3.ts";
+import Overlay from '../components/Overlay.tsx';
 
 export const strength = [
     "Worst ☹",
@@ -40,6 +41,7 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
 
     const [walletMismatchError, setShowWalletMismatchError] = useState(false);
 
+    const [showOverlay, setShowOverlay] = useState(false);
 
     function setPasswordAndCheck(to: string) {
         if (to === "") {
@@ -108,12 +110,15 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
         erc20Contract: string,
         chainId: string
     ) {
+        setShowOverlay(true)
         const depositTx = await depositToken(
             contractAddress,
             virtualaccount.commitment,
             depositAmount,
             erc20Contract,
-            virtualaccount.encryptedNote)
+            virtualaccount.encryptedNote).catch(err => {
+                setShowOverlay(false);
+            })
 
         if (depositTx !== undefined) {
             await depositTx.wait().then((receipt: any) => {
@@ -123,6 +128,8 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
                         virtualaccount.commitment,
                         name,
                         selectedCurrency.name);
+                } else {
+                    setShowOverlay(false);
                 }
             })
         }
@@ -189,13 +196,15 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
                 provider,
                 contractAddress,
                 "/VirtualAccounts.json");
-
+            setShowOverlay(true);
             const tx = await depositEth(
                 contract,
                 virtualaccount.commitment,
                 depositAmount,
                 virtualaccount.encryptedNote
-            );
+            ).catch(err => {
+                setShowOverlay(false);
+            });
 
             if (tx !== undefined) {
                 await tx.wait().then((receipt: any) => {
@@ -205,7 +214,11 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
                             virtualaccount.commitment,
                             name,
                             selectedCurrency.name);
+                    } else {
+                        setShowOverlay(false);
                     }
+                }).catch((err: any) => {
+                    setShowOverlay(false)
                 })
             }
         }
@@ -213,6 +226,7 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
 
 
     return <form onSubmit={onSubmitForm} class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md" method="POST">
+        <Overlay show={showOverlay} ></Overlay>
         <h1 class="text-2xl font-bold mb-6 text-center">New Virtual Account</h1>
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Account Name</label>

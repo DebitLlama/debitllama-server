@@ -10,6 +10,7 @@ import { requestBalanceRefresh, saveAccountData, uploadProfileData } from "../li
 import { setUpAccount } from "../lib/frontend/directdebitlib.ts";
 import { AccountCardElement, CheckoutAccountCardElement } from "../components/AccountCardElement.tsx";
 import { CarouselButtons } from "../components/components.tsx";
+import Overlay from "../components/Overlay.tsx";
 
 export interface Currency {
     name: string,
@@ -82,6 +83,9 @@ export interface LoggedInUiProps {
     backClicked: () => void;
     forwardClicked: () => void;
 
+    showOverlay: boolean;
+    setShowOverlay: (to: boolean) => void;
+
 }
 
 
@@ -100,7 +104,8 @@ export interface ButtonsBasedOnSelectionProps {
     profile: ProfileProps
     topupAmount: number,
     setTopupAmount: (to: number) => void;
-    ethEncryptPublicKey: string
+    ethEncryptPublicKey: string;
+    setShowOverlay: (to: boolean) => void;
 
 }
 
@@ -110,6 +115,7 @@ interface TopupBalanceArgs {
     chainId: string,
     handleError: (msg: string) => void;
     currency: Currency;
+    setShowOverlay: (to: boolean) => void;
 }
 
 async function handleEthTopup(
@@ -117,23 +123,32 @@ async function handleEthTopup(
     commitment: string,
     amount: string,
     chainId: string,
-    handleError: CallableFunction) {
-
+    handleError: CallableFunction,
+    setShowOverlay: (to: boolean) => void
+) {
+    setShowOverlay(true)
     const topuptx = await topUpETH(
         contract,
         commitment,
         amount
-    )
+    ).catch((err) => {
+        setShowOverlay(false)
+    })
     if (topuptx !== undefined) {
         await topuptx.wait().then(async (receipt: any) => {
             if (receipt.status === 1) {
                 const res = await requestBalanceRefresh(commitment, chainId);
                 if (res !== 200) {
                     handleError("An error occured saving the balance!");
+                    setShowOverlay(false);
                 } else {
                     location.reload();
                 }
+            } else {
+                setShowOverlay(false)
             }
+        }).catch((err: any) => {
+            setShowOverlay(false)
         })
     }
 }
@@ -143,13 +158,17 @@ async function handleTokenTopup(
     commitment: string,
     amount: string,
     chainId: string,
-    handleError: CallableFunction
+    handleError: CallableFunction,
+    setShowOverlay: (to: boolean) => void
 ) {
+    setShowOverlay(true)
     const topuptx = await topUpTokens(
         contract,
         commitment,
         amount
-    );
+    ).catch((err: any) => {
+        setShowOverlay(false)
+    });
 
     if (topuptx !== undefined) {
         await topuptx.wait().then(async (receipt: any) => {
@@ -157,14 +176,19 @@ async function handleTokenTopup(
                 const res = await requestBalanceRefresh(commitment, chainId);
                 if (res !== 200) {
                     handleError("An error occured saving the balance!");
+                    setShowOverlay(false)
                 } else {
                     location.reload();
                 }
+            } else {
+                setShowOverlay(false)
             }
+        }).catch((err: any) => {
+            setShowOverlay(false)
         })
     }
 }
-
+//TODO: ADD THE OVERLAY!
 
 function topupbalance(args: TopupBalanceArgs) {
     const debitContractAddress = getVirtualAccountsContractAddress[args.chainId as ChainIds];
@@ -188,7 +212,8 @@ function topupbalance(args: TopupBalanceArgs) {
                 args.commitment,
                 args.topupAmount.toString(),
                 args.chainId,
-                args.handleError
+                args.handleError,
+                args.setShowOverlay
             )
         } else {
             const erc20Contract = await getContract(
@@ -209,7 +234,8 @@ function topupbalance(args: TopupBalanceArgs) {
                     args.commitment,
                     args.topupAmount.toString(),
                     args.chainId,
-                    args.handleError
+                    args.handleError,
+                    args.setShowOverlay
                 );
             } else {
                 // Add allowance and then deposit
@@ -227,7 +253,9 @@ function topupbalance(args: TopupBalanceArgs) {
                                 args.commitment,
                                 args.topupAmount.toString(),
                                 args.chainId,
-                                args.handleError);
+                                args.handleError,
+                                args.setShowOverlay
+                            );
                         }
                     })
                 }
@@ -246,7 +274,8 @@ interface onCreateAccountSubmitArgs {
     depositAmount: string,
     passwordProps: AccountPasswordInputProps,
     ethEncryptPublicKey: string,
-    accountCurrency: string
+    accountCurrency: string,
+    setShowOverlay: (to: boolean) => void;
 }
 
 async function handleTokenDeposit(
@@ -259,14 +288,18 @@ async function handleTokenDeposit(
     chainId: string,
     depositAmount: string,
     accountName: string,
-    accountCurrency: string
+    accountCurrency: string,
+    setShowOverlay: (to: boolean) => void
 ) {
+    setShowOverlay(true)
     const depositTx = await depositToken(
         debitcontract,
         virtualaccount.commitment,
         depositAmount,
         erc20Contract,
-        virtualaccount.encryptedNote)
+        virtualaccount.encryptedNote).catch((err) => {
+            setShowOverlay(false)
+        })
 
     if (depositTx !== undefined) {
         await depositTx.wait().then(async (receipt: any) => {
@@ -274,10 +307,15 @@ async function handleTokenDeposit(
                 const saveStatus = await saveAccountData(chainId, virtualaccount.commitment, accountName, accountCurrency)
                 if (saveStatus === 500) {
                     //TODO: Should display an error
+                    setShowOverlay(false);
                 } else {
                     location.reload();
                 }
+            } else {
+                setShowOverlay(false)
             }
+        }).catch((err: any) => {
+            setShowOverlay(false)
         })
     }
 }
@@ -341,7 +379,9 @@ function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
                     args.chainId,
                     args.depositAmount,
                     accountName,
-                    args.accountCurrency)
+                    args.accountCurrency,
+                    args.setShowOverlay
+                )
             } else {
                 // Add allowance and then deposit 
                 const approveTx = await approveSpend(
@@ -360,19 +400,23 @@ function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
                                 args.chainId,
                                 args.depositAmount,
                                 accountName,
-                                args.accountCurrency)
+                                args.accountCurrency,
+                                args.setShowOverlay
+                            )
                         }
                     })
                 }
             }
         } else {
-
+            args.setShowOverlay(true)
             const tx = await depositEth(
                 debitContract,
                 virtualaccount.commitment,
                 args.depositAmount,
                 virtualaccount.encryptedNote
-            );
+            ).catch((err) => {
+                args.setShowOverlay(false)
+            });
 
             if (tx !== undefined) {
                 await tx.wait().then(async (receipt: any) => {
@@ -385,11 +429,16 @@ function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
                             args.accountCurrency)
                         if (saveStatus === 500) {
                             //TODO: Should display an error
+                            args.setShowOverlay(false);
                         } else {
                             location.reload();
                         }
 
+                    } else {
+                        args.setShowOverlay(false);
                     }
+                }).catch((err: any) => {
+                    args.setShowOverlay(false);
                 })
             }
         }
@@ -472,7 +521,8 @@ function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
             selectedCurrency: props.item.currency,
             depositAmount: props.paymentAmount,
             ethEncryptPublicKey: props.ethEncryptPublicKey,
-            accountCurrency: props.item.currency.name
+            accountCurrency: props.item.currency.name,
+            setShowOverlay: props.setShowOverlay
         })}>
             <BuyPageProfile
                 profileExists={props.profileExists}
@@ -527,7 +577,8 @@ function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
                             commitment: selectedAccount.commitment,
                             chainId: props.item.network,
                             handleError,
-                            currency: props.item.currency
+                            currency: props.item.currency,
+                            setShowOverlay: props.setShowOverlay
                         })}
                         class="flex flex-row justify-center  text-2xl mb-4 mt-2 w-full bg-indigo-500 text-white font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
                         type="submit">
@@ -561,6 +612,7 @@ function LoggedInUi(props: LoggedInUiProps) {
     // I need to display the accounts as cards, they must be selectable so I need state here and a button to approve payment after typing the account password
     const acc = props.accounts[props.currentlyShowingAccount];
     return <div class="flex flex-col">
+        <Overlay show={props.showOverlay}></Overlay>
         <div class="flex flex-col flex-wrap"></div>
         <div class="flex flex-col justify-center">
             <div class="flex flex-row justify-center mb-8" >
@@ -604,7 +656,7 @@ function LoggedInUi(props: LoggedInUiProps) {
                 topupAmount={props.topupAmount}
                 setTopupAmount={props.setTopupAmount}
                 ethEncryptPublicKey={props.ethEncryptPublicKey}
-
+                setShowOverlay={props.setShowOverlay}
             ></UIBasedOnSelection>
 
         </div>
@@ -675,6 +727,8 @@ export default function BuyButtonPage(props: BuyButtonPageProps) {
 
     const [currentlyShowingAccount, setCurrentlyShowingAccount] = useState(0);
     const [accountVisible, setAccountVisible] = useState(true);
+
+    const [showOverlay, setShowOverlay] = useState(false);
 
     function backClicked() {
         if (currentlyShowingAccount === 0) {
@@ -768,6 +822,8 @@ export default function BuyButtonPage(props: BuyButtonPageProps) {
             visible={accountVisible}
             backClicked={backClicked}
             forwardClicked={forwardClicked}
+            showOverlay={showOverlay}
+            setShowOverlay={setShowOverlay}
         ></LoggedInUi> : <LoggedOutUi buttonid={props.item.buttonId} url={props.url} ></LoggedOutUi>}
     </BuyPageLayout>
 

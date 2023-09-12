@@ -1,6 +1,7 @@
 import { useState } from 'preact/hooks';
 import { approveSpend, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts, topUpETH, topUpTokens, withdraw } from '../lib/frontend/web3.ts';
 import { redirectToAccountPage } from '../lib/frontend/fetch.ts';
+import Overlay from '../components/Overlay.tsx';
 
 export interface AccountTopupOrCloseProps {
     isERC20: boolean,
@@ -15,38 +16,53 @@ export interface AccountTopupOrCloseProps {
 
 export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
     const [amount, setAmount] = useState("");
-
+    const [showOverlay, setShowOverlay] = useState(false);
     const handleError = (err: string) => {
         console.log(err);
     }
 
     async function handleTokenTopup(contract: any) {
+        setShowOverlay(true)
         const topuptx = await topUpTokens(
             contract,
             props.commitment,
             amount
-        );
+        ).catch((err) => {
+            setShowOverlay(false)
+        });
 
         if (topuptx !== undefined) {
             await topuptx.wait().then((receipt: any) => {
                 if (receipt.status === 1) {
                     redirectToAccountPage(props.chainId, props.commitment, props.accountName, props.currencyName)
+                } else {
+                    setShowOverlay(false);
                 }
+            }).catch((err: any) => {
+                setShowOverlay(false)
             })
         }
     }
 
     async function handleEthTopup(contract: any) {
+        setShowOverlay(true)
+
         const topuptx = await topUpETH(
             contract,
             props.commitment,
             amount
-        )
+        ).catch(err => {
+            setShowOverlay(false)
+        })
         if (topuptx !== undefined) {
             await topuptx.wait().then((receipt: any) => {
                 if (receipt.status === 1) {
                     redirectToAccountPage(props.chainId, props.commitment, props.accountName, props.currencyName)
+                } else {
+                    setShowOverlay(false)
                 }
+            }).catch((err: any) => {
+                setShowOverlay(false)
             })
         }
     }
@@ -114,7 +130,10 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
             props.debitContractAddress,
             "/VirtualAccounts.json");
 
-        const withdrawTx = await withdraw(contract, props.commitment);
+        setShowOverlay(true);
+        const withdrawTx = await withdraw(contract, props.commitment).catch((err) => {
+            setShowOverlay(false)
+        });
 
         await withdrawTx.wait().then((receipt: any) => {
             if (receipt.status === 1) {
@@ -124,11 +143,16 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
                     props.accountName,
                     props.currencyName
                 )
+            } else {
+                setShowOverlay(false)
             }
+        }).catch((err: any) => {
+            setShowOverlay(false)
         })
     }
 
     return <><div class="w-full place-items-start text-left mt-2">
+        <Overlay show={showOverlay}></Overlay>
         <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Add Balance</label>
         <form onSubmit={topupClicked}>
             <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"

@@ -1,3 +1,4 @@
+import Overlay from "../components/Overlay.tsx";
 import { PaymentIntentRow, PaymentIntentStatus } from "../lib/enums.ts";
 import { packToSolidityProof, toNoteHex } from "../lib/frontend/directdebitlib.ts";
 import { updatePaymentIntentToClosed } from "../lib/frontend/fetch.ts";
@@ -14,6 +15,7 @@ export interface CancelPaymentIntentButtonProps {
 export default function CancelPaymentIntentButton(props: CancelPaymentIntentButtonProps) {
     const [showError, setShowError] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const [showOvelay, setShowOvelay] = useState(false);
 
     const handleError = (msg: string) => {
         setShowError(true);
@@ -44,7 +46,7 @@ export default function CancelPaymentIntentButton(props: CancelPaymentIntentButt
         const publicSignals = JSON.parse(props.paymentIntent.publicSignals);
 
         const hashes = [toNoteHex(publicSignals[0]), toNoteHex(publicSignals[1])];
-
+        setShowOvelay(true)
         const tx = await cancelPaymentIntent(
             contract,
             packToSolidityProof(proof),
@@ -55,6 +57,8 @@ export default function CancelPaymentIntentButton(props: CancelPaymentIntentButt
                 debitTimes: props.paymentIntent.debitTimes,
                 debitInterval: props.paymentIntent.debitInterval,
                 payment: props.paymentIntent.maxDebitAmount
+            }).catch((err) => {
+                setShowOvelay(false);
             })
 
         await tx.wait().then(async (receipt: any) => {
@@ -66,12 +70,17 @@ export default function CancelPaymentIntentButton(props: CancelPaymentIntentButt
                 } else {
                     handleError("An error occured while updating the database")
                 }
+            } else {
+                setShowOvelay(false);
             }
+        }).catch((err: any) => {
+            setShowOvelay(false);
         })
     }
 
 
     return <div class={"flex flex-col justify-center"}>
+        <Overlay show={showOvelay}></Overlay>
         {props.paymentIntent.statusText === PaymentIntentStatus.CANCELLED ? <p class="text-sm text-red-500">Payment Intent Cancelled!</p> :
             <button
                 disabled={props.paymentIntent.statusText === PaymentIntentStatus.CANCELLED}
