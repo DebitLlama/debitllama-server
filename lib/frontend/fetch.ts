@@ -2,6 +2,7 @@ import {
   DebitItemTableColNames,
   PaymentIntentsTableColNames,
   RelayerTopupHistoryColNames,
+  RelayerTxHistoryColNames,
 } from "../enums.ts";
 import { ChainIds } from "../shared/web3.ts";
 
@@ -256,6 +257,39 @@ export async function fetchPaginatedRelayerTopupHistory(args: {
   sortDirection: "ASC" | "DESC";
 }) {
   return await fetch("/app/pagination/relayerTopupHistory", {
+    credentials: "same-origin",
+    method: "POST",
+    body: JSON.stringify(args),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((response) => response);
+}
+
+export async function fetchPaginatedTxHistory(args: {
+  currentPage: number;
+  searchTerm: string;
+  sortBy: RelayerTxHistoryColNames;
+  sortDirection: "ASC" | "DESC";
+}) {
+  return await fetch("/app/pagination/relayerTxHistory", {
+    credentials: "same-origin",
+    method: "POST",
+    body: JSON.stringify(args),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((response) => response);
+}
+
+export async function fetchPaginatedTxHistoryByPaymentIntentId(args: {
+  paymentIntent_id: number;
+  currentPage: number;
+  searchTerm: string;
+  sortBy: RelayerTxHistoryColNames;
+  sortDirection: "ASC" | "DESC";
+}) {
+  return await fetch("/app/pagination/relayerTxHistoryWithPaymentIntentId", {
     credentials: "same-origin",
     method: "POST",
     body: JSON.stringify(args),
