@@ -33,33 +33,33 @@ export const handler: Handlers<any, State> = {
         const select = queryBuilder.select();
         const { from, to } = getPagination(currentPage, RELAYERTOPUPHISTORYPAGESIZE)
 
-        let debitItemsData = [];
+        let data = [];
         let rowCount = 0;
         if (searchTerm === "") {
-            const { data: itemRows, count } = await select.RelayerTopUpHistory.byUserIdDescPaginated(
+            const { data: rows, count } = await select.RelayerTopUpHistory.byUserIdPaginated(
                 order,
                 sortDirection === "ASC",
                 from,
                 to
             )
-            debitItemsData = itemRows;
+            data = rows;
             rowCount = count;
         } else {
-            const { data: itemRows, count } = await select.RelayerTopUpHistory.byUserIdDescPaginatedWithTxSearch(
+            const { data: rows, count } = await select.RelayerTopUpHistory.byUserIdPaginatedWithTxSearch(
                 order,
                 sortDirection === "ASC",
                 from,
                 to,
                 searchTerm
             );
-            debitItemsData = itemRows;
+            data = rows;
             rowCount = count;
         }
 
         const totalPages = getTotalPages(rowCount, RELAYERTOPUPHISTORYPAGESIZE);
         return new Response(JSON.stringify({
             currentPage,
-            debitItemsData,
+            data,
             totalPages
         }), { status: 200 })
     }
