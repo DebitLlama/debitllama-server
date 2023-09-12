@@ -158,6 +158,20 @@ export const MapRelayerTopupHistoryColnamesToDbColNames: {
   [RelayerTopupHistoryColNames.Network]: "network",
 };
 
+export enum RelayerTxHistoryColNames {
+  Date = "Date",
+  Network = "Network",
+  GasUsed = "GasUsed",
+}
+
+export const MapRelayerTxHistoryColnamesToDbColNames: {
+  [key in RelayerTxHistoryColNames]: string;
+} = {
+  [RelayerTxHistoryColNames.Date]: "created_at",
+  [RelayerTxHistoryColNames.GasUsed]: "allGasUsed",
+  [RelayerTxHistoryColNames.Network]: "network",
+};
+
 export enum FilterFor {
   PaymentIntents,
   TransactionHistory,
