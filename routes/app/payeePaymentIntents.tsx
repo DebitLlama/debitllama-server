@@ -356,6 +356,13 @@ export default function CreatedPaymentIntents(props: PageProps) {
                     </table>
                 </div>
             </div>
+                <hr
+                    class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
+                <div class="flex flex-row justify-center">
+                    <h4 class={"text-gray-400"}>Transaction History</h4>
+                </div>
+                <hr
+                    class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
                 <RelayedTxHistory paymentIntent_id={pi.id} searchBy="paymentIntent_id" totalPages={props.data.paymentIntentHistoryTotalpages} txHistory={props.data.paymentIntentHistory}></RelayedTxHistory>
             </> : <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
                 <h1 class="text-2xl font-bold mb-6 text-center">Not Found</h1>

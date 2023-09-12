@@ -5,7 +5,7 @@ import { Tooltip, UnderlinedTd, getDebitIntervalText, getPaymentIntentStatusLogo
 import { PaymentIntentRow, PaymentIntentStatus, RELAYERTRANSACTIONHISTORYPAGESIZE } from "../../lib/enums.ts";
 import RelayedTxHistory from "../../islands/pagination/RelayedTxHistoryWithPagination.tsx";
 import CancelPaymentIntentButton from "../../islands/CancelPaymentIntentButton.tsx";
-import { ChainIds,  networkNameFromId, rpcUrl } from "../../lib/shared/web3.ts";
+import { ChainIds, networkNameFromId, rpcUrl } from "../../lib/shared/web3.ts";
 import { getPaymentIntentHistory } from "../../lib/backend/web3.ts";
 import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 
@@ -144,6 +144,13 @@ export default function CreatedPaymentIntents(props: PageProps) {
                         </tbody>
                     </table>
                 </div>
+                <hr
+                    class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
+                <div class="flex flex-row justify-center">
+                    <h4 class={"text-gray-400"}>Transaction History</h4>
+                </div>
+                <hr
+                    class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
                 <RelayedTxHistory paymentIntent_id={pi.id} searchBy="paymentIntent_id" totalPages={props.data.paymentIntentHistoryTotalpages} txHistory={props.data.paymentIntentHistory}></RelayedTxHistory>
 
             </div> : <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
