@@ -5,7 +5,7 @@ import { fetchTopUpEvent, getRelayerTopUpContract } from "../../lib/backend/web3
 import RelayerUISwitcher from "../../islands/RelayerUISwitcher.tsx";
 import { getTotalPages, updateRelayerBalanceAndHistorySwitchNetwork } from "../../lib/backend/businessLogic.ts";
 import QueryBuilder from "../../lib/backend/queryBuilder.ts";
-import { RELAYERTOPUPHISTORYPAGESIZE } from "../../lib/enums.ts";
+import { RELAYERTOPUPHISTORYPAGESIZE, RELAYERTRANSACTIONHISTORYPAGESIZE } from "../../lib/enums.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(_req, ctx) {
@@ -30,15 +30,18 @@ export const handler: Handlers<any, State> = {
             return new Response(null, { status: 303, headers })
         }
 
-        const { data: relayerTopUpHistoryData, count: topupHistoryDataCount } = await select.RelayerTopUpHistory.byUserIdDescPaginated(
+        const { data: relayerTopUpHistoryData, count: topupHistoryDataCount } = await select.RelayerTopUpHistory.byUserIdPaginated(
             "created_at", false, 0, 9
         );
         const totalPagesForTopupHistory = getTotalPages(topupHistoryDataCount, RELAYERTOPUPHISTORYPAGESIZE);
 
 
-        const { data: relayerTxHistoryData } = await select.RelayerHistory.byUserIdForPayee();
+        const { data: relayerTxHistoryData, count: txHistoryCount } = await select.RelayerHistory.byPayeeUserIdPaginated(
+            "created_at", false, 0, RELAYERTRANSACTIONHISTORYPAGESIZE - 1
+        );
+        const totalPagesForRelayerTxHistory = getTotalPages(txHistoryCount, RELAYERTRANSACTIONHISTORYPAGESIZE)
 
-        return ctx.render({ ...ctx.state, relayerBalanceData, profileData, relayerTopUpHistoryData, totalPagesForTopupHistory, relayerTxHistoryData, });
+        return ctx.render({ ...ctx.state, relayerBalanceData, profileData, relayerTopUpHistoryData, totalPagesForTopupHistory, relayerTxHistoryData, totalPagesForRelayerTxHistory });
     },
     async POST(_req, ctx) {
         const json = await _req.json();
