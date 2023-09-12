@@ -296,6 +296,65 @@ export default class QueryBuilder {
             .eq("payee_user_id", this.userid);
           return this.responseHandler(res);
         },
+        byPayeeUserIdPaginated: async (
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+        ) => {
+          const res = await this.client.from("RelayerHistory")
+            .select("*", { count: "exact" })
+            .order(order, { ascending })
+            .eq("payee_user_id", this.userid)
+            .range(rangeFrom, rangeTo);
+
+          return this.responseHandler(res);
+        },
+        byPayeeUserIdPaginatedWithTxSearch: async (
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+          searchTerm: string,
+        ) => {
+          const res = await this.client.from("RelayerHistory")
+            .select("*", { count: "exact" })
+            .order(order, { ascending })
+            .textSearch("submittedTransaction", searchTerm)
+            .eq("payee_user_id", this.userid)
+            .range(rangeFrom, rangeTo);
+          return this.responseHandler(res);
+        },
+        byPaymentIntentIdPaginated: async (
+          paymentIntentid: number,
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+        ) => {
+          const res = await this.client.from("RelayerHistory")
+            .select("*", { count: "exact" })
+            .order(order, { ascending })
+            .eq("paymentIntent_id", paymentIntentid)
+            .range(rangeFrom, rangeTo);
+          return this.responseHandler(res);
+        },
+        byPaymentIntentIdPaginatedWithTxSearch: async (
+          paymentIntentid: number,
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+          searchTerm: string,
+        ) => {
+          const res = await this.client.from("RelayerHistory")
+            .select("*", { count: "exact" })
+            .eq("paymentIntent_id", paymentIntentid)
+            .order(order, { ascending })
+            .textSearch("submittedTransaction", searchTerm)
+            .range(rangeFrom, rangeTo);
+          return this.responseHandler(res);
+        },
       },
       RelayerBalance: {
         //selectRelayerBalanceByUserId
@@ -324,7 +383,7 @@ export default class QueryBuilder {
             ).order("created_at", { ascending: false });
           return this.responseHandler(res);
         },
-        byUserIdDescPaginated: async (
+        byUserIdPaginated: async (
           order: string,
           ascending: boolean,
           rangeFrom: number,
@@ -338,7 +397,7 @@ export default class QueryBuilder {
 
           return this.responseHandler(res);
         },
-        byUserIdDescPaginatedWithTxSearch: async (
+        byUserIdPaginatedWithTxSearch: async (
           order: string,
           ascending: boolean,
           rangeFrom: number,

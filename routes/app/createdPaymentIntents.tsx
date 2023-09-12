@@ -2,10 +2,10 @@ import Layout from "../../components/Layout.tsx";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
 import { Tooltip, UnderlinedTd, getDebitIntervalText, getPaymentIntentStatusLogo, getSubscriptionTooltipMessage } from "../../components/components.tsx";
-import { PaymentIntentRow, PaymentIntentStatus } from "../../lib/enums.ts";
-import RelayedTxHistory from "../../islands/RelayedTxHistory.tsx";
+import { PaymentIntentRow, PaymentIntentStatus, RELAYERTRANSACTIONHISTORYPAGESIZE } from "../../lib/enums.ts";
+import RelayedTxHistory from "../../islands/pagination/RelayedTxHistoryWithPagination.tsx";
 import CancelPaymentIntentButton from "../../islands/CancelPaymentIntentButton.tsx";
-import { ChainIds, chainIdFromNetworkName, networkNameFromId, rpcUrl } from "../../lib/shared/web3.ts";
+import { ChainIds,  networkNameFromId, rpcUrl } from "../../lib/shared/web3.ts";
 import { getPaymentIntentHistory } from "../../lib/backend/web3.ts";
 import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 
@@ -21,10 +21,13 @@ export const handler: Handlers<any, State> = {
             return ctx.render({ ...ctx.state, notfound: true });
         }
 
-        const { data: paymentIntentHistory } = await select.RelayerHistory
-            .byPaymentIntentId(paymentIntentData[0].id);
+        const { data: paymentIntentHistory, count: paymentIntentHistoryTotalpages } = await select.RelayerHistory
+            .byPaymentIntentIdPaginated(
+                paymentIntentData[0].id,
+                "created_at", false, 0, RELAYERTRANSACTIONHISTORYPAGESIZE - 1
+            );
 
-        return ctx.render({ ...ctx.state, notfound: false, paymentIntentData, paymentIntentHistory });
+        return ctx.render({ ...ctx.state, notfound: false, paymentIntentData, paymentIntentHistory, paymentIntentHistoryTotalpages });
     },
     async POST(req: any, ctx: any) {
         const json = await req.json();
@@ -141,7 +144,7 @@ export default function CreatedPaymentIntents(props: PageProps) {
                         </tbody>
                     </table>
                 </div>
-                <RelayedTxHistory paymentIntentHistory={props.data.paymentIntentHistory}></RelayedTxHistory>
+                <RelayedTxHistory paymentIntent_id={pi.id} searchBy="paymentIntent_id" totalPages={props.data.paymentIntentHistoryTotalpages} txHistory={props.data.paymentIntentHistory}></RelayedTxHistory>
 
             </div> : <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
                 <h1 class="text-2xl font-bold mb-6 text-center">Not Found</h1>

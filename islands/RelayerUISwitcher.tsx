@@ -1,7 +1,7 @@
 import { useState } from "preact/hooks";
 import RelayerDetailsCard from "./RelayerDetailsCard.tsx";
 import RelayerTopupHistory from "./pagination/RelayerTopupHistory.tsx";
-import RelayedTxHistory from "./RelayedTxHistory.tsx";
+import RelayedTxHistory from "./pagination/RelayedTxHistoryWithPagination.tsx";
 
 export interface RelayerUISwitcherProps {
     data: any
@@ -44,7 +44,7 @@ export default function RelayerUISwitcher(props: RelayerUISwitcherProps) {
             case RelayerUIState.TOPUPHISTORY:
                 return <RelayerTopupHistory totalPages={props.data.totalPagesForTopupHistory} topUpHistoryData={props.data.relayerTopUpHistoryData}></RelayerTopupHistory>
             case RelayerUIState.TXHISTORY:
-                return <RelayedTxHistory paymentIntentHistory={props.data.relayerTxHistoryData}></RelayedTxHistory>
+                return <RelayedTxHistory paymentIntent_id={undefined} searchBy="user_id" totalPages={props.data.totalPagesForRelayerTxHistory} txHistory={props.data.relayerTxHistoryData}></RelayedTxHistory>
             default:
                 return null;
         }
@@ -59,5 +59,4 @@ export default function RelayerUISwitcher(props: RelayerUISwitcherProps) {
         </div>
         {getSelectedUI()}
     </div>
-
 }
