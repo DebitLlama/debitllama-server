@@ -22,7 +22,6 @@ export const handler: Handlers<any, State> = {
         }
 
         const { data: profileData } = await select.Profiles.byUserId();
-
         if (profileData === null || profileData.length === 0) {
             // Redirect to the profile page instead so the user needs to fill it out!
             const headers = new Headers();

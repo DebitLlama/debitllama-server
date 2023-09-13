@@ -4,11 +4,11 @@ import { useState } from 'preact/hooks';
 import AccountPasswordInput, { AccountPasswordInputProps } from "./accountPasswordInput.tsx";
 import { strength } from "./accountCreatePageForm.tsx";
 import BuyPageProfile, { ProfileProps } from "../components/BuyPageProfile.tsx";
-import { approveSpend, depositEth, depositToken, getAllowance, getContract, getJsonRpcProvider, handleNetworkSelect, parseEther, requestAccounts, topUpETH, topUpTokens } from "../lib/frontend/web3.ts";
+import { approveSpend, depositEth, depositToken, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts, topUpETH, topUpTokens } from "../lib/frontend/web3.ts";
 import { ChainIds, getVirtualAccountsContractAddress } from "../lib/shared/web3.ts";
 import { requestBalanceRefresh, saveAccountData, uploadProfileData } from "../lib/frontend/fetch.ts";
 import { setUpAccount } from "../lib/frontend/directdebitlib.ts";
-import { AccountCardElement, CheckoutAccountCardElement } from "../components/AccountCardElement.tsx";
+import { AccountCardElement } from "../components/AccountCardElement.tsx";
 import { CarouselButtons } from "../components/components.tsx";
 import Overlay from "../components/Overlay.tsx";
 
@@ -188,7 +188,6 @@ async function handleTokenTopup(
         })
     }
 }
-//TODO: ADD THE OVERLAY!
 
 function topupbalance(args: TopupBalanceArgs) {
     const debitContractAddress = getVirtualAccountsContractAddress[args.chainId as ChainIds];
@@ -367,8 +366,6 @@ function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
 
 
             const allowance: bigint = await getAllowance(erc20Contract, address, debitContractAddress);
-
-            // TODO: Need to disable the button and maybe show a popup so people don't navigate away!
 
             if (allowance >= parseEther(args.depositAmount)) {
                 // Just deposit
