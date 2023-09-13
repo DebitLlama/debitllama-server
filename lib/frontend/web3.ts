@@ -9,7 +9,6 @@ import {
 } from "../shared/web3.ts";
 import { SolidityProof } from "./directdebitlib.ts";
 
-
 export function isEthereumUndefined() {
   //@ts-ignore This runs in the browser only. Checking if the browser has window.ethereum
   return window.ethereum === undefined;
@@ -172,9 +171,9 @@ export async function depositEth(
 ) {
   return await contract.depositEth(
     commitment,
-    ethers.parseEther(balance),
+    parseEther(balance),
     encryptedNote,
-    { value: ethers.parseEther(balance) },
+    { value: parseEther(balance) },
   );
 }
 
@@ -187,7 +186,7 @@ export async function depositToken(
 ) {
   return await contract.depositToken(
     commitment,
-    ethers.parseEther(balance),
+    parseEther(balance),
     token,
     encryptedNote,
   );
@@ -200,8 +199,8 @@ export async function topUpETH(
 ) {
   return await contract.topUpETH(
     commitment,
-    ethers.parseEther(balance),
-    { value: ethers.parseEther(balance) },
+    parseEther(balance),
+    { value: parseEther(balance) },
   );
 }
 
@@ -210,7 +209,7 @@ export async function topUpTokens(
   commitment: string,
   balance: string,
 ) {
-  return await contract.topUpTokens(commitment, ethers.parseEther(balance));
+  return await contract.topUpTokens(commitment, parseEther(balance));
 }
 
 export async function approveSpend(
@@ -218,7 +217,7 @@ export async function approveSpend(
   spender: string,
   amount: string,
 ) {
-  return await erc20Contract.approve(spender, ethers.parseEther(amount));
+  return await erc20Contract.approve(spender, parseEther(amount));
 }
 
 export async function getAllowance(
@@ -246,10 +245,10 @@ export async function directDebit(
     hashes,
     payee,
     [
-      ethers.parseEther(debit.maxDebitAmount),
+      parseEther(debit.maxDebitAmount),
       debit.debitTimes,
       debit.debitInterval,
-      ethers.parseEther(debit.payment),
+      parseEther(debit.payment),
     ],
   );
 }
@@ -271,10 +270,10 @@ export async function cancelPaymentIntent(
     hashes,
     payee,
     [
-      ethers.parseEther(debit.maxDebitAmount),
+      parseEther(debit.maxDebitAmount),
       debit.debitTimes,
       debit.debitInterval,
-      ethers.parseEther(debit.payment),
+      parseEther(debit.payment),
     ],
   );
 }
@@ -284,7 +283,7 @@ export async function withdraw(contract: any, commitment: string) {
 }
 
 export function parseEther(input: string) {
-  return ethers.parseEther(input);
+  return ethers.parseEther(`${input}`);
 }
 
 export async function topupRelayer(contract: any, amount: string) {
@@ -295,3 +294,18 @@ export async function relayerAddress(contract: any) {
   return await contract.relayer();
 }
 
+export async function connectWallet(
+  contract: any,
+  commitment: string,
+  token: string,
+  encryptedNote: string,
+) {
+  return await contract.connectWallet(commitment, token, encryptedNote);
+}
+
+export async function disconnectWallet(
+  contract: any,
+  commitment: string,
+) {
+  return await contract.disconnectWallet(commitment);
+}
