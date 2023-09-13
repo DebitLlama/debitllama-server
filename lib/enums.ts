@@ -162,6 +162,8 @@ export enum RelayerTxHistoryColNames {
   Date = "Date",
   Network = "Network",
   GasUsed = "GasUsed",
+  PaymentAmount = "paymentAmount",
+  PaymentCurrency = "paymentCurerncy",
 }
 
 export const MapRelayerTxHistoryColnamesToDbColNames: {
@@ -170,6 +172,8 @@ export const MapRelayerTxHistoryColnamesToDbColNames: {
   [RelayerTxHistoryColNames.Date]: "created_at",
   [RelayerTxHistoryColNames.GasUsed]: "allGasUsed",
   [RelayerTxHistoryColNames.Network]: "network",
+  [RelayerTxHistoryColNames.PaymentAmount]: "paymentAmount",
+  [RelayerTxHistoryColNames.PaymentCurrency]: "paymentCurrency",
 };
 
 export enum FilterFor {
