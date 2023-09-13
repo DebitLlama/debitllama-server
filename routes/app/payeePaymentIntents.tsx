@@ -94,7 +94,7 @@ export const handler: Handlers<any, State> = {
         });
 
         if (estimation === null || estimation === undefined) {
-            return errorResponseBuilder("Unable to Create Debit Request.")
+            return errorResponseBuilder("Unable to Create Debit Request. Gas estimation for the transaction failed.")
         }
 
         const { data: relayerBalanceDataArr } = await select.RelayerBalance.byUserId();
@@ -292,6 +292,11 @@ export default function CreatedPaymentIntents(props: PageProps) {
                                 <UnderlinedTd extraStyles=""><Tooltip message="The unique identifier of the payment intent"></Tooltip></UnderlinedTd>
                             </tr>
                             <tr>
+                                <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Customer Account Balance:</UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><p>{pi.account_id.balance}  {JSON.parse(pi.debit_item_id.currency).name}</p></UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><Tooltip message="The current balance of the account that will be charged."></Tooltip></UnderlinedTd>
+                            </tr>
+                            <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm" >Approved Payment:</UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><p> {pi.debit_item_id.max_price} {JSON.parse(pi.debit_item_id.currency).name} </p></UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><Tooltip message="The maximum amount that can be debited from the account"></Tooltip></UnderlinedTd>
@@ -340,11 +345,7 @@ export default function CreatedPaymentIntents(props: PageProps) {
                                 <UnderlinedTd extraStyles=""><p> {pi.nextPaymentDate === null ? "" : new Date(pi.nextPaymentDate).toLocaleString()}</p></UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><Tooltip message="The approximate time when the next payment intent will become valid."></Tooltip></UnderlinedTd>
                             </tr>
-                            <tr>
-                                <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Account Balance:</UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><p>{pi.account_id.balance}  {JSON.parse(pi.debit_item_id.currency).name}</p></UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><Tooltip message="The current balance of the account that will be charged."></Tooltip></UnderlinedTd>
-                            </tr>
+
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Cancel Payment Intent:</UnderlinedTd>
                                 <UnderlinedTd extraStyles="">
