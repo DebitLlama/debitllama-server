@@ -42,7 +42,6 @@ export const handler: Handlers<any, State> = {
                     // Here I return the data from the query string because that is what was saved!
                     return ctx.render({ notfound: false, ...ctx.state, currency, name, commitment, closed: false, networkId, accountData });
                 } else {
-
                     if (data[0].balance !== formatEther(accountData.account[3])) {
                         const update = queryBuilder.update();
                         //Check if there were payment intents with account balance too low and 
@@ -50,9 +49,10 @@ export const handler: Handlers<any, State> = {
                         await updatePaymentIntentsWhereAccountBalanceWasAdded(queryBuilder, data[0], accountData.account[3]);
 
                         // Update the account balance finally
+
                         await update.Accounts.balanceAndClosedById(accountData.account[3], !accountData.account[0], data[0].id)
                     }
-                    if (!data[0].closed[0]) {
+                    if (data[0].closed) {
                         // If it's closed I redirect to accounts page!
                         const headers = new Headers();
                         headers.set("location", "/app/accounts");
