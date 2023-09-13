@@ -135,7 +135,9 @@ export default function RelayerDetailsCard(props: RelayerDetailsCardProps) {
 
 export function IsBalanceMissing(networkName: NetworkNames, relayerData: any) {
     const missingBalance = mapNetworkNameToMissingBalanceColumn(networkName, relayerData);
-
+    if (missingBalance === null) {
+        return null;
+    }
     if (parseEther(missingBalance) !== BigInt("0")) {
         return <div class={`mb-4 border-solid border-2 border-red-600 flex flex-col justify-center`}>
             <div><h4 class="text-xl mx-auto text-center">{"Missing Balance"}</h4></div>
