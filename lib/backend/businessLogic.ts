@@ -24,7 +24,7 @@ export async function updateRelayerBalanceAndHistorySwitchNetwork(
   switch (chainId) {
     case ChainIds.BTT_TESTNET_ID: {
       const bttBalance = parseEther(
-        `${relayerBalance[0].BTT_Donau_Testnet_Balance}`,
+        relayerBalance[0].BTT_Donau_Testnet_Balance,
       );
       const newBalance = parseEther(addedBalance) + bttBalance;
       const missingBalance = parseEther(
@@ -303,20 +303,17 @@ export async function updatePaymentIntentsWhereAccountBalanceWasAdded(
   for (let i = 0; i < paymentIntentsToReset.length; i++) {
     const piToReset = paymentIntentsToReset[i];
     if (piToReset.used_for === 0) {
-      // set to created
-      if (piToReset.used_for === 0) {
-        // Set to created!
-        await update.PaymentIntents.updateForAccountBalanceNotLowAnymore(
-          PaymentIntentStatus.CREATED,
-          piToReset.paymentIntent,
-        );
-      } else {
-        // set to recurring!
-        await update.PaymentIntents.updateForAccountBalanceNotLowAnymore(
-          PaymentIntentStatus.RECURRING,
-          piToReset.paymentIntent,
-        );
-      }
+      // Set to created!
+      await update.PaymentIntents.updateForAccountBalanceNotLowAnymore(
+        PaymentIntentStatus.CREATED,
+        piToReset,
+      );
+    } else {
+      // set to recurring!
+      await update.PaymentIntents.updateForAccountBalanceNotLowAnymore(
+        PaymentIntentStatus.RECURRING,
+        piToReset,
+      );
     }
   }
 }
