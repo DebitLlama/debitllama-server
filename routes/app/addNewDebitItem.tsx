@@ -44,6 +44,7 @@ export const handler: Handlers<any, State> = {
         const { data: relayerBalanceData } = await select.RelayerBalance.byUserId();
         // I'm gonna add the id of the relayerBalance to the debit item so I can join tables later more easily
         if (relayerBalanceData === null || relayerBalanceData.length === 0) {
+            //TODO: The insert here could select!
             await insert.RelayerBalance.newRelayerBalance()
             const { data: relayerBalanceData2, error: relayerBalanceDataError2 } = await select.RelayerBalance.byUserId();
             relayerBalanceId = relayerBalanceData2[0].id;
