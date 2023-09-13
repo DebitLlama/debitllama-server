@@ -7,8 +7,8 @@ import RelayerGasTracker from "../../static/RelayerGasTracker.json" assert {
 };
 import {
   ChainIds,
-  getVirtualAccountsContractAddress,
   getRelayerGasTrackerContractAddress,
+  getVirtualAccountsContractAddress,
   rpcUrl,
 } from "../shared/web3.ts";
 import { Buffer } from "https://deno.land/x/node_buffer@1.1.0/mod.ts";
@@ -79,10 +79,10 @@ export async function estimateRelayerGas(
     ],
     args.payeeAddress,
     [
-      ethers.parseEther(args.maxDebitAmount),
+      parseEther(args.maxDebitAmount),
       args.debitTimes,
       args.debitInterval,
-      ethers.parseEther(args.actualDebitedAmount),
+      parseEther(args.actualDebitedAmount),
     ],
   );
 }
@@ -110,7 +110,7 @@ function toNoteHex(number: any, length = 32) {
 }
 
 export function parseEther(input: string) {
-  return ethers.parseEther(input);
+  return ethers.parseEther(`${input}`);
 }
 export function formatEther(input: any) {
   return ethers.formatEther(input);
