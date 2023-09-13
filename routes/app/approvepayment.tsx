@@ -2,7 +2,7 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
 import BuyPageLayout from "../../components/BuyPageLayout.tsx";
 import { getItemProps } from "../buyitnow.tsx";
-import { getAccount, getEncryptedNote } from "../../lib/backend/web3.ts";
+import { formatEther, getAccount, getEncryptedNote, parseEther } from "../../lib/backend/web3.ts";
 import { decryptData } from "../../lib/backend/decryption.ts";
 import ApprovePaymentIsland from "../../islands/approvePaymentIsland.tsx";
 import QueryBuilder from "../../lib/backend/queryBuilder.ts";
@@ -48,6 +48,15 @@ export const handler: Handlers<any, State> = {
       return ctx.render({ ...ctx.state, notfound: true, itemData: [] });
     }
 
+    if (parseEther(accountdata[0].balance) !== account.account[3]) {
+      const update = queryBuilder.update();
+
+      await update.Accounts.balanceAndClosedById(
+        account.account[3],
+        !account.account[0],
+        accountdata[0].id);
+    }
+
     const encryptedNote = await getEncryptedNote(accountcommitment, accountNetwork);
 
     //Decrypt the encrypted note
@@ -61,7 +70,7 @@ export const handler: Handlers<any, State> = {
         symmetricEncryptedNote,
         accountcommitment,
         accountName: accountdata[0].name,
-        accountBalance: accountdata[0].balance,
+        accountBalance: formatEther(account.account.balance),
         accountCurrency: accountdata[0].currency
       });
 
