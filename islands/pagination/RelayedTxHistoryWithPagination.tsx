@@ -131,10 +131,13 @@ export default function RelayedTxHistory(props: RelayedTxHistoryProps) {
                     <th scope="col" class="w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
                         Date
                     </th>
-
+                    <th scope="col" class="w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                        Payment Amount
+                    </th>
                     <th scope="col" class="w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
                         Gas Used
                     </th>
+
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
@@ -145,6 +148,9 @@ export default function RelayedTxHistory(props: RelayedTxHistoryProps) {
                         </td>
                         <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
                             {new Date(data.created_at).toLocaleString()}
+                        </td>
+                        <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
+                            {data.paymentAmount}{" "}{JSON.parse(data.paymentCurrency).name}
                         </td>
                         <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
                             <div class="flex items-center gap-x-2">
