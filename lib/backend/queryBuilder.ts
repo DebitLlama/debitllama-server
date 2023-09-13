@@ -111,8 +111,10 @@ export default class QueryBuilder {
       Profiles: {
         //selectProfileByUserId
         byUserId: async () => {
-          const res = await this.client.from("Profiles").select().eq(
-            "userid",
+          const res = await this.client.from("Profiles").select("*", {
+            count: "exact",
+          }).eq(
+            "id",
             this.userid,
           );
           return this.responseHandler(res);
@@ -568,7 +570,7 @@ export default class QueryBuilder {
             estimatedGas,
             statusText,
             lastPaymentDate: null,
-            nextPaymentDate: new Date().toDateString(),
+            nextPaymentDate: new Date().toISOString(),
             pricing,
             currency,
             network,
@@ -701,6 +703,8 @@ export default class QueryBuilder {
           statusText: string,
           paymentIntentRow: PaymentIntentRow,
         ) => {
+          console.log("updateForAccountBalanceNotLowAnymore")
+          console.log(paymentIntentRow)
           const res = await this.client.from("PaymentIntents").update({
             failedDynamicPaymentAmount: "0",
             statusText,
@@ -763,7 +767,6 @@ export default class QueryBuilder {
       Profiles: {
         //upsertProfile
         all: async (
-          id: string,
           walletaddress: string,
           firstname: string,
           lastname: string,
@@ -775,7 +778,7 @@ export default class QueryBuilder {
         ) => {
           const res = await this.client.from("Profiles").upsert(
             {
-              id,
+              id: this.userid,
               walletaddress,
               firstname,
               lastname,
@@ -784,7 +787,6 @@ export default class QueryBuilder {
               city,
               postcode,
               country,
-              userid: this.userid,
             },
             { ignoreDuplicates: false },
           ).select();
