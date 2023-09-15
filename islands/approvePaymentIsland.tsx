@@ -1,4 +1,5 @@
 import { AccountCardElement } from "../components/AccountCardElement.tsx";
+import { AccountTypes } from "../lib/enums.ts";
 import { createPaymentIntent, toNoteHex } from "../lib/frontend/directdebitlib.ts";
 import { aesDecryptData } from "../lib/frontend/encryption.ts";
 import { logoutRequest, redirectToRedirectPage, uploadPaymentIntent } from "../lib/frontend/fetch.ts";
@@ -12,7 +13,9 @@ interface ApprovePaymentIslandProps {
     accountcommitment: string,
     accountName: string,
     accountBalance: string,
-    accountCurrency: string
+    accountCurrency: string,
+    accountType: AccountTypes,
+    closed: boolean
 }
 
 
@@ -73,18 +76,21 @@ export default function ApprovePaymentIsland(props: ApprovePaymentIslandProps) {
         }
     }
 
-
-    return <div class="flex flex-col">
+    return <div class="flex flex-col p-3">
         <div class="flex flex-col flex-wrap">
         </div>
-        {success ? <SuccessAnimation></SuccessAnimation> : <><div class="flex flex-row justify-center text-xl">
-            <AccountCardElement
-                name={props.accountName}
-                balance={props.accountBalance}
-                currency={props.accountCurrency}
-                network={""}
-            ></AccountCardElement>
-        </div>
+        {success ? <SuccessAnimation></SuccessAnimation> : <>
+            <div class="flex flex-row justify-center">
+                <AccountCardElement
+                    name={props.accountName}
+                    balance={props.accountBalance}
+                    currency={props.accountCurrency}
+                    network={""}
+                    accountType={props.accountType}
+                    closed={props.closed}
+                ></AccountCardElement>
+
+            </div>
             <div class="w-60 mx-auto mt-4">
                 <label for="password" class="block mb-2 text-sm font-medium">Account Password</label>
                 <input value={password} onChange={(event: any) => setPassword(event.target.value)} type="password" name="password" id="password" placeholder="••••••••" class="border border-gray-300 sm:text-sm rounded-lg focus:ring-indigo-600 focus:border-indigo-600 block w-full p-2.5 dark:focus:ring-indigo-500 dark:focus:border-indigo-500" />
