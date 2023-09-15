@@ -4,9 +4,10 @@ import CurrencySelectDropdown from "./CurrencySelectDropdown.tsx";
 import AccountPasswordInput from "./accountPasswordInput.tsx";
 import { approveSpend, depositEth, depositToken, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts } from "../lib/frontend/web3.ts";
 import { setUpAccount } from '../lib/frontend/directdebitlib.ts';
-import { redirectToAccountPage } from '../lib/frontend/fetch.ts';
 import { ChainIds, NetworkNames, SelectableCurrency, availableNetworks, bittorrentCurrencies, chainIdFromNetworkName, getVirtualAccountsContractAddress } from "../lib/shared/web3.ts";
 import Overlay from '../components/Overlay.tsx';
+import { redirectToAccountsPage, saveAccount } from '../lib/frontend/fetch.ts';
+import { AccountTypes } from '../lib/enums.ts';
 
 export const strength = [
     "Worst ☹",
@@ -121,13 +122,23 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
             })
 
         if (depositTx !== undefined) {
-            await depositTx.wait().then((receipt: any) => {
+            await depositTx.wait().then(async (receipt: any) => {
                 if (receipt.status === 1) {
-                    redirectToAccountPage(
-                        chainId,
-                        virtualaccount.commitment,
+                    const res = await saveAccount({
                         name,
-                        selectedCurrency.name);
+                        networkId: chainId,
+                        commitment: virtualaccount.commitment,
+                        currency: JSON.stringify(selectedCurrency),
+                        accountType: AccountTypes.VIRTUALACCOUNT
+                    });
+                    if (res.status === 200) {
+                        redirectToAccountsPage()
+                    }
+                    else {
+                        console.log("An error occured with saving the account!");
+                        const json = await res.json();
+                        console.error(json)
+                    }
                 } else {
                     setShowOverlay(false);
                 }
@@ -135,10 +146,11 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
         }
     }
 
-
+    //TODO: Upload new account via API so I don't need to have that weird account page path query string!
     async function onSubmitForm(event: any) {
-        setShowWalletMismatchError(false);
         event.preventDefault();
+        setShowWalletMismatchError(false);
+
         // I check if I can find a wallet
         const chainId = chainIdFromNetworkName[selectedNetwork as NetworkNames];
 
@@ -150,10 +162,10 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
 
         const address = await requestAccounts();
 
-        if (props.walletaddress !== address) {
-            setShowWalletMismatchError(true);
-            return
-        }
+        // if (props.walletaddress !== address) {
+        //     setShowWalletMismatchError(true);
+        //     return
+        // }
 
         const virtualaccount = await setUpAccount(password, props.ethEncryptPublicKey);
 
@@ -207,13 +219,21 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
             });
 
             if (tx !== undefined) {
-                await tx.wait().then((receipt: any) => {
+                await tx.wait().then(async (receipt: any) => {
                     if (receipt.status === 1) {
-                        redirectToAccountPage(
-                            chainId,
-                            virtualaccount.commitment,
+                        const res = await saveAccount({
                             name,
-                            selectedCurrency.name);
+                            networkId: chainId,
+                            commitment: virtualaccount.commitment,
+                            currency: JSON.stringify(selectedCurrency),
+                            accountType: AccountTypes.VIRTUALACCOUNT
+                        });
+                        if (res.status === 200) {
+                            redirectToAccountsPage();
+                        }
+                        else {
+                            const json = await res.json();
+                        }
                     } else {
                         setShowOverlay(false);
                     }
@@ -227,13 +247,13 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
 
     return <form onSubmit={onSubmitForm} class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md" method="POST">
         <Overlay show={showOverlay} ></Overlay>
-        <h1 class="text-2xl font-bold mb-6 text-center">New Virtual Account</h1>
+        <h1 class="text-2xl font-bold text-center">New Virtual Account</h1>
+        <h4 class="text-md mb-6">Virtual Accounts can hold native tokens like BTT or ERC-20 tokens. You need to deposit into the account.</h4>
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Account Name</label>
             <input value={name} onChange={(event: any) => setName(event.target.value)} required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
                 type="text" id="name" name="name" placeholder="" />
         </div>
-
         <CurrencySelectDropdown
             setSelectedNetwork={setSelectedNetwork}
             selectedNetwork={selectedNetwork}
@@ -256,6 +276,10 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
             passwordMatchError={passwordMatchError}
             passwordStrengthNotification={passwordStrengthNotification}
         ></AccountPasswordInput>
+        <div class="mb-4">
+            <p class="text-sm ...">The password is used for encrypting your account and it's needed for spending. Do not reuse your login password. The accounts are non-custodial and if you loose your password we can't recover it for you. You can always close the account and withdraw the deposit with the wallet you created it with.</p>
+
+        </div>
         {walletMismatchError ? <p class="text-sm text-red-500">Your browser wallet does not match your profile!</p> : ""}
         <button
             disabled={isButtonDisabled()}
