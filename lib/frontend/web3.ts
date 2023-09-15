@@ -1,4 +1,4 @@
-import { ethers } from "../../ethers.min.js";
+import { ethers, ZeroAddress } from "../../ethers.min.js";
 import {
   ChainIds,
   explorerUrl,
@@ -12,6 +12,13 @@ import { SolidityProof } from "./directdebitlib.ts";
 export function isEthereumUndefined() {
   //@ts-ignore This runs in the browser only. Checking if the browser has window.ethereum
   return window.ethereum === undefined;
+}
+
+export function isZero(addr: string) {
+  return addr === ZeroAddress;
+}
+export function isAddress(addr: string) {
+  return ethers.isAddress(addr);
 }
 
 export function redirectToMetamask() {
@@ -28,6 +35,11 @@ export async function requestAccounts() {
   } catch (err: any) {
     return "Please Connect Your Wallet";
   }
+}
+
+export function getJSONRPCProvider(networkId: string) {
+  const url = rpcUrl[networkId as ChainIds];
+  return new ethers.JsonRpcProvider(url);
 }
 
 async function onboardOrSwitchNetwork(networkid: any, handleError: any) {
@@ -228,6 +240,13 @@ export async function getAllowance(
   return await erc20Contract.allowance(owner, spender);
 }
 
+export async function balanceOf(
+  erc20Contract: any,
+  account: string,
+) {
+  return await erc20Contract.balanceOf(account);
+}
+
 export async function directDebit(
   contract: any,
   proof: SolidityProof,
@@ -284,6 +303,10 @@ export async function withdraw(contract: any, commitment: string) {
 
 export function parseEther(input: string) {
   return ethers.parseEther(`${input}`);
+}
+
+export function formatEther(input: any) {
+  return ethers.formatEther(input);
 }
 
 export async function topupRelayer(contract: any, amount: string) {
