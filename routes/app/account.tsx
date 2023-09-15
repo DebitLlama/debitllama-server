@@ -3,13 +3,16 @@
 import Layout from "../../components/Layout.tsx";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
-import { ChainIds, getVirtualAccountsContractAddress, networkNameFromId, rpcUrl } from "../../lib/shared/web3.ts";
+import { ChainIds, getConnectedWalletsContractAddress, getVirtualAccountsContractAddress, networkNameFromId } from "../../lib/shared/web3.ts";
 import { getAccount } from "../../lib/backend/web3.ts";
 import { ZeroAddress, formatEther } from "../../ethers.min.js";
 import AccountTopupOrClose from "../../islands/AccountTopupOrClose.tsx";
 import { AccountCardElement } from "../../components/AccountCardElement.tsx";
 import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 import { updatePaymentIntentsWhereAccountBalanceWasAdded } from "../../lib/backend/businessLogic.ts";
+import { AccountTypes } from "../../lib/enums.ts";
+import WalletApproveOrDisconnect from "../../islands/WalletApproveOrDisconnect.tsx";
+import WalletDetailsFetcher from "../../islands/WalletDetailsFetcher.tsx";
 
 export const handler: Handlers<any, State> = {
     async GET(req: any, ctx: any) {
@@ -18,89 +21,106 @@ export const handler: Handlers<any, State> = {
         const queryBuilder = new QueryBuilder(ctx);
         const select = queryBuilder.select();
         try {
-            const { networkId, commitment, name, currency } = JSON.parse(query);
+            const { data } = await select.Accounts.byCommitment(query);
 
-            const networkExists = rpcUrl[networkId as ChainIds]
-            if (!networkExists) {
-                //   render a not found page
+            if (data.length === 0) {
                 return ctx.render({ ...ctx.state, notfound: true })
             }
-            const accountData = await getAccount(commitment, networkId);
-            if (accountData.exists) {
-                const { data } = await select.Accounts.byCommitment(commitment);
 
-                if (data.length === 0) {
-                    const insert = queryBuilder.insert();
+            const networkId = data[0].network_id;
 
-                    await insert.Accounts.newAccount(
-                        networkId,
-                        commitment,
-                        name,
-                        currency,
-                        accountData.account[3]
-                    )
-                    // Here I return the data from the query string because that is what was saved!
-                    return ctx.render({ notfound: false, ...ctx.state, currency, name, commitment, closed: false, networkId, accountData });
-                } else {
-                    if (data[0].balance !== formatEther(accountData.account[3])) {
-                        const update = queryBuilder.update();
-                        //Check if there were payment intents with account balance too low and 
-                        // calculate how much balance was added and set them to recurring or created where possible
-                        await updatePaymentIntentsWhereAccountBalanceWasAdded(queryBuilder, data[0], accountData.account[3]);
+            const onChainAccount = await getAccount(query, networkId, data[0].accountType);
 
-                        // Update the account balance finally
+            // I only do this for Virtual accounts, only those have balance!
+            if (data[0].balance !== formatEther(onChainAccount.account[3])
+                && data[0].accountType === AccountTypes.VIRTUALACCOUNT) {
+                const update = queryBuilder.update();
 
-                        await update.Accounts.balanceAndClosedById(accountData.account[3], !accountData.account[0], data[0].id)
-                    }
-                    if (data[0].closed) {
-                        // If it's closed I redirect to accounts page!
-                        const headers = new Headers();
-                        headers.set("location", "/app/accounts");
-                        return new Response(null, {
-                            status: 303,
-                            headers,
-                        });
-                    }
+                //Check if there were payment intents with account balance too low and 
+                // calculate how much balance was added and set them to recurring or created where possible
+                await updatePaymentIntentsWhereAccountBalanceWasAdded(queryBuilder, data[0], onChainAccount.account[3]);
 
-                    // Here I return the data from the database because the account was saved
-                    return ctx.render({ notfound: false, ...ctx.state, currency, name, commitment, closed: data[0].closed, networkId: networkId, accountData });
-                }
-            } else {
-                // render a context not found page
-                return ctx.render({ ...ctx.state, notfound: true })
+                // Update the account balance finally
+
+                await update.Accounts.balanceAndClosedById(onChainAccount.account[3], !onChainAccount.account[0], data[0].id)
+
             }
+
+            if (data[0].closed) {
+                // If it's closed I redirect to accounts page!
+                const headers = new Headers();
+                headers.set("location", "/app/accounts");
+                return new Response(null, {
+                    status: 303,
+                    headers,
+                });
+            }
+            return ctx.render(
+                {
+                    notfound: false,
+                    ...ctx.state,
+                    currency: data[0].currency,
+                    name: data[0].name,
+                    commitment: query,
+                    closed: data[0].closed,
+                    networkId: networkId,
+                    accountData: onChainAccount,
+                    accountType: data[0].accountType
+                });
 
         } catch (err) {
             return new Response(null, { status: 500 })
         }
     }
 }
-
 export default function Account(props: PageProps) {
     const balance = props.data.accountData.account[3];
     const tokenAddress = props.data.accountData.account[2];
+    const creatorAddress = props.data.accountData.account[1];
+    const accountType = props.data.accountType;
     return <Layout isLoggedIn={props.data.token}>
         {!props.data.notfound ?
             <div class="container mx-auto py-8">
                 <div class="flex items-center justify-center h-full">
-                    <div class="bg-white shadow-2xl p-6 rounded-2xl border-2 border-gray-50 w-96">
-                        <div class="flex flex-col">
+                    <div class="bg-white shadow-2xl p-6 rounded-2xl border-2 border-gray-50">
+                        <div class="flex flex-col justify-center">
                             <AccountCardElement
                                 name={props.data.name}
                                 balance={formatEther(balance)}
                                 network={networkNameFromId[props.data.networkId as ChainIds]}
                                 currency={props.data.currency}
+                                accountType={accountType}
+                                closed={props.data.closed}
                             ></AccountCardElement>
-                            <AccountTopupOrClose
-                                currencyName={props.data.currency}
-                                accountName={props.data.name}
-                                debitContractAddress={getVirtualAccountsContractAddress[props.data.networkId as ChainIds]}
-                                erc20ContractAddress={tokenAddress}
-                                commitment={props.data.commitment}
-                                chainId={props.data.networkId}
-                                isERC20={tokenAddress !== ZeroAddress}
-                                accountClosed={props.data.closed}
-                            ></AccountTopupOrClose>
+                            <WalletDetailsFetcher
+                                accountType={accountType}
+                                networkId={props.data.networkId}
+                                creatorAddress={creatorAddress}
+                                tokenAddress={tokenAddress}
+                                currencyName={JSON.parse(props.data.currency).name}
+                                updateBalance={(to: string) => {
+                                    //Do nothing here now,
+                                }}
+                            ></WalletDetailsFetcher>
+                            {accountType === AccountTypes.VIRTUALACCOUNT ?
+                                <AccountTopupOrClose
+                                    currencyName={props.data.currency}
+                                    accountName={props.data.name}
+                                    debitContractAddress={getVirtualAccountsContractAddress[props.data.networkId as ChainIds]}
+                                    erc20ContractAddress={tokenAddress}
+                                    commitment={props.data.commitment}
+                                    chainId={props.data.networkId}
+                                    isERC20={tokenAddress !== ZeroAddress}
+                                    accountClosed={props.data.closed}
+                                ></AccountTopupOrClose>
+                                : <WalletApproveOrDisconnect
+                                    chainId={props.data.networkId}
+                                    erc20ContractAddress={tokenAddress}
+                                    debitContractAddress={getConnectedWalletsContractAddress[props.data.networkId as ChainIds]}
+                                    accountClosed={props.data.closed}
+                                    commitment={props.data.commitment}
+                                ></WalletApproveOrDisconnect>
+                            }
                         </div>
                     </div>
                 </div>
