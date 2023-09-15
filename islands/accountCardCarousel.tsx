@@ -83,9 +83,11 @@ export default function AccountCardCarousel(props: AccountCardCarouselProps) {
                         networkId: data.network_id,
                         commitment: data.commitment,
                         name: data.name,
-                        extraCSS: visible ? "fade-in-element" : "fade-out-element"
+                        extraCSS: visible ? "fade-in-element" : "fade-out-element",
+                        accountType: data.accountType,
+                        closed: data.closed
                     })}
-                <CarouselButtons backClicked={backClicked} forwardClicked={forwardClicked}></CarouselButtons>
+                {props.accountData.length < 2 ? null : <CarouselButtons backClicked={backClicked} forwardClicked={forwardClicked}></CarouselButtons>}
                 <hr
                     class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
             </div>
