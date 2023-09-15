@@ -49,6 +49,10 @@ export const explorerUrl: { [key in ChainIds]: EXPORERURLS } = {
   [ChainIds.BTT_TESTNET_ID]: EXPORERURLS.BTT_TESTNET,
 };
 
+export const explorerUrlAddressPath: { [key in ChainIds]: string } = {
+  [ChainIds.BTT_TESTNET_ID]: "/#/address/",
+};
+
 export const walletCurrency: { [key in ChainIds]: NetworkTickers } = {
   [ChainIds.BTT_TESTNET_ID]: NetworkTickers.BTT_TESTNET,
 };
