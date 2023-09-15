@@ -89,9 +89,10 @@ export const handler: Handlers<any, State> = {
             actualDebitedAmount: requestedDebitAmount,
             debitTimes: paymentIntentData.debitTimes,
             debitInterval: paymentIntentData.debitInterval
-        }, paymentIntentData.network).catch(err => {
-            console.log(err)
-        });
+        }, paymentIntentData.network,
+            paymentIntentData.account_id.accountType).catch(err => {
+                console.log(err)
+            });
 
         if (estimation === null || estimation === undefined) {
             return errorResponseBuilder("Unable to Create Debit Request. Gas estimation for the transaction failed.")
@@ -349,7 +350,7 @@ export default function CreatedPaymentIntents(props: PageProps) {
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Cancel Payment Intent:</UnderlinedTd>
                                 <UnderlinedTd extraStyles="">
-                                    <CancelPaymentIntentButton chainId={pi.network as ChainIds} paymentIntent={pi} transactionsLeft={pi.debit_item_id.debit_times - pi.used_for}></CancelPaymentIntentButton>
+                                    <CancelPaymentIntentButton accountType={pi.account_id.accountType} chainId={pi.network as ChainIds} paymentIntent={pi} transactionsLeft={pi.debit_item_id.debit_times - pi.used_for}></CancelPaymentIntentButton>
                                 </UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><Tooltip message="Only the payee or the wallet that created the account can cancel the payment. You need to sign a transaction."></Tooltip></UnderlinedTd>
                             </tr>
