@@ -5,13 +5,19 @@ import VirtualAccountsArtifact from "../../static/VirtualAccounts.json" assert {
 import RelayerGasTracker from "../../static/RelayerGasTracker.json" assert {
   type: "json",
 };
+import ERC20Artifact from "../../static/ERC20.json" assert {
+  type: "json",
+};
+
 import {
   ChainIds,
+  getConnectedWalletsContractAddress,
   getRelayerGasTrackerContractAddress,
   getVirtualAccountsContractAddress,
   rpcUrl,
 } from "../shared/web3.ts";
 import { Buffer } from "https://deno.land/x/node_buffer@1.1.0/mod.ts";
+import { AccountTypes } from "../enums.ts";
 
 export function validateAddress(address: string) {
   return ethers.isAddress(address);
@@ -23,8 +29,14 @@ export function getProvider(networkId: string) {
 }
 
 // I need to implement the server side Contract functions here with ethers js
-export function getContract(provider: any, networkId: string) {
-  const address = getVirtualAccountsContractAddress[networkId as ChainIds];
+export function getContract(
+  provider: any,
+  networkId: string,
+  accountType: AccountTypes,
+) {
+  const address = accountType === AccountTypes.VIRTUALACCOUNT
+    ? getVirtualAccountsContractAddress[networkId as ChainIds]
+    : getConnectedWalletsContractAddress[networkId as ChainIds];
 
   return new ethers.Contract(
     address,
@@ -39,16 +51,24 @@ export function getRelayerTopUpContract(networkId: string) {
   return new ethers.Contract(addr, RelayerGasTracker.abi, provider);
 }
 
-export async function getAccount(commitment: string, networkId: string) {
+export async function getAccount(
+  commitment: string,
+  networkId: string,
+  accountType: AccountTypes,
+) {
   const provider = getProvider(networkId);
-  const contract = getContract(provider, networkId);
+  const contract = getContract(provider, networkId, accountType);
   const account = await contract.accounts(commitment);
   return { account, exists: account.creator !== ZeroAddress };
 }
 
-export async function getEncryptedNote(commitment: string, networkId: string) {
+export async function getEncryptedNote(
+  commitment: string,
+  networkId: string,
+  accountType: AccountTypes,
+) {
   const provider = getProvider(networkId);
-  const contract = getContract(provider, networkId);
+  const contract = getContract(provider, networkId, accountType);
   const encryptedNote = await contract.encryptedNotes(commitment);
   return encryptedNote;
 }
@@ -66,9 +86,10 @@ interface DirectDebitArgs {
 export async function estimateRelayerGas(
   args: DirectDebitArgs,
   networkId: string,
+  accountType: AccountTypes,
 ) {
   const provider = getProvider(networkId);
-  const contract = getContract(provider, networkId);
+  const contract = getContract(provider, networkId, accountType);
   const publicSignals = JSON.parse(args.publicSignals);
 
   return await contract.directdebit.estimateGas(
@@ -129,8 +150,47 @@ export async function fetchTopUpEvent(
 export async function getPaymentIntentHistory(
   chainId: ChainIds,
   paymentIntent: string,
+  accountType: AccountTypes,
 ) {
   const provider = getProvider(chainId);
-  const contract = getContract(provider, chainId);
+  const contract = getContract(provider, chainId, accountType);
   return await contract.paymentIntents(paymentIntent);
+}
+
+export async function getAllowance(
+  erc20Contract: any,
+  owner: string,
+  spender: string,
+) {
+  return await erc20Contract.allowance(owner, spender);
+}
+
+export async function balanceOf(
+  erc20Contract: any,
+  account: string,
+) {
+  return await erc20Contract.balanceOf(account);
+}
+
+export async function getERC20AllowanceAndWalletBalance(
+  chainId: ChainIds,
+  erc20Address: string,
+  creatorAddress: string,
+  spenderContract: string,
+) {
+  const provider = getProvider(chainId);
+  const contract = new ethers.Contract(
+    erc20Address,
+    ERC20Artifact.abi,
+    provider,
+  );
+
+  const balance = await balanceOf(contract, creatorAddress);
+  const allowance = await getAllowance(
+    contract,
+    creatorAddress,
+    spenderContract,
+  );
+
+  return { balance, allowance };
 }
