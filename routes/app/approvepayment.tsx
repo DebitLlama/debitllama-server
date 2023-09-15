@@ -6,6 +6,7 @@ import { formatEther, getAccount, getEncryptedNote, parseEther } from "../../lib
 import { decryptData } from "../../lib/backend/decryption.ts";
 import ApprovePaymentIsland from "../../islands/approvePaymentIsland.tsx";
 import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import { AccountTypes } from "../../lib/enums.ts";
 
 const ethEncryptPrivateKey = Deno.env.get("ETHENCRYPTPRIVATEKEY") || "";
 
@@ -43,24 +44,27 @@ export const handler: Handlers<any, State> = {
       return ctx.render({ ...ctx.state, notfound: true, itemData: [] });
     }
 
-    const account = await getAccount(accountcommitment, accountNetwork);
-    if (!account.exists) {
+    const onChainAccount = await getAccount(accountcommitment, accountNetwork, accountdata[0].accountType);
+    if (!onChainAccount.exists) {
       return ctx.render({ ...ctx.state, notfound: true, itemData: [] });
     }
 
-    if (parseEther(accountdata[0].balance) !== account.account[3]) {
+    if (
+      parseEther(accountdata[0].balance) !== onChainAccount.account[3] &&
+      accountdata[0].accountType !== AccountTypes.CONNECTEDWALLET
+    ) {
+      //This don't need to run when the account type is ConnectedWallet!
       const update = queryBuilder.update();
 
       await update.Accounts.balanceAndClosedById(
-        account.account[3],
-        !account.account[0],
+        onChainAccount.account[3],
+        !onChainAccount.account[0],
         accountdata[0].id);
     }
 
-    const encryptedNote = await getEncryptedNote(accountcommitment, accountNetwork);
+    const encryptedNote = await getEncryptedNote(accountcommitment, accountNetwork, accountdata[0].accountType);
 
     //Decrypt the encrypted note
-
     const symmetricEncryptedNote = await decryptData(ethEncryptPrivateKey, encryptedNote);
     const resp = await ctx.render(
       {
@@ -70,8 +74,10 @@ export const handler: Handlers<any, State> = {
         symmetricEncryptedNote,
         accountcommitment,
         accountName: accountdata[0].name,
-        accountBalance: formatEther(account.account.balance),
-        accountCurrency: accountdata[0].currency
+        accountBalance: formatEther(onChainAccount.account.balance),
+        accountCurrency: accountdata[0].currency,
+        accountType: accountdata[0].accountType,
+        closed: accountdata[0].closed,
       });
 
     resp.headers.set("Cache-control", "no-cache, no-store, must-revalidate");
@@ -91,7 +97,6 @@ export default function Approvepayments(props: PageProps) {
   return <>{!notfound ? <BuyPageLayout
     isLoggedIn={props.data.token}
     item={getItemProps(item)}
-
   >
     <ApprovePaymentIsland
       symmetricEncryptedNote={props.data.symmetricEncryptedNote}
@@ -100,6 +105,8 @@ export default function Approvepayments(props: PageProps) {
       accountName={props.data.accountName}
       accountBalance={props.data.accountBalance}
       accountCurrency={props.data.accountCurrency}
+      accountType={props.data.accountType}
+      closed={props.data.closed}
     ></ApprovePaymentIsland>
   </BuyPageLayout> : <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
     <h1 class="text-2xl font-bold mb-6 text-center">Not Found</h1>
