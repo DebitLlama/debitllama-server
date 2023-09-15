@@ -66,7 +66,6 @@ export const handler: Handlers<any, State> = {
             headers.set("location", "/app/profile");
             return new Response(null, { status: 303, headers })
         }
-        // TODO: More Input verification!!
 
         if (isNaN(parseInt(debitTimes))) {
             return errorResponseBuilder("Invalid Debit Time!")
