@@ -1,4 +1,5 @@
 import {
+  AccountTypes,
   DynamicPaymentRequestJobsStatus,
   PaymentIntentRow,
   PaymentIntentStatus,
@@ -94,7 +95,7 @@ export default class QueryBuilder {
           const res = await this.client.from("Accounts").select().eq(
             "commitment",
             commitment,
-          );
+          ).eq("user_id", this.userid);
           return this.responseHandler(res);
         },
         //selectOpenAccountsByIdDESC
@@ -104,6 +105,14 @@ export default class QueryBuilder {
             .select()
             .eq("user_id", this.userid)
             .eq("closed", false)
+            .order("last_modified", { ascending: false });
+          return this.responseHandler(res);
+        },
+        allByUserIdOrderDesc: async () => {
+          const res = await this.client
+            .from("Accounts")
+            .select()
+            .eq("user_id", this.userid)
             .order("last_modified", { ascending: false });
           return this.responseHandler(res);
         },
@@ -447,9 +456,10 @@ export default class QueryBuilder {
           name: string,
           currency: string,
           balance: string,
+          accountType: AccountTypes,
         ) => {
           const res = await this.client.from("Accounts").insert({
-            created_at: new Date().toISOString(),
+            created_at: new Date().toUTCString(),
             user_id: this.userid,
             network_id,
             commitment,
@@ -457,7 +467,8 @@ export default class QueryBuilder {
             closed: false,
             currency,
             balance: formatEther(balance),
-            last_modified: new Date().toISOString(),
+            last_modified: new Date().toUTCString(),
+            accountType,
           });
 
           return this.responseHandler(res);
@@ -478,7 +489,7 @@ export default class QueryBuilder {
           relayerBalance_id: string,
         ) => {
           const res = await this.client.from("Items").insert({
-            created_at: new Date().toISOString(),
+            created_at: new Date().toUTCString(),
             payee_id: this.userid,
             payee_address,
             currency,
@@ -557,7 +568,7 @@ export default class QueryBuilder {
           const res = await this.client.from(
             "PaymentIntents",
           ).insert({
-            created_at: new Date().toISOString(),
+            created_at: new Date().toUTCString(),
             creator_user_id: this.userid,
             payee_user_id,
             account_id,
@@ -570,7 +581,7 @@ export default class QueryBuilder {
             estimatedGas,
             statusText,
             lastPaymentDate: null,
-            nextPaymentDate: new Date().toISOString(),
+            nextPaymentDate: new Date().toUTCString(),
             pricing,
             currency,
             network,
@@ -587,7 +598,7 @@ export default class QueryBuilder {
         //insertNewRelayerBalance
         newRelayerBalance: async () => {
           const res = await this.client.from("RelayerBalance").insert({
-            created_at: new Date().toISOString(),
+            created_at: new Date().toUTCString(),
             user_id: this.userid,
           });
 
@@ -603,7 +614,7 @@ export default class QueryBuilder {
         ) => {
           const res = await this.client.from("RelayerTopUpHistory")
             .insert({
-              created_at: new Date().toISOString(),
+              created_at: new Date().toUTCString(),
               transactionHash,
               user_id: this.userid,
               network: chainId,
@@ -622,7 +633,7 @@ export default class QueryBuilder {
         ) => {
           const res = await this.client.from("DynamicPaymentRequestJobs")
             .insert({
-              created_at: new Date().toISOString(),
+              created_at: new Date().toUTCString(),
               paymentIntent_id,
               requestedAmount,
               status: DynamicPaymentRequestJobsStatus.CREATED,
@@ -646,7 +657,7 @@ export default class QueryBuilder {
               .update({
                 balance: formatEther(balance),
                 closed,
-                last_modified: new Date().toISOString(),
+                last_modified: new Date().toUTCString(),
               }).eq("id", id);
             return this.responseHandler(res);
           }),
@@ -703,8 +714,6 @@ export default class QueryBuilder {
           statusText: string,
           paymentIntentRow: PaymentIntentRow,
         ) => {
-          console.log("updateForAccountBalanceNotLowAnymore")
-          console.log(paymentIntentRow)
           const res = await this.client.from("PaymentIntents").update({
             failedDynamicPaymentAmount: "0",
             statusText,
@@ -732,7 +741,7 @@ export default class QueryBuilder {
         ) => {
           const res = await this.client.from("RelayerBalance").update({
             BTT_Donau_Testnet_Balance: formatEther(newBalance),
-            last_topup: new Date().toISOString(),
+            last_topup: new Date().toUTCString(),
             Missing_BTT_Donau_Testnet_Balance: formatEther(newMissingBalance),
           }).eq("id", id);
 
@@ -749,7 +758,7 @@ export default class QueryBuilder {
         ) => {
           const res = await this.client.from("DynamicPaymentRequestJobs")
             .update({
-              created_at: new Date().toISOString(),
+              created_at: new Date().toUTCString(),
               requestedAmount,
               status: DynamicPaymentRequestJobsStatus.CREATED,
               allocatedGas,
