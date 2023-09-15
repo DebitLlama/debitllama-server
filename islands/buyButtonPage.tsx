@@ -1,16 +1,18 @@
 import BuyPageLayout from "../components/BuyPageLayout.tsx"
 import { CardOutline } from "../components/Cards.tsx";
-import { useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import AccountPasswordInput, { AccountPasswordInputProps } from "./accountPasswordInput.tsx";
 import { strength } from "./accountCreatePageForm.tsx";
 import BuyPageProfile, { ProfileProps } from "../components/BuyPageProfile.tsx";
-import { approveSpend, depositEth, depositToken, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts, topUpETH, topUpTokens } from "../lib/frontend/web3.ts";
-import { ChainIds, getVirtualAccountsContractAddress } from "../lib/shared/web3.ts";
-import { requestBalanceRefresh, saveAccountData, uploadProfileData } from "../lib/frontend/fetch.ts";
+import { approveSpend, balanceOf, depositEth, depositToken, formatEther, getAllowance, getContract, getJSONRPCProvider, handleNetworkSelect, parseEther, requestAccounts, topUpETH, topUpTokens } from "../lib/frontend/web3.ts";
+import { ChainIds, getConnectedWalletsContractAddress, getVirtualAccountsContractAddress } from "../lib/shared/web3.ts";
+import { requestBalanceRefresh, saveAccount, uploadProfileData } from "../lib/frontend/fetch.ts";
 import { setUpAccount } from "../lib/frontend/directdebitlib.ts";
 import { AccountCardElement } from "../components/AccountCardElement.tsx";
 import { CarouselButtons } from "../components/components.tsx";
 import Overlay from "../components/Overlay.tsx";
+import { AccountTypes, Pricing } from "../lib/enums.ts";
+import WalletDetailsFetcher from "./WalletDetailsFetcher.tsx";
 
 export interface Currency {
     name: string,
@@ -106,7 +108,6 @@ export interface ButtonsBasedOnSelectionProps {
     setTopupAmount: (to: number) => void;
     ethEncryptPublicKey: string;
     setShowOverlay: (to: boolean) => void;
-
 }
 
 interface TopupBalanceArgs {
@@ -137,7 +138,7 @@ async function handleEthTopup(
     if (topuptx !== undefined) {
         await topuptx.wait().then(async (receipt: any) => {
             if (receipt.status === 1) {
-                const res = await requestBalanceRefresh(commitment, chainId);
+                const res = await requestBalanceRefresh(commitment, chainId, "buyPage");
                 if (res !== 200) {
                     handleError("An error occured saving the balance!");
                     setShowOverlay(false);
@@ -173,7 +174,7 @@ async function handleTokenTopup(
     if (topuptx !== undefined) {
         await topuptx.wait().then(async (receipt: any) => {
             if (receipt.status === 1) {
-                const res = await requestBalanceRefresh(commitment, chainId);
+                const res = await requestBalanceRefresh(commitment, chainId, "buyPage");
                 if (res !== 200) {
                     handleError("An error occured saving the balance!");
                     setShowOverlay(false)
@@ -303,8 +304,14 @@ async function handleTokenDeposit(
     if (depositTx !== undefined) {
         await depositTx.wait().then(async (receipt: any) => {
             if (receipt.status === 1) {
-                const saveStatus = await saveAccountData(chainId, virtualaccount.commitment, accountName, accountCurrency)
-                if (saveStatus === 500) {
+                const resp = await saveAccount({
+                    name: accountName,
+                    networkId: chainId,
+                    commitment: virtualaccount.commitment,
+                    currency: accountCurrency,
+                    accountType: AccountTypes.VIRTUALACCOUNT
+                })
+                if (resp.status === 500) {
                     //TODO: Should display an error
                     setShowOverlay(false);
                 } else {
@@ -419,13 +426,16 @@ function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
                 await tx.wait().then(async (receipt: any) => {
                     if (receipt.status === 1) {
 
-                        const saveStatus = await saveAccountData(
-                            args.chainId,
-                            virtualaccount.commitment,
-                            accountName,
-                            args.accountCurrency)
-                        if (saveStatus === 500) {
-                            //TODO: Should display an error
+                        const resp = await saveAccount(
+                            {
+                                name: accountName,
+                                networkId: args.chainId,
+                                commitment: virtualaccount.commitment,
+                                currency: args.accountCurrency,
+                                accountType: AccountTypes.VIRTUALACCOUNT
+                            })
+                        if (resp.status === 500) {
+
                             args.setShowOverlay(false);
                         } else {
                             location.reload();
@@ -457,11 +467,122 @@ function TopUpIcon(props: { width: string }) {
     return <img style="margin-left: 10px;" src="/topupLogo.svg" width={props.width} />
 }
 
+function CreateNewAccountUI(props: {
+    item: ItemProps,
+    profileExists: boolean,
+    profile: ProfileProps
+    newAccountPasswordProps: AccountPasswordInputProps,
+    paymentAmount: string,
+    ethEncryptPublicKey: string;
+    setShowOverlay: (to: boolean) => void;
+    setPasswordAndCheck: (to: string) => void;
+    isButtonDisabled: () => boolean;
+    sentAndcheckPasswordMatch: (setTo: string) => void;
+
+}) {
+    return <form class="p-2" onSubmit={onCreateAccountSubmit({
+        chainId: props.item.network,
+        handleError,
+        profileExists: props.profileExists,
+        profile: props.profile,
+        passwordProps: props.newAccountPasswordProps,
+        selectedCurrency: props.item.currency,
+        depositAmount: props.paymentAmount,
+        ethEncryptPublicKey: props.ethEncryptPublicKey,
+        accountCurrency: props.item.currency.name,
+        setShowOverlay: props.setShowOverlay
+    })}>
+        <BuyPageProfile
+            profileExists={props.profileExists}
+            profile={props.profile}></BuyPageProfile>
+        {/* TODO: ADD CONNECT WALLET UI!! */}
+        <div class="bg-white  px-3 py-[0.25rem]">
+            <h4 class="bg-gray-50 dark:bg-gray-800 px-4 py-4 text-xl text-center mb-2">Create New Account</h4>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="accountName">Account Name</label>
+                <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+                    type="text" id="accountName" name="accountName" placeholder="" />
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="amount">Deposit Amount in ({props.item.currency.name})</label>
+                {!props.item.currency.native ? <span class="text-sm text-gray-300">Token Address: {props.item.currency.contractAddress}</span> : null}
+                <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+                    value={props.paymentAmount} type="number" id="amount" name="amount" placeholder="0" step="any" />
+            </div>
+            <AccountPasswordInput
+                password={props.newAccountPasswordProps.password}
+                setPassword={props.setPasswordAndCheck}
+                passwordAgain={props.newAccountPasswordProps.passwordAgain}
+                setPasswordAgain={props.sentAndcheckPasswordMatch}
+                passwordMatchError={props.newAccountPasswordProps.passwordMatchError}
+                passwordStrengthNotification={props.newAccountPasswordProps.passwordStrengthNotification}
+            ></AccountPasswordInput>
+            <div class="text-center">
+                <button
+                    disabled={props.isButtonDisabled()}
+                    type="submit"
+                    class="mb-4 mt-2 bg-indigo-500 text-white text-xl font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
+                >Create account</button>
+            </div>
+        </div>
+    </form>
+}
+
+function TopUpUI(props: {
+    paymentAmount: string,
+    selectedAccount: any,
+    topupAmount: number,
+    setTopupAmount: (to: number) => void,
+    item: ItemProps,
+    setShowOverlay: (to: boolean) => void
+}) {
+    const amountToTopUp = parseFloat(props.paymentAmount) - parseFloat(props.selectedAccount.balance);
+    const inputValue = props.topupAmount < amountToTopUp ? amountToTopUp : props.topupAmount;
+    return <>
+        <div class="mx-auto mt-4 bt-4">
+            <p class="bg-gray-50 dark:bg-gray-800 px-4 py-4  text-xl text-slate-600">Top Up Balance</p>
+            <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+                value={inputValue} onChange={(event: any) => props.setTopupAmount(parseFloat(event.target.value))} type="number" id="amount" name="amount" placeholder="Amount" />
+            <button
+                onClick={topupbalance({
+                    topupAmount: inputValue,
+                    commitment: props.selectedAccount.commitment,
+                    chainId: props.item.network,
+                    handleError,
+                    currency: props.item.currency,
+                    setShowOverlay: props.setShowOverlay
+                })}
+                class="flex flex-row justify-center  text-2xl mb-4 mt-2 w-full bg-indigo-500 text-white font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
+                type="submit">
+                <p>Top Up</p>
+                <TopUpIcon width="35" />
+            </button>
+        </div></>
+}
+
+function NextBttnUi(props: {
+    buttonId: string,
+    commitment: string,
+}) {
+    return <>
+        <form
+            class={"mx-auto"}
+            action={"app/approvepayment"}
+            method={"POST"}
+        >
+            <input type="hidden" value={props.buttonId} name="debititem" />
+            <input type="hidden" value={props.commitment} name="accountcommitment" />
+            <button
+                type={"submit"}
+                class="flex flex-row justify-center text-2xl font-bold w-60 mb-4 mt-4 mx-auto text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"><p>Next</p><NextIcon width={"35"} /></button>
+        </form>
+    </>
+}
+
 function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
 
     if (props.selected === 0 || props.selected < 0) {
         return <div class="mx-auto mt-4 mb-10 bt-4">
-            <p class="bg-gray-50 dark:bg-gray-800 px-4 py-4 text-xl text-slate-600">Select an account</p>
         </div>
     }
 
@@ -509,95 +630,31 @@ function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
 
 
     if (props.selected === 1) {
-        return <form class="mx-auto p-2" onSubmit={onCreateAccountSubmit({
-            chainId: props.item.network,
-            handleError,
-            profileExists: props.profileExists,
-            profile: props.profile,
-            passwordProps: props.newAccountPasswordProps,
-            selectedCurrency: props.item.currency,
-            depositAmount: props.paymentAmount,
-            ethEncryptPublicKey: props.ethEncryptPublicKey,
-            accountCurrency: props.item.currency.name,
-            setShowOverlay: props.setShowOverlay
-        })}>
-            <BuyPageProfile
-                profileExists={props.profileExists}
-                profile={props.profile}></BuyPageProfile>
-            <div class="bg-white  px-3 py-[0.25rem]">
-                <h4 class="bg-gray-50 dark:bg-gray-800 px-4 py-4 text-xl text-center mb-2">Create New Account</h4>
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="accountName">Account Name</label>
-                    <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
-                        type="text" id="accountName" name="accountName" placeholder="" />
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="amount">Deposit Amount in ({props.item.currency.name})</label>
-                    {!props.item.currency.native ? <span class="text-sm text-gray-300">{props.item.currency.contractAddress}</span> : null}
-                    <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
-                        value={props.paymentAmount} type="number" id="amount" name="amount" placeholder="0" step="any" />
-                </div>
-                <AccountPasswordInput
-                    password={props.newAccountPasswordProps.password}
-                    setPassword={setPasswordAndCheck}
-                    passwordAgain={props.newAccountPasswordProps.passwordAgain}
-                    setPasswordAgain={sentAndcheckPasswordMatch}
-                    passwordMatchError={props.newAccountPasswordProps.passwordMatchError}
-                    passwordStrengthNotification={props.newAccountPasswordProps.passwordStrengthNotification}
-                ></AccountPasswordInput>
-                <div class="text-center">
-                    <button
-                        disabled={isButtonDisabled()}
-                        type="submit"
-                        class="mb-4 mt-2 bg-indigo-500 text-white text-xl font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
-                    >Create account</button>
-                </div>
-            </div>
-        </form>
+        return <CreateNewAccountUI
+            {...props}
+            isButtonDisabled={isButtonDisabled}
+            sentAndcheckPasswordMatch={sentAndcheckPasswordMatch}
+            setPasswordAndCheck={setPasswordAndCheck}
+        ></CreateNewAccountUI>
     }
 
     if (props.selected > 1) {
         const accIndex = props.selected - 2;
         const selectedAccount = props.accounts[accIndex];
 
-        if (parseFloat(selectedAccount.balance) < parseFloat(props.paymentAmount)) {
-            const amountToTopUp = parseFloat(props.paymentAmount) - parseFloat(selectedAccount.balance);
-            const inputValue = props.topupAmount < amountToTopUp ? amountToTopUp : props.topupAmount;
-            return <>
-                <div class="mx-auto mt-4 bt-4">
-                    <p class="bg-gray-50 dark:bg-gray-800 px-4 py-4  text-xl text-slate-600">Top Up Balance</p>
-                    <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
-                        value={inputValue} onChange={(event: any) => props.setTopupAmount(parseFloat(event.target.value))} type="number" id="amount" name="amount" placeholder="Amount" />
-                    <button
-                        onClick={topupbalance({
-                            topupAmount: inputValue,
-                            commitment: selectedAccount.commitment,
-                            chainId: props.item.network,
-                            handleError,
-                            currency: props.item.currency,
-                            setShowOverlay: props.setShowOverlay
-                        })}
-                        class="flex flex-row justify-center  text-2xl mb-4 mt-2 w-full bg-indigo-500 text-white font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
-                        type="submit">
-                        <p>Top Up</p>
-                        <TopUpIcon width="35" />
-                    </button>
-                </div></>
+        //If it's a virtual account with fixed pricing and the balance is lower than what I need to pay, I prompt top up.
+        if (selectedAccount.accountType === AccountTypes.VIRTUALACCOUNT &&
+            props.item.pricing !== Pricing.Dynamic &&
+            parseFloat(selectedAccount.balance) < parseFloat(props.paymentAmount)) {
+            return <TopUpUI {...props} selectedAccount={selectedAccount}></TopUpUI>
         }
 
-        return <>
-            <form
-                class={"mx-auto"}
-                action={"app/approvepayment"}
-                method={"POST"}
-            >
-                <input type="hidden" value={props.item.buttonId} name="debititem" />
-                <input type="hidden" value={selectedAccount.commitment} name="accountcommitment" />
-                <button
-                    type={"submit"}
-                    class="flex flex-row justify-center text-2xl font-bold w-60 mb-4 mt-4 mx-auto text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"><p>Next</p><NextIcon width={"35"} /></button>
-            </form>
-        </>
+        // else the direct debit is triggered and the connected wallet account balance could also be topped up externally so I
+        // Show the next button and allow the user to subscribe!
+        return <NextBttnUi
+            buttonId={props.item.buttonId}
+            commitment={selectedAccount.commitment}
+        ></NextBttnUi>
     }
 
     return <div></div>
@@ -617,26 +674,31 @@ function LoggedInUi(props: LoggedInUiProps) {
                     New Account
                 </CardOutline>
             </div>
-            <div class={"flex flex-col justify-center"}>
-                <div class="flex flex-row flex-wrap ml-4 justify-center">
-                    <CardOutline
-                        extraCss={`mt-3 ${props.visible ? "fade-in-element-checkout" : "fade-out-elements-checkout"}`}
-                        setSelected={props.setSelectedAccount}
-                        id={props.accounts.indexOf(acc) + 2}
-                        selected={props.selectedAccount}
-                    >
-                        <AccountCardElement
-                            network={""}
-                            balance={acc.balance}
-                            currency={acc.currency}
-                            name={acc.name}
-                        ></AccountCardElement>
-                    </CardOutline>
-                </div>
-                <hr
-                    class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
-                {props.accounts.length > 1 ? <CarouselButtons backClicked={props.backClicked} forwardClicked={props.forwardClicked}></CarouselButtons> : null}
-            </div>
+
+            {acc === undefined || props.selectedAccount === 1 ? null :
+                <div class={"flex flex-col justify-center"}>
+                    <div class="flex flex-row flex-wrap ml-4 justify-center">
+                        <CardOutline
+                            extraCss={`mt-3 ${props.visible ? "fade-in-element-checkout" : "fade-out-elements-checkout"}`}
+                            setSelected={props.setSelectedAccount}
+                            id={props.accounts.indexOf(acc) + 2}
+                            selected={props.selectedAccount}
+                        >
+                            <AccountCardElement
+                                network={""}
+                                balance={acc.balance}
+                                currency={acc.currency}
+                                name={acc.name}
+                                accountType={acc.accountType}
+                                closed={acc.closed}
+                            ></AccountCardElement>
+                        </CardOutline>
+                    </div>
+                    <hr
+                        class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
+                    {props.accounts.length > 1 ? <CarouselButtons backClicked={props.backClicked} forwardClicked={props.forwardClicked}></CarouselButtons> : null}
+                </div>}
+
 
             <UIBasedOnSelection
                 newAccountPasswordScore={props.newAccountPasswordScore}
@@ -768,6 +830,21 @@ export default function BuyButtonPage(props: BuyButtonPageProps) {
             }, 400)
         }
     }
+
+    // async function fetchAndSetBalanceAndAllowance() {
+    //     const connectedWalletContractAddress = getConnectedWalletsContractAddress[props.item.network as ChainIds];
+    //     const provider = getJSONRPCProvider(props.item.network as ChainIds);
+    //     const erc20Contract = await getContract(provider, props.item.currency.contractAddress, "/ERC20.json");
+    //         const acc = props.accounts[currentlyShowingAccount];
+
+    //     const balance = await balanceOf(erc20Contract, acc.);
+    //     const allowance = await getAllowance(erc20Contract, props.creatorAddress, connectedWalletContractAddress)
+    //     if (allowance >= balance) {
+    //         props.updateConnectedWalletBalance(formatEther(balance))
+    //     } else {
+    //         props.updateConnectedWalletBalance(formatEther(allowance))
+    //     }
+    // }
 
     return <BuyPageLayout
         isLoggedIn={props.isLoggedIn}
