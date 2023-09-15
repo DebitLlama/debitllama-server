@@ -104,8 +104,7 @@ export default function PaymentIntentsPaginationForAccounts(
 
   return <>
     {showLoadingIndicator ? <HourglassLoader /> : <>
-      <h1 class="text-2xl font-bold mb-5 text-center">Payment Intents</h1>
-
+      <h1 class="text-2xl font-bold mb-5 text-center text-gray-400">Subscriptions</h1>
       <TableSearch
         tableType={FilterFor.PaymentIntents}
         searchTerm={searchTerm}
@@ -119,7 +118,6 @@ export default function PaymentIntentsPaginationForAccounts(
         sortBy={sortBy}
         sortDirection={sortDirection}
         forPage={PaymentIntentsTablePages.ACCOUNTS}
-
       ></PaymentIntentsTable>
       <PaginationButtons
         currentPage={pageData.currentPage}
