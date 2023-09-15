@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks';
 import { approveSpend, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts, topUpETH, topUpTokens, withdraw } from '../lib/frontend/web3.ts';
-import { redirectToAccountPage } from '../lib/frontend/fetch.ts';
+import { redirectToAccountPage, redirectToAccountsPage, requestBalanceRefresh } from '../lib/frontend/fetch.ts';
 import Overlay from '../components/Overlay.tsx';
 
 export interface AccountTopupOrCloseProps {
@@ -13,6 +13,8 @@ export interface AccountTopupOrCloseProps {
     currencyName: string
     accountClosed: boolean
 }
+
+//This is only for virtual accounts!
 
 export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
     const [amount, setAmount] = useState("");
@@ -32,9 +34,17 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
         });
 
         if (topuptx !== undefined) {
-            await topuptx.wait().then((receipt: any) => {
+            await topuptx.wait().then(async (receipt: any) => {
                 if (receipt.status === 1) {
-                    redirectToAccountPage(props.chainId, props.commitment, props.accountName, props.currencyName)
+
+                    const status = await requestBalanceRefresh(props.commitment, props.chainId, "app")
+
+                    if (status === 200) {
+                        redirectToAccountPage(props.commitment)
+                    }
+                    else {
+                        console.log("An error occured with saving the account!");
+                    }
                 } else {
                     setShowOverlay(false);
                 }
@@ -55,9 +65,17 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
             setShowOverlay(false)
         })
         if (topuptx !== undefined) {
-            await topuptx.wait().then((receipt: any) => {
+            await topuptx.wait().then(async (receipt: any) => {
                 if (receipt.status === 1) {
-                    redirectToAccountPage(props.chainId, props.commitment, props.accountName, props.currencyName)
+
+                    const status = await requestBalanceRefresh(props.commitment, props.chainId, "app")
+
+                    if (status === 200) {
+                        redirectToAccountPage(props.commitment)
+                    }
+                    else {
+                        console.log("An error occured with saving the account!");
+                    }
                 } else {
                     setShowOverlay(false)
                 }
@@ -134,39 +152,35 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
         const withdrawTx = await withdraw(contract, props.commitment).catch((err) => {
             setShowOverlay(false)
         });
-
-        await withdrawTx.wait().then((receipt: any) => {
-            if (receipt.status === 1) {
-                redirectToAccountPage(
-                    props.chainId,
-                    props.commitment,
-                    props.accountName,
-                    props.currencyName
-                )
-            } else {
+        if (withdrawTx !== undefined) {
+            await withdrawTx.wait().then((receipt: any) => {
+                if (receipt.status === 1) {
+                    redirectToAccountsPage();
+                } else {
+                    setShowOverlay(false)
+                }
+            }).catch((err: any) => {
                 setShowOverlay(false)
-            }
-        }).catch((err: any) => {
-            setShowOverlay(false)
-        })
+            })
+        }
     }
 
     return <><div class="w-full place-items-start text-left mt-2">
         <Overlay show={showOverlay}></Overlay>
         <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Add Balance</label>
-        <form onSubmit={topupClicked}>
-            <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+        <form onSubmit={topupClicked} class="flex flex-row justofy-between flex-wrap gap-2">
+            <input required class="max-w-lg px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
                 value={amount} onChange={(event: any) => setAmount(event.target.value)} type="number" id="amount" name="amount" placeholder="Amount" step="any" />
             <button
-                class="mt-2 w-full bg-indigo-500 text-white text-sm font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
+                class="max-w-md bg-indigo-500 text-white text-sm font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
                 disabled={props.accountClosed}
                 type="submit">Top Up</button>
         </form>
     </div>
-        <div class="my-6">
+        <div class="my-6 text-center">
             <button
                 disabled={props.accountClosed}
-                class="mt-2 w-full text-sm font-bold py-2 px-4 rounded-md transition duration-300"
+                class="mx-auto mt-2 max-w-md text-sm font-bold py-2 px-4 rounded-md transition duration-300"
                 onClick={withdrawAndClose}
                 type="button">Withdraw and Close</button>
         </div></>
