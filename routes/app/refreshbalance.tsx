@@ -2,9 +2,11 @@ import { Handlers } from "$fresh/server.ts";
 import { updatePaymentIntentsWhereAccountBalanceWasAdded } from "../../lib/backend/businessLogic.ts";
 import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 import { getAccount } from "../../lib/backend/web3.ts";
+import { AccountTypes } from "../../lib/enums.ts";
 import { ChainIds, rpcUrl } from "../../lib/shared/web3.ts";
 import { State } from "../_middleware.ts";
 
+//This is used for virtual accounts only as the connected wallets don't store balance!
 
 export const handler: Handlers<any, State> = {
     async POST(_req, ctx) {
@@ -17,7 +19,7 @@ export const handler: Handlers<any, State> = {
         if (!networkExists) {
             return new Response(null, { status: 500 })
         }
-        const accountData = await getAccount(commitment, networkId);
+        const accountData = await getAccount(commitment, networkId, AccountTypes.VIRTUALACCOUNT);
         if (accountData.exists) {
             const { data } = await select.Accounts.byCommitment(commitment);
             if (data === null || data.length === 0) {
