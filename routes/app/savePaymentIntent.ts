@@ -1,7 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 import { estimateRelayerGas } from "../../lib/backend/web3.ts";
-import { PaymentIntentStatus } from "../../lib/enums.ts";
+import { AccountTypes, PaymentIntentStatus, Pricing } from "../../lib/enums.ts";
 import { State } from "../_middleware.ts";
 
 export const handler: Handlers<any, State> = {
@@ -37,15 +37,28 @@ export const handler: Handlers<any, State> = {
       return new Response(null, { status: 500 });
     }
 
-    const estimatedGas = await estimateRelayerGas({
-      proof,
-      publicSignals,
-      payeeAddress: itemData[0].payee_address,
-      maxDebitAmount,
-      actualDebitedAmount: maxDebitAmount,
-      debitTimes,
-      debitInterval,
-    }, itemData[0].network);
+    // This estimate gas will fail if the account don't have enough balance, which is something I only check for for fixed payments from virtual accounts
+    // The gas will be estimated using zero as an actualDebitedAmount so the call should succeed even if the account is currently empty!
+    const getActualDebitedAmount =
+      accountData[0].accountType === AccountTypes.VIRTUALACCOUNT &&
+        itemData[0].pricing === Pricing.Fixed
+        ? maxDebitAmount
+        : "0";
+
+    const estimatedGas = await estimateRelayerGas(
+      {
+        proof,
+        publicSignals,
+        payeeAddress: itemData[0].payee_address,
+        maxDebitAmount,
+        actualDebitedAmount: getActualDebitedAmount,
+        debitTimes,
+        debitInterval,
+      },
+      itemData[0].network,
+      accountData[0].accountType,
+    );
+
     // Now I save it to the database if it succeeds I return ok afterwards!
     const { error: insertError } = await insert.PaymentIntent
       .newPaymentIntent(
