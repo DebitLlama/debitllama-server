@@ -1,4 +1,5 @@
 import {
+  AccountTypes,
   DebitItemTableColNames,
   PaymentIntentsTableColNames,
   RelayerTopupHistoryColNames,
@@ -6,30 +7,10 @@ import {
 } from "../enums.ts";
 import { ChainIds } from "../shared/web3.ts";
 
-export async function saveAccountData(
-  networkId: string,
-  commitment: string,
-  name: string,
-  currency: string,
-): Promise<number> {
-  return await fetch("/app/createdNewAccountApi", {
-    credentials: "same-origin",
-    method: "POST",
-    body: JSON.stringify({ networkId, commitment, name, currency }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  }).then((response) => response.status);
-}
-
 export function redirectToAccountPage(
-  networkId: string,
   commitment: string,
-  name: string,
-  currency: string,
 ) {
-  const params = JSON.stringify({ networkId, commitment, name, currency });
-  window.location.href = `/app/account?q=${params}`;
+  window.location.href = `/app/account?q=${commitment}`;
 }
 
 export function redirectToAccountsPage() {
@@ -58,8 +39,11 @@ export type ProfileData = {
 export async function requestBalanceRefresh(
   commitment: string,
   networkId: string,
+  calledFrom: "app" | "buyPage",
 ) {
-  return await fetch("app/refreshbalance", {
+  // If I call refresh balance from the app route then I don't need to have app in the url!
+  const getUrl = calledFrom === "app" ? "refreshbalance" : "app/refreshbalance";
+  return await fetch(getUrl, {
     credentials: "same-origin",
     method: "POST",
     body: JSON.stringify({ commitment, networkId }),
@@ -140,7 +124,7 @@ export async function logoutRequest() {
 }
 
 export async function updatePaymentIntentToClosed(
-  args: { chainId: ChainIds; paymentIntent: string },
+  args: { chainId: ChainIds; paymentIntent: string; accountType: AccountTypes },
 ) {
   return await fetch("/app/createdPaymentIntents", {
     credentials: "same-origin",
@@ -290,6 +274,23 @@ export async function fetchPaginatedTxHistoryByPaymentIntentId(args: {
   sortDirection: "ASC" | "DESC";
 }) {
   return await fetch("/app/pagination/relayerTxHistoryWithPaymentIntentId", {
+    credentials: "same-origin",
+    method: "POST",
+    body: JSON.stringify(args),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((response) => response);
+}
+
+export async function saveAccount(args: {
+  name: string;
+  networkId: string;
+  commitment: string;
+  currency: string;
+  accountType: AccountTypes;
+}) {
+  return await fetch("/app/saveAccountAPI", {
     credentials: "same-origin",
     method: "POST",
     body: JSON.stringify(args),
