@@ -2,7 +2,7 @@ import Layout from "../../components/Layout.tsx";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
 import { Tooltip, UnderlinedTd, getDebitIntervalText, getPaymentIntentStatusLogo, getSubscriptionTooltipMessage } from "../../components/components.tsx";
-import { PaymentIntentRow, PaymentIntentStatus, RELAYERTRANSACTIONHISTORYPAGESIZE } from "../../lib/enums.ts";
+import { AccountTypes, PaymentIntentRow, PaymentIntentStatus, RELAYERTRANSACTIONHISTORYPAGESIZE } from "../../lib/enums.ts";
 import RelayedTxHistory from "../../islands/pagination/RelayedTxHistoryWithPagination.tsx";
 import CancelPaymentIntentButton from "../../islands/CancelPaymentIntentButton.tsx";
 import { ChainIds, networkNameFromId, rpcUrl } from "../../lib/shared/web3.ts";
@@ -33,12 +33,12 @@ export const handler: Handlers<any, State> = {
         const json = await req.json();
         const paymentIntent = json.paymentIntent;
         const chainId = json.chainId;
-        const networkExists = rpcUrl[chainId as ChainIds]
+        const networkExists = rpcUrl[chainId as ChainIds];
+        const accountType = json.accountTye as AccountTypes;
         if (!networkExists) {
             return new Response(null, { status: 500 })
         }
-
-        const paymentIntentHistory = await getPaymentIntentHistory(chainId, paymentIntent);
+        const paymentIntentHistory = await getPaymentIntentHistory(chainId, paymentIntent, accountType);
         if (paymentIntentHistory.isNullified) {
             const queryBuilder = new QueryBuilder(ctx);
             const update = queryBuilder.update();
@@ -137,7 +137,7 @@ export default function CreatedPaymentIntents(props: PageProps) {
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Cancel Payment Intent:</UnderlinedTd>
                                 <UnderlinedTd extraStyles="">
-                                    <CancelPaymentIntentButton chainId={pi.network as ChainIds} paymentIntent={pi} transactionsLeft={pi.debit_item_id.debit_times - pi.used_for}></CancelPaymentIntentButton>
+                                    <CancelPaymentIntentButton accountType={pi.account_id.accountType} chainId={pi.network as ChainIds} paymentIntent={pi} transactionsLeft={pi.debit_item_id.debit_times - pi.used_for}></CancelPaymentIntentButton>
                                 </UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><Tooltip message="Only the payee or the wallet that created the account can cancel the payment. You need to sign a transaction."></Tooltip></UnderlinedTd>
                             </tr>
