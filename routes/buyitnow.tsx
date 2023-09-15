@@ -26,18 +26,13 @@ export const handler: Handlers<any, State> = {
             return ctx.render({ ...ctx.state, notfound: true, itemData: [] });
         }
 
-        // I need to fetch the accounts for this user and then display the ones on the same network and currency
-
-        const currency = JSON.parse(itemData[0].currency);
-
         //isLoggedOut?
         if (!ctx.state.token) {
             return ctx.render({ ...ctx.state, notfound: false, itemData, accountData: [], profileExists: false, ethEncryptPublicKey, url })
         }
 
+        const { data: accountData } = await select.Accounts.whereOpenByNetworkAndCurrencyAndUserId(itemData[0].network, itemData[0].currency);
 
-        const { data: accountData } = await select.Accounts.whereOpenByNetworkAndCurrencyAndUserId(itemData[0].network,
-            currency.name);
         const { data: profileData } = await select.Profiles.byUserId();
 
         return ctx.render({ ...ctx.state, notfound: false, itemData, accountData, profileExists: doesProfileExists(profileData), ethEncryptPublicKey, url })
