@@ -11,7 +11,7 @@ export interface PaymentIntentsTablePropWithFilter {
 }
 
 export function getNextPaymentDateDisplay(nextPaymentDate: any) {
-    return new Date(nextPaymentDate).toDateString()
+    return new Date(nextPaymentDate).toLocaleString()
 }
 
 function getPaymentColValue(pricing: string, maxDebitAmount: string, currencyName: string) {
