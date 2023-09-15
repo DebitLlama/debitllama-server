@@ -1,15 +1,16 @@
 import Overlay from "../components/Overlay.tsx";
-import { PaymentIntentRow, PaymentIntentStatus } from "../lib/enums.ts";
+import { AccountTypes, PaymentIntentRow, PaymentIntentStatus } from "../lib/enums.ts";
 import { packToSolidityProof, toNoteHex } from "../lib/frontend/directdebitlib.ts";
 import { updatePaymentIntentToClosed } from "../lib/frontend/fetch.ts";
 import { cancelPaymentIntent, getContract, handleNetworkSelect } from "../lib/frontend/web3.ts";
-import { ChainIds, getVirtualAccountsContractAddress } from "../lib/shared/web3.ts";
+import { ChainIds, getConnectedWalletsContractAddress, getVirtualAccountsContractAddress } from "../lib/shared/web3.ts";
 import { useState } from 'preact/hooks';
 
 export interface CancelPaymentIntentButtonProps {
     chainId: ChainIds;
     paymentIntent: PaymentIntentRow;
     transactionsLeft: number;
+    accountType: AccountTypes
 }
 
 export default function CancelPaymentIntentButton(props: CancelPaymentIntentButtonProps) {
@@ -39,8 +40,11 @@ export default function CancelPaymentIntentButton(props: CancelPaymentIntentButt
         if (!provider) {
             return;
         }
-        const contractAddress = getVirtualAccountsContractAddress[props.chainId];
-        const contract = await getContract(provider, contractAddress, "/VirtualAccounts.json");
+        const contractAddress = props.accountType === AccountTypes.VIRTUALACCOUNT
+            ? getVirtualAccountsContractAddress[props.chainId]
+            : getConnectedWalletsContractAddress[props.chainId];
+        const contract = await getContract(provider, contractAddress,
+            props.accountType === AccountTypes.VIRTUALACCOUNT ? "/VirtualAccounts.json" : "/ConnectedWallets.json");
 
         const proof = JSON.parse(props.paymentIntent.proof);
         const publicSignals = JSON.parse(props.paymentIntent.publicSignals);
@@ -64,7 +68,12 @@ export default function CancelPaymentIntentButton(props: CancelPaymentIntentButt
         await tx.wait().then(async (receipt: any) => {
             if (receipt.status === 1) {
                 // Should send a request to the backend to update this payment intent status to Cancelled!
-                const res = await updatePaymentIntentToClosed({ chainId: props.chainId, paymentIntent: props.paymentIntent.paymentIntent })
+                const res = await updatePaymentIntentToClosed(
+                    {
+                        accountType: props.accountType,
+                        chainId: props.chainId,
+                        paymentIntent: props.paymentIntent.paymentIntent
+                    })
                 if (res === 200) {
                     location.reload();
                 } else {
