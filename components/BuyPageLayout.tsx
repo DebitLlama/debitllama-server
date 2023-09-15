@@ -2,7 +2,7 @@ import type { ComponentChildren } from "preact";
 import { ItemProps } from "../islands/buyButtonPage.tsx";
 import { debitPricing } from "../islands/addNewDebitItemPageForm.tsx";
 import { Head } from "$fresh/runtime.ts";
-import { ChainIds, networkNameFromId } from "../lib/shared/web3.ts";
+import { ChainIds, explorerUrl, explorerUrlAddressPath, networkNameFromId } from "../lib/shared/web3.ts";
 import { Tooltip, UnderlinedTd, getDebitIntervalText, getSubscriptionTooltipMessage } from "./components.tsx";
 
 interface BuyPagelayoutProps {
@@ -20,8 +20,10 @@ function isDynamic(pricing: string) {
 
 
 export default function BuyPageLayout(props: BuyPagelayoutProps) {
+    const chainId = props.item.network as ChainIds;
+    const networkName = networkNameFromId[chainId];
+    const explorerURLLink = explorerUrl[chainId] + explorerUrlAddressPath[chainId] + props.item.currency.contractAddress;
 
-    const networkName = networkNameFromId[props.item.network as ChainIds];
     return <>
         <Head>
             <title>DebitLlama</title>
@@ -54,49 +56,61 @@ export default function BuyPageLayout(props: BuyPagelayoutProps) {
                             <thead>
                                 <tr> <th></th>
                                     <th></th>
-                                    <th></th></tr>
+                                    <th class="w-1/6"></th>
+                                </tr>
 
                             </thead>
                             <tbody>
                                 <tr>
-                                    <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm" >Subscription:</UnderlinedTd>
-                                    <UnderlinedTd extraStyles="font-semibold"><p>{props.item.name}</p></UnderlinedTd>
+                                    <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-200 text-sm" >Subscription:</UnderlinedTd>
+                                    <UnderlinedTd extraStyles=""><p>{props.item.name}</p></UnderlinedTd>
                                     <UnderlinedTd extraStyles=""><Tooltip message="The name of subscription"></Tooltip></UnderlinedTd>
                                 </tr>
                                 <tr>
-                                    <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm" >Approved Payment:</UnderlinedTd>
-                                    <UnderlinedTd extraStyles="font-semibold"><p> {props.item.maxPrice} {props.item.currency.name} </p></UnderlinedTd>
+                                    <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-200 text-sm" >Approved Payment:</UnderlinedTd>
+                                    <UnderlinedTd extraStyles=""><p> {props.item.maxPrice} {props.item.currency.name} </p></UnderlinedTd>
                                     <UnderlinedTd extraStyles=""><Tooltip message="The maximum amount that can be debited from the account"></Tooltip></UnderlinedTd>
                                 </tr>
+                                {props.item.currency.native ? null :
+                                    <tr>
+                                        <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-200 text-sm" >ERC-20 Contract:</UnderlinedTd>
+                                        <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData">
+                                            <a
+                                                class={"text-indigo-600"}
+                                                href={explorerURLLink}
+                                                target="_blank"
+                                            >Link</a>
+                                        </div></td>
+                                        <UnderlinedTd extraStyles=""><Tooltip message="ERC-20 token contract address!"></Tooltip></UnderlinedTd>
+                                    </tr>}
                                 <tr>
-                                    <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Network:</UnderlinedTd>
-                                    <UnderlinedTd extraStyles="font-semibold" ><p>{networkName}</p></UnderlinedTd>
+                                    <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-200 text-sm">Network:</UnderlinedTd>
+                                    <UnderlinedTd extraStyles="" ><p>{networkName}</p></UnderlinedTd>
                                     <UnderlinedTd extraStyles=""><Tooltip message="The network used for this payment"></Tooltip></UnderlinedTd>
                                 </tr>
                                 <tr>
-                                    <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Pricing:</UnderlinedTd>
-                                    <UnderlinedTd extraStyles="font-semibold" ><p> {props.item.pricing}</p></UnderlinedTd>
+                                    <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-200 text-sm">Pricing:</UnderlinedTd>
+                                    <UnderlinedTd extraStyles="" ><p> {props.item.pricing}</p></UnderlinedTd>
                                     <UnderlinedTd extraStyles=""><Tooltip message={getSubscriptionTooltipMessage(props.item.pricing)}></Tooltip></UnderlinedTd>
                                 </tr>
                                 <tr>
-                                    <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm" >Debit Times:</UnderlinedTd>
-                                    <UnderlinedTd extraStyles="font-semibold"><p> {props.item.debitTimes} payment{props.item.debitTimes === 1 ? "" : "s"}</p> </UnderlinedTd>
+                                    <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-200 text-sm" >Debit Times:</UnderlinedTd>
+                                    <UnderlinedTd extraStyles=""><p> {props.item.debitTimes} payment{props.item.debitTimes === 1 ? "" : "s"}</p> </UnderlinedTd>
                                     <UnderlinedTd extraStyles=""><Tooltip message="The amount of times this approval lets the payee debit the account"></Tooltip></UnderlinedTd>
                                 </tr>
                                 <tr>
-                                    <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Debit Interval (Days):</UnderlinedTd>
-                                    <UnderlinedTd extraStyles="font-semibold"><p> {getDebitIntervalText(props.item.debitInterval, props.item.debitTimes)}</p></UnderlinedTd>
+                                    <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-200 text-sm">Debit Interval (Days):</UnderlinedTd>
+                                    <UnderlinedTd extraStyles=" "><p> {getDebitIntervalText(props.item.debitInterval, props.item.debitTimes)}</p></UnderlinedTd>
                                     <UnderlinedTd extraStyles=""><Tooltip message="The amount of days that needs to pass before the account can be debited again, counted from the last payment date"></Tooltip></UnderlinedTd>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-                <div class="w-full">
+                <div class="p-3 w-full">
                     {props.children}
                 </div>
             </div>
         </div>
     </>
 }
-
