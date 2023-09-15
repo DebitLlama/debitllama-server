@@ -1,3 +1,4 @@
+import { AccountTypes } from "../lib/enums.ts";
 import { AccountCardElement } from "./AccountCardElement.tsx";
 
 interface AccountDisplayElementProps {
@@ -8,23 +9,20 @@ interface AccountDisplayElementProps {
     networkId: string,
     commitment: string,
     name: string,
-    extraCSS: string
+    extraCSS: string,
+    accountType: AccountTypes
+    closed: boolean
 }
 
 export function AccountDisplayElement(props: AccountDisplayElementProps) {
-    const accountQuery = JSON.stringify(
-        {
-            networkId: props.networkId,
-            commitment: props.commitment,
-            name: props.name,
-            currency: props.currency
-        }
-    )
-    return <a href={`/app/account?q=${accountQuery}`} class={`cardshadow mt-2 mb-2 cursor-pointer ${props.extraCSS}`}>
+    return <a href={`/app/account?q=${props.commitment}`} class={`cardshadow mt-2 mb-2 cursor-pointer ${props.extraCSS}`}>
         <AccountCardElement
             name={props.name}
             balance={props.amount}
             currency={props.currency}
-            network={props.networkName}></AccountCardElement>
+            network={props.networkName}
+            accountType={props.accountType}
+            closed={props.closed}
+        ></AccountCardElement>
     </a>
 }
