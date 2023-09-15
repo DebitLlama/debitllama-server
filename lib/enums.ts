@@ -1,6 +1,6 @@
 export enum AccountTypes {
-  VIRTUALACCOUNT,
-  CONNECTEDWALLET,
+  VIRTUALACCOUNT = "VIRTUALACCOUNT",
+  CONNECTEDWALLET = "CONNECTEDWALLET",
 }
 
 export enum PaymentIntentStatus {
@@ -22,6 +22,23 @@ export enum DynamicPaymentRequestJobsStatus {
   LOCKED = "Locked",
   COMPLETED = "Completed",
   REJECETED = "Rejected",
+}
+
+export enum FilterFor {
+  PaymentIntents,
+  TransactionHistory,
+  DebitItems,
+  RelayerTopupHistory,
+}
+
+export enum PaymentIntentsTablePages {
+  ACCOUNTS,
+  DEBITITEMS,
+  ITEM,
+}
+
+export enum DocsLinks {
+  REDIRECTURLSPEC = "https://gitbook.com",
 }
 
 export type PaymentIntentRow = {
@@ -60,6 +77,7 @@ export type Account = {
   closed: boolean;
   currency: string;
   balance: string;
+  accountType: AccountTypes
 };
 
 export type DebitItem = {
@@ -91,10 +109,8 @@ export type RelayerBalance = {
 
 // 10 Payment intents will be displayed in a
 export const PAYMENTINTENTSPAGESIZE = 10;
-
 export const DEBITITEMSTABLEPAGESIZE = 10;
 export const RELAYERTOPUPHISTORYPAGESIZE = 10;
-
 export const RELAYERTRANSACTIONHISTORYPAGESIZE = 10;
 
 export enum PaymentIntentsTableColNames {
@@ -175,20 +191,3 @@ export const MapRelayerTxHistoryColnamesToDbColNames: {
   [RelayerTxHistoryColNames.PaymentAmount]: "paymentAmount",
   [RelayerTxHistoryColNames.PaymentCurrency]: "paymentCurrency",
 };
-
-export enum FilterFor {
-  PaymentIntents,
-  TransactionHistory,
-  DebitItems,
-  RelayerTopupHistory,
-}
-
-export enum PaymentIntentsTablePages {
-  ACCOUNTS,
-  DEBITITEMS,
-  ITEM,
-}
-
-export enum DocsLinks {
-  REDIRECTURLSPEC = "https://gitbook.com",
-}
