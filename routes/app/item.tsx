@@ -55,10 +55,10 @@ export default function Item(props: PageProps) {
     return <Layout isLoggedIn={props.data.token}>
         <div class="container mx-auto py-8">
             <div>
-                <div class="bg-white shadow-2xl rounded-2xl border-2 border-gray-50 w-full">
+                <div class="bg-gray-100 shadow-2xl rounded-2xl border-2 border-gray-50 w-full">
                     <div class="flex flex-col">
-                        <div class="mb-5">
-                            <h1 class="text-2xl font-bold text-center">Debit Item</h1>
+                        <div >
+                            <h1 class="text-2xl text-gray-500 font-bold text-center">Debit Item</h1>
                         </div>
 
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
