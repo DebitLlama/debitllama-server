@@ -587,3 +587,12 @@
 .hide {
 	display: none;
 }
+
+#sidebar-id {
+	transition: width 1.00s;
+	width: 250px;
+}
+
+#sidebar-id.collapsed {
+	width: 0;
+}

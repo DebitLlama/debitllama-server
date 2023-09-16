@@ -1,3 +1,5 @@
+import SidebarToggleButton from "../islands/SidebarToggleButton.tsx";
+
 interface NavProps {
     loggedIn: boolean
 }
@@ -18,13 +20,8 @@ export default function Nav({ loggedIn }: NavProps) {
 
     return (
         <div class="sticky top-0 z-50 bg-gray-50 flex flex-wrap items-center justify-between mx-auto px-4 pt-4 pb-2 shadow-md	">
-            <a href="/app/accounts">
-                <div class="text-2xl  ml-1 font-bold flex flex-row">
-                    <img src="/logo.svg" width="45" class={"mr-3"} />{" "}
-                    <span class="mt-1">Debit</span><span class="text-gray-600 mt-1">Llama</span>
-                </div>
-            </a>
-            <ul class="flex gap-4 mb-1 mt-2">
+            <SidebarToggleButton></SidebarToggleButton>
+            {/* <ul class="flex gap-4 mb-1 mt-2">
                 {
                     loggedIn ? (
                         loggedInMenus.map((menu) => (
@@ -50,7 +47,13 @@ export default function Nav({ loggedIn }: NavProps) {
                         ))
                     )
                 }
-            </ul>
+            </ul> */}
+            <a href="/app/accounts">
+                <div class="text-2xl  ml-1 font-bold flex flex-row">
+                    <img src="/logo.svg" width="45" class={"mr-3"} />{" "}
+                    <span class="mt-1">Debit</span><span class="text-gray-600 mt-1">Llama</span>
+                </div>
+            </a>
         </div>
     );
 }

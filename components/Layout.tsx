@@ -2,6 +2,7 @@
 import { Head } from "$fresh/runtime.ts";
 import type { ComponentChildren } from "preact";
 import Nav from "./Nav.tsx";
+import SideBar from "../islands/Sidebar.tsx";
 
 interface LayoutProps {
   isLoggedIn: boolean;
@@ -18,6 +19,7 @@ export default function Layout(props: LayoutProps) {
         <script src="/directdebit_bundle.js"></script>
       </Head>
       <Nav loggedIn={props.isLoggedIn} />
+      <SideBar></SideBar>
       <div class="p-2 mx-auto" style="min-height: 88vh;">
         {props.children}
       </div>
