@@ -3,7 +3,7 @@ import ScreenSizeDetector from "screen-size-detector";
 
 function openIfScreenBig(): boolean {
     const detectScreen = new ScreenSizeDetector();
-    return detectScreen.width < 1000
+    return detectScreen.width < 2000
 }
 
 export default function SideBar() {
@@ -12,7 +12,6 @@ export default function SideBar() {
     useEffect(() => {
         setCollapse(openIfScreenBig())
     }, [])
-
 
     return <div class="flex flex-col">
         <div id="sidebar-id" class={`fixed z-20 flex flex-col left-0 bg-white h-full border-r ${collapse ? "collapsed" : ""}`}>
