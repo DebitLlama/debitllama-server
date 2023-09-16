@@ -37,6 +37,15 @@ export default class QueryBuilder {
           );
           return this.responseHandler(res);
         },
+        byButtonIdForPayeeOnly: async (buttonId: string) => {
+          const res = await this.client.from("Items").select(
+            "*,relayerBalance_id(*)",
+          ).eq(
+            "button_id",
+            buttonId,
+          ).eq("payee_id", this.userid);
+          return this.responseHandler(res);
+        },
         //selectItemsByPayeeIdDesc
         byUserIdForPayeeDesc: async () => {
           const res = await this.client.from("Items").select().eq(
