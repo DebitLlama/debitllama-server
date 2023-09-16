@@ -15,7 +15,7 @@ interface AccountDisplayElementProps {
 }
 
 export function AccountDisplayElement(props: AccountDisplayElementProps) {
-    return <a href={`/app/account?q=${props.commitment}`} class={`cardshadow mt-2 mb-2 cursor-pointer ${props.extraCSS}`}>
+    return <a href={props.closed ? "#" : `/app/account?q=${props.commitment}`} class={`cardshadow mt-2 mb-2 cursor-pointer ${props.extraCSS}`}>
         <AccountCardElement
             name={props.name}
             balance={props.amount}
