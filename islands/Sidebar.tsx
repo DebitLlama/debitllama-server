@@ -5,12 +5,22 @@ function openIfScreenBig(): boolean {
     const detectScreen = new ScreenSizeDetector();
     return detectScreen.width < 2000
 }
+const closeIfOpenSidebar = () => {
+    const sidebar = document.getElementById("sidebar-id") as HTMLDivElement;
+    if (!sidebar.classList.contains("collapsed")) {
+        sidebar.classList.add("collapsed")
+    }
+}
 
 export default function SideBar() {
     const [collapse, setCollapse] = useState(true);
 
     useEffect(() => {
-        setCollapse(openIfScreenBig())
+        setCollapse(openIfScreenBig());
+        const layoutChildren = document.getElementById("layout-children") as HTMLDivElement;
+        layoutChildren.onclick = function () {
+            closeIfOpenSidebar();
+        }
     }, [])
 
     return <div id="sidebar-id" class={`select-none sidebarheight fixed z-20 flex flex-col left-0 bg-white border-r ${collapse ? "collapsed" : ""}`}>
