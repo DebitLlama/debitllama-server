@@ -104,13 +104,13 @@ export default function PaymentIntentsPaginationForAccounts(
 
   return <>
     {showLoadingIndicator ? <HourglassLoader /> : <>
-      <h1 class="text-2xl font-bold mb-5 text-center text-gray-400">Subscriptions</h1>
       <TableSearch
         tableType={FilterFor.PaymentIntents}
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         triggerSearch={triggerSearch}
         onEnterSearch={onEnterSearch}
+        tableTitle="Account Subscriptions"
       ></TableSearch>
       <PaymentIntentsTable
         headerClicked={headerClicked}

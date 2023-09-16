@@ -120,6 +120,7 @@ export default function RelayedTxHistory(props: RelayedTxHistoryProps) {
             setSearchTerm={setSearchTerm}
             triggerSearch={triggerSearch}
             onEnterSearch={onEnterSearch}
+            tableTitle="Transaction History"
         ></TableSearch>
 
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">

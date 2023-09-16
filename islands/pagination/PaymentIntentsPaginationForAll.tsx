@@ -98,13 +98,13 @@ export default function PaymentIntentsPaginationForAll(props: PaymentIntentsPagi
 
     return <>
         {showLoadingIndicator ? <HourglassLoader /> : <>
-            <h1 class="text-2xl font-bold mb-5 text-center">Subscriptions</h1>
             <TableSearch
                 tableType={FilterFor.PaymentIntents}
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
                 triggerSearch={triggerSearch}
                 onEnterSearch={onEnterSearch}
+                tableTitle="All Subscriptions"
             ></TableSearch>
             <PaymentIntentsTable
                 headerClicked={headerClicked}

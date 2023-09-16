@@ -95,14 +95,13 @@ export default function PaymentIntentsPaginationForDebitItemsPage() {
 
     return <>
         {showLoadingIndicator ? <HourglassLoader /> : <>
-            <h1 class="text-2xl font-bold mb-5 text-center">Payment Intents</h1>
-
             <TableSearch
                 tableType={FilterFor.PaymentIntents}
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
                 triggerSearch={triggerSearch}
                 onEnterSearch={onEnterSearch}
+                tableTitle="Payment Intents"
             ></TableSearch>
             <PaymentIntentsTable
                 headerClicked={headerClicked}
