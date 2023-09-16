@@ -88,7 +88,7 @@ export default function DebitItemsTable(props: DebitItemsDataProps) {
         return <div></div>
     } else {
         return <div class="flex flex-col">
-            <h1 class="text-2xl font-bold mb-5 text-center text-gray-500">Debit Items</h1>
+            <h1 class="text-2xl font-bold mb-5 text-center">Debit Items</h1>
             <TableSearch
                 tableType={FilterFor.DebitItems}
                 searchTerm={searchTerm}
