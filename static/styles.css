@@ -596,3 +596,11 @@
 #sidebar-id.collapsed {
 	width: 0;
 }
+
+.navheight {
+	height: 68px;
+}
+
+.sidebarheight {
+	height: calc(100vh - 68px);
+}
