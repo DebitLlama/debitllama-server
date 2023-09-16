@@ -20,11 +20,11 @@ export default function Layout(props: LayoutProps) {
       </Head>
       <Nav loggedIn={props.isLoggedIn} />
       <SideBar></SideBar>
-      <div class="p-2 mx-auto" style="min-height: 88vh;">
+      <div class="p-2 mx-auto layoutheight" >
         {props.children}
       </div>
       <footer
-        class="bg-neutral-200 text-center dark:bg-neutral-700 lg:text-left">
+        class="footerheight bg-neutral-200 text-center dark:bg-neutral-700 lg:text-left">
         <div class="p-4 text-center text-neutral-700 dark:text-neutral-200 flex flex-col">
           © ZKP Tech Solutions Ltd 2023{" "}
           <a

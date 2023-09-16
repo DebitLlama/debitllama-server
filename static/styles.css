@@ -601,6 +601,18 @@
 	height: 68px;
 }
 
+.footerheight {
+	height: 68px;
+}
+
 .sidebarheight {
 	height: calc(100vh - 68px);
+}
+
+.layoutheight {
+	height: calc(100vh - 160px);
+}
+
+.w-200px {
+	width: 200px;
 }
