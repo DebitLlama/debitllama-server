@@ -610,9 +610,17 @@
 }
 
 .layoutheight {
-	height: calc(100vh - 160px);
+	height: calc(100vh - 68px);
 }
 
 .w-200px {
 	width: 200px;
+}
+
+.negativeMarginTop10Px {
+	margin-top: -10px;
+}
+
+.bg-gradient-gray-to-white {
+	background: linear-gradient(#e5e7eb, white);
 }
