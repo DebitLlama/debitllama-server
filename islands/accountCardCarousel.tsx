@@ -68,8 +68,17 @@ export default function AccountCardCarousel(props: AccountCardCarouselProps) {
     const data = props.accountData[currentAccount];
 
     if (data === undefined) {
-        return <div></div>
+        return <div class="flex flex-col justify-center">
+            <div class="flex flex-row justify-center mb-4">
+                <h4 class="text-xl">Nothing to show</h4>
+            </div>
+            <div class="flex flex-row justify-around flex-wrap gap-2">
+                <a href={"/app/addNewAccount"} class="mb-8 bg-gradient-to-b w-max text-indigo-500 font-semibold from-slate-50 to-indigo-100 px-10 py-3 rounded-2xl shadow-indigo-400 shadow-md border-b-4 hover border-b border-indigo-200 hover:shadow-sm transition-all duration-500">New Virtual Account</a>
+                <a href={"/app/newConnectedWallet"} class="mb-8 bg-gradient-to-b w-max text-indigo-500 font-semibold from-slate-50 to-indigo-100 px-10 py-3 rounded-2xl shadow-indigo-400 shadow-md border-b-4 hover border-b border-indigo-200 hover:shadow-sm transition-all duration-500">Connect Wallet</a>
+            </div>
+        </div>
     }
+
 
     return <>
         <div class="flex flex-row justify-center gap-y-px">

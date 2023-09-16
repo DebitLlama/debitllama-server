@@ -85,7 +85,15 @@ export default function DebitItemsTable(props: DebitItemsDataProps) {
 
 
     if (props.debitItems.length === 0 || props.debitItems === null) {
-        return <div></div>
+        return <div class="flex flex-col">
+            <div class="flex flex-row justify-center mb-4">
+                <h4 class="text-xl">Nothing to show</h4>
+            </div>
+            <div class="flex flex-row justify-around flex-wrap gap-2">
+                <a href={"/app/addNewDebitItem"} class="mb-8 bg-gradient-to-b w-max mx-auto text-indigo-500 font-semibold from-slate-50 to-indigo-100 px-10 py-3 rounded-2xl shadow-indigo-400 shadow-md border-b-4 hover border-b border-indigo-200 hover:shadow-sm transition-all duration-500">New Debit Item</a>
+                <a href={"/app/relayer"} class="mb-8 bg-gradient-to-b w-max mx-auto text-indigo-500 font-semibold from-slate-50 to-indigo-100 px-10 py-3 rounded-2xl shadow-indigo-400 shadow-md border-b-4 hover border-b border-indigo-200 hover:shadow-sm transition-all duration-500">Relayer</a>
+            </div> </div>
+
     } else {
         return <div class="flex flex-col">
             <h1 class="text-2xl font-bold mb-5 text-center">Debit Items</h1>
