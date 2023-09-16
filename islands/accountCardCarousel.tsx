@@ -6,6 +6,7 @@ import { formatEther } from "../ethers.min.js";
 import { CarouselButtons } from '../components/components.tsx';
 import { Pricing } from '../lib/enums.ts';
 import PaymentIntentsPaginationForAccounts from './pagination/PaymentIntentsPaginationForAccounts.tsx';
+import AccountsSelectButtons from './AccountsSelectButtons.tsx';
 
 interface AccountCardCarouselProps {
     accountData: Array<any>,
@@ -32,37 +33,25 @@ export default function AccountCardCarousel(props: AccountCardCarouselProps) {
             if (props.accountData.length - 1 < 0) {
                 return;
             }
-            setVisible(false);
-            setTimeout(() => {
-                setCurrentAccount(props.accountData.length - 1);
-                setVisible(true);
-            }, 400)
-
+            setCurrentAccountWithAnimation(props.accountData.length - 1);
         } else {
-            setVisible(false);
-            setTimeout(() => {
-                setCurrentAccount(currentAccount - 1);
-                setVisible(true);
-            }, 400)
-
+            setCurrentAccountWithAnimation(currentAccount - 1);
         }
-
     }
     function forwardClicked() {
         if (props.accountData.length - 1 === currentAccount) {
-            setVisible(false);
-            setTimeout(() => {
-                setCurrentAccount(0);
-                setVisible(true)
-            }, 400)
-
+            setCurrentAccountWithAnimation(0);
         } else {
-            setVisible(false)
-            setTimeout(() => {
-                setCurrentAccount(currentAccount + 1)
-                setVisible(true)
-            }, 400)
+            setCurrentAccountWithAnimation(currentAccount + 1)
         }
+    }
+
+    function setCurrentAccountWithAnimation(to: number) {
+        setVisible(false)
+        setTimeout(() => {
+            setCurrentAccount(to)
+            setVisible(true)
+        }, 400)
     }
 
     const data = props.accountData[currentAccount];
@@ -79,9 +68,16 @@ export default function AccountCardCarousel(props: AccountCardCarouselProps) {
         </div>
     }
 
-
-    return <>
-        <div class="flex flex-row justify-center gap-y-px">
+    return <div class={"negativeMarginTop10Px container border-2 bg-gradient-gray-to-white to-white rounded-lg mx-auto"}>
+        <AccountsSelectButtons
+            accountData={props.accountData}
+            currentAccount={currentAccount}
+            stateSetter={setCurrentAccountWithAnimation}
+        ></AccountsSelectButtons>
+        <div class="flex flex-row justify-left">
+            <p class="pl-6 mb-2 text-gray-500 font-semibold text-sm">{props.accountData.length} account{props.accountData.length === 1 ? " " : "s "} found </p>
+        </div>
+        <div class="flex flex-row justify-center ">
             <div class={"flex flex-col justify-center"}>
                 {AccountDisplayElement(
                     {
@@ -104,10 +100,10 @@ export default function AccountCardCarousel(props: AccountCardCarouselProps) {
         <MissedPaymentsNotification chainId={data.network_id} missedPayments={getPaymentIntentsForCurrentAccount(data.commitment, props.missedPayments)}></MissedPaymentsNotification>
         <hr
             class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
-        <section class="container px-4 mx-auto">
+        <section class="px-4 mx-auto">
             <PaymentIntentsPaginationForAccounts accountId={data.id}></PaymentIntentsPaginationForAccounts>
         </section>
-    </>
+    </div>
 }
 
 interface MissedPaymentsNotificationProps {
