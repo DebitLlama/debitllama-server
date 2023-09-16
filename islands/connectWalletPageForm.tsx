@@ -148,8 +148,8 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
 
     return <form onSubmit={onSubmitForm} class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md" method="POST">
         <Overlay show={showOverlay} ></Overlay>
-        <h1 class="text-2xl font-bold text-center">Connect Wallet</h1>
-        <h4 class="text-md mb-6">Connect a wallet with a specific ERC-20 token to use.</h4>
+        <h1 class="text-2xl font-bold text-left">Connect Wallet</h1>
+        <h4 class="text-md mb-6">A connected wallet will allow you to spend tokens directly from it, instead of depositing into a smart contract like virtual accounts. </h4>
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Account Name</label>
             <input value={name} onChange={(event: any) => setName(event.target.value)} required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
