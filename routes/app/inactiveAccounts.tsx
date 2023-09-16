@@ -20,6 +20,7 @@ export const handler: Handlers<any, State> = {
 export default function InactiveAccounts(props: PageProps) {
     return (
         <Layout isLoggedIn={props.data.token}>
+            <hr class="w-48 h-1 mx-auto my-8 border-0 rounded md:my-10 " />
             <AccountCardCarousel
                 missedPayments={props.data.missedPayments}
                 accountData={props.data.accountsData}></AccountCardCarousel>
