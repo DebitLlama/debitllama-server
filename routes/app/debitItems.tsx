@@ -2,7 +2,6 @@ import Layout from "../../components/Layout.tsx";
 import { State } from "../_middleware.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import QueryBuilder from "../../lib/backend/queryBuilder.ts";
-import PaymentIntentsPaginationForDebitItemsPage from "../../islands/pagination/PaymentIntentsPaginationForDebitItemsPage.tsx";
 import { DEBITITEMSTABLEPAGESIZE } from "../../lib/enums.ts";
 import { getTotalPages } from "../../lib/backend/businessLogic.ts";
 import DebitItemsTable from "../../islands/pagination/DebitItemsTable.tsx";
