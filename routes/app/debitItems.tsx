@@ -28,8 +28,5 @@ export default function DebitItems(props: PageProps) {
         </section>
         <hr
             class="my-1 h-3 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
-        <section class="container px-4 mx-auto">
-            <PaymentIntentsPaginationForDebitItemsPage></PaymentIntentsPaginationForDebitItemsPage>
-        </section>
     </Layout>
 }
