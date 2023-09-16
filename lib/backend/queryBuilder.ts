@@ -108,6 +108,15 @@ export default class QueryBuilder {
             .order("last_modified", { ascending: false });
           return this.responseHandler(res);
         },
+        whereClosedByUserIdOrderDesc: async () => {
+          const res = await this.client
+            .from("Accounts")
+            .select()
+            .eq("user_id", this.userid)
+            .eq("closed", true)
+            .order("last_modified", { ascending: false });
+          return this.responseHandler(res);
+        },
         allByUserIdOrderDesc: async () => {
           const res = await this.client
             .from("Accounts")
@@ -288,6 +297,44 @@ export default class QueryBuilder {
             .like("paymentIntent", searchTerm)
             .eq("debit_item_id", debit_item_id)
             .range(rangeFrom, rangeTo);
+          return this.responseHandler(res);
+        },
+        allByUserIdForCreatorPaginated: async (
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+        ) => {
+          const res = await this.client.from("PaymentIntents").select(
+            "*,debit_item_id(*)",
+            { count: "exact" },
+          ).eq(
+            "creator_user_id",
+            this.userid,
+          ).order(
+            order,
+            { ascending },
+          ).range(rangeFrom, rangeTo);
+          return this.responseHandler(res);
+        },
+        allByUserIdForCreatorPaginatedWithSearch: async (
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+          searchTerm: string,
+        ) => {
+          const res = await this.client.from("PaymentIntents").select(
+            "*,debit_item_id(*)",
+            { count: "exact" },
+          ).eq(
+            "creator_user_id",
+            this.userid,
+          ).order(
+            order,
+            { ascending },
+          ).range(rangeFrom, rangeTo)
+            .like("paymentIntent", searchTerm);
           return this.responseHandler(res);
         },
       },
