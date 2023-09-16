@@ -22,7 +22,6 @@ export const handler: Handlers<any, State> = {
         const select = queryBuilder.select();
         try {
             const { data } = await select.Accounts.byCommitment(query);
-
             if (data.length === 0) {
                 return ctx.render({ ...ctx.state, notfound: true })
             }
@@ -74,62 +73,64 @@ export const handler: Handlers<any, State> = {
     }
 }
 export default function Account(props: PageProps) {
+    if (props.data.notfound) {
+        return <div class="container mx-auto py-8">
+            <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
+                <h1 class="text-2xl font-bold mb-6 text-center">Account Not Found</h1>
+            </div>
+        </div>;
+    }
+
+
     const balance = props.data.accountData.account[3];
     const tokenAddress = props.data.accountData.account[2];
     const creatorAddress = props.data.accountData.account[1];
     const accountType = props.data.accountType;
+
+
     return <Layout isLoggedIn={props.data.token}>
-        {!props.data.notfound ?
-            <div class="container mx-auto py-8">
-                <div class="flex items-center justify-center h-full">
-                    <div class="bg-white shadow-2xl p-6 rounded-2xl border-2 border-gray-50">
-                        <div class="flex flex-col justify-center">
-                            <AccountCardElement
-                                name={props.data.name}
-                                balance={formatEther(balance)}
-                                network={networkNameFromId[props.data.networkId as ChainIds]}
-                                currency={props.data.currency}
-                                accountType={accountType}
-                                closed={props.data.closed}
-                            ></AccountCardElement>
-                            <WalletDetailsFetcher
-                                accountType={accountType}
-                                networkId={props.data.networkId}
-                                creatorAddress={creatorAddress}
-                                tokenAddress={tokenAddress}
-                                currencyName={JSON.parse(props.data.currency).name}
-                                updateBalance={(to: string) => {
-                                    //Do nothing here now,
-                                }}
-                            ></WalletDetailsFetcher>
-                            {accountType === AccountTypes.VIRTUALACCOUNT ?
-                                <AccountTopupOrClose
-                                    currencyName={props.data.currency}
-                                    accountName={props.data.name}
-                                    debitContractAddress={getVirtualAccountsContractAddress[props.data.networkId as ChainIds]}
-                                    erc20ContractAddress={tokenAddress}
-                                    commitment={props.data.commitment}
-                                    chainId={props.data.networkId}
-                                    isERC20={tokenAddress !== ZeroAddress}
-                                    accountClosed={props.data.closed}
-                                ></AccountTopupOrClose>
-                                : <WalletApproveOrDisconnect
-                                    chainId={props.data.networkId}
-                                    erc20ContractAddress={tokenAddress}
-                                    debitContractAddress={getConnectedWalletsContractAddress[props.data.networkId as ChainIds]}
-                                    accountClosed={props.data.closed}
-                                    commitment={props.data.commitment}
-                                ></WalletApproveOrDisconnect>
-                            }
-                        </div>
+        <div class="container mx-auto py-8">
+            <div class="flex items-center justify-center h-full">
+                <div class="bg-white shadow-2xl p-6 rounded-2xl border-2 border-gray-50">
+                    <div class="flex flex-col justify-center">
+                        <AccountCardElement
+                            name={props.data.name}
+                            balance={formatEther(balance)}
+                            network={networkNameFromId[props.data.networkId as ChainIds]}
+                            currency={props.data.currency}
+                            accountType={accountType}
+                            closed={props.data.closed}
+                        ></AccountCardElement>
+                        <WalletDetailsFetcher
+                            accountType={accountType}
+                            networkId={props.data.networkId}
+                            creatorAddress={creatorAddress}
+                            tokenAddress={tokenAddress}
+                            currencyName={JSON.parse(props.data.currency).name}
+
+                        ></WalletDetailsFetcher>
+                        {accountType === AccountTypes.VIRTUALACCOUNT ?
+                            <AccountTopupOrClose
+                                currencyName={props.data.currency}
+                                accountName={props.data.name}
+                                debitContractAddress={getVirtualAccountsContractAddress[props.data.networkId as ChainIds]}
+                                erc20ContractAddress={tokenAddress}
+                                commitment={props.data.commitment}
+                                chainId={props.data.networkId}
+                                isERC20={tokenAddress !== ZeroAddress}
+                                accountClosed={props.data.closed}
+                            ></AccountTopupOrClose>
+                            : <WalletApproveOrDisconnect
+                                chainId={props.data.networkId}
+                                erc20ContractAddress={tokenAddress}
+                                debitContractAddress={getConnectedWalletsContractAddress[props.data.networkId as ChainIds]}
+                                accountClosed={props.data.closed}
+                                commitment={props.data.commitment}
+                            ></WalletApproveOrDisconnect>
+                        }
                     </div>
                 </div>
             </div>
-            : <div class="container mx-auto py-8">
-                <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
-                    <h1 class="text-2xl font-bold mb-6 text-center">Account Not Found</h1>
-                </div>
-            </div>
-        }
+        </div>
     </Layout>
 }
