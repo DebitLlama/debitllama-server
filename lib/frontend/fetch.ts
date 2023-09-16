@@ -184,6 +184,21 @@ export async function fetchPaginatedPaymentIntentsForAccount(args: {
     },
   }).then((response) => response);
 }
+export async function fetchPaginatedSubscriptionsForUserId(args: {
+  currentPage: number;
+  searchTerm: string;
+  sortBy: PaymentIntentsTableColNames;
+  sortDirection: "ASC" | "DESC";
+}) {
+  return await fetch("/app/pagination/subscriptions", {
+    credentials: "same-origin",
+    method: "POST",
+    body: JSON.stringify(args),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((response) => response);
+}
 
 export async function fetchPaginatedPaymentIntentsForDebitItems(args: {
   currentPage: number;
