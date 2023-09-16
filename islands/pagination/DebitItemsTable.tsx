@@ -95,17 +95,17 @@ export default function DebitItemsTable(props: DebitItemsDataProps) {
             </div> </div>
 
     } else {
-        return <div class="flex flex-col">
-            <h1 class="text-2xl font-bold mb-5 text-center">Debit Items</h1>
+        return <div>
             <TableSearch
+                tableTitle="Debit Items"
                 tableType={FilterFor.DebitItems}
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
                 triggerSearch={triggerSearch}
                 onEnterSearch={onEnterSearch}
             ></TableSearch>
-            <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+            <div class=" -my-2 overflow-x-auto">
+                <div class="inline-block min-w-full py-2 align-middle">
                     <div class="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-800 select-none">
