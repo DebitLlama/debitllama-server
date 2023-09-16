@@ -53,13 +53,12 @@ export const handler: Handlers<any, State> = {
     }
 }
 
-
 export default function CreatedPaymentIntents(props: PageProps) {
     const pi = props.data.paymentIntentData[0] as PaymentIntentRow;
     return <Layout isLoggedIn={props.data.token}>
         <div class="container mx-auto">
             {!props.data.notfound ? <div>
-                <div class="text-center"><h1 class="text-2xl font-bold mb-2">Payment Intent</h1></div>
+                <div class="text-center"><h1 class="text-2xl font-bold mb-2">Subscription</h1></div>
                 <div class="flex rounded-xl" style="background-color:white;">
                     <table class="table-fixed w-full  border border-gray-200 dark:border-gray-700 md:rounded-lg">
                         <thead>
