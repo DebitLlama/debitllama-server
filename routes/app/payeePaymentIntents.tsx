@@ -177,6 +177,11 @@ export const handler: Handlers<any, State> = {
 
 
 export default function CreatedPaymentIntents(props: PageProps) {
+    if (props.data.notfound) {
+        return <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
+            <h1 class="text-2xl font-bold mb-6 text-center">Not Found</h1>
+        </div>
+    }
     const pi = props.data.paymentIntentData[0] as PaymentIntentRow;
     const dynamicPaymentRequestJobArr = props.data.dynamicPaymentRequestJobArr;
 
@@ -264,9 +269,11 @@ export default function CreatedPaymentIntents(props: PageProps) {
         }
     }
 
+
+
     return <Layout isLoggedIn={props.data.token}>
         <div class="container mx-auto py-8">
-            {!props.data.notfound ? <>  <div class="bg-gray-100 border border-gray-200 dark:border-gray-700 md:rounded-lg">
+            <div class="bg-gray-100 border border-gray-200 dark:border-gray-700 md:rounded-lg">
                 <div class="text-center"><h1 class="text-2xl font-bold mb-2 text-gray-500 dark:text-gray-40">Payment Intent</h1></div>
                 <div class="flex rounded-xl" style="background-color:white;">
                     <table class="table-fixed w-full  border border-gray-200 dark:border-gray-700 md:rounded-lg">
@@ -358,17 +365,9 @@ export default function CreatedPaymentIntents(props: PageProps) {
                     </table>
                 </div>
             </div>
-                <hr
-                    class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
-                <div class="flex flex-row justify-center">
-                    <h4 class={"text-gray-400"}>Transaction History</h4>
-                </div>
-                <hr
-                    class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
-                <RelayedTxHistory paymentIntent_id={pi.id} searchBy="paymentIntent_id" totalPages={props.data.paymentIntentHistoryTotalpages} txHistory={props.data.paymentIntentHistory}></RelayedTxHistory>
-            </> : <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
-                <h1 class="text-2xl font-bold mb-6 text-center">Not Found</h1>
-            </div>}
+            <hr
+                class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
+            <RelayedTxHistory paymentIntent_id={pi.id} searchBy="paymentIntent_id" totalPages={props.data.paymentIntentHistoryTotalpages} txHistory={props.data.paymentIntentHistory}></RelayedTxHistory>
         </div>
-    </Layout>
+    </Layout >
 }
