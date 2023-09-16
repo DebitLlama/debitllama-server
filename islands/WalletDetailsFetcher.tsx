@@ -11,7 +11,6 @@ export interface ConnectedWalletDetailsFetcherProps {
     networkId: ChainIds,
     tokenAddress: string,
     currencyName: string,
-    updateBalance: (to: string) => void;
 }
 export default function WalletDetailsFetcher(props: ConnectedWalletDetailsFetcherProps) {
     const [connectedWalletBalance, setConnectedWalletBalance] = useState("⏳");
@@ -28,10 +27,8 @@ export default function WalletDetailsFetcher(props: ConnectedWalletDetailsFetche
         setCurrentApprovalAmount(formatEther(allowance) + " " + props.currencyName);
         if (allowance >= balance) {
             setSpendableBalance(formatEther(balance) + " " + props.currencyName)
-            props.updateBalance(formatEther(balance))
         } else {
             setSpendableBalance(formatEther(allowance) + " " + props.currencyName);
-            props.updateBalance(formatEther(allowance))
         }
     }
 
