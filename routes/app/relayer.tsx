@@ -18,7 +18,6 @@ export const handler: Handlers<any, State> = {
             //TODO: It should insert().select(). I should select the insert and not run a select again!
             await insert.RelayerBalance.newRelayerBalance();
             const { data: relayerBalanceData } = await select.RelayerBalance.byUserId();
-            return ctx.render({ ...ctx.state, relayerBalanceData })
         }
 
         const { data: profileData } = await select.Profiles.byUserId();
