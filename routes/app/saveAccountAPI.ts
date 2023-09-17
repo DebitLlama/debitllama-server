@@ -67,6 +67,7 @@ export const handler: Handlers<any, State> = {
         currency,
         accountData.account[3],
         accountType,
+        accountData.account[1]
       );
       return successResponseBuilder("Account Saved");
     } else {
