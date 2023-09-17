@@ -77,7 +77,8 @@ export type Account = {
   closed: boolean;
   currency: string;
   balance: string;
-  accountType: AccountTypes
+  accountType: AccountTypes;
+  creator_address: string
 };
 
 export type DebitItem = {
