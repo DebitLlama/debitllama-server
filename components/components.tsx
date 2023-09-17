@@ -32,7 +32,7 @@ export function getSubscriptionTooltipMessage(pricing: string) {
 
 export function getDebitIntervalText(debitInterval: number, debitTimes: number) {
     if (debitTimes === 1) {
-        return "Unspecified";
+        return "Single payment";
     }
     if (debitInterval === 0) {
         return "Unspecified"
@@ -158,7 +158,7 @@ export function getPaymentRequestJobStatusTooltipMessage(status: DynamicPaymentR
 }
 
 export function CarouselButtons(props: { backClicked: () => void, forwardClicked: () => void }) {
-    return <div class="flex flex-rw justify-center">
+    return <div class="flex flex-rw justify-around">
 
         <label onClick={props.backClicked}
             class="cursor-pointer bg-white rounded-full shadow-md active:translate-y-0.5"
