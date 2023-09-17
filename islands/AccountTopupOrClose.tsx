@@ -24,7 +24,6 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
     }
 
     async function handleTokenTopup(contract: any) {
-        setShowOverlay(true)
         const topuptx = await topUpTokens(
             contract,
             props.commitment,
@@ -55,7 +54,6 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
     }
 
     async function handleEthTopup(contract: any) {
-        setShowOverlay(true)
 
         const topuptx = await topUpETH(
             contract,
@@ -93,36 +91,51 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
             return;
         }
         const address = await requestAccounts();
+        setShowOverlay(true)
 
         if (props.isERC20) {
             const erc20Contract = await getContract(
                 provider,
                 props.erc20ContractAddress,
-                "/ERC20.json");
+                "/ERC20.json").catch((err: any) => {
+                    setShowOverlay(false)
+                });
 
-            const allowance: bigint = await getAllowance(erc20Contract, address, props.debitContractAddress);
+            const allowance: bigint = await getAllowance(erc20Contract, address, props.debitContractAddress).catch((err: any) => {
+                setShowOverlay(false)
+            });;
             const contract = await getContract(
                 provider,
                 props.debitContractAddress,
-                "/VirtualAccounts.json");
+                "/VirtualAccounts.json").catch((err: any) => {
+                    setShowOverlay(false)
+                });;
 
             if (allowance >= parseEther(amount)) {
                 // Just do the top up
-                await handleTokenTopup(contract);
+                await handleTokenTopup(contract).catch((err: any) => {
+                    setShowOverlay(false)
+                });;
             } else {
                 // Add allowance and then deposit
                 const approveTx = await approveSpend(
-                    props.erc20ContractAddress,
+                    erc20Contract,
                     props.debitContractAddress,
                     amount
-                )
+                ).catch((err: any) => {
+                    setShowOverlay(false)
+                });
 
                 if (approveTx !== undefined) {
                     await approveTx.wait().then(async (receipt: any) => {
                         if (receipt.status === 1) {
-                            await handleTokenTopup(contract);
+                            await handleTokenTopup(contract).catch((err: any) => {
+                                setShowOverlay(false)
+                            });;
                         }
-                    })
+                    }).catch((err: any) => {
+                        setShowOverlay(false)
+                    });
                 }
             }
 
@@ -130,9 +143,13 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
             const contract = await getContract(
                 provider,
                 props.debitContractAddress,
-                "/VirtualAccounts.json");
+                "/VirtualAccounts.json").catch((err: any) => {
+                    setShowOverlay(false)
+                });;
 
-            await handleEthTopup(contract);
+            await handleEthTopup(contract).catch((err: any) => {
+                setShowOverlay(false)
+            });;
         }
 
     }
@@ -155,7 +172,7 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
         if (withdrawTx !== undefined) {
             await withdrawTx.wait().then((receipt: any) => {
                 if (receipt.status === 1) {
-                    redirectToAccountsPage();
+                    redirectToAccountPage(props.commitment);
                 } else {
                     setShowOverlay(false)
                 }
