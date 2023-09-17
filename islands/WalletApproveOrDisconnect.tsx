@@ -2,7 +2,7 @@ import { useState } from 'preact/hooks';
 import Overlay from "../components/Overlay.tsx";
 import { approveSpend, disconnectWallet, getContract, handleNetworkSelect, requestAccounts } from "../lib/frontend/web3.ts";
 import { ChainIds } from '../lib/shared/web3.ts';
-import { redirectToAccountsPage } from '../lib/frontend/fetch.ts';
+import { redirectToAccountPage, redirectToAccountsPage } from '../lib/frontend/fetch.ts';
 
 export interface WalletApproveOrDisconnectProps {
     chainId: ChainIds,
@@ -20,7 +20,6 @@ export default function WalletApproveOrDisconnect(props: WalletApproveOrDisconne
         console.log(err);
     }
 
-
     async function approveClicked(event: any) {
         event.preventDefault();
 
@@ -33,18 +32,25 @@ export default function WalletApproveOrDisconnect(props: WalletApproveOrDisconne
             provider,
             props.erc20ContractAddress,
             "/ERC20.json");
+        setShowOverlay(true);
 
         const approveTx = await approveSpend(
             erc20Contract,
             props.debitContractAddress,
             approveAmount
-        );
+        ).catch(err => {
+            setShowOverlay(false);
+            console.log(err)
+        });
 
         if (approveTx !== undefined) {
             await approveTx.wait().then(async (receipt: any) => {
                 if (receipt.status === 1) {
                     location.reload();
                 }
+            }).catch((err: any) => {
+                setShowOverlay(false);
+                console.log(err)
             })
         }
     }
@@ -71,7 +77,7 @@ export default function WalletApproveOrDisconnect(props: WalletApproveOrDisconne
         if (disconnectTx !== undefined) {
             await disconnectTx.wait().then((receipt: any) => {
                 if (receipt.status === 1) {
-                    redirectToAccountsPage();
+                    redirectToAccountPage(props.commitment);
                 } else {
                     setShowOverlay(false)
                 }
@@ -79,7 +85,6 @@ export default function WalletApproveOrDisconnect(props: WalletApproveOrDisconne
                 setShowOverlay(false);
             })
         }
-
     }
 
     return <>
