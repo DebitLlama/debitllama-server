@@ -1,3 +1,5 @@
+import { AccountTypes } from "../enums.ts";
+
 export enum NetworkNames {
   BTT_TESTNET = "BTT Donau Testnet",
 }
@@ -13,16 +15,12 @@ export enum ChainIds {
   BTT_TESTNET_ID = "0x405",
 }
 
-export enum DirectDebitContractAddress {
-  BTT_TESTNET = "0x003E9E692029118e110c9A73a37B62b04D3d79e9",
-}
-
 export enum VirtualAccountsContractAddress {
-  BTT_TESTNET = "0x12F85Dd36456088f46baD586923eF2eB13482bc3",
+  BTT_TESTNET = "0x870B0E3cf2c556dda20D3cB39e87145C21e8C023",
 }
 
 export enum ConnectedWalletsContractAddress {
-  BTT_TESTNET = "0xd14e897048cd38b9A1872959358B59A974FbACC1",
+  BTT_TESTNET = "0xaB9ADa67294C7f5F4690f23CEaEc4Ec6c4B14976",
 }
 
 export enum RPCURLS {
@@ -67,6 +65,13 @@ export const getConnectedWalletsContractAddress: {
   [keys in ChainIds]: ConnectedWalletsContractAddress;
 } = {
   [ChainIds.BTT_TESTNET_ID]: ConnectedWalletsContractAddress.BTT_TESTNET,
+};
+
+export const getAbiJsonByAccountType: {
+    [keys in AccountTypes]: string;
+} = {
+  [AccountTypes.VIRTUALACCOUNT] : "/VirtualAccounts.json",
+  [AccountTypes.CONNECTEDWALLET] : "/ConnectedWallets.json"
 };
 
 export const getRelayerGasTrackerContractAddress: {
