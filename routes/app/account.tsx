@@ -4,15 +4,16 @@ import Layout from "../../components/Layout.tsx";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
 import { ChainIds, getConnectedWalletsContractAddress, getVirtualAccountsContractAddress, networkNameFromId } from "../../lib/shared/web3.ts";
-import { getAccount } from "../../lib/backend/web3.ts";
-import { ZeroAddress, formatEther } from "../../ethers.min.js";
 import AccountTopupOrClose from "../../islands/AccountTopupOrClose.tsx";
 import { AccountCardElement } from "../../components/AccountCardElement.tsx";
 import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 import { updatePaymentIntentsWhereAccountBalanceWasAdded } from "../../lib/backend/businessLogic.ts";
-import { AccountTypes } from "../../lib/enums.ts";
+import { AccountTypes, Pricing } from "../../lib/enums.ts";
 import WalletApproveOrDisconnect from "../../islands/WalletApproveOrDisconnect.tsx";
 import WalletDetailsFetcher from "../../islands/WalletDetailsFetcher.tsx";
+import { formatEther, getAccount } from "../../lib/backend/web3.ts";
+import { parseEther } from "../../lib/frontend/web3.ts";
+import { ZeroAddress } from "$ethers";
 
 export const handler: Handlers<any, State> = {
     async GET(req: any, ctx: any) {
@@ -20,20 +21,30 @@ export const handler: Handlers<any, State> = {
         const query = url.searchParams.get("q") || "";
         const queryBuilder = new QueryBuilder(ctx);
         const select = queryBuilder.select();
+        const update = queryBuilder.update();
+
         try {
             const { data } = await select.Accounts.byCommitment(query);
             if (data.length === 0) {
                 return ctx.render({ ...ctx.state, notfound: true })
             }
 
+            if (data[0].closed) {
+                // If it's closed in the database, I redirect to accounts page, no need to run more code!
+                const headers = new Headers();
+                headers.set("location", "/app/accounts");
+                return new Response(null, {
+                    status: 303,
+                    headers,
+                });
+            }
+
             const networkId = data[0].network_id;
 
             const onChainAccount = await getAccount(query, networkId, data[0].accountType);
 
-            // I only do this for Virtual accounts, only those have balance!
-            if (data[0].balance !== formatEther(onChainAccount.account[3])
-                && data[0].accountType === AccountTypes.VIRTUALACCOUNT) {
-                const update = queryBuilder.update();
+            // If account on chain is active but the balance is not the same as the balance I saved
+            if (onChainAccount.account[0] && data[0].balance !== formatEther(onChainAccount.account[3])) {
 
                 //Check if there were payment intents with account balance too low and 
                 // calculate how much balance was added and set them to recurring or created where possible
@@ -45,7 +56,19 @@ export const handler: Handlers<any, State> = {
 
             }
 
-            if (data[0].closed) {
+            // If account is not active but the data saved in teh db (closed) is still false
+            // This is a separate condition to handle edge case when an empty account is closed, we don't check balance!
+            if (!onChainAccount.account[0] && !data[0].closed) {
+                await update.Accounts.balanceAndClosedById(onChainAccount.account[3], !onChainAccount.account[0], data[0].id)
+
+                // I need to void all payment intents that are not paid or cancelled!
+                // This will only void them in the database, but the proofs are already unusable since the account is not active anymore!
+                await update.PaymentIntents.toCancelledByAccountIdForCreator(data[0].id);
+            }
+
+
+
+            if (!onChainAccount.account[0]) {
                 // If it's closed I redirect to accounts page!
                 const headers = new Headers();
                 headers.set("location", "/app/accounts");
@@ -54,6 +77,9 @@ export const handler: Handlers<any, State> = {
                     headers,
                 });
             }
+
+            const { data: missedPayments } = await select.PaymentIntents.forAccountbyAccountBalanceTooLow(data[0].id)
+
             return ctx.render(
                 {
                     notfound: false,
@@ -64,7 +90,8 @@ export const handler: Handlers<any, State> = {
                     closed: data[0].closed,
                     networkId: networkId,
                     accountData: onChainAccount,
-                    accountType: data[0].accountType
+                    accountType: data[0].accountType,
+                    missedPayments
                 });
 
         } catch (err) {
@@ -72,6 +99,7 @@ export const handler: Handlers<any, State> = {
         }
     }
 }
+
 export default function Account(props: PageProps) {
     if (props.data.notfound) {
         return <div class="container mx-auto py-8">
@@ -81,12 +109,25 @@ export default function Account(props: PageProps) {
         </div>;
     }
 
-
     const balance = props.data.accountData.account[3];
     const tokenAddress = props.data.accountData.account[2];
     const creatorAddress = props.data.accountData.account[1];
     const accountType = props.data.accountType;
+    const currencyName = JSON.parse(props.data.currency).name;
+    const missedPayments = props.data.missedPayments.reduce((acc: any, currentValue: any) => {
+        if (currentValue.pricing === Pricing.Fixed) {
+            return acc + parseEther(currentValue.maxDebitAmount)
+        } else {
+            return acc + parseEther(currentValue.failedDynamicPaymentAmount)
+        };
+    }, parseEther("0"));
 
+    const balanceMessage = accountType === AccountTypes.VIRTUALACCOUNT
+        ? <p class="text-left text-red-600">You missed payments! Top up your account with at least {formatEther(missedPayments)} {currencyName}</p>
+        : <p class="text-left text-red-600">You missed payments! You are missing {formatEther(missedPayments)} {currencyName}  from you spendable balance! Make sure to have enough balance in your wallet and update your allowance. </p>
+
+
+    const showBalanceMessage = missedPayments === BigInt("0") ? null : balanceMessage
 
     return <Layout isLoggedIn={props.data.token}>
         <div class="container mx-auto py-8">
@@ -106,9 +147,11 @@ export default function Account(props: PageProps) {
                             networkId={props.data.networkId}
                             creatorAddress={creatorAddress}
                             tokenAddress={tokenAddress}
-                            currencyName={JSON.parse(props.data.currency).name}
-
+                            currencyName={currencyName}
                         ></WalletDetailsFetcher>
+                        <div class="w-80">
+                            {showBalanceMessage}
+                        </div>
                         {accountType === AccountTypes.VIRTUALACCOUNT ?
                             <AccountTopupOrClose
                                 currencyName={props.data.currency}
