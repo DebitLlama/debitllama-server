@@ -104,7 +104,7 @@ export default function Item(props: PageProps) {
                                 <tr>
                                     <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Checkout:</td>
                                     <td class={"px-4 py-4 text-sm whitespace-nowrap flex flex-row justify-start"}>
-                                        <a href={`/buyitnow/?q=${itemData.button_id}`} class={"cursor-pointer"}>
+                                        <a target="_blank" href={`/buyitnow/?q=${itemData.button_id}`} class={"cursor-pointer"}>
                                             <img
                                                 width="140px"
 
