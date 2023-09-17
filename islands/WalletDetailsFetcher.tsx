@@ -13,6 +13,7 @@ export interface ConnectedWalletDetailsFetcherProps {
     currencyName: string,
 }
 export default function WalletDetailsFetcher(props: ConnectedWalletDetailsFetcherProps) {
+
     const [connectedWalletBalance, setConnectedWalletBalance] = useState("⏳");
     const [currentApprovalAmount, setCurrentApprovalAmount] = useState("⏳");
     const [spendableBalance, setSpendableBalance] = useState("⏳");
@@ -20,9 +21,9 @@ export default function WalletDetailsFetcher(props: ConnectedWalletDetailsFetche
     async function fetchAndSetBalanceAndApproval() {
         const connectedWalletContractAddress = getConnectedWalletsContractAddress[props.networkId];
         const provider = getJSONRPCProvider(props.networkId);
-        const erc20Contract = await getContract(provider, props.tokenAddress, "/ERC20.json");
-        const balance = await balanceOf(erc20Contract, props.creatorAddress);
-        const allowance = await getAllowance(erc20Contract, props.creatorAddress, connectedWalletContractAddress)
+        const erc20Contract = await getContract(provider, props.tokenAddress, "/ERC20.json").catch(console.error);
+        const balance = await balanceOf(erc20Contract, props.creatorAddress).catch(console.error);;
+        const allowance = await getAllowance(erc20Contract, props.creatorAddress, connectedWalletContractAddress).catch(console.error);
         setConnectedWalletBalance(formatEther(balance) + " " + props.currencyName);
         setCurrentApprovalAmount(formatEther(allowance) + " " + props.currencyName);
         if (allowance >= balance) {
@@ -51,23 +52,23 @@ export default function WalletDetailsFetcher(props: ConnectedWalletDetailsFetche
         <tbody>
             <tr>
                 <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>{props.accountType === AccountTypes.CONNECTEDWALLET ? "Connected Wallet:" : "Creator Address"}</td>
-                <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData"> <small>{props.creatorAddress}</small> </div></td>
+                <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto  overflow-y-hide overflowingTableData"> <small>{props.creatorAddress}</small> </div></td>
             </tr>
             {!isZero(props.tokenAddress) && isAddress(props.tokenAddress) ? <tr>
                 <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Token Address:</td>
-                <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData"> <small>{props.tokenAddress}</small> </div></td>
+                <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto  overflow-y-hide overflowingTableData"> <small>{props.tokenAddress}</small> </div></td>
             </tr> : null}
             {props.accountType === AccountTypes.CONNECTEDWALLET ? <tr>
                 <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Wallet Balance:</td>
-                <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData"> <small>{connectedWalletBalance}</small> </div></td>
+                <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class={`overflow-x-auto overflow-y-hide overflowingTableData `} > <small class={`${connectedWalletBalance === "⏳" ? `icon-spinner` : ""}`} >{connectedWalletBalance}</small> </div></td>
             </tr> : null}
             {props.accountType === AccountTypes.CONNECTEDWALLET ? <tr>
                 <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Allowance:</td>
-                <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData"> <small>{currentApprovalAmount}</small> </div></td>
+                <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class={`overflow-x-auto overflow-y-hide overflowingTableData`} > <small class={`${currentApprovalAmount === "⏳" ? `icon-spinner` : ""}`} >{currentApprovalAmount}</small> </div></td>
             </tr> : null}
             {props.accountType === AccountTypes.CONNECTEDWALLET ? <tr>
                 <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Spendable balance:</td>
-                <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData"> <strong>{spendableBalance}</strong> </div></td>
+                <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class={`overflow-x-auto  overflow-y-hide overflowingTableData`} > <strong class={`${spendableBalance === "⏳" ? `icon-spinner` : ""}`}>{spendableBalance}</strong> </div></td>
             </tr> : null}
         </tbody>
     </table>
