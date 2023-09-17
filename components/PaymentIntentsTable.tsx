@@ -100,7 +100,7 @@ export function PaymentIntentsTable(props: PaymentIntentsTablePropWithFilter) {
                                     <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{data.debitTimes}</td>
                                     <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{data.used_for}</td>
 
-                                    {props.forPage === PaymentIntentsTablePages.ITEM ? <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{data.account_id.balance} {data.account_id.currency}</td> : null}
+                                    {props.forPage === PaymentIntentsTablePages.ITEM ? <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{data.account_id.balance} {currencyName}</td> : null}
 
                                     <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{getNextPaymentDateDisplay(data.nextPaymentDate)}</td>
                                     <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
