@@ -175,6 +175,10 @@ export async function getContract(
 }
 // Smart contract functions start here
 
+export async function getAccount(contract: any, commitment: string) {
+  return await contract.getAccount(commitment);
+}
+
 export async function depositEth(
   contract: any,
   commitment: string,
