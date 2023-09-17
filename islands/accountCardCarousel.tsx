@@ -4,7 +4,7 @@ import { AccountDisplayElement } from "../components/AccountDisplayElement.tsx";
 import { parseEther } from "../lib/frontend/web3.ts";
 import { formatEther } from "../ethers.min.js";
 import { CarouselButtons } from '../components/components.tsx';
-import { Pricing } from '../lib/enums.ts';
+import { AccountTypes, Pricing } from '../lib/enums.ts';
 import PaymentIntentsPaginationForAccounts from './pagination/PaymentIntentsPaginationForAccounts.tsx';
 import AccountsSelectButtons from './AccountsSelectButtons.tsx';
 
@@ -58,8 +58,8 @@ export default function AccountCardCarousel(props: AccountCardCarouselProps) {
 
     if (data === undefined) {
         return <div class="flex flex-col justify-center">
-            <div class="flex flex-row justify-center mb-4">
-                <h4 class="text-xl">Nothing to show</h4>
+            <div class="flex flex-row justify-center mb-4 mt-4">
+                <h4 class="text-xl">Nothing to show 🥱</h4>
             </div>
             <div class="flex flex-row justify-around flex-wrap gap-2">
                 <a href={"/app/addNewAccount"} class="mb-8 bg-gradient-to-b w-max text-indigo-500 font-semibold from-slate-50 to-indigo-100 px-10 py-3 rounded-2xl shadow-indigo-400 shadow-md border-b-4 hover border-b border-indigo-200 hover:shadow-sm transition-all duration-500">New Virtual Account</a>
@@ -97,7 +97,12 @@ export default function AccountCardCarousel(props: AccountCardCarouselProps) {
                     class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
             </div>
         </div>
-        <MissedPaymentsNotification chainId={data.network_id} missedPayments={getPaymentIntentsForCurrentAccount(data.commitment, props.missedPayments)}></MissedPaymentsNotification>
+        <MissedPaymentsNotification
+            accountType={data.accountType}
+            chainId={data.network_id}
+            missedPayments={getPaymentIntentsForCurrentAccount(data.commitment, props.missedPayments)}
+            currency={data.currency}
+        ></MissedPaymentsNotification>
         <hr
             class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
         <section class="px-4 mx-auto">
@@ -108,7 +113,9 @@ export default function AccountCardCarousel(props: AccountCardCarouselProps) {
 
 interface MissedPaymentsNotificationProps {
     missedPayments: Array<any>;
-    chainId: ChainIds
+    chainId: ChainIds,
+    accountType: AccountTypes,
+    currency: string
 }
 
 function MissedPaymentsNotification(props: MissedPaymentsNotificationProps) {
@@ -125,13 +132,18 @@ function MissedPaymentsNotification(props: MissedPaymentsNotificationProps) {
         }
     }, parseEther("0"))
 
+    const balanceMessage = props.accountType === AccountTypes.VIRTUALACCOUNT
+        ? <p class="text-left text-red-600">Top up your account with at least {formatEther(missedPaymentsSum)} {JSON.parse(props.currency).name}</p>
+        : <p class="text-left text-red-600">Deposit into your connected wallet {formatEther(missedPaymentsSum)} {JSON.parse(props.currency).name} and make sure to have enough allowance. </p>
+
+
     return <>
         <hr
             class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
-        <div class={`mx-auto max-w-sm mb-4 border-solid border-2 border-red-600 flex flex-col justify-center`}>
-            <div><h4 class="text-xl mx-auto text-center">{"Missed Payments!"}</h4></div>
-            <p class="p-5 text-center">Your account missed {props.missedPayments.length} {props.missedPayments.length === 1 ? `payment` : `payments`}!</p>
-            <p class="p-5 text-center">Top up your account with at least {formatEther(missedPaymentsSum)} {walletCurrency[props.chainId]}</p>
+        <div class={`mx-auto max-w-sm mb-4 flex flex-col justify-center`}>
+            <div><h4 class="text-xl text-red-600 mx-auto text-left">{"Missed Payments!"}</h4></div>
+            <p class="text-left text-red-600">Your account missed {props.missedPayments.length} {props.missedPayments.length === 1 ? `payment` : `payments`}!</p>
+            {balanceMessage}
         </div>
     </>
 }
