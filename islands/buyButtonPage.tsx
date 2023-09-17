@@ -4,12 +4,12 @@ import { useEffect, useState } from 'preact/hooks';
 import AccountPasswordInput, { AccountPasswordInputProps } from "./accountPasswordInput.tsx";
 import { strength } from "./accountCreatePageForm.tsx";
 import BuyPageProfile, { ProfileProps } from "../components/BuyPageProfile.tsx";
-import { approveSpend, balanceOf, depositEth, depositToken, formatEther, getAllowance, getContract, getJSONRPCProvider, handleNetworkSelect, parseEther, requestAccounts, topUpETH, topUpTokens } from "../lib/frontend/web3.ts";
-import { ChainIds, getConnectedWalletsContractAddress, getVirtualAccountsContractAddress } from "../lib/shared/web3.ts";
+import { approveSpend, connectWallet, depositEth, depositToken, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts, topUpETH, topUpTokens } from "../lib/frontend/web3.ts";
+import { ChainIds, getAbiJsonByAccountType, getConnectedWalletsContractAddress, getVirtualAccountsContractAddress } from "../lib/shared/web3.ts";
 import { requestBalanceRefresh, saveAccount, uploadProfileData } from "../lib/frontend/fetch.ts";
 import { setUpAccount } from "../lib/frontend/directdebitlib.ts";
 import { AccountCardElement } from "../components/AccountCardElement.tsx";
-import { CarouselButtons } from "../components/components.tsx";
+import { CarouselButtons, UnderlinedTd } from "../components/components.tsx";
 import Overlay from "../components/Overlay.tsx";
 import { AccountTypes, Pricing } from "../lib/enums.ts";
 import WalletDetailsFetcher from "./WalletDetailsFetcher.tsx";
@@ -88,6 +88,8 @@ export interface LoggedInUiProps {
     showOverlay: boolean;
     setShowOverlay: (to: boolean) => void;
 
+    accountTypeSwitchValue: AccountTypes;
+    setAccountTypeSwitchValue: (to: AccountTypes) => void;
 }
 
 
@@ -108,6 +110,8 @@ export interface ButtonsBasedOnSelectionProps {
     setTopupAmount: (to: number) => void;
     ethEncryptPublicKey: string;
     setShowOverlay: (to: boolean) => void;
+    accountTypeSwitchValue: AccountTypes;
+    setAccountTypeSwitchValue: (to: AccountTypes) => void;
 }
 
 interface TopupBalanceArgs {
@@ -168,6 +172,8 @@ async function handleTokenTopup(
         commitment,
         amount
     ).catch((err: any) => {
+        handleError("Unable to send transaction");
+        console.error(err)
         setShowOverlay(false)
     });
 
@@ -226,7 +232,6 @@ function topupbalance(args: TopupBalanceArgs) {
                 provider,
                 debitContractAddress,
                 "/VirtualAccounts.json");
-
             if (allowance >= parseEther(args.topupAmount.toString())) {
                 // Just do the top up
                 await handleTokenTopup(
@@ -240,7 +245,7 @@ function topupbalance(args: TopupBalanceArgs) {
             } else {
                 // Add allowance and then deposit
                 const approveTx = await approveSpend(
-                    args.currency.contractAddress,
+                    erc20Contract,
                     debitContractAddress,
                     args.topupAmount.toString()
                 )
@@ -260,7 +265,58 @@ function topupbalance(args: TopupBalanceArgs) {
                     })
                 }
             }
+        }
+    }
+}
 
+function approveBalance(args: TopupBalanceArgs) {
+    const debitContractAddress = getConnectedWalletsContractAddress[args.chainId as ChainIds];
+
+    return async () => {
+        // I need to connect the wallet do the onboarding and then do the transaction if all the conditions are met!
+        const provider = await handleNetworkSelect(args.chainId, args.handleError)
+        if (!provider) {
+            return;
+        }
+        const erc20Contract = await getContract(
+            provider,
+            args.currency.contractAddress,
+            "/ERC20.json");
+
+        args.setShowOverlay(true);
+        // Add allowance and then deposit
+        const approveTx = await approveSpend(
+            erc20Contract,
+            debitContractAddress,
+            args.topupAmount.toString()
+        ).catch((err: any) => {
+            args.setShowOverlay(false);
+        })
+
+        if (approveTx !== undefined) {
+            await approveTx.wait().then(async (receipt: any) => {
+                if (receipt.status === 1) {
+                    const res = await requestBalanceRefresh(args.commitment, args.chainId, "buyPage");
+                    if (res !== 200) {
+                        handleError("An error occured saving the balance!");
+                        args.setShowOverlay(false);
+                    } else {
+                        location.reload();
+                    }
+                }
+            })
+        }
+
+    }
+}
+
+function refreshBalanceClick(args: TopupBalanceArgs) {
+    return async () => {
+        const res = await requestBalanceRefresh(args.commitment, args.chainId, "buyPage");
+        if (res !== 200) {
+            handleError("An error occured saving the balance!");
+        } else {
+            location.reload();
         }
     }
 }
@@ -276,9 +332,10 @@ interface onCreateAccountSubmitArgs {
     ethEncryptPublicKey: string,
     accountCurrency: string,
     setShowOverlay: (to: boolean) => void;
+    accountTypeSwitchValue: AccountTypes
 }
 
-async function handleTokenDeposit(
+async function handleTokenTX(
     debitcontract: any,
     virtualaccount: {
         encryptedNote: any;
@@ -288,31 +345,39 @@ async function handleTokenDeposit(
     chainId: string,
     depositAmount: string,
     accountName: string,
-    accountCurrency: string,
-    setShowOverlay: (to: boolean) => void
-) {
-    setShowOverlay(true)
-    const depositTx = await depositToken(
-        debitcontract,
-        virtualaccount.commitment,
-        depositAmount,
-        erc20Contract,
-        virtualaccount.encryptedNote).catch((err) => {
-            setShowOverlay(false)
-        })
+    selectedCurrency: Currency,
+    setShowOverlay: (to: boolean) => void,
+    selectedAccountType: AccountTypes
 
-    if (depositTx !== undefined) {
-        await depositTx.wait().then(async (receipt: any) => {
+) { // The TX is either a deposit or a connected wallet!
+    const tx = selectedAccountType === AccountTypes.VIRTUALACCOUNT
+        ? await depositToken(
+            debitcontract,
+            virtualaccount.commitment,
+            depositAmount,
+            erc20Contract,
+            virtualaccount.encryptedNote).catch((err) => {
+                setShowOverlay(false)
+            })
+        : await connectWallet(
+            debitcontract,
+            virtualaccount.commitment,
+            erc20Contract,
+            virtualaccount.encryptedNote).catch((err) => {
+                setShowOverlay(false)
+            })
+
+    if (tx !== undefined) {
+        await tx.wait().then(async (receipt: any) => {
             if (receipt.status === 1) {
                 const resp = await saveAccount({
                     name: accountName,
                     networkId: chainId,
                     commitment: virtualaccount.commitment,
-                    currency: accountCurrency,
-                    accountType: AccountTypes.VIRTUALACCOUNT
+                    currency: JSON.stringify(selectedCurrency),
+                    accountType: selectedAccountType
                 })
                 if (resp.status === 500) {
-                    //TODO: Should display an error
                     setShowOverlay(false);
                 } else {
                     location.reload();
@@ -358,11 +423,16 @@ function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
             }
         }
         const virtualaccount = await setUpAccount(args.passwordProps.password, args.ethEncryptPublicKey);
-        const debitContractAddress = getVirtualAccountsContractAddress[args.chainId as ChainIds];
+
+        const debitContractAddress = args.accountTypeSwitchValue === AccountTypes.VIRTUALACCOUNT
+            ? getVirtualAccountsContractAddress[args.chainId as ChainIds]
+            : getConnectedWalletsContractAddress[args.chainId as ChainIds];
+
         const debitContract = await getContract(
             provider,
             debitContractAddress,
-            "/VirtualAccounts.json");
+            getAbiJsonByAccountType[args.accountTypeSwitchValue]);
+
         if (!args.selectedCurrency?.native) {
             //Approve spending, Then do the deposit
 
@@ -373,41 +443,51 @@ function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
 
 
             const allowance: bigint = await getAllowance(erc20Contract, address, debitContractAddress);
+            args.setShowOverlay(true)
 
             if (allowance >= parseEther(args.depositAmount)) {
                 // Just deposit
-                await handleTokenDeposit(
+                await handleTokenTX(
                     debitContract,
                     virtualaccount,
                     erc20Contract,
                     args.chainId,
                     args.depositAmount,
                     accountName,
-                    args.accountCurrency,
-                    args.setShowOverlay
-                )
+                    args.selectedCurrency,
+                    args.setShowOverlay,
+                    args.accountTypeSwitchValue
+                ).catch((err: any) => {
+                    args.setShowOverlay(false);
+                })
             } else {
                 // Add allowance and then deposit 
                 const approveTx = await approveSpend(
                     erc20Contract,
                     debitContractAddress,
-                    args.depositAmount);
+                    args.depositAmount).catch((err: any) => {
+                        args.setShowOverlay(false);
+                    });
 
                 if (approveTx !== undefined) {
                     await approveTx.wait().then(async (receipt: any) => {
                         if (receipt.status === 1) {
-                            //TODO: Test tokens 
-                            await handleTokenDeposit(
+                            await handleTokenTX(
                                 debitContract,
                                 virtualaccount,
                                 erc20Contract,
                                 args.chainId,
                                 args.depositAmount,
                                 accountName,
-                                args.accountCurrency,
-                                args.setShowOverlay
-                            )
+                                args.selectedCurrency,
+                                args.setShowOverlay,
+                                args.accountTypeSwitchValue
+                            ).catch((err: any) => {
+                                args.setShowOverlay(false);
+                            })
                         }
+                    }).catch((err: any) => {
+                        args.setShowOverlay(false);
                     })
                 }
             }
@@ -452,20 +532,49 @@ function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
     }
 }
 
-//TODO: Do the handle error properly! Display an error in the DOM! maybe a snackbar?
-
 function handleError(msg: string) {
-    console.error(msg)
+    // error function to display a snackbar is side effecty, vanilla magic
+    const errorDisplay = document.getElementById("error-display") as HTMLDivElement;
+    const errorText = document.getElementById("error-text") as HTMLParagraphElement;
+    // Ewwwwwww why I'm doing this? Am I lazy? haha
+    errorText.textContent = msg;
+
+    if (errorDisplay.classList.contains("hide")) {
+        errorDisplay.classList.remove("hide");
+    }
+    // LOOL this is gonna be so buggy I have no words!
+    if (errorDisplay.classList.contains("fade-out-element")) {
+        errorDisplay.classList.remove("fade-out-element")
+    }
+    // haha It works good on first try! YAAAY
+    errorDisplay.classList.add("fade-in-element");
+    errorDisplay.classList.add("show");
+    setTimeout(() => {
+        // Time out biach!
+        errorDisplay.classList.add("fade-out-element");
+        errorDisplay.classList.remove("show");
+        errorDisplay.classList.remove("fade-in-element");
+        errorDisplay.classList.add("hide");
+    }, 5000);
 }
 
 function NextIcon(props: { width: string }) {
     // Same width as height
-    return <img class="blink" src={"/whiteArrowRight.svg"} width={props.width} />
+    return <img class="blink hideOnSmallScreen" src={"/whiteArrowRight.svg"} width={props.width} />
 }
 
 function TopUpIcon(props: { width: string }) {
-    return <img style="margin-left: 10px;" src="/topupLogo.svg" width={props.width} />
+    return <img class="hideOnSmallScreen" style="margin-left: 10px;" src="/topupLogo.svg" width={props.width} />
 }
+
+function ApprovalIcon(props: { width: string }) {
+    return <img class="hideOnSmallScreen" style="margin-left: 10px;" src="/approval_delegation_white.svg" width={props.width} />
+}
+
+function RefreshIcon(props: { width: string }) {
+    return <img class="hideOnSmallScreen" style="margin-left: 10px;" src="/refresh_white.svg" width={props.width} />
+}
+
 
 function CreateNewAccountUI(props: {
     item: ItemProps,
@@ -478,6 +587,8 @@ function CreateNewAccountUI(props: {
     setPasswordAndCheck: (to: string) => void;
     isButtonDisabled: () => boolean;
     sentAndcheckPasswordMatch: (setTo: string) => void;
+    accountTypeSwitchValue: AccountTypes;
+    setAccountTypeSwitchValue: (to: AccountTypes) => void;
 
 }) {
     return <form class="p-2" onSubmit={onCreateAccountSubmit({
@@ -490,21 +601,33 @@ function CreateNewAccountUI(props: {
         depositAmount: props.paymentAmount,
         ethEncryptPublicKey: props.ethEncryptPublicKey,
         accountCurrency: props.item.currency.name,
-        setShowOverlay: props.setShowOverlay
+        setShowOverlay: props.setShowOverlay,
+        accountTypeSwitchValue: props.accountTypeSwitchValue
     })}>
         <BuyPageProfile
             profileExists={props.profileExists}
             profile={props.profile}></BuyPageProfile>
-        {/* TODO: ADD CONNECT WALLET UI!! */}
         <div class="bg-white  px-3 py-[0.25rem]">
-            <h4 class="bg-gray-50 dark:bg-gray-800 px-4 py-4 text-xl text-center mb-2">Create New Account</h4>
+            <div class="flex flex-row justify-center">
+                <label class="toggle select-none">
+                    <span class="toggle-label mr-2">Virtual Account</span>
+                    <input checked={props.accountTypeSwitchValue === AccountTypes.CONNECTEDWALLET} onChange={(event: any) => {
+                        if (event.target.checked) {
+                            props.setAccountTypeSwitchValue(AccountTypes.CONNECTEDWALLET)
+                        } else {
+                            props.setAccountTypeSwitchValue(AccountTypes.VIRTUALACCOUNT)
+                        }
+                    }} class="toggle-checkbox" type="checkbox" />
+                    <div class="toggle-switch"></div>
+                    <span class="toggle-label">Connect Wallet</span>
+                </label></div>
             <div class="mb-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="accountName">Account Name</label>
                 <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
                     type="text" id="accountName" name="accountName" placeholder="" />
             </div>
             <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="amount">Deposit Amount in ({props.item.currency.name})</label>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="amount">{props.accountTypeSwitchValue === AccountTypes.VIRTUALACCOUNT ? "Deposit amount " : "Approve spending "} {props.item.currency.name}</label>
                 {!props.item.currency.native ? <span class="text-sm text-gray-300">Token Address: {props.item.currency.contractAddress}</span> : null}
                 <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
                     value={props.paymentAmount} type="number" id="amount" name="amount" placeholder="0" step="any" />
@@ -528,7 +651,7 @@ function CreateNewAccountUI(props: {
     </form>
 }
 
-function TopUpUI(props: {
+function RefreshBalanceUI(props: {
     paymentAmount: string,
     selectedAccount: any,
     topupAmount: number,
@@ -538,45 +661,161 @@ function TopUpUI(props: {
 }) {
     const amountToTopUp = parseFloat(props.paymentAmount) - parseFloat(props.selectedAccount.balance);
     const inputValue = props.topupAmount < amountToTopUp ? amountToTopUp : props.topupAmount;
-    return <>
-        <div class="mx-auto mt-4 bt-4">
-            <p class="bg-gray-50 dark:bg-gray-800 px-4 py-4  text-xl text-slate-600">Top Up Balance</p>
-            <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
-                value={inputValue} onChange={(event: any) => props.setTopupAmount(parseFloat(event.target.value))} type="number" id="amount" name="amount" placeholder="Amount" />
-            <button
-                onClick={topupbalance({
-                    topupAmount: inputValue,
-                    commitment: props.selectedAccount.commitment,
-                    chainId: props.item.network,
-                    handleError,
-                    currency: props.item.currency,
-                    setShowOverlay: props.setShowOverlay
-                })}
-                class="flex flex-row justify-center  text-2xl mb-4 mt-2 w-full bg-indigo-500 text-white font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
-                type="submit">
-                <p>Top Up</p>
-                <TopUpIcon width="35" />
-            </button>
-        </div></>
+    return <div class="flex flex-col p-3 rounded-xl">
+        <WalletDetailsFetcher
+            // This is only rendered when a connected wallet is selected!
+            accountType={AccountTypes.CONNECTEDWALLET}
+            creatorAddress={props.selectedAccount.creator_address}
+            networkId={props.item.network as ChainIds}
+            tokenAddress={props.item.currency.contractAddress}
+            currencyName={props.item.currency.name}
+        ></WalletDetailsFetcher>
+        <table class="table-fixed w-full">
+            <thead>
+                <tr>
+                    <th class="width-200px"></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <UnderlinedTd extraStyles="rounded-lg bg-gray-50 dark:bg-black-800 text-black-400 dark:text-black-200 text-lg font-bold" >Update Allowance</UnderlinedTd>
+                    <UnderlinedTd extraStyles="importantNoPaddingLeft rounded-lg bg-gray-50 dark:bg-black-800 text-black-400 dark:text-black-200 text-sm font-bold" >
+                        <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+                            value={inputValue} onChange={(event: any) => props.setTopupAmount(parseFloat(event.target.value))} type="number" id="amount" name="amount" placeholder="Amount" />
+                        <button
+                            onClick={approveBalance({
+                                topupAmount: inputValue,
+                                commitment: props.selectedAccount.commitment,
+                                chainId: props.item.network,
+                                handleError,
+                                currency: props.item.currency,
+                                setShowOverlay: props.setShowOverlay
+                            })}
+                            class="w-full flex flex-row justify-center text-2xl font-bold mb-4 mt-4 text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">
+                            <div class="flex flex-col justify-center">
+                                <p>Approve</p>
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <ApprovalIcon width="35" />
+                            </div>
+                        </button>
+                    </UnderlinedTd>
+                </tr>
+                <tr>
+                    <UnderlinedTd extraStyles="rounded-lg bg-gray-50 dark:bg-black-800 text-black-400 dark:text-black-200 text-lg font-bold" >Refresh Balance</UnderlinedTd>
+                    <UnderlinedTd extraStyles="importantNoPaddingLeft rounded-lg bg-gray-50 dark:bg-black-800 text-black-400 dark:text-black-200 text-sm font-bold" >
+                        <p>You just added balance to the connected wallet, but can't see it?</p>
+                        <button
+                            onClick={refreshBalanceClick({
+                                topupAmount: inputValue,
+                                commitment: props.selectedAccount.commitment,
+                                chainId: props.item.network,
+                                handleError,
+                                currency: props.item.currency,
+                                setShowOverlay: props.setShowOverlay
+                            })}
+                            class="w-full flex flex-row justify-center text-2xl font-bold mb-4 mt-4 text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">
+                            <div class="flex flex-col justify-center">
+                                <p>Refresh</p>
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <RefreshIcon width="35" />
+                            </div>
+                        </button>
+                    </UnderlinedTd>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+}
+
+function TopUpUI(props: {
+    paymentAmount: string,
+    selectedAccount: any,
+    topupAmount: number,
+    setTopupAmount: (to: number) => void,
+    item: ItemProps,
+    setShowOverlay: (to: boolean) => void
+}) {
+    const amountToTopUp = parseFloat(props.paymentAmount) - parseFloat(props.selectedAccount.balance);
+    // You can't top up less than needed!
+    const inputValue = props.topupAmount < amountToTopUp ? amountToTopUp : props.topupAmount;
+
+    return <div class="flex p-3 rounded-xl">
+        <table class="table-fixed w-full">
+            <thead>
+                <tr>
+                    <th class="width-200px"></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <UnderlinedTd extraStyles="rounded-lg bg-gray-50 dark:bg-black-800 text-black-400 dark:text-black-200 text-lg font-bold" >Top Up Balance</UnderlinedTd>
+                    <UnderlinedTd extraStyles="importantNoPaddingLeft rounded-lg bg-gray-50 dark:bg-black-800 text-black-400 dark:text-black-200 text-sm font-bold" >
+                        <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+                            value={inputValue} onChange={(event: any) => props.setTopupAmount(parseFloat(event.target.value))} type="number" id="amount" name="amount" placeholder="Amount" />
+                        <button
+                            onClick={topupbalance({
+                                topupAmount: inputValue,
+                                commitment: props.selectedAccount.commitment,
+                                chainId: props.item.network,
+                                handleError,
+                                currency: props.item.currency,
+                                setShowOverlay: props.setShowOverlay
+                            })}
+                            class="w-full flex flex-row justify-center text-2xl font-bold mb-4 mt-4 text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">
+                            <div class="flex flex-col justify-center">
+                                <p>Send</p>
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <TopUpIcon width="35" />
+                            </div>
+                        </button>
+                    </UnderlinedTd>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 }
 
 function NextBttnUi(props: {
     buttonId: string,
     commitment: string,
 }) {
-    return <>
-        <form
-            class={"mx-auto"}
-            action={"app/approvepayment"}
-            method={"POST"}
-        >
-            <input type="hidden" value={props.buttonId} name="debititem" />
-            <input type="hidden" value={props.commitment} name="accountcommitment" />
-            <button
-                type={"submit"}
-                class="flex flex-row justify-center text-2xl font-bold w-60 mb-4 mt-4 mx-auto text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"><p>Next</p><NextIcon width={"35"} /></button>
-        </form>
-    </>
+    return <div class="flex p-3 rounded-xl">
+        <table class="table-fixed w-full">
+            <thead>
+                <tr>
+                    <th class="width-200px"></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <UnderlinedTd extraStyles="rounded-lg bg-gray-50 dark:bg-black-800 text-black-400 dark:text-black-200 text-lg font-bold" >Finish Checkout</UnderlinedTd>
+                    <UnderlinedTd extraStyles="importantNoPaddingLeft rounded-lg bg-gray-50 dark:bg-black-800 text-black-400 dark:text-black-200 text-sm font-bold" > <form
+                        class={"mx-auto"}
+                        action={"app/approvepayment"}
+                        method={"POST"}
+                    >
+                        <input type="hidden" value={props.buttonId} name="debititem" />
+                        <input type="hidden" value={props.commitment} name="accountcommitment" />
+                        <button
+                            type={"submit"}
+                            class="w-full flex flex-row justify-center text-2xl font-bold mb-4 mt-4 text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">
+                            <div class="flex flex-col justify-center">
+                                <p>Next</p>
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <NextIcon width={"35px"} />
+                            </div>
+                        </button>
+                    </form></UnderlinedTd>
+                </tr>
+            </tbody>
+        </table></div>
 }
 
 function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
@@ -627,29 +866,48 @@ function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
         }
         return false;
     }
+    const accIndex = props.selected - 2;
 
-
+    const selectedAccount = props.accounts[accIndex];
     if (props.selected === 1) {
         return <CreateNewAccountUI
             {...props}
             isButtonDisabled={isButtonDisabled}
             sentAndcheckPasswordMatch={sentAndcheckPasswordMatch}
             setPasswordAndCheck={setPasswordAndCheck}
+            accountTypeSwitchValue={props.accountTypeSwitchValue}
+            setAccountTypeSwitchValue={props.setAccountTypeSwitchValue}
         ></CreateNewAccountUI>
     }
 
     if (props.selected > 1) {
-        const accIndex = props.selected - 2;
-        const selectedAccount = props.accounts[accIndex];
 
-        //If it's a virtual account with fixed pricing and the balance is lower than what I need to pay, I prompt top up.
-        if (selectedAccount.accountType === AccountTypes.VIRTUALACCOUNT &&
-            props.item.pricing !== Pricing.Dynamic &&
+        if (props.item.pricing !== Pricing.Dynamic &&
             parseFloat(selectedAccount.balance) < parseFloat(props.paymentAmount)) {
-            return <TopUpUI {...props} selectedAccount={selectedAccount}></TopUpUI>
-        }
 
-        // else the direct debit is triggered and the connected wallet account balance could also be topped up externally so I
+            if (selectedAccount.accountType === AccountTypes.VIRTUALACCOUNT) {
+                //If it's a virtual account with fixed pricing and the balance is lower than what I need to pay, I prompt top up.
+                return <TopUpUI
+                    paymentAmount={props.paymentAmount}
+                    selectedAccount={selectedAccount}
+                    topupAmount={props.topupAmount}
+                    setTopupAmount={props.setTopupAmount}
+                    item={props.item}
+                    setShowOverlay={props.setShowOverlay}
+
+                ></TopUpUI>
+            } else {
+                // Display missing balance show a refresh button and an approval button
+                return <RefreshBalanceUI
+                    paymentAmount={props.paymentAmount}
+                    selectedAccount={selectedAccount}
+                    topupAmount={props.topupAmount}
+                    setTopupAmount={props.setTopupAmount}
+                    item={props.item}
+                    setShowOverlay={props.setShowOverlay}
+                ></RefreshBalanceUI>
+            }
+        }
         // Show the next button and allow the user to subscribe!
         return <NextBttnUi
             buttonId={props.item.buttonId}
@@ -669,36 +927,36 @@ function LoggedInUi(props: LoggedInUiProps) {
         <Overlay show={props.showOverlay}></Overlay>
         <div class="flex flex-col flex-wrap"></div>
         <div class="flex flex-col justify-center">
-            <div class="flex flex-row justify-center mb-8" >
-                <CardOutline setSelected={props.setSelectedAccount} id={1} selected={props.selectedAccount} extraCss="margin_0_auto mb-8 bg-gradient-to-b w-max mx-auto text-indigo-500 font-semibold from-slate-50 to-indigo-100 px-10 py-3 rounded-2xl shadow-indigo-400 shadow-md border-b-4 hover border-b border-indigo-200 hover:shadow-sm transition-all duration-500">
+            <div class="flex flex-row justify-left mb-8 flex-wrap gap-4" >
+                <CardOutline setSelected={props.setSelectedAccount} id={1} selected={props.selectedAccount} extraCss="mb-8 bg-gradient-to-b w-max h-14 text-indigo-500 font-semibold from-slate-50 to-indigo-100 px-10 py-3 rounded-2xl shadow-indigo-400 shadow-md border-b-4 hover border-b border-indigo-200 hover:shadow-sm transition-all duration-500">
                     New Account
                 </CardOutline>
+
+
+                {acc === undefined || props.selectedAccount === 1 ? null :
+                    <div class={"flex flex-col justify-center margin_0_auto"}>
+                        <div class="flex flex-row flex-wrap justify-center">
+                            <CardOutline
+                                extraCss={`mt-1 ${props.visible ? "fade-in-element-checkout" : "fade-out-elements-checkout"}`}
+                                setSelected={props.setSelectedAccount}
+                                id={props.accounts.indexOf(acc) + 2}
+                                selected={props.selectedAccount}
+                            >
+                                <AccountCardElement
+                                    network={""}
+                                    balance={acc.balance}
+                                    currency={acc.currency}
+                                    name={acc.name}
+                                    accountType={acc.accountType}
+                                    closed={acc.closed}
+                                ></AccountCardElement>
+                            </CardOutline>
+                        </div>
+                        <hr
+                            class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
+                        {props.accounts.length > 1 ? <CarouselButtons backClicked={props.backClicked} forwardClicked={props.forwardClicked}></CarouselButtons> : null}
+                    </div>}
             </div>
-
-            {acc === undefined || props.selectedAccount === 1 ? null :
-                <div class={"flex flex-col justify-center"}>
-                    <div class="flex flex-row flex-wrap ml-4 justify-center">
-                        <CardOutline
-                            extraCss={`mt-3 ${props.visible ? "fade-in-element-checkout" : "fade-out-elements-checkout"}`}
-                            setSelected={props.setSelectedAccount}
-                            id={props.accounts.indexOf(acc) + 2}
-                            selected={props.selectedAccount}
-                        >
-                            <AccountCardElement
-                                network={""}
-                                balance={acc.balance}
-                                currency={acc.currency}
-                                name={acc.name}
-                                accountType={acc.accountType}
-                                closed={acc.closed}
-                            ></AccountCardElement>
-                        </CardOutline>
-                    </div>
-                    <hr
-                        class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
-                    {props.accounts.length > 1 ? <CarouselButtons backClicked={props.backClicked} forwardClicked={props.forwardClicked}></CarouselButtons> : null}
-                </div>}
-
 
             <UIBasedOnSelection
                 newAccountPasswordScore={props.newAccountPasswordScore}
@@ -716,6 +974,8 @@ function LoggedInUi(props: LoggedInUiProps) {
                 setTopupAmount={props.setTopupAmount}
                 ethEncryptPublicKey={props.ethEncryptPublicKey}
                 setShowOverlay={props.setShowOverlay}
+                accountTypeSwitchValue={props.accountTypeSwitchValue}
+                setAccountTypeSwitchValue={props.setAccountTypeSwitchValue}
             ></UIBasedOnSelection>
 
         </div>
@@ -739,7 +999,7 @@ function LoggedOutUi(props: LoggedOutUiProps) {
         <form class="space-y-4 md:space-y-6" method="POST">
             <input type="hidden" name="buttonId" value={props.buttonid} />
             <div class="mx-auto">
-                <h2 class="text-2xl font-bold mb-5 text-center">Login</h2>
+                <h2 class="text-2xl font-bold mb-5 text-center text-gray-400">Login</h2>
             </div>
             <div>
                 <label for="email" class="block mb-2 text-sm font-medium">Your email</label>
@@ -759,7 +1019,7 @@ function LoggedOutUi(props: LoggedOutUiProps) {
 }
 
 export default function BuyButtonPage(props: BuyButtonPageProps) {
-    const [selectedAccount, setSelectedAccount] = useState(props.accounts.length !== 0 ? 2 : 0);
+    const [selectedAccount, setSelectedAccount] = useState(0);
 
     //New account creation state
     const [newAccountPassword, setNewAccountPassword] = useState("");
@@ -789,6 +1049,12 @@ export default function BuyButtonPage(props: BuyButtonPageProps) {
 
     const [showOverlay, setShowOverlay] = useState(false);
 
+    const [accountTypeSwitchValue, setAccountTypeSwitchValue] = useState<AccountTypes>(AccountTypes.VIRTUALACCOUNT);
+
+    useEffect(() => {
+        setSelectedAccount(props.accounts.length !== 0 ? 2 : 0);
+    }, [])
+
     function backClicked() {
         if (currentlyShowingAccount === 0) {
             if (props.accounts.length - 1 < 0) {
@@ -797,17 +1063,18 @@ export default function BuyButtonPage(props: BuyButtonPageProps) {
             setAccountVisible(false);
             setTimeout(() => {
                 setCurrentlyShowingAccount(props.accounts.length - 1);
-                setAccountVisible(true);
                 // Selected account is +2 to the currently selected account always!
                 setSelectedAccount(props.accounts.length + 1);
+                setAccountVisible(true);
+
             }, 400)
 
         } else {
             setAccountVisible(false);
             setTimeout(() => {
                 setCurrentlyShowingAccount(currentlyShowingAccount - 1);
-                setAccountVisible(true);
                 setSelectedAccount(currentlyShowingAccount + 1)
+                setAccountVisible(true);
             }, 400)
         }
 
@@ -817,34 +1084,20 @@ export default function BuyButtonPage(props: BuyButtonPageProps) {
             setAccountVisible(false);
             setTimeout(() => {
                 setCurrentlyShowingAccount(0);
-                setAccountVisible(true)
                 setSelectedAccount(2);
+                setAccountVisible(true)
             }, 400)
 
         } else {
             setAccountVisible(false)
             setTimeout(() => {
                 setCurrentlyShowingAccount(currentlyShowingAccount + 1)
-                setAccountVisible(true)
                 setSelectedAccount(currentlyShowingAccount + 3);
+                setAccountVisible(true)
             }, 400)
         }
     }
 
-    // async function fetchAndSetBalanceAndAllowance() {
-    //     const connectedWalletContractAddress = getConnectedWalletsContractAddress[props.item.network as ChainIds];
-    //     const provider = getJSONRPCProvider(props.item.network as ChainIds);
-    //     const erc20Contract = await getContract(provider, props.item.currency.contractAddress, "/ERC20.json");
-    //         const acc = props.accounts[currentlyShowingAccount];
-
-    //     const balance = await balanceOf(erc20Contract, acc.);
-    //     const allowance = await getAllowance(erc20Contract, props.creatorAddress, connectedWalletContractAddress)
-    //     if (allowance >= balance) {
-    //         props.updateConnectedWalletBalance(formatEther(balance))
-    //     } else {
-    //         props.updateConnectedWalletBalance(formatEther(allowance))
-    //     }
-    // }
 
     return <BuyPageLayout
         isLoggedIn={props.isLoggedIn}
@@ -898,6 +1151,8 @@ export default function BuyButtonPage(props: BuyButtonPageProps) {
             forwardClicked={forwardClicked}
             showOverlay={showOverlay}
             setShowOverlay={setShowOverlay}
+            accountTypeSwitchValue={accountTypeSwitchValue}
+            setAccountTypeSwitchValue={setAccountTypeSwitchValue}
         ></LoggedInUi> : <LoggedOutUi buttonid={props.item.buttonId} url={props.url} ></LoggedOutUi>}
     </BuyPageLayout>
 
