@@ -58,7 +58,7 @@ export async function getAccount(
 ) {
   const provider = getProvider(networkId);
   const contract = getContract(provider, networkId, accountType);
-  const account = await contract.accounts(commitment);
+  const account = await contract.getAccount(commitment);
   return { account, exists: account.creator !== ZeroAddress };
 }
 
