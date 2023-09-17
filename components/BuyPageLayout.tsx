@@ -9,15 +9,7 @@ interface BuyPagelayoutProps {
     children: ComponentChildren,
     item: ItemProps,
     isLoggedIn: boolean,
-    // triggerSnackbar: boolean
 }
-
-
-function isDynamic(pricing: string) {
-    return pricing === debitPricing[1];
-}
-
-
 
 export default function BuyPageLayout(props: BuyPagelayoutProps) {
     const chainId = props.item.network as ChainIds;
@@ -31,7 +23,7 @@ export default function BuyPageLayout(props: BuyPagelayoutProps) {
             <script src="/zxcvbn.js"></script>
             <script src="/directdebit_bundle.js"></script>
         </Head>
-        <div class="p-4 mx-auto max-w-screen-md">
+        <div class="md:pr-4 md:pl-4 pb-4 pt-4 mx-auto max-w-screen-md">
             <div class="flex flex-row justify-between">
                 <div class="flex flex-col">
                     <div class="text-2xl  ml-1 font-bold flex flex-row">
@@ -47,10 +39,11 @@ export default function BuyPageLayout(props: BuyPagelayoutProps) {
                         Logout
                     </a> : null}
             </div>
-            <div class="flex flex-row flex-wrap shadow-lg rounded-xl mt-3">
-                <div class="p-3 w-full"  >
+            <div class="flex flex-row flex-wrap shadow-lg rounded-xl mt-3 bg-gradient-gray-to-white ">
 
-                    <div class="text-center"><h1 class="text-2xl font-bold mb-2">Checkout</h1></div>
+                <div class="md:p-3 w-full " >
+
+                    <div class="text-center"><h1 class="text-2xl font-bold mb-2 text-gray-500">Checkout</h1></div>
                     <div class="flex p-3 rounded-xl" style="background-color:white;">
                         <table class="table-fixed w-full">
                             <thead>
@@ -58,7 +51,6 @@ export default function BuyPageLayout(props: BuyPagelayoutProps) {
                                     <th></th>
                                     <th class="w-1/6"></th>
                                 </tr>
-
                             </thead>
                             <tbody>
                                 <tr>
@@ -110,6 +102,14 @@ export default function BuyPageLayout(props: BuyPagelayoutProps) {
                 <div class="p-3 w-full">
                     {props.children}
                 </div>
+            </div>
+        </div>
+        <div id="error-display" role="alert" class="sticky bottom-0 w-64 margin_0_auto z-50 hide">
+            <div class="bg-red-500 text-white font-bold rounded-t px-4 py-2">
+                An Error Occured!
+            </div>
+            <div class="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700">
+                <p id="error-text"></p>
             </div>
         </div>
     </>
