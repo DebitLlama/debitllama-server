@@ -96,7 +96,8 @@ export default class QueryBuilder {
             .eq("closed", false)
             .eq("user_id", this.userid)
             .eq("network_id", networkId)
-            .eq("currency", currency);
+            .eq("currency", currency)
+            .order("last_modified", { ascending: false });
           return this.responseHandler(res);
         },
         //selectAccountByCommitment
@@ -513,6 +514,7 @@ export default class QueryBuilder {
           currency: string,
           balance: string,
           accountType: AccountTypes,
+          creator_address: string,
         ) => {
           const res = await this.client.from("Accounts").insert({
             created_at: new Date().toUTCString(),
@@ -525,6 +527,7 @@ export default class QueryBuilder {
             balance: formatEther(balance),
             last_modified: new Date().toUTCString(),
             accountType,
+            creator_address,
           });
 
           return this.responseHandler(res);
@@ -774,6 +777,19 @@ export default class QueryBuilder {
             failedDynamicPaymentAmount: "0",
             statusText,
           }).eq("id", paymentIntentRow.id);
+          return this.responseHandler(res);
+        },
+        toCancelledByAccountIdForCreator: async (
+          accountId: number,
+        ) => {
+          const res = await this.client.from("PaymentIntents")
+            .update({
+              statusText: PaymentIntentStatus.CANCELLED,
+            }).eq("creator_user_id", this.userid)
+            .eq("account_id", accountId)
+            .neq("statusText", PaymentIntentStatus.PAID)
+            .neq("statusText", PaymentIntentStatus.CANCELLED);
+
           return this.responseHandler(res);
         },
       },
