@@ -264,7 +264,6 @@ function findPaymentIntentsWithAccountBalanceLowThatCanBeReset(
   }
   return paymentIntentsToReset;
 }
-// /?TODO: TEST THIS!
 export async function updatePaymentIntentsWhereAccountBalanceWasAdded(
   queryBuilder: QueryBuilder,
   oldAccountData: Account,
