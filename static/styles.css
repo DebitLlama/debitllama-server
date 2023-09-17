@@ -363,11 +363,11 @@
 .fade-out-element-checkout {
 	animation-timing-function: linear;
 
-	animation: fadeOut 0.3s;
-	-webkit-animation: fadeOut 0.3s;
-	-moz-animation: fadeOut 0.3s;
-	-o-animation: fadeOut 0.3s;
-	-ms-animation: fadeOut 0.3s;
+	animation: fadeOut 0.5s;
+	-webkit-animation: fadeOut 0.5s;
+	-moz-animation: fadeOut 0.5s;
+	-o-animation: fadeOut 0.5s;
+	-ms-animation: fadeOut 0.5s;
 }
 
 .fade-in-element-checkout {
@@ -486,11 +486,20 @@
 	margin: 0 auto;
 }
 
+.hideOnSmallScreen {
+	display: block;
+}
+
 /* When the browser is  530px or smaller */
 @media screen and (max-width: 530px) {
 	.overflowingTableData {
 		width: 10em;
 	}
+
+	.hideOnSmallScreen {
+		display: none;
+	}
+
 }
 
 .blink {
@@ -623,4 +632,89 @@
 
 .bg-gradient-gray-to-white {
 	background: linear-gradient(#e5e7eb, white);
+}
+
+
+.icon-spinner {
+	animation: spin-animation 0.5s infinite;
+	display: inline-block;
+}
+
+@keyframes spin-animation {
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(359deg);
+	}
+}
+
+.toggle {
+	cursor: pointer;
+	display: inline-block;
+}
+
+.toggle-switch {
+	display: inline-block;
+	background: #ccc;
+	border-radius: 16px;
+	width: 58px;
+	height: 32px;
+	position: relative;
+	vertical-align: middle;
+	transition: background 0.25s;
+}
+
+.toggle-switch:before, .toggle-switch:after {
+	content: "";
+}
+
+.toggle-switch:before {
+	display: block;
+	background: linear-gradient(to bottom, #fff 0%, #eee 100%);
+	border-radius: 50%;
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+	width: 24px;
+	height: 24px;
+	position: absolute;
+	top: 4px;
+	left: 4px;
+	transition: left 0.25s;
+}
+
+.toggle:hover .toggle-switch:before {
+	background: linear-gradient(to bottom, #fff 0%, #fff 100%);
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+
+.toggle-checkbox:checked+.toggle-switch {
+	background: #c7d2fe;
+}
+
+.toggle-checkbox:checked+.toggle-switch:before {
+	left: 30px;
+}
+
+.toggle-checkbox {
+	position: absolute;
+	visibility: hidden;
+}
+
+.toggle-label {
+	margin-left: 5px;
+	position: relative;
+	top: 2px;
+}
+
+.importantNoPaddingLeft {
+	padding-left: 0 !important;
+}
+
+.width-200px {
+	width: 200px;
+}
+
+.width-320px {
+	width: 320px;
 }
