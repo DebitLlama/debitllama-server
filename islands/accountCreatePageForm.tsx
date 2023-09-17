@@ -111,7 +111,7 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
         erc20Contract: string,
         chainId: string
     ) {
-        setShowOverlay(true)
+
         const depositTx = await depositToken(
             contractAddress,
             virtualaccount.commitment,
@@ -146,7 +146,6 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
         }
     }
 
-    //TODO: Upload new account via API so I don't need to have that weird account page path query string!
     async function onSubmitForm(event: any) {
         event.preventDefault();
         setShowWalletMismatchError(false);
@@ -181,24 +180,31 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
 
 
             const allowance: bigint = await getAllowance(erc20Contract, address, contractAddress);
-
-            // TODO: Need to disable the button and maybe show a popup so people don't navigate away!
-
+            const virtualAccountsContrat = await getContract(
+                provider,
+                contractAddress,
+                "/VirtualAccounts.json");
+            setShowOverlay(true);
             if (allowance >= parseEther(depositAmount)) {
                 // Just deposit
-                await handleTokenDeposit(contractAddress, virtualaccount, erc20Contract, chainId)
+
+                await handleTokenDeposit(virtualAccountsContrat, virtualaccount, erc20Contract, chainId)
             } else {
                 // Add allowance and then deposit 
                 const approveTx = await approveSpend(
                     erc20Contract,
                     contractAddress,
-                    depositAmount);
+                    depositAmount).catch((err) => {
+                        setShowOverlay(false)
+                    });
 
                 if (approveTx !== undefined) {
                     await approveTx.wait().then(async (receipt: any) => {
                         if (receipt.status === 1) {
-                            await handleTokenDeposit(contractAddress, virtualaccount, erc20Contract, chainId)
+                            await handleTokenDeposit(virtualAccountsContrat, virtualaccount, erc20Contract, chainId)
                         }
+                    }).catch((err: any) => {
+                        setShowOverlay(false)
                     })
                 }
             }
