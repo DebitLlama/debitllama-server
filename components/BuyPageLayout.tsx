@@ -2,7 +2,7 @@ import type { ComponentChildren } from "preact";
 import { ItemProps } from "../islands/buyButtonPage.tsx";
 import { Head } from "$fresh/runtime.ts";
 import { ChainIds, explorerUrl, explorerUrlAddressPath, networkNameFromId } from "../lib/shared/web3.ts";
-import { Tooltip, UnderlinedTd, getDebitIntervalText, getDebitIntervalTooltipText, getDebitTimesText, getMaxDebitColTitleFromPricing, getSubscriptionTooltipMessage, getTotalPaymentField, getTotalPaymentFieldTooltip } from "./components.tsx";
+import { ExplorerLinkForAddress, Tooltip, UnderlinedTd, getDebitIntervalText, getDebitIntervalTooltipText, getDebitTimesText, getMaxDebitColTitleFromPricing, getSubscriptionTooltipMessage, getTotalPaymentField, getTotalPaymentFieldTooltip } from "./components.tsx";
 
 interface BuyPagelayoutProps {
     children: ComponentChildren,
@@ -14,7 +14,6 @@ interface BuyPagelayoutProps {
 export default function BuyPageLayout(props: BuyPagelayoutProps) {
     const chainId = props.item.network as ChainIds;
     const networkName = networkNameFromId[chainId];
-    const explorerURLLink = explorerUrl[chainId] + explorerUrlAddressPath[chainId] + props.item.currency.contractAddress;
 
     return <>
         <Head>
@@ -23,8 +22,8 @@ export default function BuyPageLayout(props: BuyPagelayoutProps) {
             <script src="/zxcvbn.js"></script>
             <script src="/directdebit_bundle.js"></script>
         </Head>
-        <div class="md:pr-4 md:pl-4 pb-4 pt-4 mx-auto max-w-screen-md">
-            <div class="flex flex-row justify-between">
+        <div class="md:pr-4 md:pl-4 pb-4 pt-4 mx-auto max-w-screen-lg">
+            <div class="flex flex-row flex-wrap gap-2 justify-between">
                 <div class="flex flex-col">
                     <div class="text-2xl  ml-1 font-bold flex flex-row">
                         <img src="/logo.svg" width="45" class={"mr-3"} />{" "}
@@ -34,22 +33,22 @@ export default function BuyPageLayout(props: BuyPagelayoutProps) {
                 {props.isLoggedIn ?
                     <a
                         href={"/buyitnowlogout?q=" + props.item.buttonId}
-                        class="text-lg text-gray-500 hover:text-gray-700 py-1 border-gray-500"
+                        class="rounded-md bg-gray-200 hover:bg-gray-400 text-lg text-gray-600 hover:text-gray-950 border-gray-500 p-2 ml-1   mr-4 sm:mr-0"
                     >
-                        Logout
+                        Log out
                     </a> : null}
             </div>
             <div class="flex flex-row flex-wrap shadow-lg rounded-xl mt-3 bg-gradient-gray-to-white ">
 
-                <div class="md:p-3 w-full " >
-
+                <div class="md:pb-3 md:pl-3 md:pr-3 pt-3 w-full">
                     <div class="text-center"><h1 class="text-2xl font-bold mb-2 text-gray-500 select-none">Secure Checkout</h1></div>
-                    <div class="flex p-3 rounded-xl" style="background-color:white;">
-                        <table class="table-fixed w-full">
-                            <thead>
-                                <tr> <th></th>
-                                    <th></th>
-                                    <th class="w-1/6"></th>
+                    <div class="flex rounded-xl bg-white">
+                        <table class="table-fixed w-full rounded-xl ">
+                            <thead class="bg-gray-200">
+                                <tr>
+                                    <th class="w-2/6 md:w-2/12"></th>
+                                    <th class="w-3/6"></th>
+                                    <th class="w-1/6 md:w-1/12"></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -102,13 +101,11 @@ export default function BuyPageLayout(props: BuyPagelayoutProps) {
                                 {props.item.currency.native ? null :
                                     <tr>
                                         <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-200 text-sm" >ERC-20 Contract:</UnderlinedTd>
-                                        <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData">
-                                            <a
-                                                class={"text-indigo-600"}
-                                                href={explorerURLLink}
-                                                target="_blank"
-                                            >Link</a>
-                                        </div></td>
+                                        <UnderlinedTd extraStyles="">
+                                            <div class="overflow-x-auto overflowingTableData">
+                                                <ExplorerLinkForAddress chainId={chainId} address={props.item.currency.contractAddress}></ExplorerLinkForAddress>
+                                            </div>
+                                        </UnderlinedTd>
                                         <UnderlinedTd extraStyles=""><Tooltip message="ERC-20 token contract address link to the chain explorer."></Tooltip></UnderlinedTd>
                                     </tr>}
                                 <tr>
@@ -120,7 +117,7 @@ export default function BuyPageLayout(props: BuyPagelayoutProps) {
                         </table>
                     </div>
                 </div>
-                <div class="p-3 w-full">
+                <div class="md:pb-3 md:pl-3 md:pr-3 pt-3 w-full">
                     {props.children}
                 </div>
             </div>
