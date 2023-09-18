@@ -5,7 +5,7 @@ interface AccountsSelectButtonsProps {
 }
 
 export default function AccountsSelectButtons(props: AccountsSelectButtonsProps) {
-    return <div class="flex flex-row overflow-auto pb-4 pl-4 pr-4 pt-4">
+    return <div class="flex flex-row overflow-auto pb-4 pl-4 pt-4">
         {props.accountData.map((data) => <AccountSwitcherButtons
             text={data.name}
             currentState={props.currentAccount}
