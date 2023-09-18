@@ -98,11 +98,11 @@ export default function WalletApproveOrDisconnect(props: WalletApproveOrDisconne
                 <button
                     class="max-w-md bg-indigo-500 text-white text-sm font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
                     disabled={props.accountClosed}
-                    type="submit">Approve Spend</button>
+                    type="submit">Update Allowance</button>
             </form>
         </div>
         <div class="mb-4">
-            <p class="text-sm text-gray-400">You need to approve spend to use the account. </p>
+            <p class="text-sm text-gray-400">Update your allowance to approve our contract to spend from your wallet!</p>
 
         </div>
         <div class="my-6 text-center">
