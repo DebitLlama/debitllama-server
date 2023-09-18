@@ -26,7 +26,7 @@ export function CardOutline(props: CreateAccountCardProps) {
         }
     }
 
-    return <div onClick={clickedCard} class={`${isSelected()} select-none bg-white cursor-pointer rounded-lg mr-1 ${props.extraCss}`}>
+    return <div onClick={clickedCard} class={`${isSelected()} select-none bg-white cursor-pointer rounded-lg ${props.extraCss}`}>
         {props.children}
     </div>
 }
