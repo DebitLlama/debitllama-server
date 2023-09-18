@@ -9,7 +9,7 @@ import { ChainIds, getAbiJsonByAccountType, getConnectedWalletsContractAddress, 
 import { requestBalanceRefresh, saveAccount, uploadProfileData } from "../lib/frontend/fetch.ts";
 import { setUpAccount } from "../lib/frontend/directdebitlib.ts";
 import { AccountCardElement } from "../components/AccountCardElement.tsx";
-import { CarouselButtons, TooltipWithTitle, UnderlinedTd } from "../components/components.tsx";
+import { TooltipWithTitle, UnderlinedTd } from "../components/components.tsx";
 import Overlay from "../components/Overlay.tsx";
 import { AccountTypes, Pricing } from "../lib/enums.ts";
 import WalletDetailsFetcher from "./WalletDetailsFetcher.tsx";
@@ -609,19 +609,16 @@ function CreateNewAccountUI(props: {
         <BuyPageProfile
             profileExists={props.profileExists}
             profile={props.profile}></BuyPageProfile>
-        <div class="px-3 py-[0.25rem]">
+        <div class="py-[0.25rem]">
             <hr
                 class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
             {isERC20 ?
-                <div class="flex flex-row justify-between">
-                    <span class="toggle-label mr-2">
-                        <TooltipWithTitle
-                            title="Virtual Account"
-                            extraStyle="right: -80%"
-                            message="Create a new virtual account and deposit the value. The payment will be debited from this account! They can be created per subsciption if you want!"></TooltipWithTitle>
-                    </span>
-                    <label class="toggle select-none">
+                <div class="flex flex-row justify-center mb-4">
 
+                    <label class="toggle select-none bg-gray-200 hover:bg-gray-100 border p-4 text-center w-full">
+                        <span class={`toggle-label text-sm ${props.accountTypeSwitchValue === AccountTypes.VIRTUALACCOUNT ? "text-indigo-800" : "text-neutral"}`}>
+                            Virtual Account
+                        </span>
                         <input checked={props.accountTypeSwitchValue === AccountTypes.CONNECTEDWALLET} onChange={(event: any) => {
                             if (event.target.checked) {
                                 props.setAccountTypeSwitchValue(AccountTypes.CONNECTEDWALLET)
@@ -630,23 +627,31 @@ function CreateNewAccountUI(props: {
                             }
                         }} class="toggle-checkbox" type="checkbox" />
                         <div class="toggle-switch"></div>
-
+                        <span class={`toggle-label text-sm ${props.accountTypeSwitchValue === AccountTypes.CONNECTEDWALLET ? "text-indigo-800" : "text-neutral"}`}>
+                            Connect Wallet
+                        </span>
                     </label>
-                    <span class="toggle-label">
-                        <TooltipWithTitle
-                            title="Connect Wallet"
-                            extraStyle="left: -80%"
-                            message="You can spend tokens from a connected wallet directly. Your wallet must have sufficient balance and you must approve spending! The connected wallets with the same token and network have the same balance!"></TooltipWithTitle>
-                    </span>
                 </div> : null}
+
+            {isERC20 ? <TooltipWithTitle
+                title="Which account to choose?"
+                extraStyle="right: -70%"
+                message="Virtual accounts hold deposits and need to be topped up while connected wallets let you make payments using tokens using your wallet balance directly."></TooltipWithTitle>
+                :
+                <TooltipWithTitle
+                    title="Virtual Account?"
+                    extraStyle="right: -70%"
+                    message="Virtual accounts are smart contract accounts that hold deposits. The value must be deposited into them. They can be created per subsciption if you want!"></TooltipWithTitle>}
+
+            <hr
+                class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
             <div class="mb-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="accountName">Account Name</label>
                 <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
                     type="text" id="accountName" name="accountName" placeholder="" />
             </div>
             <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="amount">{props.accountTypeSwitchValue === AccountTypes.VIRTUALACCOUNT ? "Deposit amount " : "Approve spending "} {props.item.currency.name}</label>
-                {!props.item.currency.native ? <span class="text-sm text-gray-800">Token Address: {props.item.currency.contractAddress}</span> : null}
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="amount">{props.accountTypeSwitchValue === AccountTypes.VIRTUALACCOUNT ? "Deposit " : "Approve spending "} {props.item.currency.name}</label>
                 <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
                     value={props.paymentAmount} type="number" id="amount" name="amount" placeholder="0" step="any" />
             </div>
@@ -663,7 +668,7 @@ function CreateNewAccountUI(props: {
                     disabled={props.isButtonDisabled()}
                     type="submit"
                     class="mb-4 mt-2 bg-indigo-500 text-white text-xl font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
-                >Create account</button>
+                >{props.accountTypeSwitchValue === AccountTypes.VIRTUALACCOUNT ? "Create Account" : "Connect Wallet"}</button>
             </div>
         </div>
     </form>
@@ -681,6 +686,9 @@ function RefreshBalanceUI(props: {
     const amountToTopUpFormatted = parseFloat(formatEther(amountToTopUpWEI));
     const inputValue = props.topupAmount < amountToTopUpFormatted ? amountToTopUpFormatted : props.topupAmount;
     return <div class="flex flex-col p-3 rounded-xl">
+        <div class="flex flex-row justify-left text-lg text-gray-900 p-3">
+            <h2><strong>Insufficient balance!</strong> <br /> Update it or select another account!</h2>
+        </div>
         <WalletDetailsFetcher
             // This is only rendered when a connected wallet is selected!
             accountType={AccountTypes.CONNECTEDWALLET}
@@ -692,8 +700,8 @@ function RefreshBalanceUI(props: {
         <table class="table-fixed w-full">
             <thead>
                 <tr>
-                    <th class="width-200px"></th>
-                    <th></th>
+                    <th class="w-2/6"></th>
+                    <th class="w-2/6"></th>
                 </tr>
             </thead>
             <tbody>
@@ -711,12 +719,12 @@ function RefreshBalanceUI(props: {
                                 currency: props.item.currency,
                                 setShowOverlay: props.setShowOverlay
                             })}
-                            class="w-full flex flex-row justify-center text-2xl font-bold mb-4 mt-4 text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">
+                            class="w-full flex flex-row justify-center text-xl font-bold mb-4 mt-4 text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">
                             <div class="flex flex-col justify-center">
-                                <p>Approve</p>
+                                <p class="pt-1">Approve</p>
                             </div>
                             <div class="flex flex-col justify-center">
-                                <ApprovalIcon width="35" />
+                                <ApprovalIcon width="30" />
                             </div>
                         </button>
                     </UnderlinedTd>
@@ -734,12 +742,12 @@ function RefreshBalanceUI(props: {
                                 currency: props.item.currency,
                                 setShowOverlay: props.setShowOverlay
                             })}
-                            class="w-full flex flex-row justify-center text-2xl font-bold mb-4 mt-4 text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">
+                            class="w-full flex flex-row justify-center text-xl font-bold mb-4 mt-4 text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">
                             <div class="flex flex-col justify-center">
                                 <p>Refresh</p>
                             </div>
                             <div class="flex flex-col justify-center">
-                                <RefreshIcon width="35" />
+                                <RefreshIcon width="30" />
                             </div>
                         </button>
                     </UnderlinedTd>
@@ -760,12 +768,15 @@ function TopUpUI(props: {
     const amountToTopUpWEI = parseEther(props.paymentAmount) - parseEther(props.selectedAccount.balance);
     const amountToTopUpFormatted = parseFloat(formatEther(amountToTopUpWEI));
     const inputValue = props.topupAmount < amountToTopUpFormatted ? amountToTopUpFormatted : props.topupAmount;
-    return <div class="flex p-3 rounded-xl">
+    return <div class="flex flex-col p-3 rounded-xl">
+        <div class="flex flex-row justify-left text-lg text-gray-900 p-3">
+            <h2><strong>Insufficient balance!</strong> <br /> Update it or select another account!</h2>
+        </div>
         <table class="table-fixed w-full">
             <thead>
                 <tr>
-                    <th class="width-200px"></th>
-                    <th></th>
+                    <th class="w-2/6"></th>
+                    <th class="w-2/6"></th>
                 </tr>
             </thead>
             <tbody>
@@ -783,12 +794,12 @@ function TopUpUI(props: {
                                 currency: props.item.currency,
                                 setShowOverlay: props.setShowOverlay
                             })}
-                            class="w-full flex flex-row justify-center text-2xl font-bold mb-4 mt-4 text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">
+                            class=" w-full flex flex-row justify-center text-xl font-bold mb-4 mt-4 text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">
                             <div class="flex flex-col justify-center">
                                 <p>Add</p>
                             </div>
                             <div class="flex flex-col justify-center">
-                                <TopUpIcon width="35" />
+                                <TopUpIcon width="30" />
                             </div>
                         </button>
                     </UnderlinedTd>
@@ -803,37 +814,25 @@ function NextBttnUi(props: {
     commitment: string,
 }) {
     return <div class="flex p-3 rounded-xl">
-        <table class="table-fixed w-full">
-            <thead>
-                <tr>
-                    <th class="width-200px"></th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <UnderlinedTd extraStyles="rounded-lg bg-gray-50 dark:bg-black-800 text-black-400 dark:text-black-200 text-lg font-bold" >Finish Checkout</UnderlinedTd>
-                    <UnderlinedTd extraStyles="importantNoPaddingLeft rounded-lg bg-gray-50 dark:bg-black-800 text-black-400 dark:text-black-200 text-sm font-bold" > <form
-                        class={"mx-auto"}
-                        action={"app/approvepayment"}
-                        method={"POST"}
-                    >
-                        <input type="hidden" value={props.buttonId} name="debititem" />
-                        <input type="hidden" value={props.commitment} name="accountcommitment" />
-                        <button
-                            type={"submit"}
-                            class="w-full flex flex-row justify-center text-2xl font-bold mb-4 mt-4 text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">
-                            <div class="flex flex-col justify-center">
-                                <p>Next</p>
-                            </div>
-                            <div class="flex flex-col justify-center">
-                                <NextIcon width={"35px"} />
-                            </div>
-                        </button>
-                    </form></UnderlinedTd>
-                </tr>
-            </tbody>
-        </table></div>
+        <form
+            class={"mx-auto"}
+            action={"app/approvepayment"}
+            method={"POST"}
+        >
+            <input type="hidden" value={props.buttonId} name="debititem" />
+            <input type="hidden" value={props.commitment} name="accountcommitment" />
+            <button
+                type={"submit"}
+                class="w-full flex flex-row justify-center text-xl font-bold mb-4 mt-4 text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">
+                <div class="flex flex-col justify-center">
+                    <p>Finish Checkout</p>
+                </div>
+                <div class="flex flex-col justify-center">
+                    <NextIcon width={"30px"} />
+                </div>
+            </button>
+        </form>
+    </div>
 }
 
 function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
@@ -945,35 +944,31 @@ function LoggedInUi(props: LoggedInUiProps) {
         <Overlay show={props.showOverlay}></Overlay>
         <div class="flex flex-col flex-wrap"></div>
         <div class="flex flex-col justify-center">
-            <div class="flex flex-row justify-left mb-4 flex-wrap gap-4" >
-                <CardOutline setSelected={props.setSelectedAccount} id={1} selected={props.selectedAccount} extraCss="mb-8 bg-gradient-to-b w-max h-14 text-indigo-500 font-semibold from-slate-50 to-indigo-100 px-10 py-3 rounded-2xl shadow-indigo-400 shadow-md border-b-4 hover border-b border-indigo-200 hover:shadow-sm transition-all duration-500">
+            <div class="flex flex-row justify-left flex-wrap" >
+                <CardOutline
+                    setSelected={props.setSelectedAccount}
+                    id={1}
+                    selected={props.selectedAccount} extraCss="ml-4 md:ml-0 mb-4 bg-gradient-to-b w-max h-14 text-indigo-500 font-semibold from-slate-50 to-indigo-100 px-10 py-3 rounded-2xl shadow-indigo-400 shadow-md border-b-4 hover border-b border-indigo-200 hover:shadow-sm transition-all duration-500">
                     New Account
                 </CardOutline>
+            </div>
 
-
-                {acc === undefined || props.selectedAccount === 1 ? null :
-                    <div class={"flex flex-col justify-center margin_0_auto"}>
-                        <div class="flex flex-row flex-wrap justify-center">
-                            <CardOutline
-                                extraCss={`mt-1 ${props.visible ? "fade-in-element-checkout" : "fade-out-elements-checkout"}`}
-                                setSelected={props.setSelectedAccount}
-                                id={props.accounts.indexOf(acc) + 2}
-                                selected={props.selectedAccount}
-                            >
-                                <AccountCardElement
-                                    network={""}
-                                    balance={acc.balance}
-                                    currency={acc.currency}
-                                    name={acc.name}
-                                    accountType={acc.accountType}
-                                    closed={acc.closed}
-                                ></AccountCardElement>
-                            </CardOutline>
-                        </div>
-                        <hr
-                            class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
-                        {props.accounts.length > 1 ? <CarouselButtons backClicked={props.backClicked} forwardClicked={props.forwardClicked}></CarouselButtons> : null}
-                    </div>}
+            <div class="flex flex-row overflow-auto pb-4 pl-4 md:pl-1 pr-4 pt-4">
+                {props.accounts.map((data: any) => <CardOutline
+                    extraCss={`mt-1 mr-4 ${props.visible ? "fade-in-element-checkout" : "fade-out-elements-checkout"}`}
+                    setSelected={props.setSelectedAccount}
+                    id={props.accounts.indexOf(data) + 2}
+                    selected={props.selectedAccount}
+                >
+                    <AccountCardElement
+                        network={""}
+                        balance={data.balance}
+                        currency={data.currency}
+                        name={data.name}
+                        accountType={data.accountType}
+                        closed={data.closed}
+                    ></AccountCardElement>
+                </CardOutline>)}
             </div>
 
             <UIBasedOnSelection
@@ -997,7 +992,7 @@ function LoggedInUi(props: LoggedInUiProps) {
             ></UIBasedOnSelection>
 
         </div>
-    </div>
+    </div >
 }
 
 
@@ -1070,7 +1065,7 @@ export default function BuyButtonPage(props: BuyButtonPageProps) {
     const [accountTypeSwitchValue, setAccountTypeSwitchValue] = useState<AccountTypes>(AccountTypes.VIRTUALACCOUNT);
 
     useEffect(() => {
-        setSelectedAccount(props.accounts.length !== 0 ? 2 : 0);
+        setSelectedAccount(props.accounts.length !== 0 ? 2 : 1);
     }, [])
 
     function backClicked() {
