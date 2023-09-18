@@ -185,7 +185,6 @@
 	display: inline-block;
 	border-bottom: 1px dotted black;
 	cursor: pointer;
-	margin-left: 10px;
 }
 
 .tooltip .tooltiptext {
@@ -658,6 +657,9 @@
 	background: linear-gradient(#e5e7eb, 25%, white);
 }
 
+.bg-gradinent-white-indigo-white {
+	background: linear-gradient(left, white 25%, #6366f1 75%, white);
+}
 
 .bg-gradient-white-to-gray {
 	background: linear-gradient(white, #e5e7eb);
@@ -676,6 +678,11 @@
 	100% {
 		transform: rotate(359deg);
 	}
+}
+
+.icon-blinker {
+	animation: blinker 0.5s infinite;
+	display: inline-block;
 }
 
 .toggle {
@@ -731,6 +738,7 @@
 
 .toggle-label {
 	margin-left: 5px;
+	margin-right: 5px;
 	position: relative;
 	top: 2px;
 }
