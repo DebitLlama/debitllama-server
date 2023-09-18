@@ -190,23 +190,43 @@
 
 .tooltip .tooltiptext {
 	visibility: hidden;
-	width: 120px;
-	background-color: black;
-	color: #fff;
-	text-align: center;
-	border-radius: 6px;
-	padding: 5px;
+	width: 220px;
+	background-color: rgb(67 56 202);
+	color: white;
+	text-align: left;
+	padding: 10px;
 	/* Position the tooltip */
 	position: absolute;
 	z-index: 3;
 	top: -5px;
 	right: 105%;
+	/* Shadow and border */
+	box-shadow: 0 25px 50px -12px#6366f1;
+	border-radius: 6px;
 }
 
 .tooltip:hover .tooltiptext {
 	visibility: visible;
 }
 
+.tooltiptext_noalign {
+	visibility: hidden;
+	width: 220px;
+	background-color: rgb(67 56 202);
+	color: white;
+	text-align: left;
+	padding: 10px;
+	/* Position the tooltip */
+	position: absolute;
+	z-index: 3;
+	/* Shadow and border */
+	box-shadow: 0 25px 50px -12px#6366f1;
+	border-radius: 6px;
+}
+
+.tooltip:hover .tooltiptext_noalign {
+	visibility: visible;
+}
 
 /*Account Card */
 
@@ -634,6 +654,14 @@
 	background: linear-gradient(#e5e7eb, white);
 }
 
+.bg-gradient-gray-to-white-variant2 {
+	background: linear-gradient(#e5e7eb, 25%, white);
+}
+
+
+.bg-gradient-white-to-gray {
+	background: linear-gradient(white, #e5e7eb);
+}
 
 .icon-spinner {
 	animation: spin-animation 0.5s infinite;
