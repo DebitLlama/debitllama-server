@@ -92,7 +92,6 @@ export default function AccountCardCarousel(props: AccountCardCarouselProps) {
                         accountType: data.accountType,
                         closed: data.closed
                     })}
-                {props.accountData.length < 2 ? null : <CarouselButtons backClicked={backClicked} forwardClicked={forwardClicked}></CarouselButtons>}
                 <hr
                     class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
             </div>
