@@ -1,6 +1,7 @@
 import { ComponentChildren } from "preact";
 import { DynamicPaymentRequestJobsStatus, PaymentIntentStatus, Pricing } from "../lib/enums.ts";
 import { formatEther, parseEther } from "../lib/frontend/web3.ts";
+import { ChainIds, explorerUrl, explorerUrlAddressPath } from "../lib/shared/web3.ts";
 
 export interface UnderlinedTdProps {
     children: ComponentChildren
@@ -231,7 +232,7 @@ export function getPaymentRequestJobStatusTooltipMessage(status: DynamicPaymentR
 }
 
 export function CarouselButtons(props: { backClicked: () => void, forwardClicked: () => void }) {
-    return <div class="flex flex-rw justify-around">
+    return <div class="flex flex-row justify-center">
 
         <label onClick={props.backClicked}
             class="cursor-pointer bg-white rounded-full shadow-md active:translate-y-0.5"
@@ -249,4 +250,47 @@ export function CarouselButtons(props: { backClicked: () => void, forwardClicked
             </svg>
         </label>
     </div>
+}
+
+
+export function CarouselButtonWrapper(props: { backClicked: () => void, forwardClicked: () => void, children: ComponentChildren, showArrows: boolean }) {
+    if (!props.showArrows) {
+        <div class="flex flex-row justify-center">
+            {props.children}
+        </div>
+    }
+
+    return <div class="flex flex-row justify-center">
+        <div class="flex flex-col justify-center">
+            <label onClick={props.backClicked}
+                class="cursor-pointer bg-white rounded-full shadow-md active:translate-y-0.5"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.707-10.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L9.414 11H13a1 1 0 100-2H9.414l1.293-1.293z" clip-rule="evenodd" />
+                </svg>
+            </label>
+        </div>
+        {props.children}
+        <div class="flex flex-col justify-center">
+            <label onClick={props.forwardClicked}
+                class="cursor-pointer bg-white rounded-full shadow-md active:translate-y-0.5"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd" />
+                </svg>
+            </label>
+        </div>
+    </div>
+}
+
+export function ExplorerLinkForAddress(props: {
+    chainId: ChainIds,
+    address: string
+}) {
+    const explorerURLLink = explorerUrl[props.chainId] + explorerUrlAddressPath[props.chainId] + props.address;
+    return <a
+        class={"text-indigo-600"}
+        href={explorerURLLink}
+        target="_blank"
+    >Link</a>
 }
