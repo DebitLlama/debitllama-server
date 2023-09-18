@@ -1,5 +1,6 @@
 import { ComponentChildren } from "preact";
-import { DynamicPaymentRequestJobsStatus, PaymentIntentStatus } from "../lib/enums.ts";
+import { DynamicPaymentRequestJobsStatus, PaymentIntentStatus, Pricing } from "../lib/enums.ts";
+import { formatEther, parseEther } from "../lib/frontend/web3.ts";
 
 export interface UnderlinedTdProps {
     children: ComponentChildren
@@ -15,18 +16,46 @@ export interface TooltipProps {
     message: string
 }
 
+export interface TopptipWithTitleProps extends TooltipProps {
+    title: string;
+    extraStyle: string;
+}
+
 export function Tooltip(props: TooltipProps) {
     return <div class="tooltip">
         ?
-        <span aria-label="Tooltip helptext" class="tooltiptext">{props.message}</span>
+        <span aria-label={"Tooltip: " + props.message} class="tooltiptext">{props.message}</span>
     </div>
 }
 
-export function getSubscriptionTooltipMessage(pricing: string) {
-    if (pricing === "Fixed") {
-        return "Fixed priced subscriptions will always debit the approved amount."
+export function TooltipWithTitle(props: TopptipWithTitleProps) {
+    return <div class="tooltip">
+        {props.title}
+        <span style={props.extraStyle} aria-label={"Tooltip: " + props.message} class="tooltiptext_noalign">{props.message}</span>
+    </div>
+}
+
+export function getMaxDebitColTitleFromPricing(pricing: string) {
+    if (pricing === Pricing.Fixed) {
+        return "Debit limit:"
     } else {
-        return "Metered subscriptions have dynamic pricing where the approved amount represents a maximum";
+        return "Debit limit:"
+    }
+}
+
+export function getSubscriptionTooltipMessage(pricing: string) {
+    if (pricing === Pricing.Fixed) {
+        return "Fixed priced subscriptions will automatically debit the full amount per payment!"
+    } else {
+        return "Dynamic pricing means the merchant will manually request a payment, the approved amount is the maximum that can be debited, per payment!";
+    }
+}
+
+export function getDebitTimesText(debitTimes: number) {
+    if (debitTimes === 1) {
+        return "Single Payment"
+    } else {
+        return `${debitTimes} Payments`
     }
 }
 
@@ -35,17 +64,61 @@ export function getDebitIntervalText(debitInterval: number, debitTimes: number) 
         return "Single payment";
     }
     if (debitInterval === 0) {
-        return "Unspecified"
+        return "Unspecified. The merchant can pull payments any time!"
     }
-
     if (debitInterval === 1) {
         return "The payment can be withdrawn every day"
     }
-
-    return `The payment can be withdrawn only every ${debitInterval} days`
-
+    return `The payment can be withdrawn every ${debitInterval} days`
 }
 
+export function getDebitIntervalTooltipText(debitInterval: number, debitTimes: number) {
+    if (debitTimes === 1) {
+        return "You will only pay once and then the subsciption agreement is finished!";
+    }
+    if (debitInterval === 0) {
+        return "Caution! The subscription agreement doesn't enforce any limit on withdrawal times."
+    }
+    if (debitInterval === 1) {
+        return "The payment can be debited every 24 hours after the last payment date! Consider this."
+    }
+    return `Counted from the last payment date, ${debitInterval} days will needs to pass before the account can be debited again!`
+}
+
+export function getTotalPaymentField(
+    maxPrice: string,
+    currName: string,
+    pricing: string,
+    debitInterval: number,
+    debitTimes: number) {
+
+    const maxPriceToWei = parseEther(maxPrice);
+    const totalPaidWithMaxprice = maxPriceToWei * BigInt(debitTimes);
+    const totalPaidETH = formatEther(totalPaidWithMaxprice);
+    if (pricing === Pricing.Fixed) {
+        return `${totalPaidETH} ${currName}`;
+    } else {
+        return `Max ${totalPaidETH} ${currName}`
+    }
+}
+
+export function getTotalPaymentFieldTooltip(
+    maxPrice: string,
+    currName: string,
+    pricing: string,
+    debitInterval: number,
+    debitTimes: number) {
+
+    if (pricing === Pricing.Fixed) {
+        const dividedInto = debitInterval <= 1 ? "automatically every day!" : `automatically every ${debitInterval} days!`;
+        const times = debitTimes === 1 ? "debited in a single transaction." : `divided into ${debitTimes} transactions, processed ${dividedInto}`;
+        return `The amount will be ${times}`
+    } else {
+        const dividedInto = debitInterval <= 1 ? "withdraw is allowed every day!" : `withdraw is allowed every ${debitInterval} days, after the last payment date!`;
+        const times = debitTimes === 1 ? "debited in a single transaction." : `debited with ${debitTimes} transactions, ${dividedInto}`;
+        return `The maximum amount that can be ${times} The actual amount will be requested by the merchant per payment!`
+    }
+}
 
 export function formatTxHash(tx: string) {
     return `${tx.substring(0, 5)}...${tx.substring(tx.length - 5, tx.length)}`
