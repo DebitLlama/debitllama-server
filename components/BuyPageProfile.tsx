@@ -26,7 +26,7 @@ export default function BuyPageProfile(props: BuyPageProfileProps) {
         return <div></div>
     }
 
-    return <div class="p-2">
+    return <div>
         <h4 class="text-2xl text-center mb-4 text-gray-500">You need to set up your profile!</h4>
         <div class="relative flex flex-wrap items-stretch bg-gray-50">
             <span
