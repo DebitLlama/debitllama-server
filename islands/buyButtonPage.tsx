@@ -4,12 +4,12 @@ import { useEffect, useState } from 'preact/hooks';
 import AccountPasswordInput, { AccountPasswordInputProps } from "./accountPasswordInput.tsx";
 import { strength } from "./accountCreatePageForm.tsx";
 import BuyPageProfile, { ProfileProps } from "../components/BuyPageProfile.tsx";
-import { approveSpend, connectWallet, depositEth, depositToken, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts, topUpETH, topUpTokens } from "../lib/frontend/web3.ts";
+import { approveSpend, connectWallet, depositEth, depositToken, formatEther, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts, topUpETH, topUpTokens } from "../lib/frontend/web3.ts";
 import { ChainIds, getAbiJsonByAccountType, getConnectedWalletsContractAddress, getVirtualAccountsContractAddress } from "../lib/shared/web3.ts";
 import { requestBalanceRefresh, saveAccount, uploadProfileData } from "../lib/frontend/fetch.ts";
 import { setUpAccount } from "../lib/frontend/directdebitlib.ts";
 import { AccountCardElement } from "../components/AccountCardElement.tsx";
-import { CarouselButtons, UnderlinedTd } from "../components/components.tsx";
+import { CarouselButtons, TooltipWithTitle, UnderlinedTd } from "../components/components.tsx";
 import Overlay from "../components/Overlay.tsx";
 import { AccountTypes, Pricing } from "../lib/enums.ts";
 import WalletDetailsFetcher from "./WalletDetailsFetcher.tsx";
@@ -591,6 +591,8 @@ function CreateNewAccountUI(props: {
     setAccountTypeSwitchValue: (to: AccountTypes) => void;
 
 }) {
+    const isERC20 = !props.item.currency.native;
+
     return <form class="p-2" onSubmit={onCreateAccountSubmit({
         chainId: props.item.network,
         handleError,
@@ -607,20 +609,36 @@ function CreateNewAccountUI(props: {
         <BuyPageProfile
             profileExists={props.profileExists}
             profile={props.profile}></BuyPageProfile>
-        <div class="bg-white  px-3 py-[0.25rem]">
-            <div class="flex flex-row justify-center">
-                <label class="toggle select-none">
-                    <span class="toggle-label mr-2">Virtual Account</span>
-                    <input checked={props.accountTypeSwitchValue === AccountTypes.CONNECTEDWALLET} onChange={(event: any) => {
-                        if (event.target.checked) {
-                            props.setAccountTypeSwitchValue(AccountTypes.CONNECTEDWALLET)
-                        } else {
-                            props.setAccountTypeSwitchValue(AccountTypes.VIRTUALACCOUNT)
-                        }
-                    }} class="toggle-checkbox" type="checkbox" />
-                    <div class="toggle-switch"></div>
-                    <span class="toggle-label">Connect Wallet</span>
-                </label></div>
+        <div class="px-3 py-[0.25rem]">
+            <hr
+                class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
+            {isERC20 ?
+                <div class="flex flex-row justify-between">
+                    <span class="toggle-label mr-2">
+                        <TooltipWithTitle
+                            title="Virtual Account"
+                            extraStyle="right: -80%"
+                            message="Create a new virtual account and deposit the value. The payment will be debited from this account! They can be created per subsciption if you want!"></TooltipWithTitle>
+                    </span>
+                    <label class="toggle select-none">
+
+                        <input checked={props.accountTypeSwitchValue === AccountTypes.CONNECTEDWALLET} onChange={(event: any) => {
+                            if (event.target.checked) {
+                                props.setAccountTypeSwitchValue(AccountTypes.CONNECTEDWALLET)
+                            } else {
+                                props.setAccountTypeSwitchValue(AccountTypes.VIRTUALACCOUNT)
+                            }
+                        }} class="toggle-checkbox" type="checkbox" />
+                        <div class="toggle-switch"></div>
+
+                    </label>
+                    <span class="toggle-label">
+                        <TooltipWithTitle
+                            title="Connect Wallet"
+                            extraStyle="left: -80%"
+                            message="You can spend tokens from a connected wallet directly. Your wallet must have sufficient balance and you must approve spending! The connected wallets with the same token and network have the same balance!"></TooltipWithTitle>
+                    </span>
+                </div> : null}
             <div class="mb-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="accountName">Account Name</label>
                 <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
@@ -628,7 +646,7 @@ function CreateNewAccountUI(props: {
             </div>
             <div class="mb-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="amount">{props.accountTypeSwitchValue === AccountTypes.VIRTUALACCOUNT ? "Deposit amount " : "Approve spending "} {props.item.currency.name}</label>
-                {!props.item.currency.native ? <span class="text-sm text-gray-300">Token Address: {props.item.currency.contractAddress}</span> : null}
+                {!props.item.currency.native ? <span class="text-sm text-gray-800">Token Address: {props.item.currency.contractAddress}</span> : null}
                 <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
                     value={props.paymentAmount} type="number" id="amount" name="amount" placeholder="0" step="any" />
             </div>
@@ -659,8 +677,9 @@ function RefreshBalanceUI(props: {
     item: ItemProps,
     setShowOverlay: (to: boolean) => void
 }) {
-    const amountToTopUp = parseFloat(props.paymentAmount) - parseFloat(props.selectedAccount.balance);
-    const inputValue = props.topupAmount < amountToTopUp ? amountToTopUp : props.topupAmount;
+    const amountToTopUpWEI = parseEther(props.paymentAmount) - parseEther(props.selectedAccount.balance);
+    const amountToTopUpFormatted = parseFloat(formatEther(amountToTopUpWEI));
+    const inputValue = props.topupAmount < amountToTopUpFormatted ? amountToTopUpFormatted : props.topupAmount;
     return <div class="flex flex-col p-3 rounded-xl">
         <WalletDetailsFetcher
             // This is only rendered when a connected wallet is selected!
@@ -738,10 +757,9 @@ function TopUpUI(props: {
     item: ItemProps,
     setShowOverlay: (to: boolean) => void
 }) {
-    const amountToTopUp = parseFloat(props.paymentAmount) - parseFloat(props.selectedAccount.balance);
-    // You can't top up less than needed!
-    const inputValue = props.topupAmount < amountToTopUp ? amountToTopUp : props.topupAmount;
-
+    const amountToTopUpWEI = parseEther(props.paymentAmount) - parseEther(props.selectedAccount.balance);
+    const amountToTopUpFormatted = parseFloat(formatEther(amountToTopUpWEI));
+    const inputValue = props.topupAmount < amountToTopUpFormatted ? amountToTopUpFormatted : props.topupAmount;
     return <div class="flex p-3 rounded-xl">
         <table class="table-fixed w-full">
             <thead>
@@ -767,7 +785,7 @@ function TopUpUI(props: {
                             })}
                             class="w-full flex flex-row justify-center text-2xl font-bold mb-4 mt-4 text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">
                             <div class="flex flex-col justify-center">
-                                <p>Send</p>
+                                <p>Add</p>
                             </div>
                             <div class="flex flex-col justify-center">
                                 <TopUpIcon width="35" />
@@ -927,7 +945,7 @@ function LoggedInUi(props: LoggedInUiProps) {
         <Overlay show={props.showOverlay}></Overlay>
         <div class="flex flex-col flex-wrap"></div>
         <div class="flex flex-col justify-center">
-            <div class="flex flex-row justify-left mb-8 flex-wrap gap-4" >
+            <div class="flex flex-row justify-left mb-4 flex-wrap gap-4" >
                 <CardOutline setSelected={props.setSelectedAccount} id={1} selected={props.selectedAccount} extraCss="mb-8 bg-gradient-to-b w-max h-14 text-indigo-500 font-semibold from-slate-50 to-indigo-100 px-10 py-3 rounded-2xl shadow-indigo-400 shadow-md border-b-4 hover border-b border-indigo-200 hover:shadow-sm transition-all duration-500">
                     New Account
                 </CardOutline>
@@ -989,7 +1007,7 @@ export interface LoggedOutUiProps {
 }
 function LoggedOutUi(props: LoggedOutUiProps) {
     const err = new URL(props.url).searchParams.get("error");
-    return <div class="p-3 max-w-sm	mx-auto">
+    return <div class="pb-3 max-w-sm mx-auto">
         {err && (
             <div class="bg-red-400 border-l-4 p-4" role="alert">
                 <p class="font-bold">Error</p>
@@ -998,8 +1016,8 @@ function LoggedOutUi(props: LoggedOutUiProps) {
         )}
         <form class="space-y-4 md:space-y-6" method="POST">
             <input type="hidden" name="buttonId" value={props.buttonid} />
-            <div class="mx-auto">
-                <h2 class="text-2xl font-bold mb-5 text-center text-gray-400">Login</h2>
+            <div class="">
+                <h2 class="text-2xl font-bold mb-5 text-center text-gray-400 select-none">Log In To Continue</h2>
             </div>
             <div>
                 <label for="email" class="block mb-2 text-sm font-medium">Your email</label>
@@ -1010,7 +1028,7 @@ function LoggedOutUi(props: LoggedOutUiProps) {
                 <input type="password" name="password" id="password" placeholder="••••••••" class="border border-gray-300 sm:text-sm rounded-lg focus:ring-indigo-600 focus:border-indigo-600 block w-full p-2.5 dark:focus:ring-indigo-500 dark:focus:border-indigo-500" />
             </div>
 
-            <button type="submit" class="w-full text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">Login In</button>
+            <button type="submit" class="w-full text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-2xl px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">Log In</button>
             <p class="text-sm font-light text-gray-500 dark:text-gray-400">
                 Don't have an account yet? <a target="_blank" href="/signup" class="font-medium text-indigo-600 hover:underline dark:text-indigo-500">Sign up</a>
             </p>
