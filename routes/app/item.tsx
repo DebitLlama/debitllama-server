@@ -99,7 +99,10 @@ export default function Item(props: PageProps) {
                                 </tr>
                                 <tr>
                                     <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Redirect URL:</td>
-                                    <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class={"overflow-x-auto overflowingTableData"}>{itemData.redirect_url}</div></td>
+                                    <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class={"overflow-x-auto overflowingTableData max-w-sm"}>
+                                        <a href={itemData.redirect_url} target="_blank"> {itemData.redirect_url}</a>
+                                    </div>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Checkout:</td>
