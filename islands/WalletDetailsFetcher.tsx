@@ -3,6 +3,7 @@ import { useEffect, useState } from 'preact/hooks';
 import { ChainIds, getConnectedWalletsContractAddress } from "../lib/shared/web3.ts";
 
 import { balanceOf, formatEther, getAllowance, getContract, getJSONRPCProvider, isZero, isAddress } from "../lib/frontend/web3.ts";
+import { ExplorerLinkForAddress } from "../components/components.tsx";
 
 
 export interface ConnectedWalletDetailsFetcherProps {
@@ -45,30 +46,30 @@ export default function WalletDetailsFetcher(props: ConnectedWalletDetailsFetche
     return <table>
         <thead>
             <tr>
-                <th ></th>
-                <th ></th>
+                <th class="w-2/6"></th>
+                <th class="w-2/6"></th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>{props.accountType === AccountTypes.CONNECTEDWALLET ? "Connected Wallet:" : "Creator Address"}</td>
-                <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto  overflow-y-hide overflowingTableData"> <small>{props.creatorAddress}</small> </div></td>
+                <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto  overflow-y-hide overflowingTableData"> <ExplorerLinkForAddress chainId={props.networkId} address={props.creatorAddress}></ExplorerLinkForAddress></div></td>
             </tr>
             {!isZero(props.tokenAddress) && isAddress(props.tokenAddress) ? <tr>
                 <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Token Address:</td>
-                <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto  overflow-y-hide overflowingTableData"> <small>{props.tokenAddress}</small> </div></td>
+                <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto  overflow-y-hide overflowingTableData"><ExplorerLinkForAddress chainId={props.networkId} address={props.tokenAddress}></ExplorerLinkForAddress> </div></td>
             </tr> : null}
             {props.accountType === AccountTypes.CONNECTEDWALLET ? <tr>
                 <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Wallet Balance:</td>
-                <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class={`overflow-x-auto overflow-y-hide overflowingTableData `} > <small class={`${connectedWalletBalance === "⏳" ? `icon-spinner` : ""}`} >{connectedWalletBalance}</small> </div></td>
+                <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class={`overflow-x-auto overflow-y-hide overflowingTableData `} > <small class={`${connectedWalletBalance === "⏳" ? `icon-blinker` : ""}`} >{connectedWalletBalance}</small> </div></td>
             </tr> : null}
             {props.accountType === AccountTypes.CONNECTEDWALLET ? <tr>
                 <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Allowance:</td>
-                <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class={`overflow-x-auto overflow-y-hide overflowingTableData`} > <small class={`${currentApprovalAmount === "⏳" ? `icon-spinner` : ""}`} >{currentApprovalAmount}</small> </div></td>
+                <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class={`overflow-x-auto overflow-y-hide overflowingTableData`} > <small class={`${currentApprovalAmount === "⏳" ? `icon-blinker` : ""}`} >{currentApprovalAmount}</small> </div></td>
             </tr> : null}
             {props.accountType === AccountTypes.CONNECTEDWALLET ? <tr>
                 <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Spendable balance:</td>
-                <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class={`overflow-x-auto  overflow-y-hide overflowingTableData`} > <strong class={`${spendableBalance === "⏳" ? `icon-spinner` : ""}`}>{spendableBalance}</strong> </div></td>
+                <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class={`overflow-x-auto  overflow-y-hide overflowingTableData`} > <strong class={`${spendableBalance === "⏳" ? `icon-blinker` : ""}`}>{spendableBalance}</strong> </div></td>
             </tr> : null}
         </tbody>
     </table>
