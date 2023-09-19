@@ -234,12 +234,12 @@ export function getRelayerBalanceForChainId(
 }
 
 function findPaymentIntentsWithAccountBalanceLowThatCanBeReset(
-  addedBalance: bigint,
+  currentBalance: bigint,
   paymentIntents: PaymentIntentRow[],
 ) {
   const paymentIntentsToReset = Array<any>();
 
-  let addedBalanceLeft = addedBalance;
+  let addedBalanceLeft = currentBalance;
 
   for (let i = 0; i < paymentIntents.length; i++) {
     const pi = paymentIntents[i];
@@ -264,37 +264,26 @@ function findPaymentIntentsWithAccountBalanceLowThatCanBeReset(
   }
   return paymentIntentsToReset;
 }
+
+//This should work based on current on-chain balance and not how much balance was added!
 export async function updatePaymentIntentsWhereAccountBalanceWasAdded(
   queryBuilder: QueryBuilder,
-  oldAccountData: Account,
-  fetchedAccountBalance_WEI: any,
+  currentOnChanBalance_WEI: any,
+  account_id: number,
 ) {
-  if (fetchedAccountBalance_WEI === BigInt(0)) {
+  if (currentOnChanBalance_WEI === BigInt(0)) {
     // Account was closed or it's just empty!
     return;
   }
-  const oldBalance = parseEther(oldAccountData.balance);
-  if (oldBalance >= fetchedAccountBalance_WEI) {
-    // The fetched balance is less or equals, we spent money, not topped up!
-    // I just return as there is nothing to do!
-    return;
-  }
-  //New balance - old balance is the balance that was added
-  const addedBalance = fetchedAccountBalance_WEI - oldBalance;
-
-  if (addedBalance <= BigInt(0)) {
-    // In case something went wrong with the above error check, this can't be negative!
-    return;
-  }
-
   const select = queryBuilder.select();
   const { data: paymentIntents } = await select.PaymentIntents
     .forAccountbyAccountBalanceTooLow(
-      oldAccountData.id,
+      account_id,
     );
+    
   const paymentIntentsToReset =
     findPaymentIntentsWithAccountBalanceLowThatCanBeReset(
-      addedBalance,
+      currentOnChanBalance_WEI,
       paymentIntents,
     );
   //Update payment intents
