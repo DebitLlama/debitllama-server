@@ -1,20 +1,58 @@
-# Fresh project
+# DebitLlama Serice
 
-Your new Fresh project is ready to go. You can follow the Fresh "Getting
-Started" guide here: https://fresh.deno.dev/docs/getting-started
+This repository contains the user interface and server side logic for DebitLlama.
 
-### Usage
+It was build using Deno Fresh framework.
 
-Make sure to install Deno: https://deno.land/manual/getting_started/installation
+# VPS Server Setup
 
-Then start the project:
+`sudo apt update`
 
-```
-deno task start
-```
+`sudo apt upgrade`
 
-This will watch the project directory and restart as necessary.
+`adduser debitllama`
 
-### CSS
+`usermod -aG sudo debitllama`
 
-https://tailwind-elements.com/
+`sudo apt install nginx`
+
+## Snap is needed due to certbot install
+
+`sudo apt install snapd`
+
+`sudo snap install --classic certbot`
+
+`sudo ln -s /snap/bin/certbot /usr/bin/certbot`
+
+`sudo certbot --nginx`
+
+## Need to install Deno and Node for PM2
+
+install node
+
+`curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -`
+
+`sudo apt-get install -y nodejs`
+
+intall pm2
+
+`npm install -g pm2`
+
+configure systemd for pm2
+
+`pm2 startup systemd`
+
+install deno
+
+`curl -fsSL https://deno.land/x/install/install.sh | sh`
+
+
+## Clone the repository from github
+nuff said, make sure to use the debitllama user
+
+## Run the server
+`chmod a+x run.sh`
+
+`./run.sh`
+
+
