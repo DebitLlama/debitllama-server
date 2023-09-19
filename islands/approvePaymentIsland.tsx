@@ -76,6 +76,10 @@ export default function ApprovePaymentIsland(props: ApprovePaymentIslandProps) {
         }
     }
 
+    function disableOnSubmit(e: any) {
+        e.preventDefault();
+        return false;
+    }
     return <div class="flex flex-col p-3">
         <div class="flex flex-col flex-wrap">
         </div>
@@ -93,7 +97,7 @@ export default function ApprovePaymentIsland(props: ApprovePaymentIslandProps) {
                     ></AccountCardElement>
 
                 </div>
-                <div class="flex flex-col margin_0_auto">
+                <form class="flex flex-col margin_0_auto" onSubmit={disableOnSubmit}>
                     <div class="mx-auto mt-4">
                         <label for="password" class="block mb-2 text-sm font-medium">Account Password</label>
                         <input
@@ -109,12 +113,12 @@ export default function ApprovePaymentIsland(props: ApprovePaymentIslandProps) {
                     </div>
                     <button
                         onClick={payClicked}
-                        class="width-320px mb-4 mt-4 mx-auto text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg text-2xl font-bold px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
+                        class="width-320px mb-4 mt-4 mx-auto text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg text-xl font-bold px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
                     >Subscribe</button>
                     <div class="w-60 mx-auto mt-4 text-center">
                         <p class={"text-red-600	"}>{errorMessage}</p>
                     </div>
-                </div>
+                </form>
             </div>
         </>}
     </div>
