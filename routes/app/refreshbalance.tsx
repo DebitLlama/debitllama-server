@@ -29,18 +29,18 @@ export const handler: Handlers<any, State> = {
             return errorResponseBuilder("Account closed");
         }
 
-        const accountData = await getAccount(commitment, networkId, data[0].accountType);
+        const onChainAccount = await getAccount(commitment, networkId, data[0].accountType);
 
-        if (accountData.exists) {
+        if (onChainAccount.exists) {
             const update = queryBuilder.update();
 
             //Check if there were payment intents with account balance too low and 
             // calculate how much balance was added and set them to recurring or created where possible
-            await updatePaymentIntentsWhereAccountBalanceWasAdded(queryBuilder, data[0], accountData.account[3]);
+            await updatePaymentIntentsWhereAccountBalanceWasAdded(queryBuilder, onChainAccount.account[3], data[0].id);
 
             await update.Accounts.balanceAndClosedById(
-                accountData.account[3],
-                !accountData.account[0],
+                onChainAccount.account[3],
+                !onChainAccount.account[0],
                 data[0].id);
 
             return new Response(null, { status: 200 })
