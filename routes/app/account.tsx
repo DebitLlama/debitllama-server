@@ -48,7 +48,7 @@ export const handler: Handlers<any, State> = {
 
                 //Check if there were payment intents with account balance too low and 
                 // calculate how much balance was added and set them to recurring or created where possible
-                await updatePaymentIntentsWhereAccountBalanceWasAdded(queryBuilder, data[0], onChainAccount.account[3]);
+                await updatePaymentIntentsWhereAccountBalanceWasAdded(queryBuilder, onChainAccount.account[3], data[0].id);
 
                 // Update the account balance finally
 
