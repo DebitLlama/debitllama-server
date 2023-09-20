@@ -88,7 +88,7 @@ export default function AddNewDebitItemPageForm(props: AddNewDebitItemFormProps)
                         selectedCurrency={selectedCurrency}
                         setSelectedCurrency={setSelectedCurrency}
                     ></CurrencySelectDropdown>
-                    <p class="text-sm text-gray-600	">Select the network and the currency where you want to recieve payments!</p>
+                    <p class="text-sm text-gray-600	">Select the network and the currency you want to use for the subsciption payments!</p>
 
                 </div>
                 <div class="mb-4 max-w-sm">
@@ -113,7 +113,7 @@ export default function AddNewDebitItemPageForm(props: AddNewDebitItemFormProps)
 
             <div>
                 <div class={"mb-4 max-w-sm"}>
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="debitTimes">Do many times will you debit the account?</label>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="debitTimes">How many times will you debit the account?</label>
                     <input min={1} required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
                         type="number" id="debitTimes" name="debitTimes" placeholder="1" />
                 </div>
