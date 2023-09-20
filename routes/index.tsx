@@ -1,9 +1,11 @@
 // deno-lint-ignore-file no-explicit-any
 import { Handlers, PageProps } from "$fresh/server.ts";
-import { setCookie } from "$std/http/cookie.ts";
+import { deleteCookie, getCookies } from "$std/http/cookie.ts";
 import { Head } from "$fresh/runtime.ts";
 import { signInWithPassword } from "../lib/backend/auth.ts";
 import { State } from "./_middleware.ts";
+import { CookieNames } from "../lib/enums.ts";
+import { setRenderSidebarOpen, setSupaloginCookie } from "../lib/backend/cookies.ts";
 
 export const handler: Handlers<any, State> = {
 
@@ -17,20 +19,14 @@ export const handler: Handlers<any, State> = {
         const headers = new Headers();
 
         if (data.session) {
-            setCookie(headers, {
-                name: 'supaLogin',
-                value: data.session?.access_token,
-                maxAge: data.session.expires_in
-            })
-            setCookie(headers, {
-                name: "renderSidebarOpen",
-                value: "true",
-                maxAge: data.session.expires_in
-            })
+            setSupaloginCookie(headers, data.session?.access_token, data.session.expires_in)
+            setRenderSidebarOpen(headers, "true", data.session.expires_in);
         }
+        const redirectTo = getCookies(req.headers)[CookieNames.loginRedirect];
 
-        let redirect = "/app/accounts"
+        let redirect = redirectTo === undefined || redirectTo === "" ? "/app/accounts" : redirectTo;
 
+        deleteCookie(headers, CookieNames.loginRedirect);
 
         if (error) {
             console.log(error);
