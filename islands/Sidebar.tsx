@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { setSidebarOpenCookie } from "../lib/frontend/other.ts";
+import { DocsLinks } from "../lib/enums.ts";
 
 const closeIfOpenSidebar = () => {
     const sidebar = document.getElementById("sidebar-id") as HTMLDivElement;
@@ -116,7 +117,7 @@ export default function SideBar(props: SidebarProps) {
                     </a>
                 </li>
                 <li>
-                    <a href="https://debitllama.gitbook.io/debitllama/" target="_blank" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-indigo-500 pr-6">
+                    <a href={DocsLinks.LINKTODOCSSTART} target="_blank" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                         <span class="inline-flex justify-center items-center ml-4">
                             <svg style={"margin-left: -2px;"} fill="currentColor" stroke="currentColor" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M280-280h280v-80H280v80Zm0-160h400v-80H280v80Zm0-160h400v-80H280v80Zm-80 480q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm0-560v560-560Z" /></svg>
                         </span>

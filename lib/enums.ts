@@ -38,7 +38,8 @@ export enum PaymentIntentsTablePages {
 }
 
 export enum DocsLinks {
-  REDIRECTURLSPEC = "https://gitbook.com",
+  LINKTODOCSSTART = "https://debitllama.gitbook.io/debitllama/",
+  REDIRECTURLSPEC = "https://debitllama.gitbook.io/debitllama/",
 }
 
 export type PaymentIntentRow = {
@@ -78,7 +79,7 @@ export type Account = {
   currency: string;
   balance: string;
   accountType: AccountTypes;
-  creator_address: string
+  creator_address: string;
 };
 
 export type DebitItem = {
@@ -192,3 +193,16 @@ export const MapRelayerTxHistoryColnamesToDbColNames: {
   [RelayerTxHistoryColNames.PaymentAmount]: "paymentAmount",
   [RelayerTxHistoryColNames.PaymentCurrency]: "paymentCurrency",
 };
+
+export enum CookieNames {
+  supaLogin = "supaLogin",
+  renderSidebarOpen = "renderSidebarOpen",
+  loginRedirect = "loginRedirect",
+  profileRedirect = "profileRedirect",
+}
+
+// The pages where the auth should run!
+export enum AuthWhitelist {
+  app = "/app",
+  buyitnow = "/buyitnow",
+}
