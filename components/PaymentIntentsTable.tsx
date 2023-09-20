@@ -15,7 +15,7 @@ export function getNextPaymentDateDisplay(nextPaymentDate: any) {
     return new Date(nextPaymentDate).toLocaleString()
 }
 
-function getPaymentColValue(pricing: string, maxDebitAmount: string, currencyName: string) {
+export function getPaymentColValue(pricing: string, maxDebitAmount: string, currencyName: string) {
     if (pricing === Pricing.Fixed) {
         return `${maxDebitAmount} ${currencyName}`
     } else {
@@ -23,7 +23,7 @@ function getPaymentColValue(pricing: string, maxDebitAmount: string, currencyNam
     }
 }
 
-function getTotalPaymentValue(pricing: string, maxDebitAmount: string, currencyName: string, debitTimes: number) {
+export function getTotalPaymentValue(pricing: string, maxDebitAmount: string, currencyName: string, debitTimes: number) {
     const totalinWEI = parseEther(maxDebitAmount) * BigInt(`${debitTimes}`);
     if (pricing === Pricing.Fixed) {
 
