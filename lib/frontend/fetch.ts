@@ -25,7 +25,6 @@ export function redirectToRedirectPage(
 }
 
 export type ProfileData = {
-  walletaddress: string;
   firstname: string;
   lastname: string;
   addressline1: string;
@@ -54,7 +53,6 @@ export async function requestBalanceRefresh(
 }
 
 export interface UpdateProfileDataArgs {
-  walletaddress: string;
   firstname: string;
   lastname: string;
   addressline1: string;
@@ -304,6 +302,19 @@ export async function saveAccount(args: {
   commitment: string;
   currency: string;
   accountType: AccountTypes;
+}) {
+  return await fetch("/app/saveAccountAPI", {
+    credentials: "same-origin",
+    method: "POST",
+    body: JSON.stringify(args),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((response) => response);
+}
+
+export async function updateRedirectUrl(args: {
+  redirectTo: string;
 }) {
   return await fetch("/app/saveAccountAPI", {
     credentials: "same-origin",
