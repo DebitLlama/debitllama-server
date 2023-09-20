@@ -336,3 +336,39 @@ export async function disconnectWallet(
 ) {
   return await contract.disconnectWallet(commitment);
 }
+
+export async function connectedWalletAlready(
+  contract: any,
+  walletaddr: string,
+  token: string,
+) {
+  const hash = await contract.getHashByAddresses(walletaddr, token);
+  return await contract.connectedWalletAlready(hash);
+}
+
+export async function mintToken(contract: any, address: "string") {
+  return await contract.mint(address, parseEther("1000000"));
+}
+
+export async function watchAsset(erc20Params: any, onError: any) {
+    //@ts-ignore window.ethereum should exist, I run this after onboarding!
+    await window.ethereum
+        .request({
+            method: "wallet_watchAsset",
+            params: {
+                type: "ERC20",
+                options: {
+                    address: erc20Params.address,
+                    symbol: erc20Params.symbol,
+                    decimals: erc20Params.decimals,
+                },
+            },
+        })
+        .then((success: any) => {
+            if (success) {
+            } else {
+                onError();
+            }
+        })
+        .catch(console.error);
+}
