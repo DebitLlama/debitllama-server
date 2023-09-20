@@ -258,7 +258,7 @@ export default class QueryBuilder {
           rangeTo: number,
         ) => {
           const res = await this.client.from("PaymentIntents")
-            .select("*,account_id(*)", { count: "exact" })
+            .select("*,account_id(*),debit_item_id(*)", { count: "exact" })
             .order(order, { ascending })
             .eq("payee_user_id", this.userid)
             .range(rangeFrom, rangeTo);
@@ -272,7 +272,7 @@ export default class QueryBuilder {
           searchTerm: string,
         ) => {
           const res = await this.client.from("PaymentIntents")
-            .select("*,account_id(*)", { count: "exact" })
+            .select("*,account_id(*),debit_item_id(*)", { count: "exact" })
             .order(order, { ascending })
             .like("paymentIntent", searchTerm)
             .eq("payee_user_id", this.userid)
@@ -287,7 +287,7 @@ export default class QueryBuilder {
           rangeTo: number,
         ) => {
           const res = await this.client.from("PaymentIntents")
-            .select("*,account_id(*)", { count: "exact" })
+            .select("*,account_id(*),debit_item_id(*)", { count: "exact" })
             .order(order, { ascending })
             .eq("debit_item_id", debit_item_id)
             .range(rangeFrom, rangeTo);
@@ -302,7 +302,7 @@ export default class QueryBuilder {
           searchTerm: string,
         ) => {
           const res = await this.client.from("PaymentIntents")
-            .select("*,account_id(*)", { count: "exact" })
+            .select("*,account_id(*),debit_item_id(*)", { count: "exact" })
             .order(order, { ascending })
             .like("paymentIntent", searchTerm)
             .eq("debit_item_id", debit_item_id)
