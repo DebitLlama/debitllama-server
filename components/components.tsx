@@ -314,3 +314,10 @@ export function ExplorerLinkForAddress(props: {
         target="_blank"
     >Link</a>
 }
+
+export function NotFound(props: { title: string, children: ComponentChildren }) {
+    return <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
+        <h1 class="text-2xl font-bold mb-6 text-center">{props.title}</h1>
+        {props.children}
+    </div>
+}
