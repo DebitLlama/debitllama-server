@@ -229,7 +229,7 @@ export default class QueryBuilder {
           rangeTo: number,
         ) => {
           const res = await this.client.from("PaymentIntents")
-            .select("*", { count: "exact" })
+            .select("*,debit_item_id(*)", { count: "exact" })
             .order(order, { ascending })
             .eq("account_id", accountId)
             .range(rangeFrom, rangeTo);
@@ -244,7 +244,7 @@ export default class QueryBuilder {
           searchTerm: string,
         ) => {
           const res = await this.client.from("PaymentIntents")
-            .select("*", { count: "exact" })
+            .select("*,debit_item_id(*)", { count: "exact" })
             .order(order, { ascending })
             .like("paymentIntent", searchTerm)
             .eq("account_id", accountId)
@@ -567,7 +567,6 @@ export default class QueryBuilder {
       Profiles: {
         //insertProfile
         newProfile: async (
-          walletaddress: string,
           firstname: string,
           lastname: string,
           addressline1: string,
@@ -578,7 +577,6 @@ export default class QueryBuilder {
         ) => {
           const res = await this.client.from("Profiles").insert({
             userid: this.userid,
-            walletaddress,
             firstname,
             lastname,
             addressline1,
@@ -745,6 +743,16 @@ export default class QueryBuilder {
 
           return this.responseHandler(res);
         },
+        updateRedirectUrlForItem: async (
+          button_id: string,
+          redirect_url: string,
+        ) => {
+          const res = await this.client.from("Items").update({
+            redirect_url,
+          }).eq("button_id", button_id)
+            .eq("payee_id", this.userid);
+          return this.responseHandler(res);
+        },
       },
       PaymentIntents: {
         //updatePaymentItemStatus
@@ -848,7 +856,6 @@ export default class QueryBuilder {
       Profiles: {
         //upsertProfile
         all: async (
-          walletaddress: string,
           firstname: string,
           lastname: string,
           addressline1: string,
@@ -860,7 +867,6 @@ export default class QueryBuilder {
           const res = await this.client.from("Profiles").upsert(
             {
               id: this.userid,
-              walletaddress,
               firstname,
               lastname,
               addressline1,
@@ -900,6 +906,7 @@ export default class QueryBuilder {
   responseHandler(res: SupabaseQueryResult) {
     if (res.error !== null) {
       console.log("QUERY ERROR!");
+      console.log(res);
       console.log(res.error);
     }
     return { ...res };
