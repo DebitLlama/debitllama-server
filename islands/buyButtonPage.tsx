@@ -407,7 +407,6 @@ function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
 
         if (!args.profileExists) {
             const uploadProfileStatus = await uploadProfileData({
-                walletaddress: address,
                 firstname: args.profile.firstname,
                 lastname: args.profile.lastname,
                 addressline1: args.profile.addressLine1,
