@@ -1,11 +1,15 @@
+import { setSidebarOpenCookie } from "../lib/frontend/other.ts";
 
 export default function SidebarToggleButton() {
     const toggleSidebar = () => {
         const sidebar = document.getElementById("sidebar-id");
         if (sidebar?.classList.contains("collapsed")) {
             sidebar.classList.remove("collapsed")
+            setSidebarOpenCookie("true");
         } else {
             sidebar?.classList.add("collapsed");
+            setSidebarOpenCookie("false");
+
         }
     }
     return <button
@@ -23,7 +27,7 @@ function MenuIcon() {
         viewBox="0 -960 960 960"
         width="24"
         class="mx-auto"
-        >
+    >
         <path
             d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z" />
     </svg>
