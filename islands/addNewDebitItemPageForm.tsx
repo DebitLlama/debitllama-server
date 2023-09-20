@@ -127,7 +127,7 @@ export default function AddNewDebitItemPageForm(props: AddNewDebitItemFormProps)
                         type="number" id="debitInterval" name="debitInterval" placeholder="30" />
                 </div>
                 <div class={"mb-4 max-w-sm"}>
-                    <p class="text-sm text-gray-600	">You can set the interval of days that need to pass before the account can be debited again. For a monthly subscription you can set it to 30 and debit the amount every 30 days after it was used. If you leave it at 0 you must use dynamic pricing!</p>
+                    <p class="text-sm text-gray-600	">You can set the interval of days that need to pass before the account can be debited again. For a monthly subscription you can set it to 30 and debit the account every 30 days.The account can be debited on the day the subsciption was made and then after that the days are always counted from the last payment date! If the customer account is empty or the relayer has insufficient gas, the payment interval will be delayed! If you leave it at 0 you can debit the account any time but you must use dynamic pricing and trigger it manually or through the Rest API!</p>
                 </div>
 
                 <div class={"mb-4 max-w-sm"}>
