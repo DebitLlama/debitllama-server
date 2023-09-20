@@ -4,7 +4,7 @@ import { useEffect, useState } from 'preact/hooks';
 import AccountPasswordInput, { AccountPasswordInputProps } from "./accountPasswordInput.tsx";
 import { strength } from "./accountCreatePageForm.tsx";
 import BuyPageProfile, { ProfileProps } from "../components/BuyPageProfile.tsx";
-import { approveSpend, connectWallet, depositEth, depositToken, formatEther, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts, topUpETH, topUpTokens } from "../lib/frontend/web3.ts";
+import { approveSpend, connectWallet, connectedWalletAlready, depositEth, depositToken, formatEther, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts, topUpETH, topUpTokens } from "../lib/frontend/web3.ts";
 import { ChainIds, getAbiJsonByAccountType, getConnectedWalletsContractAddress, getVirtualAccountsContractAddress } from "../lib/shared/web3.ts";
 import { requestBalanceRefresh, saveAccount, uploadProfileData } from "../lib/frontend/fetch.ts";
 import { setUpAccount } from "../lib/frontend/directdebitlib.ts";
@@ -427,6 +427,21 @@ function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
             ? getVirtualAccountsContractAddress[args.chainId as ChainIds]
             : getConnectedWalletsContractAddress[args.chainId as ChainIds];
 
+
+        if (args.accountTypeSwitchValue === AccountTypes.CONNECTEDWALLET) {
+            // I just connect the wallet and the approval needs to happen on the top up page where I will navigate to after.
+            const contract = await getContract(provider, debitContractAddress, "/ConnectedWallets.json");
+
+            //Check if the connected wallet already exists, and if yes, show an error!
+            const connectedAlready = await connectedWalletAlready(contract, address, args.selectedCurrency.contractAddress);
+
+            if (connectedAlready) {
+                handleError("You already have a wallet connected to that token!");
+                return;
+            }
+        }
+
+
         const debitContract = await getContract(
             provider,
             debitContractAddress,
@@ -635,7 +650,7 @@ function CreateNewAccountUI(props: {
             {isERC20 ? <TooltipWithTitle
                 title="Which account to choose?"
                 extraStyle="right: -70%"
-                message="Virtual accounts hold deposits and need to be topped up while connected wallets let you make payments using tokens using your wallet balance directly."></TooltipWithTitle>
+                message="Virtual accounts hold deposits and need to be topped up while connected wallets let you make payments using tokens you hold in a cold wallet."></TooltipWithTitle>
                 :
                 <TooltipWithTitle
                     title="Virtual Account?"

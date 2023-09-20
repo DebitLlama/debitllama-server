@@ -1,12 +1,13 @@
 import { useState } from 'preact/hooks';
 import Overlay from "../components/Overlay.tsx";
-import { ChainIds, SelectableCurrency, availableNetworks, bittorrentCurrencies, chainIdFromNetworkName, getConnectedWalletsContractAddress } from "../lib/shared/web3.ts";
+import { ChainIds, NetworkNames, SelectableCurrency, availableNetworks, bittorrentCurrencies, chainIdFromNetworkName, getConnectedWalletsContractAddress } from "../lib/shared/web3.ts";
 import CurrencySelectDropdown from "./CurrencySelectDropdown.tsx";
 import AccountPasswordInput from "./accountPasswordInput.tsx";
-import { connectWallet, getContract, handleNetworkSelect, requestAccounts } from '../lib/frontend/web3.ts';
+import { connectWallet, connectedWalletAlready, getContract, handleNetworkSelect, requestAccounts } from '../lib/frontend/web3.ts';
 import { setUpAccount } from '../lib/frontend/directdebitlib.ts';
 import { redirectToAccountPage, saveAccount } from '../lib/frontend/fetch.ts';
 import { AccountTypes } from "../lib/enums.ts";
+import TestnetTokens from "./TestnetTokens.tsx";
 
 export const strength = [
     "Worst ☹",
@@ -34,7 +35,7 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
     const [selectableCurrencyArray, setSelectableCurrencyArray] = useState<SelectableCurrency[]>(bittorrentCurrencies.filter((curr) => curr.native === false));
     const [selectedCurrency, setSelectedCurrency] = useState<SelectableCurrency>(selectableCurrencyArray[0]);
 
-    const [walletMismatchError, setShowWalletMismatchError] = useState(false);
+    const [walletTokenUsedError, setShowwalletTokenUsedError] = useState(false);
     function setPasswordAndCheck(to: string) {
         if (to === "") {
             setPasswordStrengthNotification("");
@@ -89,7 +90,7 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
 
     const onSubmitForm = async (event: any) => {
         event?.preventDefault();
-        setShowWalletMismatchError(false);
+        setShowwalletTokenUsedError(false);
 
         // Check if I can find a wallet
         //@ts-ignore ignoring because in other file it's not erroring. bastard
@@ -100,8 +101,7 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
         if (!provider) {
             return;
         }
-        const address = await requestAccounts();
-
+        const walletAddr = await requestAccounts();
 
         // It's a virtual account variable but will be used with connected wallet!
         const virtualaccount = await setUpAccount(password, props.ethEncryptPublicKey);
@@ -110,6 +110,15 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
 
         // I just connect the wallet and the approval needs to happen on the top up page where I will navigate to after.
         const contract = await getContract(provider, contractAddress, "/ConnectedWallets.json");
+
+        //Check if the connected wallet already exists, and if yes, show an error!
+        const connectedAlready = await connectedWalletAlready(contract, walletAddr, selectedCurrency.contractAddress);
+
+        if (connectedAlready) {
+            setShowwalletTokenUsedError(true);
+            return;
+        }
+
         setShowOverlay(true);
         const tx = await connectWallet(
             contract,
@@ -148,7 +157,8 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
     return <form onSubmit={onSubmitForm} class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md" method="POST">
         <Overlay show={showOverlay} ></Overlay>
         <h1 class="text-2xl font-bold text-left">Connect Wallet</h1>
-        <h4 class="text-md mb-6">A connected wallet will allow you to spend tokens directly from it, instead of depositing into a smart contract like virtual accounts. </h4>
+        <h4 class="text-md mb-6">A connected wallet will allow you to spend tokens directly from your cold wallet as your allowance lasts. You can only have 1 connected wallet per token. <br /></h4>
+        <TestnetTokens chainId={chainIdFromNetworkName[selectedNetwork as NetworkNames]} ></TestnetTokens>
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Account Name</label>
             <input value={name} onChange={(event: any) => setName(event.target.value)} required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
@@ -174,7 +184,7 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
         <div class="mb-4">
             <p class="text-sm ...">The password is used for encrypting your account and it's needed for spending. Do not reuse your login password. The accounts are non-custodial and if you loose your password we can't recover it for you. You can always disconnect your wallet if you don't want to continue using it!</p>
         </div>
-        {walletMismatchError ? <p class="text-sm text-red-500">Your browser wallet does not match your profile!</p> : ""}
+        {walletTokenUsedError ? <p class="text-sm text-red-500">Your wallet is already connected to that token on the current network!</p> : ""}
         <button
             disabled={isButtonDisabled()}
             class="w-full bg-indigo-500 text-white text-sm font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
