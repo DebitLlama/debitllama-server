@@ -3,6 +3,7 @@ import { MiddlewareHandlerContext } from "$fresh/server.ts";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { getCookies } from "$std/http/cookie.ts";
 import { getUser } from "../lib/backend/auth.ts";
+import { AuthWhitelist } from "../lib/enums.ts";
 
 export interface State {
   token: string | null;
@@ -23,7 +24,7 @@ export async function handler(
   const url = new URL(req.url);
   ctx.state.supabaseClient = client;
 
-  if (url.pathname.startsWith("/app/")) {
+  if (shouldCheckAuth(url.pathname)) {
     const supaCreds = getCookies(req.headers)["supaLogin"];
 
     if (!supaCreds) {
@@ -46,4 +47,9 @@ export async function handler(
   }
 
   return await ctx.next();
+}
+
+function shouldCheckAuth(pathname: string) {
+  return pathname.startsWith(AuthWhitelist.app) ||
+    pathname.startsWith(AuthWhitelist.buyitnow);
 }
