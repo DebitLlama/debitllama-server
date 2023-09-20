@@ -62,7 +62,8 @@ install deno
 
 
 ## Clone the repository from github
-nuff said, make sure to use the debitllama user
+`git clone https://username:classictoken@github.com/StrawberryChocolateFudge/debitLLama-server.git`
+
 
 ## Run the server
 `chmod a+x run.sh`
