@@ -157,7 +157,7 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
     return <form onSubmit={onSubmitForm} class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md" method="POST">
         <Overlay show={showOverlay} ></Overlay>
         <h1 class="text-2xl font-bold text-left">Connect Wallet</h1>
-        <h4 class="text-md mb-6">A connected wallet will allow you to spend tokens directly from your cold wallet as your allowance lasts. You can only have 1 connected wallet per token. <br /></h4>
+        <h4 class="text-md mb-6">A connected wallet will allow you to spend tokens directly from your cold wallet while your allowance lasts. You can only have 1 connected wallet per token. <br /></h4>
         <TestnetTokens chainId={chainIdFromNetworkName[selectedNetwork as NetworkNames]} ></TestnetTokens>
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Account Name</label>
