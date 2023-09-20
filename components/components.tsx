@@ -180,6 +180,26 @@ export function getPaymentIntentStatusLogo(status: PaymentIntentStatus | string,
     }
 }
 
+export function getPaymentIntentStatusTooltip(status: PaymentIntentStatus | string, forPage: "payee" | "account") {
+    const getName = forPage === "account" ? "subscription" : "payment intent"
+    switch (status) {
+        case PaymentIntentStatus.CREATED:
+            return `The ${getName} is active! The first payment will be soon debited from the account and transferred to ${forPage === "account" ? "the payee!" : "to the address specified when creating the item!"}`
+        case PaymentIntentStatus.CANCELLED:
+            return `The ${getName} was cancelled. The payments cannot continue. It was either manually cancelled or the account was deleted.`
+        case PaymentIntentStatus.RECURRING:
+            return `The ${getName} is active! The account can be debited again when we have reached the next payment date!`
+        case PaymentIntentStatus.PAID:
+            return `The payment period has finished. The ${getName} can be only renewed by creating a new one.`
+        case PaymentIntentStatus.BALANCETOOLOWTORELAY:
+            return `The relayer balance was too low to submit this transaction. Waiting for the payee to deposit gas.`
+        case PaymentIntentStatus.ACCOUNTBALANCETOOLOW:
+            return `The account balance is too low to pay for this ${getName}. ${forPage === "account" ? "Please top up your balance to continue!" : "Contact the customer if they don't resolve this else the payment can't continue."}`
+        default:
+            return "The subsciption status"
+    }
+}
+
 export function getPaymentRequestStatusLogo(status: DynamicPaymentRequestJobsStatus | string) {
     switch (status) {
         case DynamicPaymentRequestJobsStatus.CREATED:
