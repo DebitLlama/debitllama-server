@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks';
-import { ChainIds, networkNameFromId, walletCurrency } from "../lib/shared/web3.ts";
-import { AccountDisplayElement } from "../components/AccountDisplayElement.tsx";
+import { ChainIds, networkNameFromId } from "../lib/shared/web3.ts";
+import AccountDisplayElement from "../islands/AccountDisplayElement.tsx";
 import { parseEther } from "../lib/frontend/web3.ts";
 import { formatEther } from "../ethers.min.js";
 import { TooltipWithTitle } from '../components/components.tsx';
@@ -10,7 +10,8 @@ import AccountsSelectButtons from './AccountsSelectButtons.tsx';
 
 interface AccountCardCarouselProps {
     accountData: Array<any>,
-    missedPayments: Array<any>
+    missedPayments: Array<any>,
+    page: 'active' | "inactive"
 }
 
 function getPaymentIntentsForCurrentAccount(currentAccountCommitment: string, paymentIntents: Array<any>) {
@@ -27,24 +28,6 @@ function getPaymentIntentsForCurrentAccount(currentAccountCommitment: string, pa
 export default function AccountCardCarousel(props: AccountCardCarouselProps) {
     const [currentAccount, setCurrentAccount] = useState(0);
     const [visible, setVisible] = useState(true);
-
-    function backClicked() {
-        if (currentAccount === 0) {
-            if (props.accountData.length - 1 < 0) {
-                return;
-            }
-            setCurrentAccountWithAnimation(props.accountData.length - 1);
-        } else {
-            setCurrentAccountWithAnimation(currentAccount - 1);
-        }
-    }
-    function forwardClicked() {
-        if (props.accountData.length - 1 === currentAccount) {
-            setCurrentAccountWithAnimation(0);
-        } else {
-            setCurrentAccountWithAnimation(currentAccount + 1)
-        }
-    }
 
     function setCurrentAccountWithAnimation(to: number) {
         setVisible(false)
@@ -79,20 +62,22 @@ export default function AccountCardCarousel(props: AccountCardCarouselProps) {
         </div>
         <div class="flex flex-row justify-center ">
             <div class={"flex flex-col justify-center"}>
-                <TooltipWithTitle extraStyle='right: 50px;' message='We only update the displayed balance when you are interacting with it using DebitLlama. If you changed your wallet balance it might not be displayed here until a refresh is triggered. Opening the account page will do that!' title='Click on the card to refresh the balance!'></TooltipWithTitle>
-                {AccountDisplayElement(
-                    {
-                        amount: data.balance,
-                        currency: data.currency,
-                        createdDate: data.created_at,
-                        networkName: networkNameFromId[data.network_id as ChainIds],
-                        networkId: data.network_id,
-                        commitment: data.commitment,
-                        name: data.name,
-                        extraCSS: visible ? "fade-in-element" : "fade-out-element",
-                        accountType: data.accountType,
-                        closed: data.closed
-                    })}
+                {props.page === "active" ?
+                    <TooltipWithTitle extraStyle='right: 50px;' message='In this current release we only update the displayed balance when you are interacting with it using DebitLlama. If you changed your connected wallet balance by transfering to it, it might not be displayed until a refresh is triggered. Clicking on the card and opening the account page will do that!' title='Click on the card to refresh the balance!'></TooltipWithTitle>
+                    : null
+                }
+                <AccountDisplayElement
+                    amount={data.balance}
+                    currency={data.currency}
+                    createdDate={data.created_at}
+                    networkName={networkNameFromId[data.network_id as ChainIds]}
+                    networkId={data.network_id}
+                    commitment={data.commitment}
+                    name={data.name}
+                    extraCSS={visible ? "fade-in-element" : "fade-out-element"}
+                    accountType={data.accountType}
+                    closed={data.closed}
+                ></AccountDisplayElement>
                 <hr
                     class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
             </div>
@@ -108,7 +93,7 @@ export default function AccountCardCarousel(props: AccountCardCarouselProps) {
         <section class="px-4 mx-auto">
             <PaymentIntentsPaginationForAccounts accountId={data.id}></PaymentIntentsPaginationForAccounts>
         </section>
-    </div>
+    </div >
 }
 
 interface MissedPaymentsNotificationProps {
