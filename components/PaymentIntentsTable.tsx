@@ -1,5 +1,6 @@
 import { PaymentIntentsTableColNames, PaymentIntentsTablePages, Pricing } from "../lib/enums.ts";
-import { RenderIdentifier, getPaymentIntentStatusLogo } from "./components.tsx";
+import { TooltipWithTitle, getPaymentIntentStatusLogo } from "./components.tsx";
+import { formatEther, parseEther } from "../lib/frontend/web3.ts";
 
 export interface PaymentIntentsTablePropWithFilter {
     paymentIntentData: Array<any>
@@ -18,7 +19,17 @@ function getPaymentColValue(pricing: string, maxDebitAmount: string, currencyNam
     if (pricing === Pricing.Fixed) {
         return `${maxDebitAmount} ${currencyName}`
     } else {
-        return `Maximum ${maxDebitAmount} ${currencyName}`
+        return `${maxDebitAmount} ${currencyName} Limit`
+    }
+}
+
+function getTotalPaymentValue(pricing: string, maxDebitAmount: string, currencyName: string, debitTimes: number) {
+    const totalinWEI = parseEther(maxDebitAmount) * BigInt(`${debitTimes}`);
+    if (pricing === Pricing.Fixed) {
+
+        return `${formatEther(totalinWEI)} ${currencyName}`
+    } else {
+        return `${formatEther(totalinWEI)} ${currencyName} Limit`
     }
 }
 
@@ -41,6 +52,10 @@ export function PaymentIntentsTable(props: PaymentIntentsTablePropWithFilter) {
         return () => location.href = `/app/${getUrlPath(props.forPage)}?q=${paymentIntent}`
     }
 
+    function paymentIntentNameClicked(button_id: string) {
+        return () => location.href = `/app/item?q=${button_id}`
+    }
+
     return <><div class="flex flex-col">
         <div class="-my-2 overflow-x-auto">
             <div class="inline-block min-w-full py-2 align-middle">
@@ -48,31 +63,32 @@ export function PaymentIntentsTable(props: PaymentIntentsTablePropWithFilter) {
                     <table class="overflow-auto min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead class="bg-gray-50 dark:bg-gray-800 select-none">
                             <tr>
-                                <th tabIndex={1} onClick={props.headerClicked(PaymentIntentsTableColNames.Identifier)} scope="col" class="cursor-pointer w-32 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
-                                    <div class="flex flex-row"> Identifier {getArrows(props.sortDirection, PaymentIntentsTableColNames.Identifier, props.sortBy)}</div>
-                                </th>
+                                {props.forPage === PaymentIntentsTablePages.ITEM ? null : <th tabIndex={1} scope="col" class="cursor-pointer w-32 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
+                                    <div class="flex flex-row justify-between"> Name  <TooltipWithTitle extraStyle="right:-200px;" title=" ?" message={props.forPage === PaymentIntentsTablePages.DEBITITEMS ? `Click on the name to navigate to the item page. If you click on the other fields you will navigate to the payment intent's page!` : "Click on the table row to navigate to the subscription's page!"}></TooltipWithTitle></div>
+                                </th>}
                                 <th tabIndex={2} onClick={props.headerClicked(PaymentIntentsTableColNames.Status)} scope="col" class="cursor-pointer w-32 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
                                     <div class="flex flex-row"> Status {getArrows(props.sortDirection, PaymentIntentsTableColNames.Status, props.sortBy)}</div>
                                 </th>
-                                {PaymentIntentsTablePages.ITEM ? null :
+                                {props.forPage === PaymentIntentsTablePages.ITEM ? null :
                                     <th tabIndex={3} onClick={props.headerClicked(PaymentIntentsTableColNames.Payment)} scope="col" class="cursor-pointer w-32 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
-                                        <div class="flex flex-row">  Amount {getArrows(props.sortDirection, PaymentIntentsTableColNames.Payment, props.sortBy)}</div>
+                                        <div class="flex flex-row">  Price per Payment {getArrows(props.sortDirection, PaymentIntentsTableColNames.Payment, props.sortBy)}</div>
                                     </th>
                                 }
-                                <th tabIndex={4} onClick={props.headerClicked(PaymentIntentsTableColNames.DebitTimes)} scope="col" class="cursor-pointer w-32 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
-                                    <div class="flex flex-row"> Payments Left{getArrows(props.sortDirection, PaymentIntentsTableColNames.DebitTimes, props.sortBy)}</div>
-                                </th>
-
-                                <th tabIndex={5} onClick={props.headerClicked(PaymentIntentsTableColNames.UsedFor)} scope="col" class="cursor-pointer w-32 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
+                                {props.forPage === PaymentIntentsTablePages.ITEM ? null :
+                                    <th tabIndex={3} onClick={props.headerClicked(PaymentIntentsTableColNames.Payment)} scope="col" class="cursor-pointer w-32 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
+                                        <div class="flex flex-row justify-between">  Total Payment {getArrows(props.sortDirection, PaymentIntentsTableColNames.Payment, props.sortBy)} <TooltipWithTitle extraStyle="right:-200px;" title=" ?" message={"Total is calculated with price per payment * total payments. For dynamic subsciptions this does not reflect the actual total payment, only the maximum limit that approved for spending!"}></TooltipWithTitle></div>
+                                    </th>
+                                }
+                                <th tabIndex={4} onClick={props.headerClicked(PaymentIntentsTableColNames.UsedFor)} scope="col" class="cursor-pointer w-32 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
                                     <div class="flex flex-row"> Successful Payments {getArrows(props.sortDirection, PaymentIntentsTableColNames.UsedFor, props.sortBy)}</div>
                                 </th>
                                 {props.forPage === PaymentIntentsTablePages.ITEM ? <th scope="col" class="w-32 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
                                     Customer Account Balance
                                 </th> : null}
-                                <th tabIndex={6} onClick={props.headerClicked(PaymentIntentsTableColNames.NextPayment)} scope="col" class="cursor-pointer w-32 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
+                                <th tabIndex={5} onClick={props.headerClicked(PaymentIntentsTableColNames.NextPayment)} scope="col" class="cursor-pointer w-32 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
                                     <div class="flex flex-row"> Next payment {getArrows(props.sortDirection, PaymentIntentsTableColNames.NextPayment, props.sortBy)}</div>
                                 </th>
-                                <th tabIndex={7} onClick={props.headerClicked(PaymentIntentsTableColNames.CreatedDate)} scope="col" class="cursor-pointer w-32 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
+                                <th tabIndex={6} onClick={props.headerClicked(PaymentIntentsTableColNames.CreatedDate)} scope="col" class="cursor-pointer w-32 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
                                     <div class="flex flex-row">Created Date {getArrows(props.sortDirection, PaymentIntentsTableColNames.CreatedDate, props.sortBy)}</div>
                                 </th>
                             </tr>
@@ -81,34 +97,46 @@ export function PaymentIntentsTable(props: PaymentIntentsTablePropWithFilter) {
                             {props.paymentIntentData.map((data) => {
                                 const currency = JSON.parse(data.currency);
                                 const currencyName = currency.name;
-                                return <tr tabIndex={props.paymentIntentData.indexOf(data) + 7} class="cursor-pointer bg-white hover:bg-gray-300" onClick={paymentIntentRowClicked(data.paymentIntent)}>
-                                    <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
-                                        {RenderIdentifier(data.paymentIntent)}
-                                    </td>
-                                    <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
+                                return <tr tabIndex={props.paymentIntentData.indexOf(data) + 7} class="cursor-pointer bg-white hover:bg-gray-100" >
+                                    {props.forPage === PaymentIntentsTablePages.ITEM
+                                        ? null // Don't show this on the debit item page
+                                        : <td onClick={
+                                            props.forPage === PaymentIntentsTablePages.DEBITITEMS
+                                                ? paymentIntentNameClicked(data.debit_item_id.button_id)
+                                                : paymentIntentRowClicked(data.paymentIntent)}
+                                            class={`px-4 py-4 text-sm font-medium text-gray-700 whitespace-normal break-words ${props.forPage === PaymentIntentsTablePages.DEBITITEMS ? "border hover:bg-indigo-50" : ""}`}>
+                                            {data.debit_item_id.name}
+                                        </td>}
+                                    <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap" onClick={paymentIntentRowClicked(data.paymentIntent)}>
                                         {getPaymentIntentStatusLogo(data.statusText, "account")}
                                     </td>
-                                    {PaymentIntentsTablePages.ITEM ? null :
+                                    {props.forPage === PaymentIntentsTablePages.ITEM ? null :
 
-                                        <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+                                        <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap" onClick={paymentIntentRowClicked(data.paymentIntent)}>
                                             <div class="flex items-center gap-x-2">
                                                 <div>
                                                     <p class="text-xs font-normal text-gray-600 dark:text-gray-400">{getPaymentColValue(data.pricing, data.maxDebitAmount, currencyName)}</p>
                                                 </div>
                                             </div>
                                         </td>}
-                                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{data.debitTimes}</td>
-                                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{data.used_for}</td>
+                                    {props.forPage === PaymentIntentsTablePages.ITEM ? null :
 
+                                        <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap" onClick={paymentIntentRowClicked(data.paymentIntent)}>
+                                            <div class="flex items-center gap-x-2">
+                                                <div>
+                                                    <p class="text-xs font-normal text-gray-600 dark:text-gray-400">{getTotalPaymentValue(data.pricing, data.maxDebitAmount, currencyName, data.debitTimes)}</p>
+                                                </div>
+                                            </div>
+                                        </td>}
+                                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap" onClick={paymentIntentRowClicked(data.paymentIntent)}>{data.used_for} / {data.debitTimes}</td>
                                     {props.forPage === PaymentIntentsTablePages.ITEM ? <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{data.account_id.balance} {currencyName}</td> : null}
 
-                                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{getNextPaymentDateDisplay(data.nextPaymentDate)}</td>
-                                    <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
+                                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap" onClick={paymentIntentRowClicked(data.paymentIntent)}>{getNextPaymentDateDisplay(data.nextPaymentDate)}</td>
+                                    <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap" onClick={paymentIntentRowClicked(data.paymentIntent)}>
                                         {new Date(data.created_at).toLocaleString()}
                                     </td>
                                 </tr>
                             })}
-
                         </tbody>
                     </table>
                 </div>
