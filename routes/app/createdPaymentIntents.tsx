@@ -1,7 +1,7 @@
 import Layout from "../../components/Layout.tsx";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
-import { Tooltip, UnderlinedTd, getDebitIntervalText, getPaymentIntentStatusLogo, getSubscriptionTooltipMessage } from "../../components/components.tsx";
+import { Tooltip, UnderlinedTd, getDebitIntervalText, getPaymentIntentStatusLogo, getPaymentIntentStatusTooltip, getSubscriptionTooltipMessage } from "../../components/components.tsx";
 import { AccountTypes, PaymentIntentRow, PaymentIntentStatus, RELAYERTRANSACTIONHISTORYPAGESIZE } from "../../lib/enums.ts";
 import RelayedTxHistory from "../../islands/pagination/RelayedTxHistoryWithPagination.tsx";
 import CancelPaymentIntentButton from "../../islands/CancelPaymentIntentButton.tsx";
@@ -62,7 +62,7 @@ export default function CreatedPaymentIntents(props: PageProps) {
     }
 
     const pi = props.data.paymentIntentData[0] as PaymentIntentRow;
-    return <Layout isLoggedIn={props.data.token}>
+    return <Layout renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
         <div class="container mx-auto py-8">
             <div class="bg-gray-100 border border-gray-200 dark:border-gray-700 md:rounded-lg">
                 <div class="text-center"><h1 class="text-2xl font-bold mb-2 text-gray-500 dark:text-gray-40">Subscription</h1></div>
@@ -83,17 +83,19 @@ export default function CreatedPaymentIntents(props: PageProps) {
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm" >Status:</UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><p> {getPaymentIntentStatusLogo(pi.statusText, "account")}</p></UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><Tooltip message="The current status of the payment"></Tooltip></UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><Tooltip message={getPaymentIntentStatusTooltip(pi.statusText, "account")}></Tooltip></UnderlinedTd>
                             </tr>
-                            <tr>
-                                <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm" >Identifier:</UnderlinedTd>
-                                <UnderlinedTd extraStyles="truncate"><pre> {pi.paymentIntent}</pre></UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><Tooltip message="The unique identifier of the payment intent"></Tooltip></UnderlinedTd>
-                            </tr>
+
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm" >Approved Payment:</UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><p> {pi.debit_item_id.max_price} {JSON.parse(pi.debit_item_id.currency).name} </p></UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><Tooltip message="The maximum amount that can be debited from the account"></Tooltip></UnderlinedTd>
+                            </tr>
+                            <tr>
+                                <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">My Account Balance:</UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><p>{pi.account_id.balance}  {JSON.parse(pi.debit_item_id.currency).name}</p>
+                                    <a class="text-indigo-500 hover:text-indigo-800" href={`/app/account?q=${pi.account_id.commitment}`}>Top Up</a></UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><Tooltip message="The current balance of the account that will be charged."></Tooltip></UnderlinedTd>
                             </tr>
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Network:</UnderlinedTd>
@@ -116,37 +118,38 @@ export default function CreatedPaymentIntents(props: PageProps) {
                                 <UnderlinedTd extraStyles=""><Tooltip message="The amount of days that needs to pass before the account can be debited again, counted from the last payment date"></Tooltip></UnderlinedTd>
                             </tr>
                             <tr>
-                                <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Transaction Count:</UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><p> {pi.used_for}</p></UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><Tooltip message="The amount of times the payment intent was used!"></Tooltip></UnderlinedTd>
+                                <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Transactions:</UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><p> {pi.used_for} / {pi.debitTimes}</p></UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><Tooltip message="You can tell see how many payments have been completed per total payments. The next payment will be processed after the next payment date!"></Tooltip></UnderlinedTd>
                             </tr>
-                            <tr>
-                                <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Transactions Left:</UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><p> {pi.debit_item_id.debit_times - pi.used_for}</p></UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><Tooltip message="The amount of transactions left with this payment intent!"></Tooltip></UnderlinedTd>
-                            </tr>
+
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Last Payment Date:</UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><p> {pi.lastPaymentDate === null ? "" : new Date(pi.lastPaymentDate).toLocaleString()}</p></UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><Tooltip message="The last time this payment intent was used."></Tooltip></UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><p> {pi.lastPaymentDate === null ? "Waiting for first payment" : new Date(pi.lastPaymentDate).toLocaleString()}</p></UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><Tooltip message="The last payment date is the time when the last transaction was submitted to the network to complete the payment."></Tooltip></UnderlinedTd>
                             </tr>
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Next Payment Date:</UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><p> {pi.nextPaymentDate === null ? "" : new Date(pi.nextPaymentDate).toLocaleString()}</p></UnderlinedTd>
+                                <UnderlinedTd extraStyles="">
+                                    {pi.debitTimes - pi.used_for === 0 ? <p>Payments complete</p> :
+                                        <p>{pi.nextPaymentDate === null ? "" : new Date(pi.nextPaymentDate).toLocaleString()}</p>
+                                    }
+                                </UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><Tooltip message="The approximate time when the next payment intent will become valid."></Tooltip></UnderlinedTd>
                             </tr>
                             <tr>
-                                <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Account Balance:</UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><p>{pi.account_id.balance}  {JSON.parse(pi.debit_item_id.currency).name}</p></UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><Tooltip message="The current balance of the account that will be charged."></Tooltip></UnderlinedTd>
+                                <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm" >Identifier:</UnderlinedTd>
+                                <UnderlinedTd extraStyles="truncate"><pre> {pi.paymentIntent}</pre></UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><Tooltip message="Your subscriptions unique identifier. You can use this with the search on the subscriptions page and send it to the payee if you need them to identify your subsciption."></Tooltip></UnderlinedTd>
                             </tr>
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Cancel Payment Intent:</UnderlinedTd>
                                 <UnderlinedTd extraStyles="">
                                     <CancelPaymentIntentButton accountType={pi.account_id.accountType} chainId={pi.network as ChainIds} paymentIntent={pi} transactionsLeft={pi.debit_item_id.debit_times - pi.used_for}></CancelPaymentIntentButton>
                                 </UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><Tooltip message="Only the payee or the wallet that created the account can cancel the payment. You need to sign a transaction."></Tooltip></UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><Tooltip message="Only the payee or the wallet that created the account can cancel the payment. You need to sign a transaction with your crypto wallet. DebitLlama is unable to cancel it on the smart contract level."></Tooltip></UnderlinedTd>
                             </tr>
+
                         </tbody>
                     </table>
                 </div>
