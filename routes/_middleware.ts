@@ -1,9 +1,8 @@
 // deno-lint-ignore-file no-explicit-any
 import { MiddlewareHandlerContext } from "$fresh/server.ts";
-import { SupabaseClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { getCookies } from "$std/http/cookie.ts";
 import { getUser } from "../lib/backend/auth.ts";
-import client from "../lib/backend/supaclient.ts";
 
 export interface State {
   token: string | null;
@@ -16,6 +15,11 @@ export async function handler(
   req: Request,
   ctx: MiddlewareHandlerContext<State>,
 ) {
+  const client = createClient(
+    Deno.env.get("SUPABASE_URL") || "",
+    Deno.env.get("SUPABASE_KEY") || "",
+    { auth: { persistSession: false } },
+  );
   const url = new URL(req.url);
   ctx.state.supabaseClient = client;
 
@@ -29,9 +33,7 @@ export async function handler(
     const renderSidebarOpen = getCookies(req.headers)["renderSidebarOpen"] as
       | "true"
       | "false";
-
     const { error, data: { user } } = await getUser(client, supaCreds);
-
     if (error) {
       ctx.state.token = null;
     } else {
