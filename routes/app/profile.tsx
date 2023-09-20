@@ -87,7 +87,7 @@ export default function Profile(props: PageProps) {
   const err = props.url.searchParams.get("error");
 
   return (
-    <Layout isLoggedIn={props.data.token}>
+    <Layout renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
       <div class="mt-10 px-5 mx-auto flex max-w-screen-md flex-col justify-center">
         <div class="mx-auto text-center">
           <h1 class="text-2xl font-bold mb-5">Profile</h1>

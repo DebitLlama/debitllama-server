@@ -6,6 +6,7 @@ import SideBar from "../islands/Sidebar.tsx";
 
 interface LayoutProps {
   isLoggedIn: boolean;
+  renderSidebarOpen: string;
   children: ComponentChildren;
 }
 
@@ -19,7 +20,7 @@ export default function Layout(props: LayoutProps) {
         <script src="/directdebit_bundle.js"></script>
       </Head>
       <Nav loggedIn={props.isLoggedIn} />
-      <SideBar></SideBar>
+      <SideBar renderSidebarOpen={props.renderSidebarOpen}></SideBar>
       <div class="mx-auto layoutheight overflow-auto" id="layout-children">
         {props.children}
         <footer

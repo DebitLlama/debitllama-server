@@ -5,6 +5,7 @@ export const handler: Handlers = {
   GET(_req, _ctx) {
     const headers = new Headers();
     deleteCookie(headers, "supaLogin");
+    deleteCookie(headers, "renderSidebarOpen");
     headers.set("location", "/");
     return new Response(null, {
       status: 303,

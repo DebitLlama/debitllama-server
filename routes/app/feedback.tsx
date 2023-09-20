@@ -32,7 +32,7 @@ export default function Feedback(props: PageProps) {
     const err = props.url.searchParams.get("error");
     const success = props.url.searchParams.get("success");
 
-    return <Layout isLoggedIn={props.data.token}>
+    return <Layout renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
         <div class="mt-10 px-5 mx-auto flex max-w-screen-md flex-col justify-center">
             <div class="mx-auto text-center">
                 {err && (

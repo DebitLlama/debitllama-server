@@ -19,7 +19,7 @@ export const handler: Handlers<any, State> = {
 
 export default function Subscriptions(props: PageProps) {
     return (
-        <Layout isLoggedIn={props.data.token}>
+        <Layout renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
             <hr class="w-48 h-1 mx-auto my-8 border-0 rounded md:my-10 " />
             <section class="container px-4 mx-auto">
                 <PaymentIntentsPaginationForAll ></PaymentIntentsPaginationForAll>

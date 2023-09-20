@@ -96,7 +96,7 @@ export const handler: Handlers<any, State> = {
 
 
 export default function Relayer(props: PageProps) {
-    return <Layout isLoggedIn={props.data.token}>
+    return <Layout renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
         <RelayerUISwitcher data={props.data}></RelayerUISwitcher>
     </Layout>
 }

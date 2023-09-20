@@ -1,22 +1,21 @@
 import { useEffect, useState } from "preact/hooks";
-import ScreenSizeDetector from "screen-size-detector";
+import { setSidebarOpenCookie } from "../lib/frontend/other.ts";
 
-function openIfScreenBig(): boolean {
-    const detectScreen = new ScreenSizeDetector();
-    return detectScreen.width < 2000
-}
 const closeIfOpenSidebar = () => {
     const sidebar = document.getElementById("sidebar-id") as HTMLDivElement;
     if (!sidebar.classList.contains("collapsed")) {
         sidebar.classList.add("collapsed")
+        setSidebarOpenCookie("false");
     }
 }
 
-export default function SideBar() {
-    const [collapse, setCollapse] = useState(true);
+export interface SidebarProps {
+    renderSidebarOpen: string
+}
 
+export default function SideBar(props: SidebarProps) {
+    const [collapse, setCollapse] = useState(props.renderSidebarOpen === "false");
     useEffect(() => {
-        setCollapse(openIfScreenBig());
         const layoutChildren = document.getElementById("layout-children") as HTMLDivElement;
         layoutChildren.onclick = function () {
             closeIfOpenSidebar();
@@ -61,7 +60,6 @@ export default function SideBar() {
                             <svg style={"margin-left: -1px;"} xmlns="http://www.w3.org/2000/svg" fill="currentColor" stroke="currentColor" height="24" viewBox="0 -960 960 960" width="24"><path d="M160-200v-80h80v-280q0-83 50-147.5T420-792v-28q0-25 17.5-42.5T480-880q25 0 42.5 17.5T540-820v28q80 20 130 84.5T720-560v280h80v80H160Zm320-300Zm0 420q-33 0-56.5-23.5T400-160h160q0 33-23.5 56.5T480-80ZM320-280h320v-280q0-66-47-113t-113-47q-66 0-113 47t-47 113v280Z" /></svg>
                         </span>
                         <span class="ml-2 text-sm tracking-wide truncate">Subscriptions</span>
-                        {/* <span class="px-2 py-0.5 ml-auto text-xs font-medium tracking-wide text-red-500 bg-red-50 rounded-full">1.2k</span> */}
                     </a>
                 </li>
                 <li>
