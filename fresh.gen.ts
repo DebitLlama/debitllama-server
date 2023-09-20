@@ -36,11 +36,12 @@ import * as $30 from "./routes/app/relayer.tsx";
 import * as $31 from "./routes/app/saveAccountAPI.ts";
 import * as $32 from "./routes/app/savePaymentIntent.ts";
 import * as $33 from "./routes/app/subscriptions.tsx";
-import * as $34 from "./routes/buyitnow.tsx";
-import * as $35 from "./routes/buyitnowlogout.tsx";
-import * as $36 from "./routes/index.tsx";
-import * as $37 from "./routes/logout.tsx";
-import * as $38 from "./routes/signup.tsx";
+import * as $34 from "./routes/app/updateItemUrl.tsx";
+import * as $35 from "./routes/buyitnow.tsx";
+import * as $36 from "./routes/buyitnowlogout.tsx";
+import * as $37 from "./routes/index.tsx";
+import * as $38 from "./routes/logout.tsx";
+import * as $39 from "./routes/signup.tsx";
 import * as $$0 from "./islands/AccountTopupOrClose.tsx";
 import * as $$1 from "./islands/AccountsSelectButtons.tsx";
 import * as $$2 from "./islands/CancelDynamicPaymentRequestButton.tsx";
@@ -107,11 +108,12 @@ const manifest = {
     "./routes/app/saveAccountAPI.ts": $31,
     "./routes/app/savePaymentIntent.ts": $32,
     "./routes/app/subscriptions.tsx": $33,
-    "./routes/buyitnow.tsx": $34,
-    "./routes/buyitnowlogout.tsx": $35,
-    "./routes/index.tsx": $36,
-    "./routes/logout.tsx": $37,
-    "./routes/signup.tsx": $38,
+    "./routes/app/updateItemUrl.tsx": $34,
+    "./routes/buyitnow.tsx": $35,
+    "./routes/buyitnowlogout.tsx": $36,
+    "./routes/index.tsx": $37,
+    "./routes/logout.tsx": $38,
+    "./routes/signup.tsx": $39,
   },
   islands: {
     "./islands/AccountTopupOrClose.tsx": $$0,
