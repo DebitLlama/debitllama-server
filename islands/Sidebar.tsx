@@ -25,7 +25,7 @@ export default function SideBar(props: SidebarProps) {
 
     return <div id="sidebar-id" class={`select-none sidebarheight fixed z-20 flex flex-col left-0 bg-white border-r ${collapse ? "collapsed" : ""}`}>
         <div class="overflow-y-auto overflow-x-hidden flex-grow">
-            <ul class="flex flex-col py-4 space-y-1">
+            <ul class="flex flex-col py-4 space-y-1 whitespace-nowrap">
                 <li class="px-5">
                     <div class="flex flex-row items-center h-8">
                         <div class="text-sm font-light tracking-wide text-gray-500">Accounts</div>
