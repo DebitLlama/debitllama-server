@@ -2,6 +2,7 @@ import { useState } from 'preact/hooks';
 import { SelectableCurrency, availableNetworks, bittorrentCurrencies } from "../lib/shared/web3.ts";
 import CurrencySelectDropdown from './CurrencySelectDropdown.tsx';
 import { DocsLinks, Pricing } from "../lib/enums.ts";
+import WalletAddressSelector from "./WalletAddressSelector.tsx";
 
 export const debitPricing = [Pricing.Fixed, Pricing.Dynamic]
 
@@ -50,11 +51,24 @@ export default function AddNewDebitItemPageForm(props: AddNewDebitItemFormProps)
         <div class="flex flex-row flex-wrap justify-around flex-gap 4">
 
             <div>
+                <div class="relative mb-4 flex flex-wrap items-stretch">
+                    <span
+                        class="flex items-center whitespace-nowrap rounded-l border border-r-0 border-solid border-neutral-300 py-[0.25rem] text-center text-base font-normal leading-[1.6] text-neutral-700 dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200"
+                        id="basic-addon1"
+                    ><WalletAddressSelector /></span>
+                    <input
+                        type="text"
+                        class="relative m-0 block min-w-0 flex-auto rounded-r border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
+                        placeholder="Wallet Address"
+                        aria-label="Wallet Address"
+                        aria-describedby="basic-addon1"
+                        name="walletaddress"
+                        required
+                        id="walletAddressInput"
+                    />
+                </div>
                 <div class="mb-4 max-w-sm">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="payee">Payee Address</label>
-                    <pre id={"payee"} class="overflow-hidden text-xs text-gray-700">
-                        {props.creatorAddress}
-                    </pre>
+                    <p class="text-sm text-gray-600	">Add the wallet address that will receive the funds.</p>
                 </div>
                 <div class="mb-4 max-w-sm">
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Item Name</label>
