@@ -20,7 +20,6 @@ export const strength = [
 
 interface AccountCreatePageFormProps {
     ethEncryptPublicKey: string,
-    walletaddress: string
 }
 
 
@@ -160,11 +159,6 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
         }
 
         const address = await requestAccounts();
-
-        // if (props.walletaddress !== address) {
-        //     setShowWalletMismatchError(true);
-        //     return
-        // }
 
         const virtualaccount = await setUpAccount(password, props.ethEncryptPublicKey);
 

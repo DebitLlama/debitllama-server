@@ -36,7 +36,6 @@ export default function RelayerUISwitcher(props: RelayerUISwitcherProps) {
                                 <p class={"text-xl font-extrabold leading-10 pl-6"}>Relayer</p>
                             </div>
                             <RelayerDetailsCard
-                                walletAddress={props.data.profileData[0].walletaddress}
                                 relayerData={props.data.relayerBalanceData[0]}></RelayerDetailsCard>
                         </div>
                     </div>

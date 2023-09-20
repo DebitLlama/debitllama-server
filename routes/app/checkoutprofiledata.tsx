@@ -6,7 +6,6 @@ import { State } from "../_middleware.ts";
 export const handler: Handlers<any, State> = {
     async POST(_req, ctx) {
         const json = await _req.json();
-        const walletaddress = json.walletaddress;
         const firstname = json.firstname;
         const lastname = json.lastname;
         const addressline1 = json.addressline1;
@@ -22,7 +21,6 @@ export const handler: Handlers<any, State> = {
             const insert = queryBuilder.insert();
             // If profile don't exist I insert a new one!
             const { error } = await insert.Profiles.newProfile(
-                walletaddress,
                 firstname,
                 lastname,
                 addressline1,

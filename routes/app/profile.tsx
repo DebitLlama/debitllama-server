@@ -2,9 +2,9 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import Layout from "../../components/Layout.tsx";
 import { State } from "../_middleware.ts";
-import WalletAddressSelector from "../../islands/WalletAddressSelector.tsx"
-import { validateAddress } from "../../lib/backend/web3.ts";
 import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import { deleteCookie, getCookies } from "$std/http/cookie.ts";
+import { CookieNames } from "../../lib/enums.ts";
 
 
 export const handler: Handlers<any, State> = {
@@ -15,15 +15,6 @@ export const handler: Handlers<any, State> = {
 
     const form = await req.formData();
     const id = form.get("id") as string;
-    const walletaddress = form.get("walletaddress") as string;
-
-    const validAddress = validateAddress(walletaddress);
-
-    if (!validAddress) {
-      redirect = `/app/profile?error=${"Invalid Wallet Address"}`
-      headers.set("location", redirect);
-      return new Response(null, { status: 303, headers })
-    }
 
     const firstname = form.get("firstname") as string;
     const lastname = form.get("lastname") as string;
@@ -36,7 +27,6 @@ export const handler: Handlers<any, State> = {
     const queryBuilder = new QueryBuilder(ctx);
     const upsert = queryBuilder.upsert();
     const { error } = await upsert.Profiles.all(
-      walletaddress,
       firstname,
       lastname,
       addressline1,
@@ -49,6 +39,17 @@ export const handler: Handlers<any, State> = {
 
     if (error) {
       redirect = `/app/profile?error=${error.message}`
+    } else {
+
+      const profileRedirect = getCookies(req.headers)[CookieNames.profileRedirect];
+
+      if (profileRedirect) {
+        deleteCookie(headers, CookieNames.profileRedirect);
+        //If I should redirect to another page, please do!
+        redirect = profileRedirect;
+      } else {
+        redirect = `/app/profile?success=${true}`
+      }
     }
 
     headers.set("location", redirect);
@@ -66,7 +67,6 @@ export const handler: Handlers<any, State> = {
       return ctx.render(
         {
           ...ctx.state,
-          walletaddress: "",
           firstname: "",
           lastname: "",
           addressline1: "",
@@ -85,11 +85,15 @@ export const handler: Handlers<any, State> = {
 export default function Profile(props: PageProps) {
 
   const err = props.url.searchParams.get("error");
-
+  let success = props.url.searchParams.get("success");
+  // In case both search params exist, success is set to false and I only show the error
+  if (err) {
+    success = null;
+  }
   return (
     <Layout renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
       <div class="mt-10 px-5 mx-auto flex max-w-screen-md flex-col justify-center">
-        <div class="mx-auto text-center">
+        <div>
           <h1 class="text-2xl font-bold mb-5">Profile</h1>
           {err && (
             <div class="bg-red-400 border-l-4 p-4" role="alert">
@@ -97,30 +101,16 @@ export default function Profile(props: PageProps) {
               <p>{err}</p>
             </div>
           )}
-          <form method="POST">
-            <div class="relative mb-4 flex flex-wrap items-stretch">
-              <span
-                class="flex items-center whitespace-nowrap rounded-l border border-r-0 border-solid border-neutral-300 px-3 py-[0.25rem] text-center text-base font-normal leading-[1.6] text-neutral-700 dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200"
-                id="basic-addon1"
-              ><WalletAddressSelector /></span>
-              <input
-                type="text"
-                class="relative m-0 block min-w-0 flex-auto rounded-r border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
-                placeholder="Wallet Address"
-                aria-label="Wallet Address"
-                aria-describedby="basic-addon1"
-                name="walletaddress"
-                required
-                id="walletAddressInput"
-                value={props.data.walletaddress}
-              />
+          {success && (
+            <div class="bg-green-400 border-l-4 p-4" role="alert">
+              <p class="font-bold">Profile updated!</p>
             </div>
-            <hr
-              class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
+          )}
+          <form method="POST">
             <div class="relative flex flex-wrap items-stretch">
               <span
-                class="flex items-center whitespace-nowrap rounded-l border border-r-0 border-solid border-neutral-300 px-3 py-[0.25rem] text-center text-base font-normal leading-[1.6] text-neutral-700 dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200"
-              >First and last name</span
+                class="bg-gray-50 flex items-center whitespace-nowrap rounded-l border border-r-0 border-solid border-neutral-300 px-3 py-[0.25rem] text-center text-base font-normal leading-[1.6] text-neutral-700 dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200"
+              >First Name</span
               >
               <input
                 type="text"
@@ -130,6 +120,14 @@ export default function Profile(props: PageProps) {
                 value={props.data.firstname}
                 required
                 class="rounded-0 relative m-0 block w-[1px] min-w-0 flex-auto border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary" />
+
+            </div>
+            <hr
+              class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
+            <div class="relative flex flex-wrap items-stretch">
+              <span
+                class="flex items-center whitespace-nowrap rounded-l border border-r-0 border-solid border-neutral-300 px-3 py-[0.25rem] text-center text-base font-normal leading-[1.6] text-neutral-700 dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200"
+              >Last Name</span>
               <input
                 type="text"
                 aria-label="Last name"
@@ -220,11 +218,13 @@ export default function Profile(props: PageProps) {
             </div>
             <hr
               class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
-            <button
-              type="submit"
-              class="w-full text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">
-              Save
-            </button>
+            <div class="flex flex-row">
+              <button
+                type="submit"
+                class="w-64 mx-auto text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">
+                Save
+              </button>
+            </div>
           </form>
         </div>
       </div>

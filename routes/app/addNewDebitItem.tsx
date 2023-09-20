@@ -6,6 +6,8 @@ import { NetworkNames, chainIdFromNetworkName, getCurrenciesForNetworkName } fro
 import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 import { Pricing } from "../../lib/enums.ts";
 import { errorResponseBuilder } from "../../lib/backend/responseBuilders.ts";
+import { validateAddress } from "../../lib/backend/web3.ts";
+import { setProfileRedirectCookie } from "../../lib/backend/cookies.ts";
 
 
 
@@ -19,10 +21,11 @@ export const handler: Handlers<any, State> = {
 
         if (profileData === null || profileData.length === 0) {
             headers.set("location", "/app/profile");
+            setProfileRedirectCookie(headers, "/app/addNewDebitItem");
             return new Response(null, { status: 303, headers })
         }
 
-        return ctx.render({ ...ctx.state, creatorAddress: profileData[0].walletaddress })
+        return ctx.render({ ...ctx.state })
     },
     async POST(_req, ctx) {
 
@@ -36,6 +39,7 @@ export const handler: Handlers<any, State> = {
 
         if (profileData === null || profileData.length === 0) {
             headers.set("location", "/app/profile");
+            setProfileRedirectCookie(headers, "/app/addNewDebitItem");
             return new Response(null, { status: 303, headers })
         }
 
@@ -55,6 +59,7 @@ export const handler: Handlers<any, State> = {
 
         const name = form.get("name") as string;
         const network = form.get("network") as string;
+        const walletaddress = form.get("walletaddress") as string;
         const currency = form.get("currency") as string;
         const pricing = form.get("pricing") as string;
         const maxAmount = form.get("maxamount") as string;
@@ -64,8 +69,17 @@ export const handler: Handlers<any, State> = {
 
         if (chainIdFromNetworkName[network as NetworkNames] === undefined) {
             headers.set("location", "/app/profile");
+            setProfileRedirectCookie(headers, "/app/addNewDebitItem");
             return new Response(null, { status: 303, headers })
         }
+
+        const validAddress = validateAddress(walletaddress);
+
+        if (!validAddress) {
+            return errorResponseBuilder("Not a valid address")
+
+        }
+
 
         if (isNaN(parseInt(debitTimes))) {
             return errorResponseBuilder("Invalid Debit Time!")
@@ -111,7 +125,7 @@ export const handler: Handlers<any, State> = {
         }
 
         const { data: item } = await insert.Items.newItem(
-            profileData[0].walletaddress,
+            walletaddress,
             currency,
             maxAmount,
             debitTimes,

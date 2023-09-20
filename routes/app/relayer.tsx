@@ -6,18 +6,21 @@ import RelayerUISwitcher from "../../islands/RelayerUISwitcher.tsx";
 import { getTotalPages, updateRelayerBalanceAndHistorySwitchNetwork } from "../../lib/backend/businessLogic.ts";
 import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 import { RELAYERTOPUPHISTORYPAGESIZE, RELAYERTRANSACTIONHISTORYPAGESIZE } from "../../lib/enums.ts";
+import { setProfileRedirectCookie } from "../../lib/backend/cookies.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(_req, ctx) {
         const queryBuilder = new QueryBuilder(ctx);
         const select = queryBuilder.select();
-        const { data: relayerBalanceData } = await select.RelayerBalance.byUserId();
+        const { data: relayerBalanceDataFetched } = await select.RelayerBalance.byUserId();
+        let relayerBalanceData = relayerBalanceDataFetched;
         if (relayerBalanceData === null || relayerBalanceData.length === 0) {
             const insert = queryBuilder.insert();
             // If it doesn't exist I create a new one!
             //TODO: It should insert().select(). I should select the insert and not run a select again!
             await insert.RelayerBalance.newRelayerBalance();
-            const { data: relayerBalanceData } = await select.RelayerBalance.byUserId();
+            const { data: relayerBalanceDataAfterInsert } = await select.RelayerBalance.byUserId();
+            relayerBalanceData = relayerBalanceDataAfterInsert;
         }
 
         const { data: profileData } = await select.Profiles.byUserId();
@@ -25,6 +28,7 @@ export const handler: Handlers<any, State> = {
             // Redirect to the profile page instead so the user needs to fill it out!
             const headers = new Headers();
             headers.set("location", "/app/profile");
+            setProfileRedirectCookie(headers, "/app/relayer");
             return new Response(null, { status: 303, headers })
         }
 
@@ -57,9 +61,6 @@ export const handler: Handlers<any, State> = {
             return new Response("Invalid user Profile!", { status: 500 })
         }
 
-        if (profileData[0].walletaddress.toLowerCase() !== from.toLowerCase()) {
-            return new Response("From address doesn't match profile!", { status: 500 })
-        }
         //Check if the tx is already saved into supabase I can't add it to relayer balance
 
         const { data: relayerTopUpHistoryData } = await select.RelayerTopUpHistory.byTransactionHash(transactionHash);
