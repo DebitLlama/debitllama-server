@@ -1,7 +1,7 @@
 import Layout from "../../components/Layout.tsx";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
-import { Tooltip, UnderlinedTd, getDebitIntervalText, getPaymentIntentStatusLogo, getPaymentIntentStatusTooltip, getPaymentRequestJobStatusTooltipMessage, getPaymentRequestStatusLogo, getSubscriptionTooltipMessage } from "../../components/components.tsx";
+import { NotFound, Tooltip, UnderlinedTd, getDebitIntervalText, getPaymentIntentStatusLogo, getPaymentIntentStatusTooltip, getPaymentRequestJobStatusTooltipMessage, getPaymentRequestStatusLogo, getSubscriptionTooltipMessage } from "../../components/components.tsx";
 import CancelPaymentIntentButton from "../../islands/CancelPaymentIntentButton.tsx";
 import { ChainIds, networkNameFromId } from "../../lib/shared/web3.ts";
 import { DynamicPaymentRequestJobsStatus, PaymentIntentRow, Pricing, RELAYERTRANSACTIONHISTORYPAGESIZE } from "../../lib/enums.ts";
@@ -12,6 +12,7 @@ import CancelDynamicPaymentRequestButton from "../../islands/CancelDynamicPaymen
 import { calculateGasEstimationPerChain, getGasPrice, getRelayerBalanceForChainId, increaseGasLimit, updateRelayerBalanceWithAllocatedAmount } from "../../lib/backend/businessLogic.ts";
 import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 import RelayedTxHistory from "../../islands/pagination/RelayedTxHistoryWithPagination.tsx";
+import { getTotalPaymentValue } from "../../components/PaymentIntentsTable.tsx";
 
 
 
@@ -178,9 +179,14 @@ export const handler: Handlers<any, State> = {
 
 export default function CreatedPaymentIntents(props: PageProps) {
     if (props.data.notfound) {
-        return <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
-            <h1 class="text-2xl font-bold mb-6 text-center">Not Found</h1>
-        </div>
+        return <NotFound title="🔎">
+            <p class="text-center">After you make a sale the payment intents will be displayed here. They represent a subscription that will be later processed.</p>
+            <div class="flex flex-row text-center">
+                <a
+                    class="mx-auto bg-gradient-to-b w-max text-gray-500 font-semibold from-slate-50 to-gray-100 px-10 py-3 rounded-2xl shadow-gray-400 shadow-md border-b-4 hover border-b border-gray-200 hover:shadow-sm transition-all duration-500"
+                    href="/app/paymentIntents">Go to Payment Intents</a>
+            </div>
+        </NotFound>
     }
     const pi = props.data.paymentIntentData[0] as PaymentIntentRow;
     const dynamicPaymentRequestJobArr = props.data.dynamicPaymentRequestJobArr;
@@ -269,7 +275,7 @@ export default function CreatedPaymentIntents(props: PageProps) {
         }
     }
 
-
+    const currName = JSON.parse(pi.debit_item_id.currency).name;
 
     return <Layout renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
         <div class="container mx-auto py-8">
@@ -301,18 +307,18 @@ export default function CreatedPaymentIntents(props: PageProps) {
                             </tr>
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Customer Account Balance:</UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><p>{pi.account_id.balance}  {JSON.parse(pi.debit_item_id.currency).name}</p></UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><p>{pi.account_id.balance}  {currName}</p></UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><Tooltip message="The current balance of the account that will be charged."></Tooltip></UnderlinedTd>
                             </tr>
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm" >Approved Payment:</UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><p> {pi.debit_item_id.max_price} {JSON.parse(pi.debit_item_id.currency).name} </p></UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><p> {pi.debit_item_id.max_price} {currName} </p></UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><Tooltip message="The maximum amount that can be debited from the account"></Tooltip></UnderlinedTd>
                             </tr>
                             <IfDynamicAddDebitTrigger dynamicPaymentRequestJob={dynamicPaymentRequestJobArr[0]} pricing={pi.debit_item_id.pricing as Pricing} maxDebitAmount={pi.debit_item_id.max_price}></IfDynamicAddDebitTrigger>
                             <IfPaymentRequestJobExists
                                 dynamicPaymentRequestJobArr={props.data.dynamicPaymentRequestJobArr}
-                                currency={JSON.parse(pi.debit_item_id.currency).name}></IfPaymentRequestJobExists>
+                                currency={currName}></IfPaymentRequestJobExists>
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Network:</UnderlinedTd>
                                 <UnderlinedTd extraStyles="" ><p>{networkNameFromId[pi.debit_item_id.network as ChainIds]}</p></UnderlinedTd>
@@ -322,6 +328,11 @@ export default function CreatedPaymentIntents(props: PageProps) {
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Pricing:</UnderlinedTd>
                                 <UnderlinedTd extraStyles="" ><p> {pi.debit_item_id.pricing}</p></UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><Tooltip message={getSubscriptionTooltipMessage(pi.debit_item_id.pricing)}></Tooltip></UnderlinedTd>
+                            </tr>
+                            <tr>
+                                <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm" >Total Payments:</UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><p> {getTotalPaymentValue(pi.debit_item_id.pricing, pi.debit_item_id.max_price, currName, pi.debitTimes)}</p></UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><Tooltip message="The maximum amount that can be debited from the account during the whole subscription period!"></Tooltip></UnderlinedTd>
                             </tr>
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm" >Debit Times:</UnderlinedTd>
@@ -334,18 +345,13 @@ export default function CreatedPaymentIntents(props: PageProps) {
                                 <UnderlinedTd extraStyles=""><Tooltip message="The amount of days that needs to pass before the account can be debited again, counted from the last payment date"></Tooltip></UnderlinedTd>
                             </tr>
                             <tr>
-                                <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Transaction Count:</UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><p> {pi.used_for}</p></UnderlinedTd>
+                                <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Successful Payments:</UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><p> {pi.used_for} / {pi.debitTimes}</p></UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><Tooltip message="The amount of times the payment intent was used!"></Tooltip></UnderlinedTd>
                             </tr>
                             <tr>
-                                <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Transactions Left:</UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><p> {pi.debit_item_id.debit_times - pi.used_for}</p></UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><Tooltip message="The amount of transactions left with this payment intent!"></Tooltip></UnderlinedTd>
-                            </tr>
-                            <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Last Payment Date:</UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><p> {pi.lastPaymentDate === null ? "" : new Date(pi.lastPaymentDate).toLocaleString()}</p></UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><p> {pi.lastPaymentDate === null ? "Waiting for first payment." : new Date(pi.lastPaymentDate).toLocaleString()}</p></UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><Tooltip message="The last time this payment intent was used."></Tooltip></UnderlinedTd>
                             </tr>
                             <tr>
