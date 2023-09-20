@@ -21,6 +21,7 @@ export default function InactiveAccounts(props: PageProps) {
     return (
         <Layout renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
             <AccountCardCarousel
+                page="inactive"
                 missedPayments={props.data.missedPayments}
                 accountData={props.data.accountsData}></AccountCardCarousel>
             <hr class="w-48 h-1 mx-auto my-8 border-0 rounded md:my-10 " />
