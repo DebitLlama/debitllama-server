@@ -18,7 +18,6 @@ export const strength = [
 
 interface ConnectWalletPageFormProps {
     ethEncryptPublicKey: string,
-    walletaddress: string
 }
 
 export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps) {
