@@ -6,7 +6,7 @@ echo "Hi boss! We gonna rebuild the project first, then run it with pm2. There a
 sleep 1
 
 
-echo "Done! Now get read!"
+echo "Done! Now get ready!"
 
 sleep 1
 
