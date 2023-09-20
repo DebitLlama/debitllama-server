@@ -1,10 +1,10 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import BuyButtonPage, { ItemProps } from "../islands/buyButtonPage.tsx";
 import { State } from "./_middleware.ts";
-import { setCookie } from "$std/http/cookie.ts";
 import QueryBuilder from "../lib/backend/queryBuilder.ts";
 import { signInWithPassword } from "../lib/backend/auth.ts";
 import { parseEther } from "../lib/frontend/web3.ts";
+import { setSupaloginCookie } from "../lib/backend/cookies.ts";
 
 function doesProfileExists(profileData: any) {
     if (profileData === null || profileData.length === 0) {
@@ -50,11 +50,10 @@ export const handler: Handlers<any, State> = {
         const headers = new Headers();
 
         if (data.session) {
-            setCookie(headers, {
-                name: 'supaLogin',
-                value: data.session?.access_token,
-                maxAge: data.session.expires_in
-            })
+            setSupaloginCookie(
+                headers,
+                data.session?.access_token,
+                data.session.expires_in);
         }
 
         let redirect = "buyitnow?q=" + buttonId;
