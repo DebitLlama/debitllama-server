@@ -1,7 +1,7 @@
 import Layout from "../../components/Layout.tsx";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
-import { Tooltip, UnderlinedTd, getDebitIntervalText, getPaymentIntentStatusLogo, getPaymentRequestJobStatusTooltipMessage, getPaymentRequestStatusLogo, getSubscriptionTooltipMessage } from "../../components/components.tsx";
+import { Tooltip, UnderlinedTd, getDebitIntervalText, getPaymentIntentStatusLogo, getPaymentIntentStatusTooltip, getPaymentRequestJobStatusTooltipMessage, getPaymentRequestStatusLogo, getSubscriptionTooltipMessage } from "../../components/components.tsx";
 import CancelPaymentIntentButton from "../../islands/CancelPaymentIntentButton.tsx";
 import { ChainIds, networkNameFromId } from "../../lib/shared/web3.ts";
 import { DynamicPaymentRequestJobsStatus, PaymentIntentRow, Pricing, RELAYERTRANSACTIONHISTORYPAGESIZE } from "../../lib/enums.ts";
@@ -271,7 +271,7 @@ export default function CreatedPaymentIntents(props: PageProps) {
 
 
 
-    return <Layout isLoggedIn={props.data.token}>
+    return <Layout renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
         <div class="container mx-auto py-8">
             <div class="bg-gray-100 border border-gray-200 dark:border-gray-700 md:rounded-lg">
                 <div class="text-center"><h1 class="text-2xl font-bold mb-2 text-gray-500 dark:text-gray-40">Payment Intent</h1></div>
@@ -292,7 +292,7 @@ export default function CreatedPaymentIntents(props: PageProps) {
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm" >Status:</UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><p> {getPaymentIntentStatusLogo(pi.statusText, "payee")}</p></UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><Tooltip message="The current status of the payment"></Tooltip></UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><Tooltip message={getPaymentIntentStatusTooltip(pi.statusText, "payee")}></Tooltip></UnderlinedTd>
                             </tr>
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm" >Identifier:</UnderlinedTd>
