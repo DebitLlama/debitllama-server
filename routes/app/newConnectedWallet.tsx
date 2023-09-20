@@ -1,6 +1,7 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import Layout from "../../components/Layout.tsx";
 import ConnectWalletPageForm from "../../islands/connectWalletPageForm.tsx";
+import { setProfileRedirectCookie } from "../../lib/backend/cookies.ts";
 import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 import { State } from "../_middleware.ts";
 
@@ -15,9 +16,10 @@ export const handler: Handlers<any, State> = {
 
         if (profileData === null || profileData.length === 0) {
             headers.set("location", "/app/profile");
+            setProfileRedirectCookie(headers, "/app/newConnectedWallet");
             return new Response(null, { status: 303, headers })
         } else {
-            return ctx.render({ ...ctx.state, ethEncryptPublicKey, walletaddress: profileData[0].walletaddress })
+            return ctx.render({ ...ctx.state, ethEncryptPublicKey })
         }
     }
 }
@@ -27,7 +29,6 @@ export default function NewConnectedWallet(props: PageProps) {
         <div class="container mx-auto py-8">
             <ConnectWalletPageForm
                 ethEncryptPublicKey={props.data.ethEncryptPublicKey}
-                walletaddress={props.data.walletaddress}
             ></ConnectWalletPageForm>
         </div>
     </Layout>
