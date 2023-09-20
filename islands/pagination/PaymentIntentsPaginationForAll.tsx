@@ -5,6 +5,7 @@ import { FilterFor, PaymentIntentsTableColNames, PaymentIntentsTablePages } from
 import { HourglassLoader } from "../../components/loadingIndicators.tsx";
 import TableSearch from "../../components/TableSearch.tsx";
 import { fetchPaginatedSubscriptionsForUserId } from "../../lib/frontend/fetch.ts";
+import { NotFound } from "../../components/components.tsx";
 
 
 interface PaymentIntentsPaginationForAllProps { }
@@ -94,6 +95,11 @@ export default function PaymentIntentsPaginationForAll(props: PaymentIntentsPagi
                 setSortBy(clickedOn);
             }
         }
+    }
+    if (currentPaymentIntents.length === 0) {
+        return <NotFound title="🔎">
+            <p class="text-center">Your subscriptions will show up here!</p>
+        </NotFound>
     }
 
     return <>

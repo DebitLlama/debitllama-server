@@ -1,7 +1,7 @@
 import Layout from "../../components/Layout.tsx";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
-import { Tooltip, UnderlinedTd, getDebitIntervalText, getPaymentIntentStatusLogo, getPaymentIntentStatusTooltip, getSubscriptionTooltipMessage } from "../../components/components.tsx";
+import { NotFound, Tooltip, UnderlinedTd, getDebitIntervalText, getPaymentIntentStatusLogo, getPaymentIntentStatusTooltip, getSubscriptionTooltipMessage } from "../../components/components.tsx";
 import { AccountTypes, PaymentIntentRow, PaymentIntentStatus, RELAYERTRANSACTIONHISTORYPAGESIZE } from "../../lib/enums.ts";
 import RelayedTxHistory from "../../islands/pagination/RelayedTxHistoryWithPagination.tsx";
 import CancelPaymentIntentButton from "../../islands/CancelPaymentIntentButton.tsx";
@@ -56,9 +56,14 @@ export const handler: Handlers<any, State> = {
 export default function CreatedPaymentIntents(props: PageProps) {
 
     if (props.data.notfound) {
-        return <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
-            <h1 class="text-2xl font-bold mb-6 text-center">Not Found</h1>
-        </div>
+        return <NotFound title="🔎">
+            <p class="text-center">Your subsciptions will be displayed here.</p>
+            <div class="flex flex-row text-center">
+                <a
+                    class="mx-auto bg-gradient-to-b w-max text-gray-500 font-semibold from-slate-50 to-gray-100 px-10 py-3 rounded-2xl shadow-gray-400 shadow-md border-b-4 hover border-b border-gray-200 hover:shadow-sm transition-all duration-500"
+                    href="/app/subscriptions">Go to subsciptions</a>
+            </div>
+        </NotFound>
     }
 
     const pi = props.data.paymentIntentData[0] as PaymentIntentRow;

@@ -5,6 +5,7 @@ import TableSearch from "../../components/TableSearch.tsx";
 import { HourglassLoader } from "../../components/loadingIndicators.tsx";
 import { PaymentIntentsTable } from "../../components/PaymentIntentsTable.tsx";
 import { fetchPaginatedPaymentIntentsForDebitItems } from "../../lib/frontend/fetch.ts";
+import { NotFound } from "../../components/components.tsx";
 
 
 export default function PaymentIntentsPaginationForDebitItemsPage() {
@@ -90,6 +91,12 @@ export default function PaymentIntentsPaginationForDebitItemsPage() {
                 setSortBy(clickedOn);
             }
         }
+    }
+
+    if (currentPaymentIntents.length === 0) {
+        return <NotFound title="🔎">
+            <p class="text-center">Create a new item and sell a subscription to create a payment intent!</p>
+        </NotFound>
     }
 
 
