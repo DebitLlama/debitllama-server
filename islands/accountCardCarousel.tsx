@@ -3,7 +3,7 @@ import { ChainIds, networkNameFromId, walletCurrency } from "../lib/shared/web3.
 import { AccountDisplayElement } from "../components/AccountDisplayElement.tsx";
 import { parseEther } from "../lib/frontend/web3.ts";
 import { formatEther } from "../ethers.min.js";
-import { CarouselButtons } from '../components/components.tsx';
+import { TooltipWithTitle } from '../components/components.tsx';
 import { AccountTypes, Pricing } from '../lib/enums.ts';
 import PaymentIntentsPaginationForAccounts from './pagination/PaymentIntentsPaginationForAccounts.tsx';
 import AccountsSelectButtons from './AccountsSelectButtons.tsx';
@@ -79,6 +79,7 @@ export default function AccountCardCarousel(props: AccountCardCarouselProps) {
         </div>
         <div class="flex flex-row justify-center ">
             <div class={"flex flex-col justify-center"}>
+                <TooltipWithTitle extraStyle='right: 50px;' message='We only update the displayed balance when you are interacting with it using DebitLlama. If you changed your wallet balance it might not be displayed here until a refresh is triggered. Opening the account page will do that!' title='Click on the card to refresh the balance!'></TooltipWithTitle>
                 {AccountDisplayElement(
                     {
                         amount: data.balance,
