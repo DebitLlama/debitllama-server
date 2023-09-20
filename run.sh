@@ -5,9 +5,6 @@ echo "Hi boss! We gonna rebuild the project first, then run it with pm2. There a
 
 sleep 1
 
-echo "Are you ready? Running AOT build!"
-
-deno task build
 
 echo "Done! Now get read!"
 

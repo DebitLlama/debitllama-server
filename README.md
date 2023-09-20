@@ -1,6 +1,7 @@
 # DebitLlama Serice
 
-This repository contains the user interface and server side logic for DebitLlama.
+This repository contains the user interface and server side logic for
+DebitLlama.
 
 It was build using Deno Fresh framework.
 
@@ -28,8 +29,7 @@ It was build using Deno Fresh framework.
 
 ## Need to install Deno and Node for PM2
 
-install node
-https://github.com/nodesource/distributions
+install node https://github.com/nodesource/distributions
 
 `sudo apt-get install -y ca-certificates curl gnupg`
 
@@ -57,17 +57,27 @@ install deno
 
 `sudo apt install unzip`
 
-
 `curl -fsSL https://deno.land/x/install/install.sh | sh`
 
-
 ## Clone the repository from github
+
 `git clone https://username:classictoken@github.com/StrawberryChocolateFudge/debitLLama-server.git`
 
+Copy the nginx config to sites-available
+
+`sudo nginx -t` to verify the config
+
+`sudo systemctl reload nginx` to reload it
+
+To run Deno task build to prebuild the fresh project we need the env vars
+mocked,
+
+else the build fails, add them to the environment before running the build:
+
+`SUPABASE_URL=asf SUPABASE_KEY=asd ETHENCRYPTPUBLICKEY=asf ETHENCRYPTPRIVATEKEY=sad deno task build`
 
 ## Run the server
+
 `chmod a+x run.sh`
 
 `./run.sh`
-
-
