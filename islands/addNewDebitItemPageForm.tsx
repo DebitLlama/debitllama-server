@@ -102,15 +102,12 @@ export default function AddNewDebitItemPageForm(props: AddNewDebitItemFormProps)
                     <p class="text-sm text-gray-600	">Fixed priced subscriptions are processed automaticly while dynamic subscriptions must be triggered manually or via API.</p>
                 </div>
                 <div class="mb-4 max-w-sm">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="maxamount">Price</label>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="maxamount">Price Per Payment</label>
                     <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
                         type="number" id="maxamount" name="maxamount" placeholder="0" step="any" />
                 </div>
                 <div class="mb-4 max-w-sm">
-                    <p class="text-sm text-gray-600	">For fixed pricing the Price is the actual amount that will be debited, for the Dynamic pricing the Price is the maximum amount that can be debited. Dynamic subscriptions allow usage based billing. </p>
-                </div>
-                <div class="mb-4 max-w-sm">
-                    <p class="text-sm text-gray-600	">The customers account balance must contain the full price when subscribing, even for dynamic payments!</p>
+                    <p class="text-sm text-gray-600	">For fixed pricing the price per payment is the actual amount that will be debited, for the Dynamic pricing it's the maximum limit that can be debited. Dynamic subscriptions allow usage based billing with a spend limit. </p>
                 </div>
             </div>
 
