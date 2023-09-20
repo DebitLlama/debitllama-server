@@ -8,6 +8,7 @@ import { ChainIds, NetworkNames, SelectableCurrency, availableNetworks, bittorre
 import Overlay from '../components/Overlay.tsx';
 import { redirectToAccountsPage, saveAccount } from '../lib/frontend/fetch.ts';
 import { AccountTypes } from '../lib/enums.ts';
+import TestnetTokens from './TestnetTokens.tsx';
 
 export const strength = [
     "Worst ☹",
@@ -248,7 +249,8 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
     return <form onSubmit={onSubmitForm} class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md" method="POST">
         <Overlay show={showOverlay} ></Overlay>
         <h1 class="text-2xl font-bold text-left">New Virtual Account</h1>
-        <h4 class="text-md mb-6">Virtual Accounts can hold native tokens like BTT or ERC-20 tokens. You need to deposit into the account and then you can spend it without using your wallet again!</h4>
+        <h4 class="text-md mb-6">Virtual Accounts can hold native tokens like BTT or ERC-20 tokens. You need to deposit into the account and then you can spend from it without signing transactions with your wallet!</h4>
+        <TestnetTokens chainId={chainIdFromNetworkName[selectedNetwork as NetworkNames]}></TestnetTokens>
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Account Name</label>
             <input value={name} onChange={(event: any) => setName(event.target.value)} required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
