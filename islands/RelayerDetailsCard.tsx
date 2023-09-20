@@ -6,7 +6,6 @@ import Overlay from '../components/Overlay.tsx';
 
 export interface RelayerDetailsCardProps {
     relayerData: any;
-    walletAddress: string;
 }
 
 
@@ -39,13 +38,6 @@ export default function RelayerDetailsCard(props: RelayerDetailsCardProps) {
         }
         const address = await requestAccounts();
 
-        if (address !== props.walletAddress) {
-            // Check to make sure you use the wallet that you added in the profiles!
-            //Display error if it's not the correct wallet
-            setErrorMessage("Your wallet address must match the profile!")
-            setShowError(true);
-            return;
-        }
 
         const contract = await getContract(
             provider,
