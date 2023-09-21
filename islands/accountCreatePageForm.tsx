@@ -271,6 +271,7 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
                 type="number" id="amount" name="amount" placeholder="0" step={"any"} />
         </div>
         <AccountPasswordInput
+            title='Virtual Account Password'
             password={password}
             setPassword={setPasswordAndCheck}
             passwordAgain={passwordAgain}

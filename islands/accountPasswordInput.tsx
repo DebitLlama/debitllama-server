@@ -8,11 +8,12 @@ export interface AccountPasswordInputProps {
     setPasswordAgain: (to: string) => void;
     passwordStrengthNotification: string;
     passwordMatchError: string;
+    title: string
 }
 
 export default function AccountPasswordInput(props: AccountPasswordInputProps) {
     return <> <div class="mb-4">
-        <label class="block text-gray-700 text-sm font-bold mb-2" for="encryptionpass">Virtual Account Password</label>
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="encryptionpass">{props.title}</label>
         <input
             value={props.password}
             onKeyUp={(event: any) => props.setPassword(event.target.value)}

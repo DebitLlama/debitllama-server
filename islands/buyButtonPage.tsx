@@ -670,6 +670,7 @@ function CreateNewAccountUI(props: {
                     value={props.paymentAmount} type="number" id="amount" name="amount" placeholder="0" step="any" />
             </div>
             <AccountPasswordInput
+                title={"Account Password"}
                 password={props.newAccountPasswordProps.password}
                 setPassword={props.setPasswordAndCheck}
                 passwordAgain={props.newAccountPasswordProps.passwordAgain}
@@ -1137,6 +1138,7 @@ export default function BuyButtonPage(props: BuyButtonPageProps) {
             accounts={props.accounts}
             newAccountPasswordProps={
                 {
+                    title: "Account Password",
                     password: newAccountPassword,
                     setPassword: setNewAccountPassword,
                     passwordAgain: newAccountPasswordAgain,

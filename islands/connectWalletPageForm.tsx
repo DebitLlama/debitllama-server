@@ -174,6 +174,7 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
             setSelectedCurrency={setSelectedCurrencyHook}
         ></CurrencySelectDropdown>
         <AccountPasswordInput
+            title="Account Password"
             password={password}
             setPassword={setPasswordAndCheck}
             passwordAgain={passwordAgain}
