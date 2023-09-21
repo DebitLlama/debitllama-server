@@ -51,7 +51,7 @@ export default function Item(props: PageProps) {
 
     const itemData = props.data.itemData[0];
 
-    const embeddedCode = `<a href="https://app.debitllama.com/buyitnow/?q=${itemData.button_id}"><img width="140px" src={"https://app.debitllama.com/buyitnow.png"}/></a>`
+    const embeddedCode = `<a href="https://debitllama.com/buyitnow/?q=${itemData.button_id}"><img width="140px" src={"https://debitllama.com/buyitnow.png"}/></a>`
 
     return <Layout renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
         <div class="container mx-auto py-8">
