@@ -99,7 +99,7 @@ export default function ApprovePaymentIsland(props: ApprovePaymentIslandProps) {
                 </div>
                 <form class="flex flex-col margin_0_auto" onSubmit={disableOnSubmit}>
                     <div class="mx-auto mt-4">
-                        <label for="password" class="block mb-2 text-sm font-medium">Account Password</label>
+                        <label for="password" class="block mb-2 text-sm font-medium">Decrypt your Account with the Password</label>
                         <input
                             value={password}
                             onChange={(event: any) => setPassword(event.target.value)}
@@ -108,12 +108,11 @@ export default function ApprovePaymentIsland(props: ApprovePaymentIslandProps) {
                             id="password"
                             placeholder="••••••••"
                             class="width-320px border border-gray-300 sm:text-sm rounded-lg focus:ring-indigo-600 focus:border-indigo-600 block w-full p-2.5 dark:focus:ring-indigo-500 dark:focus:border-indigo-500"
-
                         />
                     </div>
                     <button
                         onClick={payClicked}
-                        class="width-320px mb-4 mt-4 mx-auto text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg text-xl font-bold px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
+                        class="w-full flex flex-row justify-center text-xl font-bold mb-4 mt-4 text-white bg-indigo-700 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800 indigobg"
                     >Subscribe</button>
                     <div class="w-60 mx-auto mt-4 text-center">
                         <p class={"text-red-600	"}>{errorMessage}</p>
@@ -121,6 +120,10 @@ export default function ApprovePaymentIsland(props: ApprovePaymentIslandProps) {
                 </form>
             </div>
         </>}
+        <div class="bg-gray-100 border-t border-b border-gray-500 text-gray-700 px-4 py-3" role="alert">
+            <p class="font-bold">Make sure you are on debitllama.com! By entering the password you accept the terms of this subsciption and prove you are the owner of this account. This is a secure page, your password and decrypted account remains confidental and never leaves the browser.</p>
+            <p class="text-sm">DebitLlama does not collect or store your password or decrypted account. If you lost or forgot your account password, we can't recover it for you. You can always withdraw the account balance using the wallet that created it. By clicking Subscibe you accept to create a zero-knowledge proof that will be used to debit the payments during the subsciption period. If you wish to cancel the subsciption, you can cancel it any time using your wallet.</p>
+        </div>
     </div>
 }
 
