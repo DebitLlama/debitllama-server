@@ -227,6 +227,11 @@
 	visibility: visible;
 }
 
+.indigobg {
+	box-shadow: 0 25px 50px -12px#6366f1;
+
+}
+
 /*Account Card */
 
 .accountCard_container {
