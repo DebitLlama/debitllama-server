@@ -81,3 +81,7 @@ else the build fails, add them to the environment before running the build:
 `chmod a+x run.sh`
 
 `./run.sh`
+
+## Redeployment:
+
+After SSH to the server, pull the changes and run the rebuiild with the mock EVN vars, then pm2 restart the service
