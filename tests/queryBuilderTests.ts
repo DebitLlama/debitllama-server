@@ -15,15 +15,11 @@ async function main() {
     },
   });
 
-  const selectItems = queryBuilder.select().Items;
+  const query = client.from("Accounts").select();
+  query.eq("name", "My another account");
+  const res = await query;
 
-const items = await selectItems.byButtonId("");
-
-  const selected = await queryBuilder.select().Items.byButtonId(
-    "ef8090b3-a038-44c6-b2ad-b69c91b3d2b9",
-  );
-
-  console.log(selected);
+  console.log(res)
 }
 
 await main();
