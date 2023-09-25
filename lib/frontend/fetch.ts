@@ -325,3 +325,47 @@ export async function updateRedirectUrl(args: {
     },
   }).then((response) => response);
 }
+
+export async function fetchPaginatedAccessTokens(args: {
+  currentPage: number;
+  sortDirection: "ASC" | "DESC";
+}) {
+  return await fetch("/app/pagination/accessTokens", {
+    credentials: "same-origin",
+    method: "POST",
+    body: JSON.stringify(args),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((response) => response);
+}
+
+export async function deleteAccessToken(
+  args: {
+    accesstoken: string;
+  },
+) {
+  return await fetch("/app/apiAccess", {
+    credentials: "same-origin",
+    method: "DELETE",
+    body: JSON.stringify(args),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((response) => response);
+}
+
+export async function updateWebhookUrl(
+  args: {
+    webhook_url: string;
+  },
+) {
+  return await fetch("/app/updateWebhook", {
+    credentials: "same-origin",
+    method: "POST",
+    body: JSON.stringify(args),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((response) => response);
+}
