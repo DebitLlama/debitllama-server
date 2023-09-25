@@ -19,6 +19,9 @@ export function PaginationButtons(props: PaginationButtonsProps) {
                 previous
             </span>
         </button>
+        <div class={"mx-auto text-center"}>
+            {props.currentPage + 1}/{props.totalPages}
+        </div>
         <button onClick={props.nextClicked} disabled={props.nextDisabled} href="#" class="disabled:border-white disabled:hover:bg-white	 flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800">
             <span>
                 Next
