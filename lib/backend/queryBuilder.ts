@@ -135,6 +135,28 @@ export default class QueryBuilder {
             .order("last_modified", { ascending: false });
           return this.responseHandler(res);
         },
+        allByUserIdApiV1: async (
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+          filter: Array<{ parameter: string; value: string }>,
+        ) => {
+          const query = this.client
+            .from("Accounts")
+            .select("*", { count: "exact" })
+            .eq("user_id", this.userid)
+            .order(order, { ascending })
+            .range(rangeFrom, rangeTo);
+
+          for (let i = 0; i < filter.length; i++) {
+            query.eq(filter[i].parameter, filter[i].value);
+          }
+
+          const res = await query;
+
+          return this.responseHandler(res);
+        },
       },
       Profiles: {
         //selectProfileByUserId
@@ -481,6 +503,29 @@ export default class QueryBuilder {
           return this.responseHandler(res);
         },
       },
+      ApiAuthTokens: {
+        byUseridPaginated: async (
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+        ) => {
+          const res = await this.client.from("ApiAuthTokens")
+            .select("*", { count: "exact" })
+            .order(order, { ascending })
+            .eq("creator_id", this.userid)
+            .range(rangeFrom, rangeTo);
+          return this.responseHandler(res);
+        },
+      },
+      Webhooks: {
+        byUserId: async () => {
+          const res = await this.client.from("Webhooks")
+            .select("*")
+            .eq("creator_id", this.userid);
+          return this.responseHandler(res);
+        },
+      },
       DynamicPaymentRequestJobs: {
         //selectDynamicPaymentRequestJobByPaymentIntentIdAndUserId
         byPaymentIntentIdAndUserId: async (paymentIntent_id: string) => {
@@ -701,6 +746,33 @@ export default class QueryBuilder {
           return this.responseHandler(res);
         },
       },
+      ApiAuthTokens: {
+        newToken: async (
+          access_token: string,
+          expiryDate: string,
+        ) => {
+          const res = await this.client.from("ApiAuthTokens")
+            .insert({
+              created_at: new Date().toUTCString(),
+              access_token,
+              creator_id: this.userid,
+              expiry_date_utc: expiryDate,
+            });
+          return this.responseHandler(res);
+        },
+      },
+      Webhooks: {
+        newUrl: async (
+          webhook_url: string,
+        ) => {
+          const res = await this.client.from("Webhooks").insert({
+            created_at: new Date().toUTCString(),
+            webhook_url,
+            creator_id: this.userid,
+          });
+          return this.responseHandler(res);
+        },
+      },
     };
   }
 
@@ -828,7 +900,14 @@ export default class QueryBuilder {
           return this.responseHandler(res);
         },
       },
-
+      Webhooks: {
+        byUserId: async (webhook_url: string) => {
+          const res = await this.client.from("Webhooks")
+            .update({ webhook_url })
+            .eq("creator_id", this.userid);
+          return this.responseHandler(res);
+        },
+      },
       DynamicPaymentRequestJobs: {
         //updateDynamicPaymentRequestJob
         ByPaymentIntentIdAndRequestCreator: async (
@@ -897,6 +976,15 @@ export default class QueryBuilder {
               "status",
               DynamicPaymentRequestJobsStatus.LOCKED,
             );
+          return this.responseHandler(res);
+        },
+      },
+      ApiAuthTokens: {
+        ByAccessToken: async (accessToken: string) => {
+          const res = await this.client.from("ApiAuthTokens")
+            .delete()
+            .eq("access_token", accessToken)
+            .eq("creator_id", this.userid);
           return this.responseHandler(res);
         },
       },
