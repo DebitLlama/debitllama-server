@@ -4,12 +4,12 @@ export enum AccountTypes {
 }
 
 export enum PaymentIntentStatus {
-  CREATED = "Created",
-  CANCELLED = "Cancelled",
-  RECURRING = "Recurring",
-  PAID = "Paid",
-  BALANCETOOLOWTORELAY = "Balance too low to relay",
-  ACCOUNTBALANCETOOLOW = "Account Balance too low",
+  CREATED = "CREATED",
+  CANCELLED = "CANCELLED",
+  RECURRING = "RECURRING",
+  PAID = "PAID",
+  BALANCETOOLOWTORELAY = "BALANCETOOLOWTORELAY",
+  ACCOUNTBALANCETOOLOW = "ACCOUNTBALANCETOOLOW",
 }
 
 export enum Pricing {
