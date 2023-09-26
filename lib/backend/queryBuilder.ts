@@ -108,6 +108,13 @@ export default class QueryBuilder {
           ).eq("user_id", this.userid);
           return this.responseHandler(res);
         },
+        byCommitmentAPiV1: async (commitment: string) => {
+          const res = await this.client.from("Accounts").select().eq(
+            "commitment",
+            commitment,
+          );
+          return this.responseHandler(res);
+        },
         //selectOpenAccountsByIdDESC
         whereOpenByUserIdOrderDesc: async () => {
           const res = await this.client
@@ -135,7 +142,7 @@ export default class QueryBuilder {
             .order("last_modified", { ascending: false });
           return this.responseHandler(res);
         },
-        allByUserIdApiV1: async (
+        allApiV1: async (
           order: string,
           ascending: boolean,
           rangeFrom: number,
@@ -145,16 +152,18 @@ export default class QueryBuilder {
           const query = this.client
             .from("Accounts")
             .select("*", { count: "exact" })
-            .eq("user_id", this.userid)
             .order(order, { ascending })
             .range(rangeFrom, rangeTo);
 
           for (let i = 0; i < filter.length; i++) {
-            query.eq(filter[i].parameter, filter[i].value);
+            const param = filter[i].parameter === "account_type"
+              ? "accountType"
+              : filter[i].parameter;
+
+            query.eq(param, filter[i].value);
           }
 
           const res = await query;
-
           return this.responseHandler(res);
         },
       },
@@ -201,6 +210,14 @@ export default class QueryBuilder {
           const res = await this.client.from("PaymentIntents")
             .select("*,debit_item_id(*)")
             .eq("creator_user_id", this.userid)
+            .eq("account_id", account_id)
+            .eq("statusText", PaymentIntentStatus.ACCOUNTBALANCETOOLOW);
+          return this.responseHandler(res);
+        },
+        //API v1 lets ya fetch without creator_user_id!
+        forAccountbyAccountBalanceTooLowAPIV1: async (account_id: number) => {
+          const res = await this.client.from("PaymentIntents")
+            .select("*,debit_item_id(*)")
             .eq("account_id", account_id)
             .eq("statusText", PaymentIntentStatus.ACCOUNTBALANCETOOLOW);
           return this.responseHandler(res);
@@ -369,7 +386,7 @@ export default class QueryBuilder {
             .like("paymentIntent", searchTerm);
           return this.responseHandler(res);
         },
-        allByCreatorIdApiV1: async (
+        allByCreatorIdApiV1FilterCommitment: async (
           commitment: string,
           order: string,
           ascending: boolean,
@@ -380,8 +397,44 @@ export default class QueryBuilder {
           const query = this.client
             .from("PaymentIntents")
             .select("*,debit_item_id(*)", { count: "exact" })
-            .eq("creator_user_id", this.userid)
             .eq("commitment", commitment)
+            .order(order, { ascending })
+            .range(rangeFrom, rangeTo);
+          for (let i = 0; i < filter.length; i++) {
+            query.eq(filter[i].parameter, filter[i].value);
+          }
+          const res = await query;
+          return this.responseHandler(res);
+        },
+        allByCreatorIdApiV1: async (
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+          filter: Array<{ parameter: string; value: string }>,
+        ) => {
+          const query = this.client
+            .from("PaymentIntents")
+            .select("*,debit_item_id(*),account_id(*)", { count: "exact" })
+            .eq("creator_user_id", this.userid)
+            .order(order, { ascending })
+            .range(rangeFrom, rangeTo);
+          for (let i = 0; i < filter.length; i++) {
+            query.eq(filter[i].parameter, filter[i].value);
+          }
+          const res = await query;
+          return this.responseHandler(res);
+        },
+        allApiV1: async (
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+          filter: Array<{ parameter: string; value: string }>,
+        ) => {
+          const query = this.client
+            .from("PaymentIntents")
+            .select("*,debit_item_id(*),account_id(*)", { count: "exact" })
             .order(order, { ascending })
             .range(rangeFrom, rangeTo);
           for (let i = 0; i < filter.length; i++) {
