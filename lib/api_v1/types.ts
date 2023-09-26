@@ -225,7 +225,7 @@ export const endpointDefinitions: { [key in EndpointNames_ApiV1]: string } = {
   [EndpointNames_ApiV1.accounts]:
     "GET: Accounts of access token owner paginated",
   [EndpointNames_ApiV1.accountsSlug]:
-    "GET: an account by commitment and refresh cached balance",
+    "GET: an account by commitment and refresh owned account balance if authenticated!",
   [EndpointNames_ApiV1.items]:
     "GET all items of access token owner paginated,PUT: new item",
   [EndpointNames_ApiV1.itemsSlug]:
@@ -277,6 +277,8 @@ export interface v1_Index_Response extends Base_ApiV1 {
 export interface v1_AccountsResponse extends Base_ApiV1 {
   accounts: Array<Account_ApiV1>;
   pagination: PaginationResponse_ApiV1;
+  filters: Array<Filter>;
+  availableFilters: Array<string>;
 }
 
 export interface v1_AccountResponse extends Base_ApiV1 {
@@ -284,8 +286,17 @@ export interface v1_AccountResponse extends Base_ApiV1 {
   all_payment_intents: {
     pagination: PaginationResponse_ApiV1;
     data: Array<PaymentIntent_ApiV1>;
+    filter: Array<Filter>;
+    availableFilters: Array<string>;
   };
   missing_payments: Array<PaymentIntent_ApiV1>;
+}
+export interface v1_Payment_intentsResponse extends Base_ApiV1 {
+  paymentIntents: Array<PaymentIntent_ApiV1>;
+  pagination: PaginationResponse_ApiV1;
+}
+export interface v1_SinglePaymentIntentResponse extends Base_ApiV1 {
+  paymentIntent: PaymentIntent_ApiV1;
 }
 
 export interface PaginationResponse_ApiV1 {
@@ -295,6 +306,11 @@ export interface PaginationResponse_ApiV1 {
   sort_by: string; // The column that is sorted
   sort_direction: string; // ASC or DESC
   sortable_columns: Array<string>; // Should return the colums that can be sorted
+}
+
+export interface Filter {
+  parameter: string;
+  value: string;
 }
 
 export interface PaginationSearchParams_ApiV1 {
@@ -489,7 +505,6 @@ export const checksPaymentIntents_filterKeys: {
   [PaymentIntents_filterKeys.currency]: true,
   [PaymentIntents_filterKeys.debit_item_id]: true,
 };
-//TODO: map PaymentIntents_sortBy and PaymentIntents_filter_Keys to actual DB column names to use in the query!
 
 export const validate_PaymentIntents_filterKeys: {
   [key in PaymentIntents_filterKeys]: CallableFunction;
@@ -560,7 +575,8 @@ export const getSortableColumns: {
     .map((ent) => ent[0]),
   [EndpointNames_ApiV1.items]: [],
   [EndpointNames_ApiV1.itemsSlug]: [],
-  [EndpointNames_ApiV1.paymentIntents]: [],
+  [EndpointNames_ApiV1.paymentIntents]: Object.entries(PaymentIntents_sortyBy)
+    .map((ent) => ent[0]),
   [EndpointNames_ApiV1.paymentIntentsSlug]: [],
   [EndpointNames_ApiV1.relayer]: [],
   [EndpointNames_ApiV1.relayerSlug]: [],
