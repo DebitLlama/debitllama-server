@@ -9,6 +9,7 @@
     "livetest_queryBuilderTests": "deno run -A tests/queryBuilderTests.ts --allow-net",
     "test_v1": "deno test -A tests/apiv1/index.ts",
     "test_accounts": "deno test -A tests/apiv1/accounts.ts",
+    "test_accountslug":"deno test -A tests/apiv1/accountslug.ts",
     "main": "deno run -A main.ts",
     "build": "deno run -A dev.ts build",
     "preview": "deno run -A main.ts"
