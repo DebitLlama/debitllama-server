@@ -7,7 +7,7 @@ import {
 } from "../enums.ts";
 import { ChainIds } from "../shared/web3.ts";
 import QueryBuilder from "./queryBuilder.ts";
-import { getProvider, parseEther } from "./web3.ts";
+import { getAccount, getProvider, parseEther } from "./web3.ts";
 
 export async function updateRelayerBalanceAndHistorySwitchNetwork(
   chainId: ChainIds,
@@ -280,7 +280,7 @@ export async function updatePaymentIntentsWhereAccountBalanceWasAdded(
     .forAccountbyAccountBalanceTooLow(
       account_id,
     );
-    
+
   const paymentIntentsToReset =
     findPaymentIntentsWithAccountBalanceLowThatCanBeReset(
       currentOnChanBalance_WEI,
@@ -338,3 +338,57 @@ export const getTotalPages = (rowCount: number, pageSize: number) => {
 
   return parseInt(split[0]) + 1;
 };
+
+export async function refreshDBBalance(
+  data: Array<Account>,
+  commitment: string,
+  queryBuilder: QueryBuilder,
+) {
+  const update = queryBuilder.update();
+
+  const networkId = data[0].network_id;
+
+  const onChainAccount = await getAccount(
+    commitment,
+    networkId,
+    data[0].accountType,
+  );
+
+  // If account on chain is active but the balance is not the same as the balance I saved
+  if (
+    onChainAccount.account[0] &&
+    parseEther(data[0].balance) !== onChainAccount.account[3]
+  ) {
+    //Check if there were payment intents with account balance too low and
+    // calculate how much balance was added and set them to recurring or created where possible
+    await updatePaymentIntentsWhereAccountBalanceWasAdded(
+      queryBuilder,
+      onChainAccount.account[3],
+      data[0].id,
+    );
+
+    // Update the account balance finally
+
+    await update.Accounts.balanceAndClosedById(
+      onChainAccount.account[3],
+      !onChainAccount.account[0],
+      data[0].id,
+    );
+  }
+
+  // If account is not active but the data saved in teh db (closed) is still false
+  // This is a separate condition to handle edge case when an empty account is closed, we don't check balance!
+  if (!onChainAccount.account[0] && !data[0].closed) {
+    await update.Accounts.balanceAndClosedById(
+      onChainAccount.account[3],
+      !onChainAccount.account[0],
+      data[0].id,
+    );
+
+    // I need to void all payment intents that are not paid or cancelled!
+    // This will only void them in the database, but the proofs are already unusable since the account is not active anymore!
+    await update.PaymentIntents.toCancelledByAccountIdForCreator(data[0].id);
+  }
+
+  return onChainAccount;
+}
