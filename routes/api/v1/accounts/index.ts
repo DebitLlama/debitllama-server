@@ -9,6 +9,7 @@ import {
   Accounts_sortBy,
   checksAccounts_filterKeys,
   EndpointNames_ApiV1,
+  Filter,
   getAccountsSortBy,
   getSortableColumns,
   validate_Accounts_filterKeys,
@@ -46,6 +47,7 @@ export const handler = {
             pagination: {},
             returnError: true,
             error,
+            filters: [],
           },
         ),
         error.status,
@@ -66,6 +68,7 @@ export const handler = {
             pagination: {},
             returnError: true,
             error,
+            filters: [],
           },
         ),
         error.status,
@@ -86,6 +89,7 @@ export const handler = {
             pagination: {},
             returnError: true,
             error,
+            filters: [],
           },
         ),
         error.status,
@@ -108,6 +112,7 @@ export const handler = {
             pagination: {},
             returnError: true,
             error,
+            filters: [],
           },
         ),
         error.status,
@@ -130,6 +135,7 @@ export const handler = {
             pagination: {},
             returnError: true,
             error,
+            filters: [],
           },
         ),
         error.status,
@@ -140,10 +146,7 @@ export const handler = {
     const filterParameters = Object.entries(filter).map((a) => {
       if (checksAccounts_filterKeys[a[0] as Accounts_filterKeys]) {
         return {
-          parameter: a[0] === Accounts_filterKeys.account_type
-            // Handle the edge case that the AccountType naming in the db is different!
-            ? "accountType"
-            : a[0],
+          parameter: a[0],
           value: a[1],
         };
       }
@@ -157,17 +160,9 @@ export const handler = {
           parameter: Accounts_filterKeys;
           value: string;
         };
-
-        if (filterParam.parameter as string === "accountType") {
-          // Need to handle the accountType naming edge case!
-          validate_Accounts_filterKeys[
-            Accounts_filterKeys.account_type
-          ](filterParam.value);
-        } else {
-          validate_Accounts_filterKeys[
-            filterParam.parameter as Accounts_filterKeys
-          ](filterParam.value);
-        }
+        validate_Accounts_filterKeys[
+          filterParam.parameter as Accounts_filterKeys
+        ](filterParam.value);
       }
     } catch (err) {
       const error = {
@@ -183,6 +178,7 @@ export const handler = {
             pagination: {},
             returnError: true,
             error,
+            filters: [],
           },
         ),
         error.status,
@@ -197,7 +193,7 @@ export const handler = {
     const queryBuilder = new QueryBuilder(ctx);
     const select = queryBuilder.select();
 
-    const accounts = await select.Accounts.allByUserIdApiV1(
+    const accounts = await select.Accounts.allApiV1(
       sort_by,
       sort_direction === "ASC",
       from,
@@ -220,6 +216,7 @@ export const handler = {
             pagination: {},
             returnError: true,
             error,
+            filters: [],
           },
         ),
         error.status,
@@ -242,6 +239,7 @@ export const handler = {
         status: 0,
         timestamp: "",
       },
+      filters: filterParameters as Array<Filter>,
     }));
   },
 };

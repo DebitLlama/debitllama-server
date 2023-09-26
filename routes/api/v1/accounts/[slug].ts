@@ -1,17 +1,20 @@
 import { HandlerContext } from "$fresh/server.ts";
 import {
   AccountResponseBuilder,
+  parseFilter,
   v1Error,
   v1Success,
 } from "../../../../lib/api_v1/responseBuilders.ts";
 import {
   checksPaymentIntents_filterKeys,
   EndpointNames_ApiV1,
+  Filter,
   getPaymentIntentsSortBy,
   getSortableColumns,
   mapPaymentIntentSortByKeysToDBColNames,
   PaymentIntents_filterKeys,
   PaymentIntents_sortyBy,
+  validate_PaymentIntents_filterKeys,
 } from "../../../../lib/api_v1/types.ts";
 import {
   getPagination,
@@ -19,16 +22,11 @@ import {
   refreshDBBalance,
 } from "../../../../lib/backend/businessLogic.ts";
 import QueryBuilder from "../../../../lib/backend/queryBuilder.ts";
-import {
-  formatEther,
-  getAccount,
-  parseEther,
-} from "../../../../lib/backend/web3.ts";
+import { formatEther, parseEther } from "../../../../lib/backend/web3.ts";
 import { State } from "../../../_middleware.ts";
 
 export const handler = {
   async GET(_req: Request, ctx: HandlerContext<any, State>) {
-    console.log("Triggered!");
     const { slug } = ctx.params;
     const url = new URL(_req.url);
 
@@ -65,15 +63,25 @@ export const handler = {
         if (
           checksPaymentIntents_filterKeys[a[0] as PaymentIntents_filterKeys]
         ) {
-          //I need to map the filter keys parameters to database column compatible names!!
-          // Using a mapping I made for sortBy, which is compatible with filterKeys, just contains more things
+          validate_PaymentIntents_filterKeys[a[0] as PaymentIntents_filterKeys](
+            a[1],
+          );
           return {
-            parameter: mapPaymentIntentSortByKeysToDBColNames[
-              a[0] as PaymentIntents_sortyBy
-            ],
+            parameter: a[0],
             value: a[1],
           };
         }
+      });
+
+      const mappedFilterParameters = filterParameters.map((fil) => {
+        //I need to map the filter keys parameters to database column compatible names!!
+        // Using a mapping I made for sortBy, which is compatible with filterKeys, just contains more things
+        return {
+          parameter: mapPaymentIntentSortByKeysToDBColNames[
+            fil?.parameter as PaymentIntents_sortyBy
+          ],
+          value: fil?.value,
+        };
       });
 
       const { from, to } = getPagination(
@@ -84,7 +92,7 @@ export const handler = {
       const queryBuilder = new QueryBuilder(ctx);
       const select = queryBuilder.select();
 
-      const { data } = await select.Accounts.byCommitment(slug);
+      const { data } = await select.Accounts.byCommitmentAPiV1(slug);
 
       if (data.length === 0) {
         throw new Error("Account not found!");
@@ -92,7 +100,10 @@ export const handler = {
 
       let updatedBalance = data[0].balance;
       let updatedClosed = data[0].closed;
-      if (!data[0].closed) {
+
+      // For now, only update balance if the caller is authenticated and he is the account owner
+      if (!data[0].closed && data[0].user_id === ctx.state.userid) {
+        //TODO: RATE LIMITER! REFRESH BALANCE MAX ONLY ONCE VERY few minutes!
         // If the data in the db is not closed this will refresh the database
         const onChainAccount = await refreshDBBalance(data, slug, queryBuilder);
         // Now the account could be closed for all I know, if it refreshed!
@@ -108,13 +119,13 @@ export const handler = {
       // I just return the account
 
       const allPaymentIntents = await select.PaymentIntents
-        .allByCreatorIdApiV1(
+        .allByCreatorIdApiV1FilterCommitment(
           slug,
           sort_by,
           sort_direction === "ASC",
           from,
           to,
-          filterParameters as Array<{ parameter: string; value: string }>,
+          mappedFilterParameters as Array<{ parameter: string; value: string }>,
         );
 
       if (allPaymentIntents.error) {
@@ -126,7 +137,7 @@ export const handler = {
 
       const total_pages = getTotalPages(allPaymentIntents.count, page_size);
       const { data: missedPayments } = await select.PaymentIntents
-        .forAccountbyAccountBalanceTooLow(data[0].id);
+        .forAccountbyAccountBalanceTooLowAPIV1(data[0].id);
 
       return v1Success(AccountResponseBuilder({
         commitment: slug,
@@ -150,6 +161,7 @@ export const handler = {
           sortable_columns:
             getSortableColumns[EndpointNames_ApiV1.accountsSlug],
         },
+        filters: filterParameters as Array<Filter>,
       }));
     } catch (err) {
       const error = {
@@ -168,17 +180,10 @@ export const handler = {
           missingPayments: [],
           allPaymentIntents: [],
           pagination: {},
+          filters: [],
         }),
         error.status,
       );
     }
   },
 };
-
-function parseFilter(filter: any) {
-  try {
-    return JSON.parse(filter);
-  } catch (err) {
-    throw new Error("Malformed Filter Parameter. Must be valid json");
-  }
-}

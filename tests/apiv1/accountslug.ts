@@ -16,7 +16,7 @@ Deno.test("api/v1/accounts pagination parameters", async () => {
   }
 
   const filter = JSON.stringify({
-    // [PaymentIntents_filterKeys.payee_address]: true,
+    [PaymentIntents_filterKeys.payee_address]: "0x2beE8f1a64A0a2dFbf105114B6B092b5636bC552",
     // [PaymentIntents_filterKeys.max_debit_amount]: true,
     // [PaymentIntents_filterKeys.debit_times]: true,
     // [PaymentIntents_filterKeys.debit_interval]: true,
@@ -34,5 +34,5 @@ Deno.test("api/v1/accounts pagination parameters", async () => {
   console.log(res.status);
   console.log("here");
   const json = await res.json();
-  console.log(JSON.stringify(json));
+  console.log(json);
 });

@@ -13,3 +13,9 @@ export async function AuthenticatedGET(args: AuthenticatedGETArgs) {
     },
   }).then((response) => response);
 }
+
+export async function UnAuthenticatedGET(url: string) {
+  return await fetch(url, {
+    method: "GET",
+  }).then((response) => response);
+}
