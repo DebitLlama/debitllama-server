@@ -18,6 +18,7 @@ import {
 } from "../shared/web3.ts";
 import {
   Account_ApiV1,
+  Accounts_filterKeys,
   AccountTypes_ApiV1,
   accountTypesToV1,
   Currency_ApiV1,
@@ -26,15 +27,19 @@ import {
   EndpointNames_ApiV1,
   endpoints_ApiV1,
   ErrorResponse,
+  Filter,
   Link,
   Network_ApiV1,
   PaginationResponse_ApiV1,
   PaymentIntent_ApiV1,
+  PaymentIntents_filterKeys,
   PaymentIntentStatus_ApiV1,
   Pricing_ApiV1,
   v1_AccountResponse,
   v1_AccountsResponse,
   v1_Index_Response,
+  v1_Payment_intentsResponse,
+  v1_SinglePaymentIntentResponse,
   V1Error,
 } from "./types.ts";
 
@@ -148,6 +153,7 @@ export interface AccountsResponseBuilderProps {
   pagination: PaginationResponse_ApiV1 | object;
   returnError: boolean;
   error: V1Error;
+  filters: Array<Filter>;
 }
 
 export function AccountsResponseBuilder(args: AccountsResponseBuilderProps) {
@@ -227,6 +233,8 @@ export function AccountsResponseBuilder(args: AccountsResponseBuilderProps) {
     _links,
     accounts,
     pagination: pagination as PaginationResponse_ApiV1,
+    filters: args.filters,
+    availableFilters: Object.entries(Accounts_filterKeys).map((ent) => ent[0]),
   };
   return body;
 }
@@ -243,6 +251,7 @@ export interface AccountResponseBuilderProps {
   missingPayments: Array<PaymentIntentRow>;
   allPaymentIntents: Array<PaymentIntentRow>;
   pagination: PaginationResponse_ApiV1 | object;
+  filters: Array<Filter>;
 }
 
 export function AccountResponseBuilder(args: AccountResponseBuilderProps) {
@@ -268,16 +277,16 @@ export function AccountResponseBuilder(args: AccountResponseBuilderProps) {
   }
 
   const networkId = args.data.network_id as ChainIds;
-  const accountName = networkNameFromId[networkId];
+  const networkName = networkNameFromId[networkId];
   const currency = JSON.parse(args.data.currency);
   const network = {
-    name: accountName,
+    name: networkName,
     rpc: rpcUrl[networkId],
     chain_id: networkId,
     virtual_accounts_contract: getVirtualAccountsContractAddress[networkId],
     connected_wallets_contract: getVirtualAccountsContractAddress[networkId],
     currency: walletCurrency[networkId],
-    available_currencies: getCurrenciesForNetworkName[accountName].map(
+    available_currencies: getCurrenciesForNetworkName[networkName].map(
       (curr) => {
         return {
           name: curr.name,
@@ -318,7 +327,7 @@ export function AccountResponseBuilder(args: AccountResponseBuilderProps) {
     all_payment_intents: {
       pagination: args.pagination as PaginationResponse_ApiV1,
       data: args.allPaymentIntents.map((row) =>
-        mapPaymentIntentsRowToPaymentIntentsApiV1(
+        mapPaymentIntentsRowToPaymentIntentsApiV1ForAccounts(
           row,
           currency,
           network,
@@ -326,9 +335,13 @@ export function AccountResponseBuilder(args: AccountResponseBuilderProps) {
           args.updatedClosed,
         )
       ),
+      filter: args.filters,
+      availableFilters: Object.entries(PaymentIntents_filterKeys).map((ent) =>
+        ent[0]
+      ),
     },
     missing_payments: args.missingPayments.map((row) => {
-      return mapPaymentIntentsRowToPaymentIntentsApiV1(
+      return mapPaymentIntentsRowToPaymentIntentsApiV1ForAccounts(
         row,
         currency,
         network,
@@ -348,6 +361,101 @@ export function AccountResponseBuilder(args: AccountResponseBuilderProps) {
   return body;
 }
 
+export interface PaymentIntentsResponseBuilderArgs {
+  returnError: boolean;
+  error: V1Error;
+  allPaymentIntents: Array<PaymentIntentRow>;
+  pagination: PaginationResponse_ApiV1 | object;
+}
+
+export function PaymentIntentsReponseBuilder(
+  args: PaymentIntentsResponseBuilderArgs,
+) {
+  const _self = {
+    href: "/api/v1/payment_intents",
+    methods: endpoints_ApiV1[EndpointNames_ApiV1.paymentIntents],
+  };
+  const _version = "v1";
+  const _description = endpointDefinitions[EndpointNames_ApiV1.paymentIntents];
+  if (args.returnError) {
+    const errorRes: ErrorResponse = {
+      _self,
+      _description,
+      _version,
+      _links: [
+        {
+          href: "/api/v1",
+          methods: endpoints_ApiV1[EndpointNames_ApiV1.v1],
+        },
+      ],
+      error: args.error,
+    };
+    return errorRes;
+  }
+  // Gonna get all the payment intent links
+  const paymentIntentsLinks = getLinksFromPaymentIntents(
+    args.allPaymentIntents,
+  );
+  // Else return the payment intents!
+  const body: v1_Payment_intentsResponse = {
+    _self,
+    _version,
+    _description,
+    _links: paymentIntentsLinks,
+    paymentIntents: args.allPaymentIntents.map((row) =>
+      mapPaymentIntentsRowToPaymentIntentsApiV1(row)
+    ),
+    pagination: args.pagination as PaginationResponse_ApiV1,
+  };
+
+  return body;
+}
+
+export interface SinglePaymentIntentReposinseBuilderArgs {
+  returnError: boolean;
+  error: V1Error;
+  paymentIntentRow: PaymentIntentRow;
+}
+
+export function SinglePaymentIntentReposinseBuilder(
+  args: SinglePaymentIntentReposinseBuilderArgs,
+) {
+  const _self = {
+    href: `/api/v1/payment_intents/${args.paymentIntentRow.paymentIntent}`,
+    methods: endpoints_ApiV1[EndpointNames_ApiV1.paymentIntentsSlug],
+  };
+  const _version = "v1";
+  const _description =
+    endpointDefinitions[EndpointNames_ApiV1.paymentIntentsSlug];
+  if (args.returnError) {
+    const errorRes: ErrorResponse = {
+      _self,
+      _description,
+      _version,
+      _links: [{
+        href: "/api/v1/payment_intents",
+        methods: endpoints_ApiV1[EndpointNames_ApiV1.paymentIntents],
+      }],
+      error: args.error,
+    };
+    return errorRes;
+  }
+
+  const body: v1_SinglePaymentIntentResponse = {
+    _self,
+    _version,
+    _description,
+    _links: [{
+      href: `/api/v1/item/${args.paymentIntentRow.debit_item_id.id}`,
+      methods: endpoints_ApiV1[EndpointNames_ApiV1.itemsSlug],
+    }],
+    paymentIntent: mapPaymentIntentsRowToPaymentIntentsApiV1(
+      args.paymentIntentRow,
+    ),
+  };
+  return body;
+}
+
 function getLinksFromPaymentIntents(
   paymentIntentsRows: Array<PaymentIntentRow>,
 ): Array<Link> {
@@ -360,6 +468,63 @@ function getLinksFromPaymentIntents(
 }
 
 function mapPaymentIntentsRowToPaymentIntentsApiV1(
+  row: PaymentIntentRow,
+): PaymentIntent_ApiV1 {
+  const currency = JSON.parse(row.currency);
+  const networkId = row.network as ChainIds;
+  const networkName = networkNameFromId[networkId];
+  const network = {
+    name: networkName,
+    rpc: rpcUrl[networkId],
+    chain_id: networkId,
+    virtual_accounts_contract: getVirtualAccountsContractAddress[networkId],
+    connected_wallets_contract: getVirtualAccountsContractAddress[networkId],
+    currency: walletCurrency[networkId],
+    available_currencies: getCurrenciesForNetworkName[networkName].map(
+      (curr) => {
+        return {
+          name: curr.name,
+          native: curr.native,
+          contractAddress: curr.contractAddress,
+        };
+      },
+    ),
+  };
+  return {
+    id: row.id,
+    created_at: row.created_at,
+    account: mapAccountRowToAccountApiV1(
+      row.account_id,
+      currency,
+      network,
+      row.account_id.balance,
+      row.account_id.closed,
+    ),
+    payee_address: row.payee_address,
+    max_debit_amount: row.maxDebitAmount,
+    debit_times: row.debitTimes,
+    debit_interval: row.debitInterval,
+    payment_intent: row.paymentIntent,
+    commitment: row.commitment,
+    estimated_gas: row.estimatedGas,
+    status_text: row.statusText as PaymentIntentStatus_ApiV1,
+    last_payment_date: row.lastPaymentDate,
+    next_payment_date: row.nextPaymentDate,
+    pricing: row.pricing as Pricing_ApiV1,
+    currency,
+    network,
+    debit_item: mapDebitItemRowToApiV1(
+      row.debit_item_id,
+      currency,
+      network,
+    ),
+    used_for: row.used_for,
+    transactions_left: row.debitTimes - row.used_for,
+    failed_dynamic_payment_amount: row.failedDynamicPaymentAmount,
+  };
+}
+
+function mapPaymentIntentsRowToPaymentIntentsApiV1ForAccounts(
   row: PaymentIntentRow,
   currency: Currency_ApiV1,
   network: Network_ApiV1,
@@ -446,4 +611,12 @@ function mapDebitItemRowToApiV1(
     deleted: debit_item_id.deleted,
     payment_intents_count: debit_item_id.payment_intents_count,
   };
+}
+
+export function parseFilter(filter: any) {
+  try {
+    return JSON.parse(filter);
+  } catch (err) {
+    throw new Error("Malformed Filter Parameter. Must be valid json");
+  }
 }
