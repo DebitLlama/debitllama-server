@@ -27,13 +27,24 @@ export enum SubsciptionStatus_ApiV1 {
 }
 
 export enum PaymentIntentStatus_ApiV1 {
-  CREATED = "Created",
-  CANCELLED = "Cancelled",
-  RECURRING = "Recurring",
-  PAID = "Paid",
-  BALANCETOOLOWTORELAY = "Balance too low to relay",
-  ACCOUNTBALANCETOOLOW = "Account Balance too low",
+  CREATED = "CREATED",
+  CANCELLED = "CANCELLED",
+  RECURRING = "RECURRING",
+  PAID = "PAID",
+  BALANCETOOLOWTORELAY = "BALANCETOOLOWTORELAY",
+  ACCOUNTBALANCETOOLOW = "ACCOUNTBALANCETOOLOW",
 }
+
+export const validatePaymentIntentStatus_ApiV1: {
+  [key in PaymentIntentStatus_ApiV1]: boolean;
+} = {
+  [PaymentIntentStatus_ApiV1.CREATED]: true,
+  [PaymentIntentStatus_ApiV1.CANCELLED]: true,
+  [PaymentIntentStatus_ApiV1.RECURRING]: true,
+  [PaymentIntentStatus_ApiV1.PAID]: true,
+  [PaymentIntentStatus_ApiV1.BALANCETOOLOWTORELAY]: true,
+  [PaymentIntentStatus_ApiV1.ACCOUNTBALANCETOOLOW]: true,
+};
 
 export enum Pricing_ApiV1 {
   Fixed = "Fixed",
@@ -91,13 +102,13 @@ export interface PaymentIntent_ApiV1 {
 }
 
 export enum AccountTypes_ApiV1 {
-  virtual_account = "virtual_account",
-  connected_wallet = "connected_wallet",
+  VIRTUALACCOUNT = "VIRTUALACCOUNT",
+  CONNECTEDWALLET = "CONNECTEDWALLET",
 }
 
 export const accountTypesToV1 = {
-  [AccountTypes.CONNECTEDWALLET]: AccountTypes_ApiV1.connected_wallet,
-  [AccountTypes.VIRTUALACCOUNT]: AccountTypes_ApiV1.virtual_account,
+  [AccountTypes.CONNECTEDWALLET]: AccountTypes_ApiV1.CONNECTEDWALLET,
+  [AccountTypes.VIRTUALACCOUNT]: AccountTypes_ApiV1.VIRTUALACCOUNT,
 };
 
 export interface Account_ApiV1 {
@@ -122,7 +133,7 @@ export type SmartContract_ApiV1 = {
 export interface Currency_ApiV1 {
   name: string;
   native: boolean; // is it a native token , if true then contract address is false
-  contract_address: string;
+  contractAddress: string;
 }
 export enum DynamicPaymentRequestJobsStatus_ApiV1 {
   CREATED = "Created",
@@ -270,6 +281,11 @@ export interface v1_AccountsResponse extends Base_ApiV1 {
 
 export interface v1_AccountResponse extends Base_ApiV1 {
   account: Account_ApiV1;
+  all_payment_intents: {
+    pagination: PaginationResponse_ApiV1;
+    data: Array<PaymentIntent_ApiV1>;
+  };
+  missing_payments: Array<PaymentIntent_ApiV1>;
 }
 
 export interface PaginationResponse_ApiV1 {
@@ -316,7 +332,6 @@ export enum Accounts_filterKeys {
   balance = "balance",
   closed = "closed",
 }
-
 
 export const getAccountsSortBy: { [key in Accounts_sortBy]: Accounts_sortBy } =
   // Why would I create this? What is the point? Well to validate strings, during runtime it's passed a string
@@ -396,6 +411,144 @@ export const validate_Accounts_filterKeys: {
   },
 };
 
+export enum PaymentIntents_sortyBy {
+  created_at = "created_at",
+  payee_address = "payee_address",
+  max_debit_amount = "max_debit_amount",
+  debit_times = "debit_times",
+  debit_interval = "debit_interval",
+  payment_intent = "payment_intent",
+  status_text = "status_text",
+  estimated_gas = "estimated_gas",
+  last_payment_date = "last_payment_date",
+  next_payment_date = "next_payment_date",
+  pricing = "pricing",
+  currency = "currency",
+  debit_item_id = "debit_item_id",
+}
+
+export enum PaymentIntents_filterKeys {
+  payee_address = "payee_address",
+  max_debit_amount = "max_debit_amount",
+  debit_times = "debit_times",
+  debit_interval = "debit_interval",
+  status_text = "status_text",
+  pricing = "pricing",
+  currency = "currency",
+  debit_item_id = "debit_item_id",
+}
+
+export const mapPaymentIntentSortByKeysToDBColNames = {
+  [PaymentIntents_sortyBy.created_at]: "created_at",
+  [PaymentIntents_sortyBy.payee_address]: "payee_address",
+  [PaymentIntents_sortyBy.max_debit_amount]: "maxDebitAmount",
+  [PaymentIntents_sortyBy.debit_times]: "debitTimes",
+  [PaymentIntents_sortyBy.debit_interval]: "debitInterval",
+  [PaymentIntents_sortyBy.payment_intent]: "paymentIntent",
+  [PaymentIntents_sortyBy.status_text]: "statusText",
+  [PaymentIntents_sortyBy.estimated_gas]: "estimatedGas",
+  [PaymentIntents_sortyBy.last_payment_date]: "lastPaymentDate",
+  [PaymentIntents_sortyBy.next_payment_date]: "nextPaymentDate",
+  [PaymentIntents_sortyBy.pricing]: "pricing",
+  [PaymentIntents_sortyBy.currency]: "currency",
+  [PaymentIntents_sortyBy.debit_item_id]: "debit_item_id",
+};
+
+export const getPaymentIntentsSortBy: {
+  [key in PaymentIntents_sortyBy]: PaymentIntents_sortyBy;
+} = {
+  [PaymentIntents_sortyBy.created_at]: PaymentIntents_sortyBy.created_at,
+  [PaymentIntents_sortyBy.payee_address]: PaymentIntents_sortyBy.payee_address,
+  [PaymentIntents_sortyBy.max_debit_amount]:
+    PaymentIntents_sortyBy.max_debit_amount,
+  [PaymentIntents_sortyBy.debit_times]: PaymentIntents_sortyBy.debit_times,
+  [PaymentIntents_sortyBy.debit_interval]:
+    PaymentIntents_sortyBy.debit_interval,
+  [PaymentIntents_sortyBy.payment_intent]:
+    PaymentIntents_sortyBy.payment_intent,
+  [PaymentIntents_sortyBy.status_text]: PaymentIntents_sortyBy.status_text,
+  [PaymentIntents_sortyBy.estimated_gas]: PaymentIntents_sortyBy.estimated_gas,
+  [PaymentIntents_sortyBy.last_payment_date]:
+    PaymentIntents_sortyBy.last_payment_date,
+  [PaymentIntents_sortyBy.next_payment_date]:
+    PaymentIntents_sortyBy.next_payment_date,
+  [PaymentIntents_sortyBy.pricing]: PaymentIntents_sortyBy.pricing,
+  [PaymentIntents_sortyBy.currency]: PaymentIntents_sortyBy.currency,
+  [PaymentIntents_sortyBy.debit_item_id]: PaymentIntents_sortyBy.debit_item_id,
+};
+
+export const checksPaymentIntents_filterKeys: {
+  [key in PaymentIntents_filterKeys]: boolean;
+} = {
+  [PaymentIntents_filterKeys.payee_address]: true,
+  [PaymentIntents_filterKeys.max_debit_amount]: true,
+  [PaymentIntents_filterKeys.debit_times]: true,
+  [PaymentIntents_filterKeys.debit_interval]: true,
+  [PaymentIntents_filterKeys.status_text]: true,
+  [PaymentIntents_filterKeys.pricing]: true,
+  [PaymentIntents_filterKeys.currency]: true,
+  [PaymentIntents_filterKeys.debit_item_id]: true,
+};
+//TODO: map PaymentIntents_sortBy and PaymentIntents_filter_Keys to actual DB column names to use in the query!
+
+export const validate_PaymentIntents_filterKeys: {
+  [key in PaymentIntents_filterKeys]: CallableFunction;
+} = {
+  [PaymentIntents_filterKeys.payee_address]: (val: any) => {
+    if (!ethers.isAddress(val)) {
+      throw new Error("Invalid payee_address filter parameter!");
+    }
+  },
+  [PaymentIntents_filterKeys.max_debit_amount]: (val: any) => {
+    if (isNaN(parseFloat(val))) {
+      throw new Error(
+        "Invalid max_debit_amount filter parameter. Must be valid float string!",
+      );
+    }
+  },
+  [PaymentIntents_filterKeys.debit_times]: (val: any) => {
+    if (isNaN(parseInt(val))) {
+      throw new Error("Invalid debit_times filter parameter. Must be integer.");
+    }
+  },
+  [PaymentIntents_filterKeys.debit_interval]: (val: any) => {
+    if (isNaN(parseInt(val))) {
+      throw new Error(
+        "Invalid debit_interval filter parameter. Must be integer",
+      );
+    }
+  },
+  [PaymentIntents_filterKeys.status_text]: (val: any) => {
+    if (!validatePaymentIntentStatus_ApiV1[val as PaymentIntentStatus_ApiV1]) {
+      throw new Error("Invalid Payment Intent Status filter parameter.");
+    }
+  },
+  [PaymentIntents_filterKeys.pricing]: (val: any) => {
+    if (val !== Pricing_ApiV1.Dynamic && val !== Pricing_ApiV1.Fixed) {
+      throw new Error(
+        "Invalid Pricing filter parameter. Must be Dynamic or Fixed",
+      );
+    }
+  },
+  [PaymentIntents_filterKeys.currency]: (val: any) => {
+    const decoded = JSON.parse(val);
+    if (!decoded.name) {
+      throw new Error("Invalid currency filter parameter name");
+    }
+    if (decoded.native === undefined || decoded.native === "") {
+      throw new Error("Invalid currency filter parameter native");
+    }
+    if (decoded.contractAddress === undefined) {
+      throw new Error("Invalid currency filter paramerer contractAddress");
+    }
+  },
+  [PaymentIntents_filterKeys.debit_item_id]: (val: any) => {
+    if (isNaN(parseInt(val))) {
+      throw new Error("Invalid debit_item_id parameter. Must be valid integer");
+    }
+  },
+};
+
 export const getSortableColumns: {
   [key in EndpointNames_ApiV1]: Array<string>;
 } = {
@@ -403,7 +556,8 @@ export const getSortableColumns: {
   [EndpointNames_ApiV1.accounts]: Object.entries(Accounts_sortBy).map((ent) =>
     ent[0]
   ),
-  [EndpointNames_ApiV1.accountsSlug]: [],
+  [EndpointNames_ApiV1.accountsSlug]: Object.entries(PaymentIntents_sortyBy)
+    .map((ent) => ent[0]),
   [EndpointNames_ApiV1.items]: [],
   [EndpointNames_ApiV1.itemsSlug]: [],
   [EndpointNames_ApiV1.paymentIntents]: [],

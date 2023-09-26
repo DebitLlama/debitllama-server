@@ -369,6 +369,27 @@ export default class QueryBuilder {
             .like("paymentIntent", searchTerm);
           return this.responseHandler(res);
         },
+        allByCreatorIdApiV1: async (
+          commitment: string,
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+          filter: Array<{ parameter: string; value: string }>,
+        ) => {
+          const query = this.client
+            .from("PaymentIntents")
+            .select("*,debit_item_id(*)", { count: "exact" })
+            .eq("creator_user_id", this.userid)
+            .eq("commitment", commitment)
+            .order(order, { ascending })
+            .range(rangeFrom, rangeTo);
+          for (let i = 0; i < filter.length; i++) {
+            query.eq(filter[i].parameter, filter[i].value);
+          }
+          const res = await query;
+          return this.responseHandler(res);
+        },
       },
 
       RelayerHistory: {
@@ -781,7 +802,7 @@ export default class QueryBuilder {
       Accounts: {
         //updateAccount
         balanceAndClosedById:
-          (async (balance: string, closed: boolean, id: string) => {
+          (async (balance: string, closed: boolean, id: number) => {
             const res = await this.client.from("Accounts")
               .update({
                 balance: formatEther(balance),
