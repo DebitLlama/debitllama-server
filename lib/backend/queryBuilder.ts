@@ -83,6 +83,23 @@ export default class QueryBuilder {
             .range(rangeFrom, rangeTo);
           return this.responseHandler(res);
         },
+        allForAPIV1: async (
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+          filter: Array<{ parameter: string; value: string }>,
+        ) => {
+          const query = this.client.from("Items")
+            .select("*", { count: "exact" })
+            .order(order, { ascending })
+            .range(rangeFrom, rangeTo);
+          for (let i = 0; i < filter.length; i++) {
+            query.eq(filter[i].parameter, filter[i].value);
+          }
+          const res = await query;
+          return this.responseHandler(res);
+        },
       },
       Accounts: {
         // selectOpenAccountsFromUserByNetworkAndCurrency
@@ -443,6 +460,12 @@ export default class QueryBuilder {
           const res = await query;
           return this.responseHandler(res);
         },
+        byPaymentIntentApiV1: async (paymentIntent: string) => {
+          const query = await this.client.from("PaymentIntents")
+            .select("*,debit_item_id(*),account_id(*)", { count: "exact" })
+            .eq("paymentIntent", paymentIntent);
+          return this.responseHandler(query);
+        },
       },
 
       RelayerHistory: {
@@ -616,6 +639,13 @@ export default class QueryBuilder {
               "id",
               jobId,
             );
+          return this.responseHandler(res);
+        },
+        byPaymentIntentId: async (paymentIntent_id: string) => {
+          const res = await this.client.from("DynamicPaymentRequestJobs")
+            .select("*,relayerBalance_id(*),paymentIntent_id(*)")
+            .eq("paymentIntent_id", paymentIntent_id);
+
           return this.responseHandler(res);
         },
       },
@@ -816,7 +846,7 @@ export default class QueryBuilder {
               request_creator_id: this.userid,
               allocatedGas,
               relayerBalance_id,
-            });
+            }).select();
           return this.responseHandler(res);
         },
       },
@@ -996,7 +1026,7 @@ export default class QueryBuilder {
               status: DynamicPaymentRequestJobsStatus.CREATED,
               allocatedGas,
             }).eq("paymentIntent_id", paymentIntent_id)
-            .eq("request_creator_id", this.userid);
+            .eq("request_creator_id", this.userid).select();
 
           return this.responseHandler(res);
         },
