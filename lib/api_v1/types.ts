@@ -294,9 +294,28 @@ export interface v1_AccountResponse extends Base_ApiV1 {
 export interface v1_Payment_intentsResponse extends Base_ApiV1 {
   paymentIntents: Array<PaymentIntent_ApiV1>;
   pagination: PaginationResponse_ApiV1;
+  filter: Array<Filter>;
+  availableFilters: Array<string>;
 }
 export interface v1_SinglePaymentIntentResponse extends Base_ApiV1 {
-  paymentIntent: PaymentIntent_ApiV1;
+  paymentIntent: PaymentIntent_ApiV1 | any;
+  dynamicPaymentRequest: DynamicPaymentRequest_ApiV1 | any;
+}
+
+export enum DynamicPaymentRequestResponseMessage {
+  CREATEDREQUEST = "CREATEDREQUEST",
+  CANCELLEDREQUEST = "CANCELLEDREQUEST",
+}
+
+export interface v1_DynamicPaymentRequesResponse extends Base_ApiV1 {
+  result: { message: DynamicPaymentRequestResponseMessage; id: number };
+}
+
+export interface V1_ItemsResponse extends Base_ApiV1 {
+  items: Array<DebitItem_ApiV1>;
+  pagination: PaginationResponse_ApiV1;
+  filter: Array<Filter>;
+  availableFilters: Array<string>;
 }
 
 export interface PaginationResponse_ApiV1 {
@@ -443,6 +462,22 @@ export enum PaymentIntents_sortyBy {
   debit_item_id = "debit_item_id",
 }
 
+export enum Items_sortBy {
+  created_at = "created_at",
+  payee_address = "payee_address",
+  currency = "currency",
+  max_price = "max_price",
+  debit_times = "debit_times",
+  debit_interval = "debit_interval",
+  button_id = "button_id",
+  redirect_url = "redirect_url",
+  pricing = "pricing",
+  network = "network",
+  name = "name",
+  deleted = "deleted",
+  payment_intents_count = "payment_intents_count",
+}
+
 export enum PaymentIntents_filterKeys {
   payee_address = "payee_address",
   max_debit_amount = "max_debit_amount",
@@ -491,6 +526,24 @@ export const getPaymentIntentsSortBy: {
   [PaymentIntents_sortyBy.pricing]: PaymentIntents_sortyBy.pricing,
   [PaymentIntents_sortyBy.currency]: PaymentIntents_sortyBy.currency,
   [PaymentIntents_sortyBy.debit_item_id]: PaymentIntents_sortyBy.debit_item_id,
+};
+
+export const getItemsSortBy: {
+  [key in Items_sortBy]: Items_sortBy;
+} = {
+  [Items_sortBy.created_at]: Items_sortBy.created_at,
+  [Items_sortBy.payee_address]: Items_sortBy.payee_address,
+  [Items_sortBy.currency]: Items_sortBy.currency,
+  [Items_sortBy.max_price]: Items_sortBy.max_price,
+  [Items_sortBy.debit_times]: Items_sortBy.debit_times,
+  [Items_sortBy.debit_interval]: Items_sortBy.debit_interval,
+  [Items_sortBy.button_id]: Items_sortBy.button_id,
+  [Items_sortBy.redirect_url]: Items_sortBy.redirect_url,
+  [Items_sortBy.pricing]: Items_sortBy.pricing,
+  [Items_sortBy.network]: Items_sortBy.network,
+  [Items_sortBy.name]: Items_sortBy.name,
+  [Items_sortBy.deleted]: Items_sortBy.deleted,
+  [Items_sortBy.payment_intents_count]: Items_sortBy.payment_intents_count,
 };
 
 export const checksPaymentIntents_filterKeys: {
@@ -573,7 +626,9 @@ export const getSortableColumns: {
   ),
   [EndpointNames_ApiV1.accountsSlug]: Object.entries(PaymentIntents_sortyBy)
     .map((ent) => ent[0]),
-  [EndpointNames_ApiV1.items]: [],
+  [EndpointNames_ApiV1.items]: Object.entries(Items_sortBy).map((ent) =>
+    ent[0]
+  ),
   [EndpointNames_ApiV1.itemsSlug]: [],
   [EndpointNames_ApiV1.paymentIntents]: Object.entries(PaymentIntents_sortyBy)
     .map((ent) => ent[0]),
