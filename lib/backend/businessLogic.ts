@@ -1,5 +1,6 @@
 import {
   Account,
+  DynamicPaymentRequestJobsStatus,
   PaymentIntentRow,
   PaymentIntentStatus,
   Pricing,
@@ -7,7 +8,13 @@ import {
 } from "../enums.ts";
 import { ChainIds } from "../shared/web3.ts";
 import QueryBuilder from "./queryBuilder.ts";
-import { getAccount, getProvider, parseEther } from "./web3.ts";
+import {
+  estimateRelayerGas,
+  formatEther,
+  getAccount,
+  getProvider,
+  parseEther,
+} from "./web3.ts";
 
 export async function updateRelayerBalanceAndHistorySwitchNetwork(
   chainId: ChainIds,
@@ -391,4 +398,205 @@ export async function refreshDBBalance(
   }
 
   return onChainAccount;
+}
+
+export async function addDynamicPaymentRequest(
+  paymentIntent: string,
+  queryBuilder: QueryBuilder,
+  requestedDebitAmount: string,
+) {
+  const select = queryBuilder.select();
+
+  const { data: paymentIntentDataArray } = await select.PaymentIntents
+    .byPaymentIntentAndUserIdForPayee(paymentIntent);
+
+  if (paymentIntentDataArray === null || paymentIntentDataArray.length === 0) {
+    throw new Error("Invalid Payment Intent");
+  }
+  const paymentIntentData = paymentIntentDataArray[0];
+  if (
+    parseEther(requestedDebitAmount) >
+      parseEther(paymentIntentData.maxDebitAmount)
+  ) {
+    throw new Error("Requested Amount Too High!");
+  }
+
+  if (paymentIntentData.pricing !== Pricing.Dynamic) {
+    throw new Error("Only accepting dynamic priced payment intents!");
+  }
+
+  if (parseEther(requestedDebitAmount) <= 0) {
+    throw new Error("Zero or negative payments are not accepted!");
+  }
+
+  if (
+    paymentIntentData.nextPaymentDate !== null &&
+    new Date().getTime() < new Date(paymentIntentData.nextPaymentDate).getTime()
+  ) {
+    // If next payment date is set, I check if the current date exceeds it or not.
+    // If not, then it might be too early to send this transaction and it would fail...
+    throw new Error(
+      "Payment not due! Check next payment date. If you try to debit too early the transaction will fail!",
+    );
+  }
+
+  const estimation = await estimateRelayerGas(
+    {
+      proof: paymentIntentData.proof,
+      publicSignals: paymentIntentData.publicSignals,
+      payeeAddress: paymentIntentData.payee_address,
+      maxDebitAmount: paymentIntentData.maxDebitAmount,
+      actualDebitedAmount: requestedDebitAmount,
+      debitTimes: paymentIntentData.debitTimes,
+      debitInterval: paymentIntentData.debitInterval,
+    },
+    paymentIntentData.network,
+    paymentIntentData.account_id.accountType,
+  ).catch((err) => {
+    console.log(err);
+  });
+
+  if (estimation === null || estimation === undefined) {
+    throw new Error(
+      "Unable to Create Debit Request. Gas estimation for the transaction failed.",
+    );
+  }
+
+  const { data: relayerBalanceDataArr } = await select.RelayerBalance
+    .byUserId();
+
+  if (relayerBalanceDataArr === null || relayerBalanceDataArr.length === 0) {
+    throw new Error("Relayer balance not found!");
+  }
+
+  const relayerBalance = getRelayerBalanceForChainId(
+    paymentIntentData.network,
+    relayerBalanceDataArr[0],
+  );
+  const feeData = await getGasPrice(paymentIntentData.network);
+
+  const estimationForChain = calculateGasEstimationPerChain(
+    paymentIntentData.network,
+    feeData,
+    increaseGasLimit(estimation),
+  );
+
+  if (!estimationForChain) {
+    throw new Error("Unable to estimate gas!");
+  }
+
+  if (parseEther(relayerBalance) < estimationForChain) {
+    throw new Error(
+      `Relayer balance too low. You need to top up the relayer with at least ${
+        formatEther(estimationForChain)
+      } ${JSON.parse(paymentIntentData.currency).name}`,
+    );
+  }
+
+  const { data: dynamicPaymentRequestJobDataArr } = await select
+    .DynamicPaymentRequestJobs
+    .byPaymentIntentIdAndUserId(paymentIntentData.id);
+
+  const insert = queryBuilder.insert();
+  const update = queryBuilder.update();
+  let id;
+  if (
+    dynamicPaymentRequestJobDataArr === null ||
+    dynamicPaymentRequestJobDataArr.length === 0
+  ) {
+    // I need to insert an new job!
+    const insertedRequestRes = await insert.DynamicPaymentRequestJobs.newJob(
+      paymentIntentData.id,
+      requestedDebitAmount,
+      formatEther(estimationForChain),
+      relayerBalanceDataArr[0].id,
+    );
+    id = insertedRequestRes.data[0].id;
+    console.log("insertedRequestRes", insertedRequestRes);
+
+    await updateRelayerBalanceWithAllocatedAmount(
+      queryBuilder,
+      relayerBalanceDataArr[0].id,
+      paymentIntentData.network,
+      relayerBalance,
+      "0",
+      formatEther(estimationForChain),
+    );
+  } else {
+    if (
+      dynamicPaymentRequestJobDataArr[0].status ===
+        DynamicPaymentRequestJobsStatus.LOCKED
+    ) {
+      throw new Error(
+        "Payment request is locked. You can't update it anymore!",
+      );
+    }
+
+    // I update the existing job!
+    const updateedRequestRes = await update.DynamicPaymentRequestJobs
+      .ByPaymentIntentIdAndRequestCreator(
+        paymentIntentData.id,
+        requestedDebitAmount,
+        formatEther(estimationForChain),
+      );
+
+    id = updateedRequestRes.data[0].id;
+
+    await updateRelayerBalanceWithAllocatedAmount(
+      queryBuilder,
+      relayerBalanceDataArr[0].id,
+      paymentIntentData.network,
+      relayerBalance,
+      dynamicPaymentRequestJobDataArr[0].allocatedGas,
+      formatEther(estimationForChain),
+    );
+  }
+
+  if (
+    parseEther(requestedDebitAmount) >
+      parseEther(paymentIntentData.account_id.balance)
+  ) {
+    await update.PaymentIntents.statusTextToAccountBalanceTooLowById(
+      paymentIntentData,
+    );
+    return {
+      msg:
+        "Request Created but customer balance too low! We notified the customer about the pending payment!",
+      id,
+    };
+  }
+
+  return { msg: "Request Created!", id };
+}
+
+export async function cancelDynamicPaymentRequestLogic(
+  requestId: number,
+  queryBuilder: QueryBuilder,
+) {
+  const select = queryBuilder.select();
+  const deleteQ = queryBuilder.delete();
+  const { data: selectedDynamicPaymentRequest } = await select
+    .DynamicPaymentRequestJobs.byJobId(requestId);
+  // this will delete the row by id if it was created by the user and the row is not locked!
+  const result = await deleteQ.DynamicPaymentRequestJobs.byIdForRequestCreator(
+    requestId,
+  );
+  const chainId = selectedDynamicPaymentRequest[0].paymentIntent_id
+    .network as ChainIds;
+  const relayerBalance = selectedDynamicPaymentRequest[0].relayerBalance_id;
+  const allocatedGas = selectedDynamicPaymentRequest[0].allocatedGas;
+  await updateRelayerBalanceWithAllocatedAmount(
+    queryBuilder,
+    relayerBalance.id,
+    chainId,
+    getRelayerBalanceForChainId(chainId, relayerBalance),
+    allocatedGas,
+    "0",
+  );
+
+  if (result.error !== null) {
+    throw new Error("Unable to delete Payment Request!");
+  } else {
+    return "Deleted Payment Request! The page will refresh in 10 seconds!";
+  }
 }

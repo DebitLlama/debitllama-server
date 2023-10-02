@@ -8,6 +8,7 @@ import {
 import {
   checksPaymentIntents_filterKeys,
   EndpointNames_ApiV1,
+  Filter,
   getPaymentIntentsSortBy,
   getSortableColumns,
   mapPaymentIntentSortByKeysToDBColNames,
@@ -52,11 +53,17 @@ export const handler = {
       }
 
       const filter = parseFilter(filterQ);
-
+      const appliedFilters: Filter[] = [];
       const filterParameters = Object.entries(filter).map((a) => {
         if (
           checksPaymentIntents_filterKeys[a[0] as PaymentIntents_filterKeys]
         ) {
+          // I push the unmapped filtes int an extarnal array
+          appliedFilters.push({
+            parameter: a[0],
+            value: a[1] as string,
+          });
+
           //I need to map the filter keys parameters to database column compatible names!!
           // Using a mapping I made for sortBy, which is compatible with filterKeys, just contains more things
           return {
@@ -109,6 +116,7 @@ export const handler = {
           sortable_columns:
             getSortableColumns[EndpointNames_ApiV1.paymentIntents],
         },
+        filters: appliedFilters,
       }));
     } catch (err: any) {
       const error = {
@@ -122,6 +130,7 @@ export const handler = {
           returnError: true,
           allPaymentIntents: [],
           pagination: {},
+          filters: [],
         }),
         error.status,
       );

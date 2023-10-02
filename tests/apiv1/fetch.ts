@@ -19,3 +19,20 @@ export async function UnAuthenticatedGET(url: string) {
     method: "GET",
   }).then((response) => response);
 }
+
+export interface AuthenticatedPOSTArgs {
+  accesstoken: string;
+  url: string;
+  body: string;
+}
+
+export async function AuthenticatedPOST(args: AuthenticatedPOSTArgs) {
+  return await fetch(args.url, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${args.accesstoken}`,
+      "Content-Type": "application/json",
+    },
+    body: args.body,
+  }).then((response) => response);
+}
