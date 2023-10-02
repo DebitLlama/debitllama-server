@@ -11,6 +11,8 @@
     "test_accounts": "deno test -A tests/apiv1/accounts.ts",
     "test_accountslug": "deno test -A tests/apiv1/accountslug.ts",
     "test_paymentIntents": "deno test -A tests/apiv1/payment_intents.ts",
+    "test_paymentIntentslug": "deno test -A tests/apiv1/payment_intentslug.ts",
+    "test_items": "deno test -A tests/apiv1/items.ts",
     "main": "deno run -A main.ts",
     "build": "deno run -A dev.ts build",
     "preview": "deno run -A main.ts"
