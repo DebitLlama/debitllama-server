@@ -54,8 +54,9 @@ import * as $48 from "./routes/app/updateWebhook.tsx";
 import * as $49 from "./routes/buyitnow.tsx";
 import * as $50 from "./routes/buyitnowlogout.tsx";
 import * as $51 from "./routes/index.tsx";
-import * as $52 from "./routes/logout.tsx";
-import * as $53 from "./routes/signup.tsx";
+import * as $52 from "./routes/login.tsx";
+import * as $53 from "./routes/logout.tsx";
+import * as $54 from "./routes/signup.tsx";
 import * as $$0 from "./islands/AccessTokenUISwitcher.tsx";
 import * as $$1 from "./islands/AccountDisplayElement.tsx";
 import * as $$2 from "./islands/AccountTopupOrClose.tsx";
@@ -145,8 +146,9 @@ const manifest = {
     "./routes/buyitnow.tsx": $49,
     "./routes/buyitnowlogout.tsx": $50,
     "./routes/index.tsx": $51,
-    "./routes/logout.tsx": $52,
-    "./routes/signup.tsx": $53,
+    "./routes/login.tsx": $52,
+    "./routes/logout.tsx": $53,
+    "./routes/signup.tsx": $54,
   },
   islands: {
     "./islands/AccessTokenUISwitcher.tsx": $$0,
