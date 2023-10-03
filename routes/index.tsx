@@ -40,7 +40,7 @@ export default function Home() {
                         <img src="https://raw.githubusercontent.com/StrawberryChocolateFudge/debitLLama-server/API_V1/static/yeah-llama.gif" width="250px" />
                         <div class={"flex flex-col justify-center mb-4 p-4"}>
                             <h2 class="text-4xl font-bold mt-2 text-gray-800 w-80">Easy merchant integration</h2>
-                            <p class="text-gray-600 whitespace-break-spaces w-80">Simply link to your custom checkout page, it's compatible with every website! Receive recurring crypto payments from your customers automatically afterwards.</p>
+                            <p class="text-gray-600 whitespace-break-spaces w-80">Simply embedd our checkout button, it's compatible with every website! Receive recurring crypto payments from your customers automatically afterwards.</p>
                         </div>
                     </div>
                 </div>
