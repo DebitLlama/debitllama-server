@@ -28,7 +28,7 @@ export default function Home() {
             <section class="flex flex-col justify-center mt-10 ">
                 <div class="flex flex-row justify-center">
                     <div class={"grow w-full flex flex-row justify-around flex-wrap gap-2 bg-gray-50 rounded m-8 shadow-lg max-w-7xl"}>
-                        <img src="./dancing-llama.gif" width="250" />
+                        <img src="https://raw.githubusercontent.com/StrawberryChocolateFudge/debitLLama-server/API_V1/static/dancing-llama.gif" width="250" />
                         <div class={"flex flex-col justify-center mb-4 p-4"}>
                             <h2 class="text-4xl font-bold mt-2 text-gray-800 w-80">Map your EOA to a Password</h2>
                             <p class="text-gray-600 whitespace-break-spaces w-80">Externally owned accounts require you to send transactions manually. Using DebitLlama you can connect your EOA and initiate payments on secure checkout pages, just by entering a password!</p>
@@ -37,7 +37,7 @@ export default function Home() {
                 </div>
                 <div class="flex flex-row justify-center">
                     <div class={"grow w-full flex flex-row justify-around flex-wrap gap-2 bg-gray-50 rounded m-8 shadow-lg max-w-7xl"}>
-                        <img src="./yeah-llama.gif" width="250px" />
+                        <img src="https://raw.githubusercontent.com/StrawberryChocolateFudge/debitLLama-server/API_V1/static/yeah-llama.gif" width="250px" />
                         <div class={"flex flex-col justify-center mb-4 p-4"}>
                             <h2 class="text-4xl font-bold mt-2 text-gray-800 w-80">Easy merchant integration</h2>
                             <p class="text-gray-600 whitespace-break-spaces w-80">Simply link to your custom checkout page, it's compatible with every website! Receive recurring crypto payments from your customers automatically afterwards.</p>
