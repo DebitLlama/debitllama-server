@@ -14,7 +14,7 @@
     "test_paymentIntentslug": "deno test -A tests/apiv1/payment_intentslug.ts",
     "test_items": "deno test -A tests/apiv1/items.ts",
     "main": "deno run -A main.ts",
-    "build": "deno run -A dev.ts build",
+    "build": "TESTACCESSTOKEN=asd SUPABASE_URL=asf SUPABASE_KEY=asd ETHENCRYPTPUBLICKEY=asf ETHENCRYPTPRIVATEKEY=sad deno run -A dev.ts build",
     "preview": "deno run -A main.ts"
   },
   "imports": {
