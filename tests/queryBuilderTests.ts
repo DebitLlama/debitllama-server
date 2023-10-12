@@ -15,11 +15,10 @@ async function main() {
     },
   });
 
-  const query = client.from("Accounts").select();
-  query.eq("name", "My another account");
-  const res = await query;
-
-  console.log(res)
+  const emailData = await queryBuilder.select().RPC.emailByUserId(
+    "10224224-3f34-4781-85bf-04f7529a5196",
+  );
+  console.log(emailData.data[0].email);
 }
 
 await main();
