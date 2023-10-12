@@ -23,5 +23,13 @@ read -s ethencryptpublickey
 echo "Who is the best devops guy ever? You are! Now Enter the ETHENCRYPTPRIVATEKEY and don't tell about it to anyone!"
 read -s ethencryptprivatekey
 
+echo "Enter SMTP Hostname:"
+read -s smtphostname
 
-ENV=production SUPABASE_URL=${supabase_url} SUPABASE_KEY=${supabase_key} ETHENCRYPTPUBLICKEY=${ethencryptpublickey} ETHENCRYPTPRIVATEKEY=${ethencryptprivatekey} pm2 start main.ts --interpreter="deno" --interpreter-args="run -A" 
+echo "Enter SMTP Username:"
+read -s smtpusername
+
+echo "Enter SMTP password"
+read -s smtppassword
+
+ENV=production SMTP_HOSTNAME=${smtphostname} SMTP_USERNAME=${smtpusername} SMTP_PASSWORD=${smtppassword}  SUPABASE_URL=${supabase_url} SUPABASE_KEY=${supabase_key} ETHENCRYPTPUBLICKEY=${ethencryptpublickey} ETHENCRYPTPRIVATEKEY=${ethencryptprivatekey} pm2 start main.ts --interpreter="deno" --interpreter-args="run -A" 
