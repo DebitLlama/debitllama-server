@@ -670,6 +670,13 @@
 	background: linear-gradient(white, #e5e7eb);
 }
 
+.text-gradient-gray-to-white {
+	background: -webkit-linear-gradient(black, #6366f1);
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
 .icon-spinner {
 	animation: spin-animation 0.5s infinite;
 	display: inline-block;
