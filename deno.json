@@ -32,7 +32,9 @@
     "@metamask/eth-sig-util": "https://esm.sh/@metamask/eth-sig-util@6.0.0",
     "buffer": "http://deno.land/x/node_buffer@1.1.0/mod.ts",
     "screen-size-detector": "https://esm.sh/screen-size-detector@1.0.4",
-    "jose": "https://deno.land/x/jose@v4.14.6/index.ts"
+    "jose": "https://deno.land/x/jose@v4.14.6/index.ts",
+    "@simplewebauthn/browser" : "https://esm.sh/@simplewebauthn/browser@8.3.1",
+    "@simplewebauthn/server": "https://esm.sh/@simplewebauthn/server@8.3.2"
   },
   "compilerOptions": {
     "jsx": "react-jsx",
