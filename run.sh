@@ -32,4 +32,4 @@ read -s smtpusername
 echo "Enter SMTP password"
 read -s smtppassword
 
-ENV=production SMTP_HOSTNAME=${smtphostname} SMTP_USERNAME=${smtpusername} SMTP_PASSWORD=${smtppassword}  SUPABASE_URL=${supabase_url} SUPABASE_KEY=${supabase_key} ETHENCRYPTPUBLICKEY=${ethencryptpublickey} ETHENCRYPTPRIVATEKEY=${ethencryptprivatekey} pm2 start main.ts --interpreter="deno" --interpreter-args="run -A" 
+TESTACCESSTOKEN=asd ENV=production SMTP_HOSTNAME=${smtphostname} SMTP_USERNAME=${smtpusername} SMTP_PASSWORD=${smtppassword}  SUPABASE_URL=${supabase_url} SUPABASE_KEY=${supabase_key} ETHENCRYPTPUBLICKEY=${ethencryptpublickey} ETHENCRYPTPRIVATEKEY=${ethencryptprivatekey} pm2 start main.ts --interpreter="deno" --interpreter-args="run -A" 
