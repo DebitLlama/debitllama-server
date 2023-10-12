@@ -244,3 +244,16 @@ export type AccessTokenRow = {
   creator_id: string;
   expiry_date_utc: string;
 };
+
+export enum TemporaryUrlsType {
+  VERIFYEMAILADDRESS = "VERIFYEMAILADDRESS",
+  PASSWORDRESETLINK = "PASSWORDRESETLINK",
+}
+
+export enum EMAILCONSTANTS {
+  noreply = "noreply@debitllama.com",
+  verifyEmailUrlBase = "https://debitllama.com/verifyEmail?q=",
+  verifyEmailSubject = "Verify your email address",
+  passwordResetUrlBase = "https://debitllama.com/passwordreset?q=",
+  passwordResetSubject = "Password reset requested",
+}
