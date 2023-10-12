@@ -24,11 +24,11 @@ export async function getUser(
   return await supabaseClient.auth.getUser(supaCreds);
 }
 
-export function generateApiAuthToken() {
-  const rand = () => {
-    return Math.random().toString(36).slice(2);
-  };
+export const rand = () => {
+  return Math.random().toString(36).slice(2);
+};
 
+export function generateApiAuthToken() {
   const token = () => {
     return "debitllama.APIv1_" + rand() + rand() + rand();
   };
