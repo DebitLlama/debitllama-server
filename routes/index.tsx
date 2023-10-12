@@ -31,8 +31,8 @@ export default function Home() {
 
             <section class="flex flex-col justify-center pt-10 bg-gradient-gray-to-white-variant2 max-w-7xl rounded mx-auto">
                 <div class="flex flex-row justify-center rounded border shadow-lg max-w-7xl mx-auto">
-                    <img class="bigScreen" src="/DashboardScreenshot.png" />
-                    <img class="smallScreen" src="/AccountScreenshot.png" />
+                    <img class="bigScreen" src="https://raw.githubusercontent.com/StrawberryChocolateFudge/debitLLama-server/API_V1/static/DashboardScreenshot.png" />
+                    <img class="smallScreen" src="https://raw.githubusercontent.com/StrawberryChocolateFudge/debitLLama-server/API_V1/static/AccountScreenshot.png" />
                 </div>
                 <div class="flex flex-row justify-center mt-5">
                     <div class="flex flex-row justify-around flex-wrap  p-8 rounded max-w-7xl">
@@ -75,7 +75,7 @@ export default function Home() {
 
                 </div>
                 <div class={"flex flex-row justify-center"}>
-                    <img src="/PaymentsImage.svg" />
+                    <img src="https://raw.githubusercontent.com/StrawberryChocolateFudge/debitLLama-server/dea5a287be9c210698396f3bd0522158cd243974/static/PaymentsImage.svg" />
                 </div>
             </section>
 
