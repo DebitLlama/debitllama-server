@@ -649,6 +649,44 @@ export default class QueryBuilder {
           return this.responseHandler(res);
         },
       },
+
+      PasswordResetUrls: {
+        byQ: async (q: string) => {
+          const res = await this.client.from("PasswordResetUrls")
+            .select()
+            .eq("q", q);
+          return this.responseHandler(res);
+        },
+        byNonce: async (nonce: string) => {
+          const res = await this.client.from("PasswordResetUrls")
+            .select()
+            .eq("nonce", nonce);
+          return this.responseHandler(res);
+        },
+      },
+      VerifiedEmails: {
+        byUserId: async (user_id: string) => {
+          const res = await this.client.from("VerifiedEmail")
+            .select()
+            .eq("user_id", user_id);
+
+          return this.responseHandler(res);
+        },
+        byUrl: async (url: string) => {
+          const res = await this.client.from("VerifiedEmail")
+            .select()
+            .eq("url", url);
+          return this.responseHandler(res);
+        },
+      },
+      RPC: {
+        emailByUserId: async (user_id: string) => {
+          const res = await this.client.rpc("get_email_by_user_uuid2", {
+            user_id,
+          });
+          return this.responseHandler(res);
+        },
+      },
     };
   }
 
@@ -877,6 +915,30 @@ export default class QueryBuilder {
           return this.responseHandler(res);
         },
       },
+      PasswordResetUrls: {
+        createNew: async (q: string, user_id: string, nonce: string) => {
+          const res = await this.client.from("PasswordResetUrls")
+            .insert({
+              created_at: new Date().toUTCString(),
+              q,
+              user_id,
+              nonce,
+            });
+          return this.responseHandler(res);
+        },
+      },
+      VerifiedEmails: {
+        createNew: async (user_id: string, url: string) => {
+          const res = await this.client.from("VerifiedEmail")
+            .insert({
+              created_at: new Date().toUTCString(),
+              user_id,
+              verified: false,
+              url,
+            });
+          return this.responseHandler(res);
+        },
+      },
     };
   }
 
@@ -1031,6 +1093,16 @@ export default class QueryBuilder {
           return this.responseHandler(res);
         },
       },
+      VerifiedEmails: {
+        updateToVerified: async (user_id: string) => {
+          const res = await this.client.from("VerifiedEmail")
+            .update({
+              verified: true,
+            }).eq("user_id", user_id);
+
+          return this.responseHandler(res);
+        },
+      },
     };
   }
 
@@ -1089,6 +1161,14 @@ export default class QueryBuilder {
             .delete()
             .eq("access_token", accessToken)
             .eq("creator_id", this.userid);
+          return this.responseHandler(res);
+        },
+      },
+      PasswordResetUrls: {
+        byQAndType: async (q: string) => {
+          const res = await this.client.from("PasswordResetUrls")
+            .delete()
+            .eq("q", q);
           return this.responseHandler(res);
         },
       },
