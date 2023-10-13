@@ -42,8 +42,7 @@ export default function Home() {
                     </div>
                 </div>
             </section>
-
-
+            <hr class="border max-w-7xl mx-auto" />
             <section class="flex flex-row justify-center mt-10 bg-gradient-white-to-gray max-w-7xl mx-auto">
                 <div class="flex flex-row justify-around max-w-7xl flex-wrap gap-4">
                     <div class="flex flex-col justify-center text-center">
@@ -70,7 +69,7 @@ export default function Home() {
                 </div>
             </section>
 
-            <section class="flex flex-col justify-center pt-10 bg-gradient-white-to-gray max-w-7xl mx-auto">
+            <section class="flex flex-col justify-center pt-10 bg-gradient-gray-to-white max-w-7xl mx-auto">
 
                 <div class="flex flex-row justify-center text-center pb-5">
                     <h2 class="text-4xl font-bold text-gray-800 ">Free to use! Transaction fees only!</h2>
@@ -79,7 +78,7 @@ export default function Home() {
                     <a href="https://debitllama.gitbook.io/debitllama/" class="font-bold w-42 text-white bg-black hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-lg px-5 py-2.5 text-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800">How we compare to others?</a>
                 </div>
                 <div class="flex flex-row justify-center text-center pb-5 mt-5">
-                    <h2 class="text-xl font-bold text-gray-800 ">Subscribe and forget it or cancel any time!</h2>
+                    <h2 class="text-xl font-bold text-gray-800 ">Subscriptions are set it and forget it or you can cancel any time!</h2>
                 </div>
                 <div class={"flex flex-row justify-center"}>
                     <img src="https://raw.githubusercontent.com/StrawberryChocolateFudge/debitLLama-server/dea5a287be9c210698396f3bd0522158cd243974/static/PaymentsImage.svg" width="400px" />
@@ -97,7 +96,7 @@ export default function Home() {
                 </div>
                 <div class="flex flex-row justify-center mb-5">
                     <h3 class="text-center text-lg">
-                        We use cutting edge Zero-knowledge proof technology to make subsciption payments happen!
+                        We use cutting edge Zero-knowledge proof technology to make subsciption payments happen securely!
                     </h3>
                 </div>
             </section>
