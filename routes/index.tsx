@@ -1,4 +1,5 @@
 import { Head } from "$fresh/runtime.ts";
+import { Tooltip, UnderlinedTd } from "../components/components.tsx";
 
 export default function Home() {
     return <>
@@ -35,9 +36,9 @@ export default function Home() {
                     <img class="smallScreen" src="https://raw.githubusercontent.com/StrawberryChocolateFudge/debitLLama-server/API_V1/static/AccountScreenshot.png" />
                 </div>
                 <div class="flex flex-row justify-center mt-5">
-                    <div class="flex flex-row justify-around flex-wrap  p-8 rounded max-w-7xl">
-                        <h2 class="text-xl font-bold mt-2 text-gray-800">Connect your Wallet and pay by entering a password!</h2>
-                        <p class="text-gray-600 whitespace-break-spaces">Externally owned accounts require you to send transactions manually. Using DebitLlama you can connect your wallet and pay with it later on secure checkout pages, just by entering a password!</p>
+                    <div class="flex flex-col flex-wrap justify-around flex-wrap  p-8 rounded max-w-7xl">
+                        <h2 class="text-xl font-bold mt-2 text-gray-800 text-center">We have crypto direct debit!</h2>
+                        <p class="text-gray-600 whitespace-break-spaces">Externally owned accounts require you to send transactions manually. We solved this problem!</p>
                     </div>
                 </div>
             </section>
@@ -62,33 +63,42 @@ export default function Home() {
                         </div>
                         <div class="py-4 px-4 mt-1 text-white overflow-auto">
                             <pre class="text-sm">
-                                {`<a href="https://debitllama.com/buyitnow/?q=<IDENTIFIER>"><img width="140px" src={"https://debitllama.com/buyitnow.png"}/></a>`}
+                                {`<a href="https://debitllama.com/buyitnow/?q=<IDENTIFIER>"><img width="140px" src="https://debitllama.com/buyitnow.png"/></a>`}
                             </pre>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section class="flex flex-col justify-center pt-10 bg-gradient-gray-to-white max-w-7xl mx-auto">
-                <div class="flex flex-row justify-center text-center pb-5">
-                    <h2 class="text-4xl font-bold text-gray-800 ">Set it and forget it or cancel any time!</h2>
+            <section class="flex flex-col justify-center pt-10 bg-gradient-white-to-gray max-w-7xl mx-auto">
 
+                <div class="flex flex-row justify-center text-center pb-5">
+                    <h2 class="text-4xl font-bold text-gray-800 ">Free to use! Transaction fees only!</h2>
+                </div>
+                <div class="flex flex-row justify-center mt-2">
+                    <a href="https://debitllama.gitbook.io/debitllama/" class="font-bold w-42 text-white bg-black hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-lg px-5 py-2.5 text-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800">How we compare to others?</a>
+                </div>
+                <div class="flex flex-row justify-center text-center pb-5 mt-5">
+                    <h2 class="text-xl font-bold text-gray-800 ">Subscribe and forget it or cancel any time!</h2>
                 </div>
                 <div class={"flex flex-row justify-center"}>
-                    <img src="https://raw.githubusercontent.com/StrawberryChocolateFudge/debitLLama-server/dea5a287be9c210698396f3bd0522158cd243974/static/PaymentsImage.svg" />
+                    <img src="https://raw.githubusercontent.com/StrawberryChocolateFudge/debitLLama-server/dea5a287be9c210698396f3bd0522158cd243974/static/PaymentsImage.svg" width="400px" />
                 </div>
             </section>
 
-
-
             <section class="flex flex-col justify-center bg-gradient-gray-to-white max-w-7xl mx-auto">
                 <div class="flex flex-row justify-center">
-                    <div class={"w-full flex flex-row justify-around flex-wrap gap-2 bg-gray-50 rounded m-8 max-w-7xl p-10"}>
+                    <div class={"w-full flex flex-row justify-around flex-wrap gap-2 bg-gray-50 rounded m-8 max-w-7xl pt-10 pl-10 pr-10"}>
                         <h1 class="text-center mx-auto text-4xl font-bold mt-2 text-gray-800">See the docs to learn more</h1>
                         <div class="flex flex-row justify-center mt-2">
                             <a href="https://debitllama.gitbook.io/debitllama/" class="font-bold w-42 text-white bg-black hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-lg px-5 py-2.5 text-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800">Read the Docs</a>
                         </div>
                     </div>
+                </div>
+                <div class="flex flex-row justify-center mb-5">
+                    <h3 class="text-center text-lg">
+                        We use cutting edge Zero-knowledge proof technology to make subsciption payments happen!
+                    </h3>
                 </div>
             </section>
         </div >
