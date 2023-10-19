@@ -1,4 +1,5 @@
-import { ChainIds, NetworkNames, SelectableCurrency, chainIdFromNetworkName, explorerUrl, explorerUrlAddressPath } from "../lib/shared/web3.ts";
+import { useEffect } from "preact/hooks";
+import { NetworkNames, SelectableCurrency, chainIdFromNetworkName, explorerUrl, explorerUrlAddressPath, getCurrenciesForNetworkName } from "../lib/shared/web3.ts";
 
 interface CurrencySelectDropdownProps {
     selectedNetwork: string,
@@ -8,10 +9,10 @@ interface CurrencySelectDropdownProps {
     availableNetworks: string[]
     selectedCurrency: SelectableCurrency,
     setSelectedCurrency: (to: SelectableCurrency) => void;
+    isWalletConnectPage: boolean
 }
 
 export default function CurrencySelectDropdown(props: CurrencySelectDropdownProps) {
-
 
     const onSelectNetwork = (event: any) => {
         props.setSelectedNetwork(event.target.value);
@@ -20,14 +21,17 @@ export default function CurrencySelectDropdown(props: CurrencySelectDropdownProp
     const onSelectCurrency = (event: any) => {
         props.setSelectedCurrency(JSON.parse(event.target.value))
     }
-    // TODO: Implement this when using multiple networks!
-    // useEffect(() => {
-    //     if (selectedNetwork === availableNetworks[0]) {
-    //         setSelectableCurrencyArray(ethereumCurrencies)
-    //     } else if (selectedNetwork === availableNetworks[1]) {
-    //         setSelectableCurrencyArray(bittorrentCurrencies);
-    //     }
-    // }, [selectedNetwork]);
+    useEffect(() => {
+        let currenciesArray = [];
+        if (props.isWalletConnectPage) {
+            currenciesArray = getCurrenciesForNetworkName[props.selectedNetwork as NetworkNames].filter((curr) => curr.native === false)
+        } else {
+            currenciesArray = getCurrenciesForNetworkName[props.selectedNetwork as NetworkNames]
+        }
+
+        props.setSelectableCurrencyArray(currenciesArray)
+        props.setSelectedCurrency(currenciesArray[0])
+    }, [props.selectedNetwork]);
 
     const chainId = chainIdFromNetworkName[props.selectedNetwork as NetworkNames];
     const explorerURLLink = explorerUrl[chainId] + explorerUrlAddressPath[chainId] + props.selectedCurrency.contractAddress;
