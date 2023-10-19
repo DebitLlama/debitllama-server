@@ -53,6 +53,11 @@ export interface RenderPurchaseDetails {
     debitTimes: string,
 }
 
+export type ShowOverlayError = {
+    showError: boolean,
+    message: string,
+    action: () => void
+}
 export interface LoggedInUiProps {
     item: ItemProps
     accounts: any;
@@ -87,6 +92,7 @@ export interface LoggedInUiProps {
 
     showOverlay: boolean;
     setShowOverlay: (to: boolean) => void;
+    showOverlayError: ShowOverlayError;
 
     accountTypeSwitchValue: AccountTypes;
     setAccountTypeSwitchValue: (to: AccountTypes) => void;
@@ -550,17 +556,14 @@ function handleError(msg: string) {
     // error function to display a snackbar is side effecty, vanilla magic
     const errorDisplay = document.getElementById("error-display") as HTMLDivElement;
     const errorText = document.getElementById("error-text") as HTMLParagraphElement;
-    // Ewwwwwww why I'm doing this? Am I lazy? haha
     errorText.textContent = msg;
 
     if (errorDisplay.classList.contains("hide")) {
         errorDisplay.classList.remove("hide");
     }
-    // LOOL this is gonna be so buggy I have no words!
     if (errorDisplay.classList.contains("fade-out-element")) {
         errorDisplay.classList.remove("fade-out-element")
     }
-    // haha It works good on first try! YAAAY
     errorDisplay.classList.add("fade-in-element");
     errorDisplay.classList.add("show");
     setTimeout(() => {
@@ -956,7 +959,7 @@ function LoggedInUi(props: LoggedInUiProps) {
     // I need to display the accounts as cards, they must be selectable so I need state here and a button to approve payment after typing the account password
     const acc = props.accounts[props.currentlyShowingAccount];
     return <div class="flex flex-col">
-        <Overlay show={props.showOverlay}></Overlay>
+        <Overlay show={props.showOverlay} error={props.showOverlayError}></Overlay>
         <div class="flex flex-col flex-wrap"></div>
         <div class="flex flex-col justify-center">
             <div class="flex flex-row justify-left flex-wrap" >
@@ -1076,6 +1079,11 @@ export default function BuyButtonPage(props: BuyButtonPageProps) {
     const [accountVisible, setAccountVisible] = useState(true);
 
     const [showOverlay, setShowOverlay] = useState(false);
+    const [showOverlayError, setShowOverlayError] = useState({
+        showError: false,
+        message: "",
+        action: () => setShowOverlay(false)
+    })
 
     const [accountTypeSwitchValue, setAccountTypeSwitchValue] = useState<AccountTypes>(AccountTypes.VIRTUALACCOUNT);
 
@@ -1180,6 +1188,7 @@ export default function BuyButtonPage(props: BuyButtonPageProps) {
             forwardClicked={forwardClicked}
             showOverlay={showOverlay}
             setShowOverlay={setShowOverlay}
+            showOverlayError={showOverlayError}
             accountTypeSwitchValue={accountTypeSwitchValue}
             setAccountTypeSwitchValue={setAccountTypeSwitchValue}
         ></LoggedInUi> : <LoggedOutUi buttonid={props.item.buttonId} url={props.url} ></LoggedOutUi>}
