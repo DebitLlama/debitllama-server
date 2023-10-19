@@ -66,9 +66,6 @@ export default function Login(props: PageProps) {
                     <div class="mx-auto">
                         <h2 class="text-2xl font-bold mb-5 text-center">Welcome to <span>Debit</span><span class="text-gray-600">Llama</span></h2>
                     </div>
-                    <div class="mx-auto">
-                        <h4 class="text-sm font-bold mb-5 text-center">Stage Environment Version 0.0.1 </h4>
-                    </div>
                     <div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0 bg-gradient-gray-to-white-variant2">
                         <div class="mx-auto pt-1 pb-1">
                             <h2 class="text-2xl text-center text-gray-600">User Login</h2>
