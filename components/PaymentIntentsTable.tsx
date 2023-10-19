@@ -1,6 +1,7 @@
 import { PaymentIntentsTableColNames, PaymentIntentsTablePages, Pricing } from "../lib/enums.ts";
 import { TooltipWithTitle, getPaymentIntentStatusLogo } from "./components.tsx";
 import { formatEther, parseEther } from "../lib/frontend/web3.ts";
+import { ChainIds, networkNameFromId } from "../lib/shared/web3.ts";
 
 export interface PaymentIntentsTablePropWithFilter {
     paymentIntentData: Array<any>
@@ -69,6 +70,7 @@ export function PaymentIntentsTable(props: PaymentIntentsTablePropWithFilter) {
                                 <th tabIndex={2} onClick={props.headerClicked(PaymentIntentsTableColNames.Status)} scope="col" class="cursor-pointer w-32 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
                                     <div class="flex flex-row"> Status {getArrows(props.sortDirection, PaymentIntentsTableColNames.Status, props.sortBy)}</div>
                                 </th>
+
                                 {props.forPage === PaymentIntentsTablePages.ITEM ? null :
                                     <th tabIndex={3} onClick={props.headerClicked(PaymentIntentsTableColNames.Payment)} scope="col" class="cursor-pointer w-32 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
                                         <div class="flex flex-row">  Price per Payment {getArrows(props.sortDirection, PaymentIntentsTableColNames.Payment, props.sortBy)}</div>
@@ -76,7 +78,7 @@ export function PaymentIntentsTable(props: PaymentIntentsTablePropWithFilter) {
                                 }
                                 {props.forPage === PaymentIntentsTablePages.ITEM ? null :
                                     <th tabIndex={3} onClick={props.headerClicked(PaymentIntentsTableColNames.Payment)} scope="col" class="cursor-pointer w-32 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
-                                        <div class="flex flex-row justify-between">  Total Payment {getArrows(props.sortDirection, PaymentIntentsTableColNames.Payment, props.sortBy)} <TooltipWithTitle extraStyle="right:-200px;" title=" ?" message={"Total is calculated with price per payment * total payments. For dynamic subsciptions this does not reflect the actual total payment, only the maximum limit that approved for spending!"}></TooltipWithTitle></div>
+                                        <div class="flex flex-row justify-between">  Total Payment {getArrows(props.sortDirection, PaymentIntentsTableColNames.Payment, props.sortBy)} <TooltipWithTitle extraStyle="right:-200px;" title=" ?" message={"Total is calculated with price per payment * total payments. For dynamic subscriptions this does not reflect the actual total payment, only the maximum limit that approved for spending!"}></TooltipWithTitle></div>
                                     </th>
                                 }
                                 <th tabIndex={4} onClick={props.headerClicked(PaymentIntentsTableColNames.UsedFor)} scope="col" class="cursor-pointer w-32 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
@@ -90,6 +92,9 @@ export function PaymentIntentsTable(props: PaymentIntentsTablePropWithFilter) {
                                 </th>
                                 <th tabIndex={6} onClick={props.headerClicked(PaymentIntentsTableColNames.CreatedDate)} scope="col" class="cursor-pointer w-32 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
                                     <div class="flex flex-row">Created Date {getArrows(props.sortDirection, PaymentIntentsTableColNames.CreatedDate, props.sortBy)}</div>
+                                </th>
+                                <th tabIndex={6} onClick={props.headerClicked(PaymentIntentsTableColNames.Network)} scope="col" class="cursor-pointer w-32 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
+                                    <div class="flex flex-row">Network{getArrows(props.sortDirection, PaymentIntentsTableColNames.Network, props.sortBy)}</div>
                                 </th>
                             </tr>
                         </thead>
@@ -134,6 +139,9 @@ export function PaymentIntentsTable(props: PaymentIntentsTablePropWithFilter) {
                                     <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap" onClick={paymentIntentRowClicked(data.paymentIntent)}>{getNextPaymentDateDisplay(data.nextPaymentDate)}</td>
                                     <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap" onClick={paymentIntentRowClicked(data.paymentIntent)}>
                                         {new Date(data.created_at).toLocaleString()}
+                                    </td>
+                                    <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap" onClick={paymentIntentRowClicked(data.paymentIntent)}>
+                                        {networkNameFromId[data.network as ChainIds]}
                                     </td>
                                 </tr>
                             })}

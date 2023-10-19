@@ -658,7 +658,7 @@ function CreateNewAccountUI(props: {
                 <TooltipWithTitle
                     title="Virtual Account?"
                     extraStyle="right: -70%"
-                    message="Virtual accounts are smart contract accounts that hold deposits. The value must be deposited into them. They can be created per subsciption if you want!"></TooltipWithTitle>}
+                    message="Virtual accounts are smart contract accounts that hold deposits. The value must be deposited into them. They can be created per subscription if you want!"></TooltipWithTitle>}
 
             <hr
                 class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />

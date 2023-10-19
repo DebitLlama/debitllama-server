@@ -3,7 +3,7 @@ import TableSearch from "../../components/TableSearch.tsx";
 import { formatTxHash } from "../../components/components.tsx";
 import { FilterFor, RelayerTxHistoryColNames } from "../../lib/enums.ts";
 import { fetchPaginatedTxHistory, fetchPaginatedTxHistoryByPaymentIntentId } from "../../lib/frontend/fetch.ts";
-import { ChainIds, getChainExplorerForChainId, walletCurrency } from "../../lib/shared/web3.ts";
+import { ChainIds, getChainExplorerForChainId, networkNameFromId, walletCurrency } from "../../lib/shared/web3.ts";
 import { useEffect, useState } from "preact/hooks";
 
 export interface RelayedTxHistoryProps {
@@ -12,7 +12,6 @@ export interface RelayedTxHistoryProps {
     searchBy: "user_id" | "paymentIntent_id",
     paymentIntent_id: number | undefined
 }
-//TODO: for dynamic payments the history should show the actual amount debited! and the max amount too!
 
 export default function RelayedTxHistory(props: RelayedTxHistoryProps) {
     const [currentTxHistoryData, setCurrentTxHistoryData] = useState<Array<any>>(props.txHistory);
@@ -130,6 +129,10 @@ export default function RelayedTxHistory(props: RelayedTxHistoryProps) {
                         Transaction
                     </th>
                     <th scope="col" class="w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                        Network
+                    </th>
+
+                    <th scope="col" class="w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
                         Date
                     </th>
                     <th scope="col" class="w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -146,6 +149,9 @@ export default function RelayedTxHistory(props: RelayedTxHistoryProps) {
                     return <tr class="cursor-pointer bg-white hover:bg-gray-300" onClick={onRowClicked(getChainExplorerForChainId(data.network, data.submittedTransaction))}>
                         <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
                             {formatTxHash(data.submittedTransaction)}
+                        </td>
+                        <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
+                            {networkNameFromId[data.network as ChainIds]}
                         </td>
                         <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
                             {new Date(data.created_at).toLocaleString()}

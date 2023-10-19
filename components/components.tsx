@@ -75,7 +75,7 @@ export function getDebitIntervalText(debitInterval: number, debitTimes: number) 
 
 export function getDebitIntervalTooltipText(debitInterval: number, debitTimes: number) {
     if (debitTimes === 1) {
-        return "You will only pay once and then the subsciption agreement is finished!";
+        return "You will only pay once and then the subscription agreement is finished!";
     }
     if (debitInterval === 0) {
         return "Caution! The subscription agreement doesn't enforce any limit on withdrawal times."
@@ -196,7 +196,7 @@ export function getPaymentIntentStatusTooltip(status: PaymentIntentStatus | stri
         case PaymentIntentStatus.ACCOUNTBALANCETOOLOW:
             return `The account balance is too low to pay for this ${getName}. ${forPage === "account" ? "Please top up your balance to continue!" : "Contact the customer if they don't resolve this else the payment can't continue."}`
         default:
-            return "The subsciption status"
+            return "The subscription status"
     }
 }
 

@@ -55,7 +55,7 @@ export default function BuyPageLayout(props: BuyPagelayoutProps) {
                                 <tr>
                                     <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-200 text-sm" >Subscription:</UnderlinedTd>
                                     <UnderlinedTd extraStyles=""><p>{props.item.name}</p></UnderlinedTd>
-                                    <UnderlinedTd extraStyles=""><Tooltip message="Check the name of the subsciption to make sure you are on the right page!"></Tooltip></UnderlinedTd>
+                                    <UnderlinedTd extraStyles=""><Tooltip message="Check the name of the subscription to make sure you are on the right page!"></Tooltip></UnderlinedTd>
                                 </tr>
                                 <tr>
                                     <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-200 text-sm" >{getMaxDebitColTitleFromPricing(props.item.pricing)}</UnderlinedTd>

@@ -114,7 +114,7 @@ export default function Home() {
                     </div>
                     <div class="flex flex-row justify-center mb-5">
                         <h3 class="text-center text-lg">
-                            We use cutting edge Zero-knowledge proof technology to make subsciption payments happen securely!
+                            We use cutting edge Zero-knowledge proof technology to make subscription payments happen securely!
                         </h3>
                     </div>
                 </div>

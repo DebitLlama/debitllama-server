@@ -5,12 +5,12 @@ import { AccountTypes } from "../enums.ts";
 import { ChainIds, networkNameFromId } from "../shared/web3.ts";
 
 export enum EventTypes_ApiV1 {
-  customerSubsciptionCreated = "customer.subsciption.created",
-  customerSubsciptionCancelled = "customer.subsciption.cancelled",
-  customerSubsciptionPayment = "customer.subsciption.payment",
-  customerSubsciptionFinished = "customer.subsciption.finished",
-  customerSubsciptionBalanceLow = "customer.subsciption.balancelow",
-  customerSubsciptionBalanceUpdated = "customer.subsciption.balanceupdated",
+  customerSubscriptionCreated = "customer.subscription.created",
+  customerSubscriptionCancelled = "customer.subscription.cancelled",
+  customerSubscriptionPayment = "customer.subscription.payment",
+  customerSubscriptionFinished = "customer.subscription.finished",
+  customerSubscriptionBalanceLow = "customer.subscription.balancelow",
+  customerSubscriptionBalanceUpdated = "customer.subscription.balanceupdated",
   merchantRelayerBalanceLow = "merchant.relayer.balancelow",
   dynamicPaymentRequestCreated = "merchant.request.created",
   dynamicPaymentRequestLocked = "merchant.request.locked",
@@ -18,12 +18,12 @@ export enum EventTypes_ApiV1 {
   dynamicPaymentRequestCompleted = "merchant.request.completed",
 }
 
-export enum SubsciptionStatus_ApiV1 {
-  CREATED = "Created", // A subsciption was created and its ready to be relayed
-  CANCELLED = "Cancelled", // A subsciption was cancelled
+export enum SubscriptionStatus_ApiV1 {
+  CREATED = "Created", // A subscription was created and its ready to be relayed
+  CANCELLED = "Cancelled", // A subscription was cancelled
   ACTIVE = "Active", // A subscription is active, means the payments are recurring
   COMPLETED = "Completed",
-  BLOCKED = "Blocked", // Blocked subsciption is delaying because of invalid account balance or relayer balance
+  BLOCKED = "Blocked", // Blocked subscription is delaying because of invalid account balance or relayer balance
 }
 
 export enum PaymentIntentStatus_ApiV1 {
@@ -163,7 +163,7 @@ export interface WebhookEvents_ApiV1 {
   api_version: string; //"2023-09-24", // The last time the Api version was updated,
   type: EventTypes_ApiV1;
   data: EventData_ApiV1;
-  status: SubsciptionStatus_ApiV1;
+  status: SubscriptionStatus_ApiV1;
 }
 
 export const APIV1 = "https://debitllama.com/api/v1/";

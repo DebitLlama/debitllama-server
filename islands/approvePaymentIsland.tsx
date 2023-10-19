@@ -24,13 +24,21 @@ export default function ApprovePaymentIsland(props: ApprovePaymentIslandProps) {
     const [errorMessage, setErrorMessage] = useState("");
     const [success, setSuccess] = useState(false);
 
+    // Sometimes the button submits the request twice for some reason. If it submitted it once I lock it so it cant do again!
+    const [payClickLocked, setLockPayClicked] = useState(false);
+
     async function payClicked() {
+
         const decryptedNote = await aesDecryptData(props.symmetricEncryptedNote, password);
         if (decryptedNote === "") {
             setErrorMessage("Invalid password");
             return;
         } else {
             setErrorMessage("");
+            if (payClickLocked) {
+                return;
+            }
+            setLockPayClicked(true);
         }
         const paymentIntent = await createPaymentIntent({
             paymentIntentSecret: {
@@ -44,7 +52,11 @@ export default function ApprovePaymentIsland(props: ApprovePaymentIslandProps) {
                 wasmFilePath: "/directDebit.wasm",
                 zkeyFilePath: "/directDebit_final.zkey"
             }
-        }).catch(err => console.error(err));
+        }).catch(err => {
+            console.error(err)
+            setLockPayClicked(false);
+            return;
+        });
         if (paymentIntent !== null) {
 
             await uploadPaymentIntent({
@@ -70,7 +82,8 @@ export default function ApprovePaymentIsland(props: ApprovePaymentIslandProps) {
                             toNoteHex(paymentIntent.publicSignals[0]));
                     }, 3000)
                 } else {
-                    setErrorMessage("Unable to save Payment Intent")
+                    setErrorMessage("Unable to save Payment Intent");
+                    setLockPayClicked(false);
                 }
             })
         }
@@ -121,8 +134,8 @@ export default function ApprovePaymentIsland(props: ApprovePaymentIslandProps) {
             </div>
         </>}
         <div class="bg-gray-100 border-t border-b border-gray-500 text-gray-700 px-4 py-3" role="alert">
-            <p class="font-bold">Make sure you are on debitllama.com! By entering the password you accept the terms of this subsciption and prove you are the owner of this account. This is a secure page, your password and decrypted account remains confidental and never leaves the browser.</p>
-            <p class="text-sm">DebitLlama does not collect or store your password or decrypted account. If you lost or forgot your account password, we can't recover it for you. You can always withdraw the account balance using the wallet that created it. By clicking Subscibe you accept to create a zero-knowledge proof that will be used to debit the payments during the subsciption period. If you wish to cancel the subsciption, you can cancel it any time using your wallet.</p>
+            <p class="font-bold">Make sure you are on debitllama.com! By entering the password you accept the terms of this subscription and prove you are the owner of this account. This is a secure page, your password and decrypted account remains confidental and never leaves the browser.</p>
+            <p class="text-sm">DebitLlama does not collect or store your password or decrypted account. If you lost or forgot your account password, we can't recover it for you. You can always withdraw the account balance using the wallet that created it. By clicking Subscibe you accept to create a zero-knowledge proof that will be used to debit the payments during the subscription period. If you wish to cancel the subscription, you can cancel it any time using your wallet.</p>
         </div>
     </div>
 }

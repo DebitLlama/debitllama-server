@@ -1,6 +1,7 @@
 import { Handlers } from "$fresh/server.ts";
 import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 import { estimateRelayerGas } from "../../lib/backend/web3.ts";
+import { sendPaymentIntentCreatedEmail } from "../../lib/email/doSend.ts";
 import { AccountTypes, PaymentIntentStatus, Pricing } from "../../lib/enums.ts";
 import { State } from "../_middleware.ts";
 
@@ -84,6 +85,18 @@ export const handler: Handlers<any, State> = {
     if (insertError !== null) {
       return new Response(null, { status: 500 });
     }
+
+    // Send an email to the creator of the payment intent to notify him that it was saved!
+    const customerEmailData = await select.RPC.emailByUserId(
+      ctx.state.userid as string,
+    );
+    const payeeEmailData = await select.RPC.emailByUserId(itemData[0].payee_id);
+
+    await sendPaymentIntentCreatedEmail(
+      customerEmailData.data[0].email,
+      payeeEmailData.data[0].email,
+      paymentIntent,
+    );
 
     //Update the debit item with how many payment intents are related to it
     await update.Items.paymentIntentsCountByButtonId(
