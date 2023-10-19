@@ -2,7 +2,7 @@ import { useState } from 'preact/hooks';
 import Overlay from "../components/Overlay.tsx";
 import { approveSpend, disconnectWallet, getContract, handleNetworkSelect, requestAccounts } from "../lib/frontend/web3.ts";
 import { ChainIds } from '../lib/shared/web3.ts';
-import { redirectToAccountPage, redirectToAccountsPage } from '../lib/frontend/fetch.ts';
+import { redirectToAccountPage } from '../lib/frontend/fetch.ts';
 
 export interface WalletApproveOrDisconnectProps {
     chainId: ChainIds,
@@ -15,15 +15,21 @@ export interface WalletApproveOrDisconnectProps {
 export default function WalletApproveOrDisconnect(props: WalletApproveOrDisconnectProps) {
     const [showOverlay, setShowOverlay] = useState(false);
     const [approveAmount, setApproveAmount] = useState("");
+    const [showOverlayError, setShowOverlayError] = useState({
+        showError: false,
+        message: "",
+        action: () => setShowOverlay(false)
+    })
+
 
     const handleError = (err: string) => {
-        console.log(err);
+        setShowOverlayError({ ...showOverlayError, showError: true, message: err })
     }
 
     async function approveClicked(event: any) {
         event.preventDefault();
 
-        const provider = await handleNetworkSelect(props.chainId, handleError)
+        const provider = await handleNetworkSelect(props.chainId, console.log)
         if (!provider) {
             return;
         }
@@ -33,14 +39,14 @@ export default function WalletApproveOrDisconnect(props: WalletApproveOrDisconne
             props.erc20ContractAddress,
             "/ERC20.json");
         setShowOverlay(true);
+        setShowOverlayError({ ...showOverlayError, showError: false, message: "" })
 
         const approveTx = await approveSpend(
             erc20Contract,
             props.debitContractAddress,
             approveAmount
         ).catch(err => {
-            setShowOverlay(false);
-            console.log(err)
+            handleError("Unable to approve spend!")
         });
 
         if (approveTx !== undefined) {
@@ -49,8 +55,7 @@ export default function WalletApproveOrDisconnect(props: WalletApproveOrDisconne
                     location.reload();
                 }
             }).catch((err: any) => {
-                setShowOverlay(false);
-                console.log(err)
+                handleError("Transaction failed!")
             })
         }
     }
@@ -67,29 +72,29 @@ export default function WalletApproveOrDisconnect(props: WalletApproveOrDisconne
             "/ConnectedWallets.json"
         )
         setShowOverlay(true);
+        setShowOverlayError({ ...showOverlayError, showError: false, message: "" })
         const disconnectTx = await disconnectWallet(
             contract,
             props.commitment,
         ).catch(err => {
-            setShowOverlay(false);
-            console.log(err)
+            handleError("Unable to disconnect wallet! Check if you are using the correct account!")
         })
         if (disconnectTx !== undefined) {
             await disconnectTx.wait().then((receipt: any) => {
                 if (receipt.status === 1) {
                     redirectToAccountPage(props.commitment);
                 } else {
-                    setShowOverlay(false)
+                    handleError("Transaction failed!")
                 }
             }).catch((err: any) => {
-                setShowOverlay(false);
+                handleError("Transaction failed")
             })
         }
     }
 
     return <>
         <div class="w-full place-items-start text-left mt-2">
-            <Overlay show={showOverlay}></Overlay>
+            <Overlay show={showOverlay} error={showOverlayError}></Overlay>
             <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Allowance:</label>
             <form onSubmit={approveClicked} class="flex flex-row justofy-between flex-wrap gap-2"
             >

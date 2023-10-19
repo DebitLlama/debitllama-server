@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks';
 import Overlay from "../components/Overlay.tsx";
-import { ChainIds, NetworkNames, SelectableCurrency, availableNetworks, bittorrentCurrencies, chainIdFromNetworkName, getConnectedWalletsContractAddress } from "../lib/shared/web3.ts";
+import { ChainIds, NetworkNames, SelectableCurrency, availableNetworks, bittorrentCurrencies, chainIdFromNetworkName, getConnectedWalletsContractAddress, getCurrenciesForNetworkName } from "../lib/shared/web3.ts";
 import CurrencySelectDropdown from "./CurrencySelectDropdown.tsx";
 import AccountPasswordInput from "./accountPasswordInput.tsx";
 import { connectWallet, connectedWalletAlready, getContract, handleNetworkSelect, requestAccounts } from '../lib/frontend/web3.ts';
@@ -23,6 +23,12 @@ interface ConnectWalletPageFormProps {
 
 export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps) {
     const [showOverlay, setShowOverlay] = useState(false);
+    const [showOverlayError, setShowOverlayError] = useState({
+        showError: false,
+        message: "",
+        action: () => setShowOverlay(false)
+    })
+
     const [name, setName] = useState("");
     const [password, setPassword] = useState("");
     const [passwordAgain, setPasswordAgain] = useState("");
@@ -32,7 +38,8 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
 
     const [connectWalletButtonText, setConnectWalletButtonText] = useState("Connect Wallet");
     const [selectedNetwork, setSelectedNetwork] = useState(availableNetworks[0]);
-    const [selectableCurrencyArray, setSelectableCurrencyArray] = useState<SelectableCurrency[]>(bittorrentCurrencies.filter((curr) => curr.native === false));
+    
+    const [selectableCurrencyArray, setSelectableCurrencyArray] = useState<SelectableCurrency[]>(getCurrenciesForNetworkName[selectedNetwork as NetworkNames].filter((curr) => curr.native === false));
     const [selectedCurrency, setSelectedCurrency] = useState<SelectableCurrency>(selectableCurrencyArray[0]);
 
     const [walletTokenUsedError, setShowwalletTokenUsedError] = useState(false);
@@ -118,7 +125,7 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
             setShowwalletTokenUsedError(true);
             return;
         }
-
+        setShowOverlayError({ ...showOverlayError, showError: false, message: "" })
         setShowOverlay(true);
         const tx = await connectWallet(
             contract,
@@ -126,7 +133,7 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
             selectedCurrency.contractAddress,
             virtualaccount.encryptedNote).catch(err => {
                 console.log("connect wallet err", err)
-                setShowOverlay(false);
+                setShowOverlayError({ ...showOverlayError, showError: true, message: "Unable to connect to smart contract" })
             });
 
         if (tx !== undefined) {
@@ -146,19 +153,20 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
                         console.error(await res.json())
                     }
                 } else {
-                    setShowOverlay(false);
+                    setShowOverlayError({ ...showOverlayError, showError: true, message: "Transaction failed" })
+
                 }
             })).catch((err: any) => {
-                setShowOverlay(false);
+                setShowOverlayError({ ...showOverlayError, showError: true, message: "Transaction failed" })
+
             })
         }
     }
 
     return <form onSubmit={onSubmitForm} class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md" method="POST">
-        <Overlay show={showOverlay} ></Overlay>
+        <Overlay show={showOverlay} error={showOverlayError} ></Overlay>
         <h1 class="text-2xl font-bold text-left">Connect Wallet</h1>
         <h4 class="text-md mb-6">A connected wallet will allow you to spend tokens directly from your cold wallet while your allowance lasts. You can only have 1 connected wallet per token. <br /></h4>
-        <TestnetTokens chainId={chainIdFromNetworkName[selectedNetwork as NetworkNames]} ></TestnetTokens>
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Account Name</label>
             <input value={name} onChange={(event: any) => setName(event.target.value)} required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
@@ -172,7 +180,9 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
             availableNetworks={availableNetworks}
             selectedCurrency={selectedCurrency}
             setSelectedCurrency={setSelectedCurrencyHook}
+            isWalletConnectPage={true}
         ></CurrencySelectDropdown>
+        <TestnetTokens chainId={chainIdFromNetworkName[selectedNetwork as NetworkNames]} ></TestnetTokens>
         <AccountPasswordInput
             title="Account Password"
             password={password}

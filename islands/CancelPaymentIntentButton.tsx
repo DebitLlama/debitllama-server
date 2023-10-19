@@ -16,7 +16,12 @@ export interface CancelPaymentIntentButtonProps {
 export default function CancelPaymentIntentButton(props: CancelPaymentIntentButtonProps) {
     const [showError, setShowError] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
-    const [showOvelay, setShowOvelay] = useState(false);
+    const [showOvelay, setShowOverlay] = useState(false);
+    const [showOverlayError, setShowOverlayError] = useState({
+        showError: false,
+        message: "",
+        action: () => setShowOverlay(false)
+    })
 
     const handleError = (msg: string) => {
         setShowError(true);
@@ -50,7 +55,8 @@ export default function CancelPaymentIntentButton(props: CancelPaymentIntentButt
         const publicSignals = JSON.parse(props.paymentIntent.publicSignals);
 
         const hashes = [toNoteHex(publicSignals[0]), toNoteHex(publicSignals[1])];
-        setShowOvelay(true)
+        setShowOverlayError({ ...showOverlayError, showError: false, message: "" })
+        setShowOverlay(true)
         const tx = await cancelPaymentIntent(
             contract,
             packToSolidityProof(proof),
@@ -62,7 +68,7 @@ export default function CancelPaymentIntentButton(props: CancelPaymentIntentButt
                 debitInterval: props.paymentIntent.debitInterval,
                 payment: props.paymentIntent.maxDebitAmount
             }).catch((err) => {
-                setShowOvelay(false);
+                setShowOverlayError({ ...showOverlayError, showError: true, message: "Unable to create transaction" })
             })
 
         await tx.wait().then(async (receipt: any) => {
@@ -78,18 +84,20 @@ export default function CancelPaymentIntentButton(props: CancelPaymentIntentButt
                     location.reload();
                 } else {
                     handleError("An error occured while updating the database")
+                    setShowOverlayError({ ...showOverlayError, showError: true, message: "Updating database failed!" })
                 }
             } else {
-                setShowOvelay(false);
+                setShowOverlayError({ ...showOverlayError, showError: true, message: "Transaction failed!" })
             }
         }).catch((err: any) => {
-            setShowOvelay(false);
+            setShowOverlayError({ ...showOverlayError, showError: true, message: "Transaction failed!" })
+
         })
     }
 
 
     return <div class={"flex flex-col justify-center"}>
-        <Overlay show={showOvelay}></Overlay>
+        <Overlay show={showOvelay} error={showOverlayError}></Overlay>
         {props.paymentIntent.statusText === PaymentIntentStatus.CANCELLED ? <p class="text-sm text-red-500">Payment Intent Cancelled!</p> :
             <button
                 disabled={props.paymentIntent.statusText === PaymentIntentStatus.CANCELLED}

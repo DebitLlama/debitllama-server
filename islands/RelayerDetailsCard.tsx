@@ -15,6 +15,12 @@ export default function RelayerDetailsCard(props: RelayerDetailsCardProps) {
     const [showError, setShowError] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [showOverlay, setShowOverlay] = useState(false);
+    const [showOverlayError, setShowOverlayError] = useState({
+        showError: false,
+        message: "",
+        action: () => setShowOverlay(false)
+    })
+
 
     const onSelectNetwork = (event: any) => {
         setNetworkSelected(event.target.value);
@@ -45,9 +51,11 @@ export default function RelayerDetailsCard(props: RelayerDetailsCardProps) {
             "/RelayerGasTracker.json"
         )
         setShowOverlay(true)
+        setShowOverlayError({ ...showOverlayError, showError: false, message: "" })
+
         const tx = await topupRelayer(contract, topUpAmount).catch(err => {
             console.log(err)
-            setShowOverlay(false)
+            setShowOverlayError({ ...showOverlayError, showError: true, message: "Unable to top up relayer!" })
             handleError("Unable to submit transaction!")
         });
 
@@ -67,7 +75,8 @@ export default function RelayerDetailsCard(props: RelayerDetailsCardProps) {
                     }).catch((err) => {
                         setShowError(true);
                         setErrorMessage("An error occured. Contract the tech support! ErrorMessage:" + err.message)
-                        setShowOverlay(false)
+                        setShowOverlayError({ ...showOverlayError, showError: true, message: "An error occured when updating the relayer. Contact support!" })
+
                     }).then((status: any) => {
                         if (status === 200) {
                             location.reload();
@@ -77,8 +86,8 @@ export default function RelayerDetailsCard(props: RelayerDetailsCardProps) {
                         }
                     })
             } else {
-                handleError("Transaction Failed!")
-                setShowOverlay(false);
+                setShowOverlayError({ ...showOverlayError, showError: true, message: "Transaction failed!" })
+
             }
         })
     }
@@ -89,7 +98,7 @@ export default function RelayerDetailsCard(props: RelayerDetailsCardProps) {
             {availableNetworks.map((network) => <option value={network}>{network}</option>)}
         </select>
     </div>
-        <Overlay show={showOverlay}></Overlay>
+        <Overlay show={showOverlay} error={showOverlayError}></Overlay>
         <table class="min-w-full divide-y divide-y-reverse divide-x divide-x-reverse divide-gray-200 dark:divide-gray-700">
             <thead>
                 <tr>
@@ -127,7 +136,7 @@ export default function RelayerDetailsCard(props: RelayerDetailsCardProps) {
 
 export function IsBalanceMissing(networkName: NetworkNames, relayerData: any) {
     const missingBalance = mapNetworkNameToMissingBalanceColumn(networkName, relayerData);
-    if (missingBalance === null) {
+    if (missingBalance === "") {
         return null;
     }
     if (parseEther(missingBalance) !== BigInt("0")) {
