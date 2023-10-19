@@ -6,18 +6,24 @@
     "test_enc": "deno test tests/encryption.ts",
     "test_queryFilter": "deno run -A tests/queryFilter.ts --allow-net",
     "livetest_paymentIntentResetting": "deno run -A tests/paymentIntentResetting.ts --allow-net",
-    "livetest_queryBuilderTests": "deno run -A tests/queryBuilderTests.ts --allow-new",
+    "livetest_queryBuilderTests": "deno run -A tests/queryBuilderTests.ts --allow-net",
+    "test_v1": "deno test -A tests/apiv1/index.ts",
+    "test_accounts": "deno test -A tests/apiv1/accounts.ts",
+    "test_accountslug": "deno test -A tests/apiv1/accountslug.ts",
+    "test_paymentIntents": "deno test -A tests/apiv1/payment_intents.ts",
+    "test_paymentIntentslug": "deno test -A tests/apiv1/payment_intentslug.ts",
+    "test_items": "deno test -A tests/apiv1/items.ts",
     "main": "deno run -A main.ts",
-    "build": "deno run -A dev.ts build",
+    "build": "SMTP_HOSTNAME=asd SMTP_USERNAME=asd SMTP_PASSWORD=asd TESTACCESSTOKEN=asd SUPABASE_URL=asf SUPABASE_KEY=asd ETHENCRYPTPUBLICKEY=asf ETHENCRYPTPRIVATEKEY=sad deno run -A dev.ts build",
     "preview": "deno run -A main.ts"
   },
   "imports": {
-    "$fresh/": "https://deno.land/x/fresh@1.4.3/",
-    "preact": "https://esm.sh/preact@10.15.1",
-    "preact/": "https://esm.sh/preact@10.15.1/",
-    "preact-render-to-string": "https://esm.sh/*preact-render-to-string@6.2.1",
-    "@preact/signals": "https://esm.sh/*@preact/signals@1.1.3",
-    "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.2.3",
+    "$fresh/": "https://deno.land/x/fresh@1.5.2/",
+    "preact": "https://esm.sh/preact@10.18.1",
+    "preact/": "https://esm.sh/preact@10.18.1/",
+    "preact-render-to-string": "https://esm.sh/*preact-render-to-string@6.2.2",
+    "@preact/signals": "https://esm.sh/*@preact/signals@1.2.1",
+    "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.5.0",
     "twind": "https://esm.sh/twind@0.16.19",
     "twind/": "https://esm.sh/twind@0.16.19/",
     "$std/": "https://deno.land/std@0.193.0/",
@@ -25,26 +31,12 @@
     "$ethers": "https://esm.sh/ethers@6.5.1",
     "@metamask/eth-sig-util": "https://esm.sh/@metamask/eth-sig-util@6.0.0",
     "buffer": "http://deno.land/x/node_buffer@1.1.0/mod.ts",
-    "screen-size-detector": "https://esm.sh/screen-size-detector@1.0.4"
+    "screen-size-detector": "https://esm.sh/screen-size-detector@1.0.4",
+    "jose": "https://deno.land/x/jose@v4.14.6/index.ts",
+    "@simplewebauthn/browser": "https://esm.sh/@simplewebauthn/browser@8.3.1",
+    "@simplewebauthn/server": "https://esm.sh/@simplewebauthn/server@8.3.2"
   },
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "jsxImportSource": "preact"
-  },
-  "lint": {
-    "rules": {
-      "tags": [
-        "fresh",
-        "recommended"
-      ]
-    },
-    "exclude": [
-      "_fresh"
-    ]
-  },
-  "fmt": {
-    "exclude": [
-      "_fresh"
-    ]
-  }
+  "compilerOptions": { "jsx": "react-jsx", "jsxImportSource": "preact" },
+  "lint": { "rules": { "tags": ["fresh", "recommended"] } },
+  "exclude": ["**/_fresh/*"]
 }

@@ -7,11 +7,11 @@ import { ChainIds, getConnectedWalletsContractAddress, getVirtualAccountsContrac
 import AccountTopupOrClose from "../../islands/AccountTopupOrClose.tsx";
 import { AccountCardElement } from "../../components/AccountCardElement.tsx";
 import QueryBuilder from "../../lib/backend/queryBuilder.ts";
-import { updatePaymentIntentsWhereAccountBalanceWasAdded } from "../../lib/backend/businessLogic.ts";
+import { refreshDBBalance } from "../../lib/backend/businessLogic.ts";
 import { AccountTypes, Pricing } from "../../lib/enums.ts";
 import WalletApproveOrDisconnect from "../../islands/WalletApproveOrDisconnect.tsx";
 import WalletDetailsFetcher from "../../islands/WalletDetailsFetcher.tsx";
-import { formatEther, getAccount } from "../../lib/backend/web3.ts";
+import { formatEther } from "../../lib/backend/web3.ts";
 import { parseEther } from "../../lib/frontend/web3.ts";
 import { ZeroAddress } from "$ethers";
 
@@ -21,8 +21,6 @@ export const handler: Handlers<any, State> = {
         const query = url.searchParams.get("q") || "";
         const queryBuilder = new QueryBuilder(ctx);
         const select = queryBuilder.select();
-        const update = queryBuilder.update();
-
         try {
             const { data } = await select.Accounts.byCommitment(query);
             if (data.length === 0) {
@@ -41,32 +39,7 @@ export const handler: Handlers<any, State> = {
 
             const networkId = data[0].network_id;
 
-            const onChainAccount = await getAccount(query, networkId, data[0].accountType);
-
-            // If account on chain is active but the balance is not the same as the balance I saved
-            if (onChainAccount.account[0] && data[0].balance !== formatEther(onChainAccount.account[3])) {
-
-                //Check if there were payment intents with account balance too low and 
-                // calculate how much balance was added and set them to recurring or created where possible
-                await updatePaymentIntentsWhereAccountBalanceWasAdded(queryBuilder, onChainAccount.account[3], data[0].id);
-
-                // Update the account balance finally
-
-                await update.Accounts.balanceAndClosedById(onChainAccount.account[3], !onChainAccount.account[0], data[0].id)
-
-            }
-
-            // If account is not active but the data saved in teh db (closed) is still false
-            // This is a separate condition to handle edge case when an empty account is closed, we don't check balance!
-            if (!onChainAccount.account[0] && !data[0].closed) {
-                await update.Accounts.balanceAndClosedById(onChainAccount.account[3], !onChainAccount.account[0], data[0].id)
-
-                // I need to void all payment intents that are not paid or cancelled!
-                // This will only void them in the database, but the proofs are already unusable since the account is not active anymore!
-                await update.PaymentIntents.toCancelledByAccountIdForCreator(data[0].id);
-            }
-
-
+            const onChainAccount = await refreshDBBalance(data, query, queryBuilder)
 
             if (!onChainAccount.account[0]) {
                 // If it's closed I redirect to accounts page!
@@ -95,6 +68,7 @@ export const handler: Handlers<any, State> = {
                 });
 
         } catch (err) {
+            console.log(err);
             return new Response(null, { status: 500 })
         }
     }

@@ -514,6 +514,10 @@
 	display: block;
 }
 
+.codeDisplayWidth {
+	width: 520px;
+}
+
 /* When the browser is  530px or smaller */
 @media screen and (max-width: 530px) {
 	.overflowingTableData {
@@ -523,6 +527,11 @@
 	.hideOnSmallScreen {
 		display: none;
 	}
+
+	.codeDisplayWidth {
+		width: 300px;
+	}
+
 
 }
 
@@ -668,6 +677,13 @@
 
 .bg-gradient-white-to-gray {
 	background: linear-gradient(white, #e5e7eb);
+}
+
+.text-gradient-gray-to-white {
+	background: -webkit-linear-gradient(black, #6366f1);
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
 }
 
 .icon-spinner {

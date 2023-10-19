@@ -83,6 +83,23 @@ export default class QueryBuilder {
             .range(rangeFrom, rangeTo);
           return this.responseHandler(res);
         },
+        allForAPIV1: async (
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+          filter: Array<{ parameter: string; value: string }>,
+        ) => {
+          const query = this.client.from("Items")
+            .select("*", { count: "exact" })
+            .order(order, { ascending })
+            .range(rangeFrom, rangeTo);
+          for (let i = 0; i < filter.length; i++) {
+            query.eq(filter[i].parameter, filter[i].value);
+          }
+          const res = await query;
+          return this.responseHandler(res);
+        },
       },
       Accounts: {
         // selectOpenAccountsFromUserByNetworkAndCurrency
@@ -106,6 +123,13 @@ export default class QueryBuilder {
             "commitment",
             commitment,
           ).eq("user_id", this.userid);
+          return this.responseHandler(res);
+        },
+        byCommitmentAPiV1: async (commitment: string) => {
+          const res = await this.client.from("Accounts").select().eq(
+            "commitment",
+            commitment,
+          );
           return this.responseHandler(res);
         },
         //selectOpenAccountsByIdDESC
@@ -133,6 +157,30 @@ export default class QueryBuilder {
             .select()
             .eq("user_id", this.userid)
             .order("last_modified", { ascending: false });
+          return this.responseHandler(res);
+        },
+        allApiV1: async (
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+          filter: Array<{ parameter: string; value: string }>,
+        ) => {
+          const query = this.client
+            .from("Accounts")
+            .select("*", { count: "exact" })
+            .order(order, { ascending })
+            .range(rangeFrom, rangeTo);
+
+          for (let i = 0; i < filter.length; i++) {
+            const param = filter[i].parameter === "account_type"
+              ? "accountType"
+              : filter[i].parameter;
+
+            query.eq(param, filter[i].value);
+          }
+
+          const res = await query;
           return this.responseHandler(res);
         },
       },
@@ -179,6 +227,14 @@ export default class QueryBuilder {
           const res = await this.client.from("PaymentIntents")
             .select("*,debit_item_id(*)")
             .eq("creator_user_id", this.userid)
+            .eq("account_id", account_id)
+            .eq("statusText", PaymentIntentStatus.ACCOUNTBALANCETOOLOW);
+          return this.responseHandler(res);
+        },
+        //API v1 lets ya fetch without creator_user_id!
+        forAccountbyAccountBalanceTooLowAPIV1: async (account_id: number) => {
+          const res = await this.client.from("PaymentIntents")
+            .select("*,debit_item_id(*)")
             .eq("account_id", account_id)
             .eq("statusText", PaymentIntentStatus.ACCOUNTBALANCETOOLOW);
           return this.responseHandler(res);
@@ -347,6 +403,69 @@ export default class QueryBuilder {
             .like("paymentIntent", searchTerm);
           return this.responseHandler(res);
         },
+        allByCreatorIdApiV1FilterCommitment: async (
+          commitment: string,
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+          filter: Array<{ parameter: string; value: string }>,
+        ) => {
+          const query = this.client
+            .from("PaymentIntents")
+            .select("*,debit_item_id(*)", { count: "exact" })
+            .eq("commitment", commitment)
+            .order(order, { ascending })
+            .range(rangeFrom, rangeTo);
+          for (let i = 0; i < filter.length; i++) {
+            query.eq(filter[i].parameter, filter[i].value);
+          }
+          const res = await query;
+          return this.responseHandler(res);
+        },
+        allByCreatorIdApiV1: async (
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+          filter: Array<{ parameter: string; value: string }>,
+        ) => {
+          const query = this.client
+            .from("PaymentIntents")
+            .select("*,debit_item_id(*),account_id(*)", { count: "exact" })
+            .eq("creator_user_id", this.userid)
+            .order(order, { ascending })
+            .range(rangeFrom, rangeTo);
+          for (let i = 0; i < filter.length; i++) {
+            query.eq(filter[i].parameter, filter[i].value);
+          }
+          const res = await query;
+          return this.responseHandler(res);
+        },
+        allApiV1: async (
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+          filter: Array<{ parameter: string; value: string }>,
+        ) => {
+          const query = this.client
+            .from("PaymentIntents")
+            .select("*,debit_item_id(*),account_id(*)", { count: "exact" })
+            .order(order, { ascending })
+            .range(rangeFrom, rangeTo);
+          for (let i = 0; i < filter.length; i++) {
+            query.eq(filter[i].parameter, filter[i].value);
+          }
+          const res = await query;
+          return this.responseHandler(res);
+        },
+        byPaymentIntentApiV1: async (paymentIntent: string) => {
+          const query = await this.client.from("PaymentIntents")
+            .select("*,debit_item_id(*),account_id(*)", { count: "exact" })
+            .eq("paymentIntent", paymentIntent);
+          return this.responseHandler(query);
+        },
       },
 
       RelayerHistory: {
@@ -481,6 +600,29 @@ export default class QueryBuilder {
           return this.responseHandler(res);
         },
       },
+      ApiAuthTokens: {
+        byUseridPaginated: async (
+          order: string,
+          ascending: boolean,
+          rangeFrom: number,
+          rangeTo: number,
+        ) => {
+          const res = await this.client.from("ApiAuthTokens")
+            .select("*", { count: "exact" })
+            .order(order, { ascending })
+            .eq("creator_id", this.userid)
+            .range(rangeFrom, rangeTo);
+          return this.responseHandler(res);
+        },
+      },
+      Webhooks: {
+        byUserId: async () => {
+          const res = await this.client.from("Webhooks")
+            .select("*")
+            .eq("creator_id", this.userid);
+          return this.responseHandler(res);
+        },
+      },
       DynamicPaymentRequestJobs: {
         //selectDynamicPaymentRequestJobByPaymentIntentIdAndUserId
         byPaymentIntentIdAndUserId: async (paymentIntent_id: string) => {
@@ -497,6 +639,51 @@ export default class QueryBuilder {
               "id",
               jobId,
             );
+          return this.responseHandler(res);
+        },
+        byPaymentIntentId: async (paymentIntent_id: string) => {
+          const res = await this.client.from("DynamicPaymentRequestJobs")
+            .select("*,relayerBalance_id(*),paymentIntent_id(*)")
+            .eq("paymentIntent_id", paymentIntent_id);
+
+          return this.responseHandler(res);
+        },
+      },
+
+      PasswordResetUrls: {
+        byQ: async (q: string) => {
+          const res = await this.client.from("PasswordResetUrls")
+            .select()
+            .eq("q", q);
+          return this.responseHandler(res);
+        },
+        byNonce: async (nonce: string) => {
+          const res = await this.client.from("PasswordResetUrls")
+            .select()
+            .eq("nonce", nonce);
+          return this.responseHandler(res);
+        },
+      },
+      VerifiedEmails: {
+        byUserId: async (user_id: string) => {
+          const res = await this.client.from("VerifiedEmail")
+            .select()
+            .eq("user_id", user_id);
+
+          return this.responseHandler(res);
+        },
+        byUrl: async (url: string) => {
+          const res = await this.client.from("VerifiedEmail")
+            .select()
+            .eq("url", url);
+          return this.responseHandler(res);
+        },
+      },
+      RPC: {
+        emailByUserId: async (user_id: string) => {
+          const res = await this.client.rpc("get_email_by_user_uuid2", {
+            user_id,
+          });
           return this.responseHandler(res);
         },
       },
@@ -697,6 +884,57 @@ export default class QueryBuilder {
               request_creator_id: this.userid,
               allocatedGas,
               relayerBalance_id,
+            }).select();
+          return this.responseHandler(res);
+        },
+      },
+      ApiAuthTokens: {
+        newToken: async (
+          access_token: string,
+          expiryDate: string,
+        ) => {
+          const res = await this.client.from("ApiAuthTokens")
+            .insert({
+              created_at: new Date().toUTCString(),
+              access_token,
+              creator_id: this.userid,
+              expiry_date_utc: expiryDate,
+            });
+          return this.responseHandler(res);
+        },
+      },
+      Webhooks: {
+        newUrl: async (
+          webhook_url: string,
+        ) => {
+          const res = await this.client.from("Webhooks").insert({
+            created_at: new Date().toUTCString(),
+            webhook_url,
+            creator_id: this.userid,
+          });
+          return this.responseHandler(res);
+        },
+      },
+      PasswordResetUrls: {
+        createNew: async (q: string, user_id: string, nonce: string) => {
+          const res = await this.client.from("PasswordResetUrls")
+            .insert({
+              created_at: new Date().toUTCString(),
+              q,
+              user_id,
+              nonce,
+            });
+          return this.responseHandler(res);
+        },
+      },
+      VerifiedEmails: {
+        createNew: async (user_id: string, url: string) => {
+          const res = await this.client.from("VerifiedEmail")
+            .insert({
+              created_at: new Date().toUTCString(),
+              user_id,
+              verified: false,
+              url,
             });
           return this.responseHandler(res);
         },
@@ -709,7 +947,7 @@ export default class QueryBuilder {
       Accounts: {
         //updateAccount
         balanceAndClosedById:
-          (async (balance: string, closed: boolean, id: string) => {
+          (async (balance: string, closed: boolean, id: number) => {
             const res = await this.client.from("Accounts")
               .update({
                 balance: formatEther(balance),
@@ -813,6 +1051,18 @@ export default class QueryBuilder {
 
           return this.responseHandler(res);
         },
+        BTT_Mainnet_BalanceById: async (
+          newRelayerBalance: bigint,
+          relayerBalance_id: number,
+        ) => {
+          const res = await this.client.from("RelayerBalance").update({
+            BTT_Mainnet_Balance: formatEther(newRelayerBalance),
+          }).eq(
+            "id",
+            relayerBalance_id,
+          );
+          return this.responseHandler(res);
+        },
         //updateMissing_BTT_Donau_Testnet_Balance
         Missing_BTT_Donau_Testnet_BalanceById: async (
           newBalance: bigint,
@@ -827,8 +1077,28 @@ export default class QueryBuilder {
 
           return this.responseHandler(res);
         },
-      },
+        Missing_BTT_Mainnet_BalanceById: async (
+          newBalance: bigint,
+          newMissingBalance: bigint,
+          id: number,
+        ) => {
+          const res = await this.client.from("RelayerBalance").update({
+            BTT_Mainnet_Balance: formatEther(newBalance),
+            last_topup: new Date().toUTCString(),
+            Missing_BTT_Mainnet_Balance: formatEther(newMissingBalance),
+          }).eq("id", id);
 
+          return this.responseHandler(res);
+        },
+      },
+      Webhooks: {
+        byUserId: async (webhook_url: string) => {
+          const res = await this.client.from("Webhooks")
+            .update({ webhook_url })
+            .eq("creator_id", this.userid);
+          return this.responseHandler(res);
+        },
+      },
       DynamicPaymentRequestJobs: {
         //updateDynamicPaymentRequestJob
         ByPaymentIntentIdAndRequestCreator: async (
@@ -843,7 +1113,17 @@ export default class QueryBuilder {
               status: DynamicPaymentRequestJobsStatus.CREATED,
               allocatedGas,
             }).eq("paymentIntent_id", paymentIntent_id)
-            .eq("request_creator_id", this.userid);
+            .eq("request_creator_id", this.userid).select();
+
+          return this.responseHandler(res);
+        },
+      },
+      VerifiedEmails: {
+        updateToVerified: async (user_id: string) => {
+          const res = await this.client.from("VerifiedEmail")
+            .update({
+              verified: true,
+            }).eq("user_id", user_id);
 
           return this.responseHandler(res);
         },
@@ -897,6 +1177,23 @@ export default class QueryBuilder {
               "status",
               DynamicPaymentRequestJobsStatus.LOCKED,
             );
+          return this.responseHandler(res);
+        },
+      },
+      ApiAuthTokens: {
+        ByAccessToken: async (accessToken: string) => {
+          const res = await this.client.from("ApiAuthTokens")
+            .delete()
+            .eq("access_token", accessToken)
+            .eq("creator_id", this.userid);
+          return this.responseHandler(res);
+        },
+      },
+      PasswordResetUrls: {
+        byQAndType: async (q: string) => {
+          const res = await this.client.from("PasswordResetUrls")
+            .delete()
+            .eq("q", q);
           return this.responseHandler(res);
         },
       },

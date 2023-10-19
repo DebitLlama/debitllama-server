@@ -4,7 +4,7 @@ import CurrencySelectDropdown from "./CurrencySelectDropdown.tsx";
 import AccountPasswordInput from "./accountPasswordInput.tsx";
 import { approveSpend, depositEth, depositToken, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts } from "../lib/frontend/web3.ts";
 import { setUpAccount } from '../lib/frontend/directdebitlib.ts';
-import { ChainIds, NetworkNames, SelectableCurrency, availableNetworks, bittorrentCurrencies, chainIdFromNetworkName, getVirtualAccountsContractAddress } from "../lib/shared/web3.ts";
+import { ChainIds, NetworkNames, SelectableCurrency, availableNetworks, bittorrentCurrencies, bttMainnetCurrencies, chainIdFromNetworkName, getVirtualAccountsContractAddress } from "../lib/shared/web3.ts";
 import Overlay from '../components/Overlay.tsx';
 import { redirectToAccountsPage, saveAccount } from '../lib/frontend/fetch.ts';
 import { AccountTypes } from '../lib/enums.ts';
@@ -34,7 +34,7 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
 
     const [createAccountButtonText, setCreateAccountButtonText] = useState("Create Account");
     const [selectedNetwork, setSelectedNetwork] = useState(availableNetworks[0]);
-    const [selectableCurrencyArray, setSelectableCurrencyArray] = useState<SelectableCurrency[]>(bittorrentCurrencies);
+    const [selectableCurrencyArray, setSelectableCurrencyArray] = useState<SelectableCurrency[]>(bttMainnetCurrencies);
 
     const [selectedCurrency, setSelectedCurrency] = useState<SelectableCurrency>(selectableCurrencyArray[0]);
 
@@ -43,6 +43,11 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
     const [walletMismatchError, setShowWalletMismatchError] = useState(false);
 
     const [showOverlay, setShowOverlay] = useState(false);
+    const [showOverlayError, setShowOverlayError] = useState({
+        showError: false,
+        message: "",
+        action: () => setShowOverlay(false)
+    })
 
     function setPasswordAndCheck(to: string) {
         if (to === "") {
@@ -118,7 +123,7 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
             depositAmount,
             erc20Contract,
             virtualaccount.encryptedNote).catch(err => {
-                setShowOverlay(false);
+                setShowOverlayError({ ...showOverlayError, showError: true, message: "Unable to deposit token" })
             })
 
         if (depositTx !== undefined) {
@@ -138,9 +143,10 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
                         console.log("An error occured with saving the account!");
                         const json = await res.json();
                         console.error(json)
+                        setShowOverlayError({ ...showOverlayError, showError: true, message: "An error occured when saving the account!" })
                     }
                 } else {
-                    setShowOverlay(false);
+                    setShowOverlayError({ ...showOverlayError, showError: true, message: "Transaction failed" })
                 }
             })
         }
@@ -180,6 +186,8 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
                 contractAddress,
                 "/VirtualAccounts.json");
             setShowOverlay(true);
+            setShowOverlayError({ ...showOverlayError, showError: false, message: "" })
+
             if (allowance >= parseEther(depositAmount)) {
                 // Just deposit
 
@@ -190,7 +198,7 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
                     erc20Contract,
                     contractAddress,
                     depositAmount).catch((err) => {
-                        setShowOverlay(false)
+                        setShowOverlayError({ ...showOverlayError, showError: true, message: "Transaction cancelled!" })
                     });
 
                 if (approveTx !== undefined) {
@@ -199,7 +207,7 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
                             await handleTokenDeposit(virtualAccountsContrat, virtualaccount, erc20Contract, chainId)
                         }
                     }).catch((err: any) => {
-                        setShowOverlay(false)
+                        setShowOverlayError({ ...showOverlayError, showError: true, message: "Transaction failed!" })
                     })
                 }
             }
@@ -210,13 +218,15 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
                 contractAddress,
                 "/VirtualAccounts.json");
             setShowOverlay(true);
+            setShowOverlayError({ ...showOverlayError, showError: false, message: "" })
+
             const tx = await depositEth(
                 contract,
                 virtualaccount.commitment,
                 depositAmount,
                 virtualaccount.encryptedNote
             ).catch(err => {
-                setShowOverlay(false);
+                setShowOverlayError({ ...showOverlayError, showError: true, message: "Unable to deposit!" })
             });
 
             if (tx !== undefined) {
@@ -236,10 +246,10 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
                             const json = await res.json();
                         }
                     } else {
-                        setShowOverlay(false);
+                        setShowOverlayError({ ...showOverlayError, showError: true, message: "Transaction failed!" })
                     }
                 }).catch((err: any) => {
-                    setShowOverlay(false)
+                    setShowOverlayError({ ...showOverlayError, showError: true, message: "Transaction failed!" })
                 })
             }
         }
@@ -247,10 +257,9 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
 
 
     return <form onSubmit={onSubmitForm} class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md" method="POST">
-        <Overlay show={showOverlay} ></Overlay>
+        <Overlay show={showOverlay} error={showOverlayError}></Overlay>
         <h1 class="text-2xl font-bold text-left">New Virtual Account</h1>
         <h4 class="text-md mb-6">Virtual Accounts can hold native tokens like BTT or ERC-20 tokens. You need to deposit into the account and then you can spend from it without signing transactions with your wallet!</h4>
-        <TestnetTokens chainId={chainIdFromNetworkName[selectedNetwork as NetworkNames]}></TestnetTokens>
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Account Name</label>
             <input value={name} onChange={(event: any) => setName(event.target.value)} required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
@@ -264,7 +273,9 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
             availableNetworks={availableNetworks}
             selectedCurrency={selectedCurrency}
             setSelectedCurrency={setSelectedCurrencyHook}
+            isWalletConnectPage={false}
         ></CurrencySelectDropdown>
+        <TestnetTokens chainId={chainIdFromNetworkName[selectedNetwork as NetworkNames]}></TestnetTokens>
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="amount">Deposit Amount</label>
             <input value={depositAmount} onChange={(event: any) => setDepositAmount(event.target.value)} required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"

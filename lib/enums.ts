@@ -4,12 +4,12 @@ export enum AccountTypes {
 }
 
 export enum PaymentIntentStatus {
-  CREATED = "Created",
-  CANCELLED = "Cancelled",
-  RECURRING = "Recurring",
-  PAID = "Paid",
-  BALANCETOOLOWTORELAY = "Balance too low to relay",
-  ACCOUNTBALANCETOOLOW = "Account Balance too low",
+  CREATED = "CREATED",
+  CANCELLED = "CANCELLED",
+  RECURRING = "RECURRING",
+  PAID = "PAID",
+  BALANCETOOLOWTORELAY = "BALANCETOOLOWTORELAY",
+  ACCOUNTBALANCETOOLOW = "ACCOUNTBALANCETOOLOW",
 }
 
 export enum Pricing {
@@ -40,6 +40,8 @@ export enum PaymentIntentsTablePages {
 export enum DocsLinks {
   LINKTODOCSSTART = "https://debitllama.gitbook.io/debitllama/",
   REDIRECTURLSPEC = "https://debitllama.gitbook.io/debitllama/",
+  APIDOCS = "https://debitllama.gitbook.io/debitllama/",
+  WEBHOOKDOCS = "https://debitllama.gitbook.io/debitllama/",
 }
 
 export type PaymentIntentRow = {
@@ -105,6 +107,8 @@ export type RelayerBalance = {
   created_at: string;
   BTT_Donau_Testnet_Balance: string;
   Missing_BTT_Donau_Testnet_Balance: string;
+  BTT_Mainnet_Balance: string;
+  Missing_BTT_Mainnet_Balance: string;
   user_id: string;
   last_topup: string;
 };
@@ -205,4 +209,53 @@ export enum CookieNames {
 export enum AuthWhitelist {
   app = "/app",
   buyitnow = "/buyitnow",
+}
+
+export enum TokenExpiry {
+  ONEMONTH = "ONEMONTH",
+  SIXMONTHS = "SIXMONTHS",
+  ONEYEAR = "ONEYEAR",
+  NEVER = "NEVER",
+}
+
+export const monthsToDate: {
+  [keys in TokenExpiry]: CallableFunction;
+} = {
+  [TokenExpiry.ONEMONTH]: () => addToCurrentDate(1),
+  [TokenExpiry.SIXMONTHS]: () => addToCurrentDate(6),
+  [TokenExpiry.ONEYEAR]: () => addToCurrentDate(12),
+  [TokenExpiry.NEVER]: () => addToCurrentDate(1200), // Gonna expire in 100 years if never is selected
+};
+
+function addToCurrentDate(months: number) {
+  const currentDate = new Date();
+  const newdate = new Date(
+    currentDate.setMonth(currentDate.getMonth() + months),
+  );
+  return newdate.toUTCString();
+}
+
+export enum ApiAccessErrors {
+  InvalidExpiryDate = "Invalid Expiry Date",
+}
+
+export type AccessTokenRow = {
+  id: number;
+  created_at: string;
+  access_token: string;
+  creator_id: string;
+  expiry_date_utc: string;
+};
+
+export enum TemporaryUrlsType {
+  VERIFYEMAILADDRESS = "VERIFYEMAILADDRESS",
+  PASSWORDRESETLINK = "PASSWORDRESETLINK",
+}
+
+export enum EMAILCONSTANTS {
+  noreply = "noreply@debitllama.com",
+  verifyEmailUrlBase = "https://debitllama.com/verifyEmail?q=",
+  verifyEmailSubject = "Verify your email address",
+  passwordResetUrlBase = "https://debitllama.com/passwordreset?q=",
+  passwordResetSubject = "Password reset requested",
 }

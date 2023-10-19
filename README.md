@@ -74,7 +74,7 @@ mocked,
 
 else the build fails, add them to the environment before running the build:
 
-`SUPABASE_URL=asf SUPABASE_KEY=asd ETHENCRYPTPUBLICKEY=asf ETHENCRYPTPRIVATEKEY=sad deno task build`
+`deno task build`
 
 ## Run the server
 

@@ -19,6 +19,13 @@ export interface AccountTopupOrCloseProps {
 export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
     const [amount, setAmount] = useState("");
     const [showOverlay, setShowOverlay] = useState(false);
+    const [showOverlayError, setShowOverlayError] = useState({
+        showError: false,
+        message: "",
+        action: () => setShowOverlay(false)
+    })
+
+
     const handleError = (err: string) => {
         console.log(err);
     }
@@ -29,7 +36,7 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
             props.commitment,
             amount
         ).catch((err) => {
-            setShowOverlay(false)
+            setShowOverlayError({ ...showOverlayError, showError: true, message: "Unable to top up tokens!" })
         });
 
         if (topuptx !== undefined) {
@@ -43,12 +50,14 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
                     }
                     else {
                         console.log("An error occured with saving the account!");
+                        setShowOverlayError({ ...showOverlayError, showError: true, message: "An error occured wile saving the account!" })
                     }
                 } else {
-                    setShowOverlay(false);
+                    setShowOverlayError({ ...showOverlayError, showError: true, message: "Transaction failed!" })
+
                 }
             }).catch((err: any) => {
-                setShowOverlay(false)
+                setShowOverlayError({ ...showOverlayError, showError: true, message: "Transaction failed!" })
             })
         }
     }
@@ -60,7 +69,7 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
             props.commitment,
             amount
         ).catch(err => {
-            setShowOverlay(false)
+            setShowOverlayError({ ...showOverlayError, showError: true, message: "Transaction failed!" })
         })
         if (topuptx !== undefined) {
             await topuptx.wait().then(async (receipt: any) => {
@@ -72,13 +81,14 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
                         redirectToAccountPage(props.commitment)
                     }
                     else {
-                        console.log("An error occured with saving the account!");
+                        setShowOverlayError({ ...showOverlayError, showError: true, message: "An error occured wile saving the account!" })
                     }
                 } else {
-                    setShowOverlay(false)
+                    setShowOverlayError({ ...showOverlayError, showError: true, message: "Transaction failed!" })
+
                 }
             }).catch((err: any) => {
-                setShowOverlay(false)
+                setShowOverlayError({ ...showOverlayError, showError: true, message: "Transaction failed!" })
             })
         }
     }
@@ -92,29 +102,30 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
         }
         const address = await requestAccounts();
         setShowOverlay(true)
+        setShowOverlayError({ ...showOverlayError, showError: false, message: "" })
 
         if (props.isERC20) {
             const erc20Contract = await getContract(
                 provider,
                 props.erc20ContractAddress,
                 "/ERC20.json").catch((err: any) => {
-                    setShowOverlay(false)
+                    setShowOverlayError({ ...showOverlayError, showError: true, message: "Unable to connect to ERC20 contract!" })
                 });
 
             const allowance: bigint = await getAllowance(erc20Contract, address, props.debitContractAddress).catch((err: any) => {
-                setShowOverlay(false)
+                setShowOverlayError({ ...showOverlayError, showError: true, message: "Unable to fetch token allowance!" })
             });;
             const contract = await getContract(
                 provider,
                 props.debitContractAddress,
                 "/VirtualAccounts.json").catch((err: any) => {
-                    setShowOverlay(false)
+                    setShowOverlayError({ ...showOverlayError, showError: true, message: "Unable to connect to smart contract!" })
                 });;
 
             if (allowance >= parseEther(amount)) {
                 // Just do the top up
                 await handleTokenTopup(contract).catch((err: any) => {
-                    setShowOverlay(false)
+                    setShowOverlayError({ ...showOverlayError, showError: true, message: "Token top up error!" })
                 });;
             } else {
                 // Add allowance and then deposit
@@ -123,18 +134,18 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
                     props.debitContractAddress,
                     amount
                 ).catch((err: any) => {
-                    setShowOverlay(false)
+                    setShowOverlayError({ ...showOverlayError, showError: true, message: "Unable to approve spend!" })
                 });
 
                 if (approveTx !== undefined) {
                     await approveTx.wait().then(async (receipt: any) => {
                         if (receipt.status === 1) {
                             await handleTokenTopup(contract).catch((err: any) => {
-                                setShowOverlay(false)
+                                setShowOverlayError({ ...showOverlayError, showError: true, message: "Transaction failed!" })
                             });;
                         }
                     }).catch((err: any) => {
-                        setShowOverlay(false)
+                        setShowOverlayError({ ...showOverlayError, showError: true, message: "Unable to approve spend!" })
                     });
                 }
             }
@@ -144,11 +155,11 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
                 provider,
                 props.debitContractAddress,
                 "/VirtualAccounts.json").catch((err: any) => {
-                    setShowOverlay(false)
+                    setShowOverlayError({ ...showOverlayError, showError: true, message: "Unable to connect to contract!" })
                 });;
 
             await handleEthTopup(contract).catch((err: any) => {
-                setShowOverlay(false)
+                setShowOverlayError({ ...showOverlayError, showError: true, message: "Top up failed!" })
             });;
         }
 
@@ -166,8 +177,10 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
             "/VirtualAccounts.json");
 
         setShowOverlay(true);
+        setShowOverlayError({ ...showOverlayError, showError: false, message: "" })
+
         const withdrawTx = await withdraw(contract, props.commitment).catch((err) => {
-            setShowOverlay(false)
+            setShowOverlayError({ ...showOverlayError, showError: true, message: "Unable to create transactions, check the connected wallet!" })
         });
         if (withdrawTx !== undefined) {
             await withdrawTx.wait().then((receipt: any) => {
@@ -183,7 +196,7 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
     }
 
     return <><div class="w-full place-items-start text-left mt-2">
-        <Overlay show={showOverlay}></Overlay>
+        <Overlay show={showOverlay} error={showOverlayError}></Overlay>
         <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Add Balance</label>
         <form onSubmit={topupClicked} class="flex flex-row justofy-between flex-wrap gap-2">
             <input required class="max-w-lg px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"

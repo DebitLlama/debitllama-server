@@ -87,6 +87,7 @@ export default function AddNewDebitItemPageForm(props: AddNewDebitItemFormProps)
                         availableNetworks={availableNetworks}
                         selectedCurrency={selectedCurrency}
                         setSelectedCurrency={setSelectedCurrency}
+                        isWalletConnectPage={false}
                     ></CurrencySelectDropdown>
                     <p class="text-sm text-gray-600	">Select the network and the currency you want to use for the subsciption payments!</p>
 

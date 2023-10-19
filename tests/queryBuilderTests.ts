@@ -15,15 +15,10 @@ async function main() {
     },
   });
 
-  const selectItems = queryBuilder.select().Items;
-
-const items = await selectItems.byButtonId("");
-
-  const selected = await queryBuilder.select().Items.byButtonId(
-    "ef8090b3-a038-44c6-b2ad-b69c91b3d2b9",
+  const emailData = await queryBuilder.select().RPC.emailByUserId(
+    "10224224-3f34-4781-85bf-04f7529a5196",
   );
-
-  console.log(selected);
+  console.log(emailData.data[0].email);
 }
 
 await main();
