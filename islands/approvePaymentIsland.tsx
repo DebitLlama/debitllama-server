@@ -42,7 +42,7 @@ export default function ApprovePaymentIsland(props: ApprovePaymentIslandProps) {
             },
             snarkArtifacts: {
                 wasmFilePath: "/directDebit.wasm",
-                zkeyFilePath: "/directDebit_0001.zkey"
+                zkeyFilePath: "/directDebit_final.zkey"
             }
         }).catch(err => console.error(err));
         if (paymentIntent !== null) {
