@@ -72,23 +72,49 @@ export async function updateRelayerBalanceAndHistorySwitchNetwork(
         feeData,
       );
       //set these resetable payment intents to created or recurring
+      await setResettablePaymentIntents(update, resetablePaymentIntents);
+      break;
+    }
+    case ChainIds.BTT_MAINNET_ID: {
+      const bttBalance = parseEther(relayerBalance[0].BTT_Mainnet_Balance);
+      const newBalance = parseEther(addedBalance) + bttBalance;
+      const missingBalance = parseEther(
+        relayerBalance[0].Missing_BTT_Mainnet_Balance,
+      );
+      const newMissingBalance = calculateNewMissingBalance(
+        missingBalance,
+        parseEther(addedBalance),
+      );
+      const id = relayerBalance[0].id;
 
-      for (let i = 0; i < resetablePaymentIntents.length; i++) {
-        const piToReset = resetablePaymentIntents[i];
-        if (piToReset.used_for === 0) {
-          // Set to created!
-          await update.PaymentIntents.statusByPaymentIntent(
-            PaymentIntentStatus.CREATED,
-            piToReset.paymentIntent,
-          );
-        } else {
-          // set to recurring!
-          await update.PaymentIntents.statusByPaymentIntent(
-            PaymentIntentStatus.RECURRING,
-            piToReset.paymentIntent,
-          );
-        }
-      }
+      await update.RelayerBalance.Missing_BTT_Mainnet_BalanceById(
+        newBalance,
+        newMissingBalance,
+        id,
+      );
+      await insert.RelayerTopUpHistory.newRow(
+        transactionHash,
+        chainId,
+        addedBalance,
+      );
+
+      // Find payment intents that I can set to Created or recurring depending on if it's the first transaction
+      // Depending on How much balance was added to the relayer and how much was the missing balance
+      const {
+        data: paymentIntentsWithLowBalance,
+      } = await select.PaymentIntents.byRelayerBalanceTooLowAndUserIdForPayee(
+        chainId,
+      );
+
+      const feeData = await getGasPrice(ChainIds.BTT_TESTNET_ID);
+
+      const resetablePaymentIntents = await findPaymentIntentsThatCanBeReset(
+        addedBalance,
+        paymentIntentsWithLowBalance,
+        feeData,
+      );
+      // Set these resetable payment intents to created or recurring
+      await setResettablePaymentIntents(update, resetablePaymentIntents);
 
       break;
     }
@@ -96,6 +122,29 @@ export async function updateRelayerBalanceAndHistorySwitchNetwork(
       break;
   }
 }
+
+async function setResettablePaymentIntents(
+  update: any,
+  resetablePaymentIntents: PaymentIntentRow[],
+) {
+  for (let i = 0; i < resetablePaymentIntents.length; i++) {
+    const piToReset = resetablePaymentIntents[i];
+    if (piToReset.used_for === 0) {
+      // Set to created!
+      await update.PaymentIntents.statusByPaymentIntent(
+        PaymentIntentStatus.CREATED,
+        piToReset.paymentIntent,
+      );
+    } else {
+      // set to recurring!
+      await update.PaymentIntents.statusByPaymentIntent(
+        PaymentIntentStatus.RECURRING,
+        piToReset.paymentIntent,
+      );
+    }
+  }
+}
+
 export function findPaymentIntentsThatCanBeReset(
   addedBalance: string,
   paymentIntentsRows: Array<PaymentIntentRow>,
@@ -147,13 +196,19 @@ export async function updateRelayerBalanceWithAllocatedAmount(
   newAllocatedBalance: string,
 ) {
   const update = queryBuilder.update();
+  const current = parseEther(currentRelayerBalance);
+  const oldAllocation = parseEther(oldAllocatedBalance);
+  const newAllocation = parseEther(newAllocatedBalance);
+  const newRelayerBalance = (current + oldAllocation) - newAllocation;
   switch (chainId) {
     case ChainIds.BTT_TESTNET_ID: {
-      const current = parseEther(currentRelayerBalance);
-      const oldAllocation = parseEther(oldAllocatedBalance);
-      const newAllocation = parseEther(newAllocatedBalance);
-      const newRelayerBalance = (current + oldAllocation) - newAllocation;
       return await update.RelayerBalance.BTT_Donau_Testnet_BalanceById(
+        newRelayerBalance,
+        relayerBalance_id,
+      );
+    }
+    case ChainIds.BTT_MAINNET_ID: {
+      return await update.RelayerBalance.BTT_Mainnet_BalanceById(
         newRelayerBalance,
         relayerBalance_id,
       );
@@ -215,6 +270,8 @@ export function calculateGasEstimationPerChain(
   switch (chainId) {
     case ChainIds.BTT_TESTNET_ID:
       return feeData.gasPrice * increasedEstimatedGas;
+    case ChainIds.BTT_MAINNET_ID:
+      return feeData.gasPrice * increasedEstimatedGas;
     default:
       return null;
   }
@@ -235,6 +292,8 @@ export function getRelayerBalanceForChainId(
   switch (chainId) {
     case ChainIds.BTT_TESTNET_ID:
       return relayerBalance.BTT_Donau_Testnet_Balance;
+    case ChainIds.BTT_MAINNET_ID:
+      return relayerBalance.BTT_Mainnet_Balance;
     default:
       return "0";
   }

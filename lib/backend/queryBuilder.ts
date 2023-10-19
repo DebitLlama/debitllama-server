@@ -1051,6 +1051,18 @@ export default class QueryBuilder {
 
           return this.responseHandler(res);
         },
+        BTT_Mainnet_BalanceById: async (
+          newRelayerBalance: bigint,
+          relayerBalance_id: number,
+        ) => {
+          const res = await this.client.from("RelayerBalance").update({
+            BTT_Mainnet_Balance: formatEther(newRelayerBalance),
+          }).eq(
+            "id",
+            relayerBalance_id,
+          );
+          return this.responseHandler(res);
+        },
         //updateMissing_BTT_Donau_Testnet_Balance
         Missing_BTT_Donau_Testnet_BalanceById: async (
           newBalance: bigint,
@@ -1061,6 +1073,19 @@ export default class QueryBuilder {
             BTT_Donau_Testnet_Balance: formatEther(newBalance),
             last_topup: new Date().toUTCString(),
             Missing_BTT_Donau_Testnet_Balance: formatEther(newMissingBalance),
+          }).eq("id", id);
+
+          return this.responseHandler(res);
+        },
+        Missing_BTT_Mainnet_BalanceById: async (
+          newBalance: bigint,
+          newMissingBalance: bigint,
+          id: number,
+        ) => {
+          const res = await this.client.from("RelayerBalance").update({
+            BTT_Mainnet_Balance: formatEther(newBalance),
+            last_topup: new Date().toUTCString(),
+            Missing_BTT_Mainnet_Balance: formatEther(newMissingBalance),
           }).eq("id", id);
 
           return this.responseHandler(res);

@@ -107,6 +107,8 @@ export type RelayerBalance = {
   created_at: string;
   BTT_Donau_Testnet_Balance: string;
   Missing_BTT_Donau_Testnet_Balance: string;
+  BTT_Mainnet_Balance: string;
+  Missing_BTT_Mainnet_Balance: string;
   user_id: string;
   last_topup: string;
 };
