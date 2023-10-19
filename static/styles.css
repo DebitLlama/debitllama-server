@@ -514,6 +514,10 @@
 	display: block;
 }
 
+.codeDisplayWidth {
+	width: 520px;
+}
+
 /* When the browser is  530px or smaller */
 @media screen and (max-width: 530px) {
 	.overflowingTableData {
@@ -523,6 +527,11 @@
 	.hideOnSmallScreen {
 		display: none;
 	}
+
+	.codeDisplayWidth {
+		width: 300px;
+	}
+
 
 }
 
