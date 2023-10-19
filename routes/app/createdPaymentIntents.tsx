@@ -30,26 +30,30 @@ export const handler: Handlers<any, State> = {
         return ctx.render({ ...ctx.state, notfound: false, paymentIntentData, paymentIntentHistory, paymentIntentHistoryTotalpages });
     },
     async POST(req: any, ctx: any) {
-        const json = await req.json();
-        const paymentIntent = json.paymentIntent;
-        const chainId = json.chainId;
-        const networkExists = rpcUrl[chainId as ChainIds];
-        const accountType = json.accountTye as AccountTypes;
-        if (!networkExists) {
-            return new Response(null, { status: 500 })
-        }
-        const paymentIntentHistory = await getPaymentIntentHistory(chainId, paymentIntent, accountType);
-        if (paymentIntentHistory.isNullified) {
-            const queryBuilder = new QueryBuilder(ctx);
-            const update = queryBuilder.update();
-            // Update the database if it's nullified
-            // set the payment intent to closed!
-            await update.PaymentIntents.statusByPaymentIntent(PaymentIntentStatus.CANCELLED, paymentIntent);
-            return new Response(null, { status: 200 })
-        } else {
-            return new Response(null, { status: 500 })
-        }
+        try {
+            const json = await req.json();
+            const paymentIntent = json.paymentIntent;
+            const chainId = json.chainId;
+            const networkExists = rpcUrl[chainId as ChainIds];
 
+            const accountType = json.accountType as AccountTypes;
+            if (!networkExists) {
+                return new Response(null, { status: 500 })
+            }
+            const paymentIntentHistory = await getPaymentIntentHistory(chainId, paymentIntent, accountType);
+            if (paymentIntentHistory.isNullified) {
+                const queryBuilder = new QueryBuilder(ctx);
+                const update = queryBuilder.update();
+                // Update the database if it's nullified
+                // set the payment intent to closed!
+                await update.PaymentIntents.statusByPaymentIntent(PaymentIntentStatus.CANCELLED, paymentIntent);
+                return new Response(null, { status: 200 })
+            } else {
+                return new Response(null, { status: 500 })
+            }
+        } catch (err: any) {
+            return new Response(null, { status: 500 })
+        }
     }
 }
 
@@ -57,11 +61,11 @@ export default function CreatedPaymentIntents(props: PageProps) {
 
     if (props.data.notfound) {
         return <NotFound title="🔎">
-            <p class="text-center">Your subsciptions will be displayed here.</p>
+            <p class="text-center">Your subscriptions will be displayed here.</p>
             <div class="flex flex-row text-center">
                 <a
                     class="mx-auto bg-gradient-to-b w-max text-gray-500 font-semibold from-slate-50 to-gray-100 px-10 py-3 rounded-2xl shadow-gray-400 shadow-md border-b-4 hover border-b border-gray-200 hover:shadow-sm transition-all duration-500"
-                    href="/app/subscriptions">Go to subsciptions</a>
+                    href="/app/subscriptions">Go to subscriptions</a>
             </div>
         </NotFound>
     }
@@ -87,7 +91,7 @@ export default function CreatedPaymentIntents(props: PageProps) {
                             </tr>
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm" >Status:</UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><p> {getPaymentIntentStatusLogo(pi.statusText, "account")}</p></UnderlinedTd>
+                                <UnderlinedTd extraStyles="">{getPaymentIntentStatusLogo(pi.statusText, "account")}</UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><Tooltip message={getPaymentIntentStatusTooltip(pi.statusText, "account")}></Tooltip></UnderlinedTd>
                             </tr>
 
@@ -145,7 +149,7 @@ export default function CreatedPaymentIntents(props: PageProps) {
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm" >Identifier:</UnderlinedTd>
                                 <UnderlinedTd extraStyles="truncate"><pre> {pi.paymentIntent}</pre></UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><Tooltip message="Your subscriptions unique identifier. You can use this with the search on the subscriptions page and send it to the payee if you need them to identify your subsciption."></Tooltip></UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><Tooltip message="Your subscriptions unique identifier. You can use this with the search on the subscriptions page and send it to the payee if you need them to identify your subscription."></Tooltip></UnderlinedTd>
                             </tr>
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Cancel Payment Intent:</UnderlinedTd>
