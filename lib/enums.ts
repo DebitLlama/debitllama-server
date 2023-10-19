@@ -127,6 +127,7 @@ export enum PaymentIntentsTableColNames {
   UsedFor = "used_for",
   NextPayment = "NextPayment",
   CreatedDate = "CreatedDate",
+  Network = "Network",
 }
 
 export const MapPaymentIntentsTableColNamesToDbColNames: {
@@ -139,6 +140,7 @@ export const MapPaymentIntentsTableColNamesToDbColNames: {
   [PaymentIntentsTableColNames.UsedFor]: "used_for", // Need to calculate it, with debit times - used_for
   [PaymentIntentsTableColNames.NextPayment]: "nextPaymentDate",
   [PaymentIntentsTableColNames.CreatedDate]: "created_at",
+  [PaymentIntentsTableColNames.Network]: "network",
 };
 
 export enum DebitItemTableColNames {
@@ -258,4 +260,7 @@ export enum EMAILCONSTANTS {
   verifyEmailSubject = "Verify your email address",
   passwordResetUrlBase = "https://debitllama.com/passwordreset?q=",
   passwordResetSubject = "Password reset requested",
+  newSubscription = "New subscription",
+  createdPaymentIntents = "https://debitllama.com/app/createdPaymentIntents?q=",
+  payeePaymentIntents = "https://debitllama.com/app/payeePaymentIntents?q=",
 }

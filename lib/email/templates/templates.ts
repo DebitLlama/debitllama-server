@@ -32,7 +32,9 @@ export interface PasswordResetArgs extends ContentArgs {
   resetUrl: string;
 }
 
-export const passwordResetTemplate = (args: PasswordResetArgs): EmailContent => {
+export const passwordResetTemplate = (
+  args: PasswordResetArgs,
+): EmailContent => {
   return {
     content: `Click the link to reset your password ${args.resetUrl} `,
     html:
@@ -40,51 +42,63 @@ export const passwordResetTemplate = (args: PasswordResetArgs): EmailContent => 
   };
 };
 
-export interface SubsciptionArgs extends ContentArgs {
+export interface SubscriptionArgs extends ContentArgs {
   paymentIntentLink: string;
 }
-export const newSubsciptionAcceptedMerchant = (
-  args: SubsciptionArgs,
+export const newSubscriptionAcceptedCustomer = (
+  args: SubscriptionArgs,
 ): EmailContent => {
+  const html = `<div style="text-align: center;">
+    <h2 style="margin: 0 auto;">New Subscription</h2>
+    <p>A new Subsciption was created.</p>
+    <p>You can see it <a href="${args.paymentIntentLink}" target="_blank">here</a></p>
+    <p>If you didn't create this subscription, you should cancel it asap using the dashboard!</p>
+    <p>The first payment will be processed 30 minutes after the subscription was created.</p>
+    </div>`;
+
   return {
-    content: `A new Subsciption was created. ${args.paymentIntentLink}`,
-    html:
-      `<p>A new Subsciption was created. Visit the <a href="${args.paymentIntentLink}" target="_blank" >link</a> to see more details.</p>`,
+    content:
+      `A new Subscription was created. ${args.paymentIntentLink}\n If you didn't create this subscription, you should cancel it using the dashboard!`,
+    html,
   };
 };
 
-export const newSubsciptionAcceptedCustomer = (
-  args: SubsciptionArgs,
+export const newSubscriptionAcceptedMerchant = (
+  args: SubscriptionArgs,
+): EmailContent => {
+  const html = `<div style="text-align: center;">
+    <h2 style="margin: 0 auto;">New Subscription</h2>
+    <p>A new Subsciption was created.</p>
+    <p>You can see it <a href="${args.paymentIntentLink}" target="_blank">here</a></p>
+    <p>If you don't want to accept this subscription, you should cancel it asap using the dashboard!</p>
+    <p>The first payment will be processed 30 minutes after the subscription was created.</p>
+    </div>`;
+
+  return {
+    content:
+      `A new subscription was created. \n${args.paymentIntentLink}.\n If you don't want to accept this subscription, cancel it asap.`,
+    html,
+  };
+};
+
+export const SubscriptionCancelledPayee = (
+  args: SubscriptionArgs,
 ): EmailContent => {
   return {
     content:
-      `A new subsciption was created. \n${args.paymentIntentLink}.\n If you did not create this subsciption you can cancel it immediately!`,
+      `A Subscription has been cancelled!\n Learn more about it at: ${args.paymentIntentLink}`,
     html:
-      `<p>A new subsciption was created. Visit the <a href="${args.paymentIntentLink}">link</a> to learn more. If you did not create this subsciption you can cancel it immediately! </p>`,
+      `<p>A Subscription has been cancelled. Learn more about it <a ${args.paymentIntentLink} target="_blank">here</a></p>`,
   };
 };
 
-
-
-export const SubsciptionCancelledPayee = (
-  args: SubsciptionArgs,
+export const SubscriptionCancelledCustomer = (
+  args: SubscriptionArgs,
 ): EmailContent => {
   return {
     content:
-      `A Subsciption has been cancelled!\n Learn more about it at: ${args.paymentIntentLink}`,
+      `You have cancelled a subscription! You can find the details at ${args.paymentIntentLink}`,
     html:
-      `<p>A Subsciption has been cancelled. Learn more about it <a ${args.paymentIntentLink} target="_blank">here</a></p>`,
+      `<p>You have cancelled a subscription! You can find more details at the <a href="${args.paymentIntentLink}" target="_blank">link here</a></p>`,
   };
 };
-
-export const SubsciptionCancelledCustomer = (
-  args: SubsciptionArgs,
-): EmailContent => {
-  return {
-    content:
-      `You have cancelled a subsciption! You can find the details at ${args.paymentIntentLink}`,
-    html:
-      `<p>You have cancelled a subsciption! You can find more details at the <a href="${args.paymentIntentLink}" target="_blank">link here</a></p>`,
-  };
-};
-
