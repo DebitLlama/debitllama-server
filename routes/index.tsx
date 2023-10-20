@@ -1,5 +1,5 @@
 import { Head } from "$fresh/runtime.ts";
-import { Tooltip, UnderlinedTd } from "../components/components.tsx";
+import SlacKInviteForm from "../islands/SlackInviteForm.tsx";
 
 export default function Home() {
     return <>
@@ -20,11 +20,11 @@ export default function Home() {
             </div>
 
             <section class="bg-gradient-white-to-gray">
-                <div class="flex flex-col justify-center mt-10  max-w-7xl mx-auto">
-                    <h1 class="text-center mx-auto text-6xl font-bold mt-2 text-gray-800">Crypto Subscription</h1>
+                <div class="flex flex-col justify-center mt-10  max-w-7xl mx-auto gap-2">
+                    <h1 class="text-center mx-auto text-6xl font-bold mt-2 text-gray-800 titleFontSizeOverride">Crypto Subscription</h1>
                     <h1 class="text-center mx-auto text-indigo-500 text-5xl font-bold mt-2">Payments Made Easily</h1>
-                    <h2 class="mx-auto text-gray-500 mt-3">Recurring payments without a hassle</h2>
-                    <div class="flex flex-row justify-center mt-2 gap-2">
+                    <h2 class="mx-auto mt-3">Recurring payments without a hassle</h2>
+                    <div class="flex flex-row justify-center mt-2 gap-4">
                         <a href="/login" class="font-bold w-42 text-white bg-black hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-lg px-5 py-2.5 text-center ">Login</a>
                         <a class="font-bold w-42  bg-gray-300 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-lg px-5 py-2.5 text-center " href="https://medium.com/@hopeter_20531">Blog</a>
                     </div>
@@ -38,18 +38,18 @@ export default function Home() {
                     </div>
                     <div class="flex flex-row justify-center mt-5">
                         <div class="flex flex-col flex-wrap justify-around flex-wrap  p-8 rounded max-w-7xl">
-                            <h2 class="text-xl font-bold mt-2 text-gray-800 text-center">We have crypto direct debit!</h2>
-                            <p class="text-gray-600 whitespace-break-spaces">Externally owned accounts require you to send transactions manually. We solved this problem!</p>
+                            <h2 class="text-5xl font-bold mt-2 text-gray-800 text-center">We have crypto direct debit!</h2>
+                            <p class="whitespace-break-spaces">Externally owned accounts require you to send transactions manually. We solved this problem!</p>
                         </div>
                     </div>
                 </div>
             </section>
 
             <section class="bg-gradient-white-to-gray">
-                <div class="flex flex-row justify-center mt-10  max-w-7xl mx-auto">
+                <div class="flex flex-row justify-around gap-5 mt-10  max-w-7xl mx-auto bg-gray-200 pt-10 pb-10">
                     <div class="flex flex-row justify-around max-w-7xl flex-wrap gap-4">
                         <div class="flex flex-col justify-center text-center">
-                            <h2 class="text-4xl font-bold text-gray-800 text-gradient-gray-to-white">Easy merchant integration</h2>
+                            <h2 class="text-4xl font-bold text-gray-800 text-gradient-gray-to-white">Easy merchant integration!</h2>
                             <div class="flex flex-row justify-center mt-2">
                                 <img src="/buyitnow.png" width="150px" />
                             </div>
@@ -86,39 +86,27 @@ export default function Home() {
                     </div>
                 </div>
             </section>
-            <section class="bg-gradient-gray-to-white pt-10">
-                <div class="flex flex-col justify-center pt-10  max-w-7xl mx-auto">
-                    <div class="flex flex-row justify-center text-center pb-5">
-                        <h2 class="text-4xl font-bold text-gray-800 ">Free to use! Transaction fees only!</h2>
-                    </div>
-                    <div class="flex flex-row justify-center mt-2">
-                        <a href="https://debitllama.gitbook.io/debitllama/" class="font-bold w-42 text-white bg-black hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-lg px-5 py-2.5 text-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800">How we compare to others?</a>
-                    </div>
-                    <div class="flex flex-row justify-around flex-wrap gap-2 text-center pb-5 mt-5">
-                        <div class="flex flex-col justify-center">
-                            <h2 class="text-xl font-bold text-gray-800 ">Subscriptions are set it and forget it or you can cancel any time!</h2>
-                        </div>
-                        <img src="https://raw.githubusercontent.com/StrawberryChocolateFudge/debitLLama-server/dea5a287be9c210698396f3bd0522158cd243974/static/PaymentsImage.svg" width="400px" />
-                    </div>
-                </div>
+
+            <section class="bg-gradient-white-to-gray pb-10 ">
+                <SlacKInviteForm></SlacKInviteForm>
             </section>
-            <section class="bg-gradient-white-to-gray">
-                <div class="flex flex-col justify-center  max-w-7xl mx-auto">
-                    <div class="flex flex-row justify-center">
-                        <div class={"w-full flex flex-row justify-around flex-wrap gap-2 bg-gray-50 rounded m-8 max-w-7xl pt-10 pl-10 pr-10"}>
-                            <h1 class="text-center mx-auto text-4xl font-bold mt-2 text-gray-800">See the docs to learn more</h1>
-                            <div class="flex flex-row justify-center mt-2">
-                                <a href="https://debitllama.gitbook.io/debitllama/" class="font-bold w-42 text-white bg-black hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-lg px-5 py-2.5 text-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800">Read the Docs</a>
-                            </div>
+
+
+            <section class="bg-gradient-gray-to-white">
+                <div class="flex flex-row justify-around gap-5 pt-10 pb-10 max-w-7xl mx-auto bg-white">
+                    <div class="flex flex-row justify-around max-w-7xl flex-wrap gap-4">
+                        <div class="flex flex-col justify-center">
+                            <h1 class="text-center mx-auto text-4xl font-bold mt-2 text-gray-800 ">Learn more about how it works</h1>
                         </div>
-                    </div>
-                    <div class="flex flex-row justify-center mb-5">
-                        <h3 class="text-center text-lg">
-                            We use cutting edge Zero-knowledge proof technology to make subscription payments happen securely!
-                        </h3>
+                        <div class="flex flex-col justify-center">
+                            <img src="/explainerLlama.png" alt="explainerLlamaPic" width="100px" class="mx-auto" />
+
+                            <a href="https://debitllama.gitbook.io/debitllama/" class="font-bold h-12 w-42 text-white bg-black hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-lg px-5 py-2.5 text-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800">Read the Docs </a>
+                        </div>
                     </div>
                 </div>
             </section>
         </div >
     </>
 }
+
