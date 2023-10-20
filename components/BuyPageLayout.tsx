@@ -53,25 +53,25 @@ export default function BuyPageLayout(props: BuyPagelayoutProps) {
                             </thead>
                             <tbody>
                                 <tr>
-                                    <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-200 text-sm" >Subscription:</UnderlinedTd>
+                                    <UnderlinedTd extraStyles="bg-gray-50 text-sm" >Subscription:</UnderlinedTd>
                                     <UnderlinedTd extraStyles=""><p>{props.item.name}</p></UnderlinedTd>
                                     <UnderlinedTd extraStyles=""><Tooltip message="Check the name of the subscription to make sure you are on the right page!"></Tooltip></UnderlinedTd>
                                 </tr>
                                 <tr>
-                                    <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-200 text-sm" >{getMaxDebitColTitleFromPricing(props.item.pricing)}</UnderlinedTd>
+                                    <UnderlinedTd extraStyles="bg-gray-50 text-sm" >{getMaxDebitColTitleFromPricing(props.item.pricing)}</UnderlinedTd>
                                     <UnderlinedTd extraStyles=""><p> {props.item.maxPrice} {props.item.currency.name} </p>
-                                        <small class="text-sm  text-gray-500">per transaction</small>
+                                        <small class="text-sm  ">per transaction</small>
                                     </UnderlinedTd>
                                     <UnderlinedTd extraStyles=""><Tooltip message="The maximum amount that can be debited from the account per payment with this subscription!"></Tooltip></UnderlinedTd>
                                 </tr>
 
                                 <tr>
-                                    <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-200 text-sm">Pricing:</UnderlinedTd>
+                                    <UnderlinedTd extraStyles="bg-gray-50 text-sm">Pricing:</UnderlinedTd>
                                     <UnderlinedTd extraStyles="" ><p> {props.item.pricing}</p></UnderlinedTd>
                                     <UnderlinedTd extraStyles=""><Tooltip message={getSubscriptionTooltipMessage(props.item.pricing)}></Tooltip></UnderlinedTd>
                                 </tr>
                                 <tr>
-                                    <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-200 text-sm" >Debit Times:</UnderlinedTd>
+                                    <UnderlinedTd extraStyles="bg-gray-50 text-sm" >Debit Times:</UnderlinedTd>
                                     <UnderlinedTd extraStyles=""><p>{getDebitTimesText(props.item.debitTimes)}</p> </UnderlinedTd>
                                     <UnderlinedTd extraStyles=""><Tooltip message="The amount of times this approval lets the payee debit the account!"></Tooltip></UnderlinedTd>
                                 </tr>
@@ -79,12 +79,12 @@ export default function BuyPageLayout(props: BuyPagelayoutProps) {
                                     ? null
                                     // Only render debit times if the interval is more than 1, else I don't need to show anything here!
                                     : <tr>
-                                        <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-200 text-sm">Debit Interval:</UnderlinedTd>
+                                        <UnderlinedTd extraStyles="bg-gray-50 text-sm">Debit Interval:</UnderlinedTd>
                                         <UnderlinedTd extraStyles=" "><p> {getDebitIntervalText(props.item.debitInterval, props.item.debitTimes)}</p></UnderlinedTd>
                                         <UnderlinedTd extraStyles=""><Tooltip message={getDebitIntervalTooltipText(props.item.debitInterval, props.item.debitTimes)}></Tooltip></UnderlinedTd>
                                     </tr>}
                                 <tr>
-                                    <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-200 text-sm">Total Payment:</UnderlinedTd>
+                                    <UnderlinedTd extraStyles="bg-gray-50 text-sm">Total Payment:</UnderlinedTd>
                                     <UnderlinedTd extraStyles=" "><p> {getTotalPaymentField(
                                         props.item.maxPrice,
                                         props.item.currency.name,
@@ -100,7 +100,7 @@ export default function BuyPageLayout(props: BuyPagelayoutProps) {
                                 </tr>
                                 {props.item.currency.native ? null :
                                     <tr>
-                                        <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-200 text-sm" >ERC-20 Contract:</UnderlinedTd>
+                                        <UnderlinedTd extraStyles="bg-gray-50  text-sm" >ERC-20 Contract:</UnderlinedTd>
                                         <UnderlinedTd extraStyles="">
                                             <div class="overflow-x-auto overflowingTableData">
                                                 <ExplorerLinkForAddress chainId={chainId} address={props.item.currency.contractAddress}></ExplorerLinkForAddress>
@@ -109,7 +109,7 @@ export default function BuyPageLayout(props: BuyPagelayoutProps) {
                                         <UnderlinedTd extraStyles=""><Tooltip message="ERC-20 token contract address link to the chain explorer."></Tooltip></UnderlinedTd>
                                     </tr>}
                                 <tr>
-                                    <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-200 text-sm">Network:</UnderlinedTd>
+                                    <UnderlinedTd extraStyles="bg-gray-50  text-sm">Network:</UnderlinedTd>
                                     <UnderlinedTd extraStyles="" ><p>{networkName}</p></UnderlinedTd>
                                     <UnderlinedTd extraStyles=""><Tooltip message="The blockchain network used for paying for this subscription."></Tooltip></UnderlinedTd>
                                 </tr>
