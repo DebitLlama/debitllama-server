@@ -58,7 +58,8 @@ import * as $52 from "./routes/logout.tsx";
 import * as $53 from "./routes/passwordreset.tsx";
 import * as $54 from "./routes/privacyPolicy.tsx";
 import * as $55 from "./routes/signup.tsx";
-import * as $56 from "./routes/verifyEmail.tsx";
+import * as $56 from "./routes/termsAndConditions.tsx";
+import * as $57 from "./routes/verifyEmail.tsx";
 import * as $$0 from "./islands/AccessTokenUISwitcher.tsx";
 import * as $$1 from "./islands/AccountDisplayElement.tsx";
 import * as $$2 from "./islands/AccountTopupOrClose.tsx";
@@ -154,7 +155,8 @@ const manifest = {
     "./routes/passwordreset.tsx": $53,
     "./routes/privacyPolicy.tsx": $54,
     "./routes/signup.tsx": $55,
-    "./routes/verifyEmail.tsx": $56,
+    "./routes/termsAndConditions.tsx": $56,
+    "./routes/verifyEmail.tsx": $57,
   },
   islands: {
     "./islands/AccessTokenUISwitcher.tsx": $$0,
