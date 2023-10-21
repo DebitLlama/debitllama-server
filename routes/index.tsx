@@ -1,5 +1,5 @@
 import { Head } from "$fresh/runtime.ts";
-import SlacKInviteForm from "../islands/SlackInviteForm.tsx";
+import SlacKInviteForm from "../components/SlackInviteForm.tsx";
 
 export default function Home() {
     return <>

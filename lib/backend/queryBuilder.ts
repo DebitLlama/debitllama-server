@@ -802,12 +802,17 @@ export default class QueryBuilder {
       },
       Feedback: {
         //insertFeedback
-        newFeedback: async (subject: string, message: string) => {
+        newFeedback: async (
+          subject: string,
+          message: string,
+          email: string,
+        ) => {
           const res = await this.client.from("Feedback").insert(
             {
               creator_id: this.userid,
               subject,
               message,
+              creator_email_address: email,
             },
           ).select();
           return this.responseHandler(res);
