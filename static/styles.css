@@ -529,11 +529,28 @@
 	}
 
 	.codeDisplayWidth {
-		width: 300px;
+		width: 360px;
+	}
+}
+
+.titleFontSizeOverride {
+	font-size: 3.75rem;
+	line-height: 1;
+}
+
+/* When the browser is  360px or smaller */
+@media screen and (max-width: 360px) {
+	.codeDisplayWidth {
+		width: 250px;
 	}
 
-
+	.titleFontSizeOverride {
+		font-size: 2.5rem;
+		line-height: 1;
+	}
 }
+
+
 
 .blink {
 	animation: blinker 2s linear infinite;

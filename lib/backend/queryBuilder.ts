@@ -5,6 +5,7 @@ import {
   PaymentIntentStatus,
 } from "../enums.ts";
 import { ChainIds } from "../shared/web3.ts";
+import { Authenticator } from "../webauthn/backend.ts";
 import { formatEther } from "./web3.ts";
 
 export type SupabaseQueryResult = {
@@ -687,6 +688,30 @@ export default class QueryBuilder {
           return this.responseHandler(res);
         },
       },
+      UserChallenges: {
+        currentChallenge: async () => {
+          const res = await this.client.from("UserChallenges")
+            .select()
+            .eq("user_id", this.userid);
+          return this.responseHandler(res);
+        },
+      },
+      Authenticators: {
+        allByUserId: async () => {
+          const res = await this.client.from("Authenticators")
+            .select()
+            .eq("user_id", this.userid);
+          return this.responseHandler(res);
+        },
+        byCredentialId: async (credentialID: string) => {
+          console.log(credentialID);
+          const res = await this.client.from("Authenticators")
+            .select()
+            .eq("user_id", this.userid)
+            .eq("credentialID", credentialID);
+          return this.responseHandler(res);
+        },
+      },
     };
   }
 
@@ -777,12 +802,17 @@ export default class QueryBuilder {
       },
       Feedback: {
         //insertFeedback
-        newFeedback: async (subject: string, message: string) => {
+        newFeedback: async (
+          subject: string,
+          message: string,
+          email: string,
+        ) => {
           const res = await this.client.from("Feedback").insert(
             {
               creator_id: this.userid,
               subject,
               message,
+              creator_email_address: email,
             },
           ).select();
           return this.responseHandler(res);
@@ -935,6 +965,44 @@ export default class QueryBuilder {
               user_id,
               verified: false,
               url,
+            });
+          return this.responseHandler(res);
+        },
+      },
+      UserChallenges: {
+        newChallenge: async (challenge: string, email: string) => {
+          const res = await this.client.from("UserChallenges")
+            .insert({
+              created_at: new Date().toUTCString(),
+              user_id: this.userid,
+              currentChallenge: challenge,
+              lastUpdated: new Date().toUTCString(),
+              email,
+            });
+          return this.responseHandler(res);
+        },
+      },
+      Authenticators: {
+        insertNew: async (
+          {
+            credentialID,
+            credentialPublicKey,
+            counter,
+            credentialDeviceType,
+            credentialBackedUp,
+            transports,
+          }: Authenticator,
+        ) => {
+          const res = await this.client.from("Authenticators")
+            .insert({
+              created_at: new Date().toUTCString(),
+              user_id: this.userid,
+              credentialID,
+              credentialPublicKey,
+              counter,
+              credentialDeviceType,
+              credentialBackedUp,
+              transports: JSON.stringify(transports),
             });
           return this.responseHandler(res);
         },
@@ -1128,6 +1196,16 @@ export default class QueryBuilder {
           return this.responseHandler(res);
         },
       },
+      UserChallenges: {
+        challengeByUserId: async (challenge: string) => {
+          const res = await this.client.from("UserChallenges")
+            .update({
+              currentChallenge: challenge,
+              lastUpdated: new Date().toUTCString(),
+            }).eq("user_id", this.userid);
+          return this.responseHandler(res);
+        },
+      },
     };
   }
 
@@ -1194,6 +1272,16 @@ export default class QueryBuilder {
           const res = await this.client.from("PasswordResetUrls")
             .delete()
             .eq("q", q);
+          return this.responseHandler(res);
+        },
+      },
+      Authenticators: {
+        byCredentialIDForUser: async (credentialID: string) => {
+          const res = await this.client.from("Authenticators")
+            .delete()
+            .eq("credentialID", credentialID)
+            .eq("user_id", this.userid);
+
           return this.responseHandler(res);
         },
       },

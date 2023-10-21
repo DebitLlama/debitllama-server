@@ -1,7 +1,7 @@
 {
   "lock": false,
   "tasks": {
-    "start": "deno run -A --watch=static/,routes/ dev.ts",
+    "start": "ENV=development deno run -A --watch=static/,routes/ dev.ts",
     "update": "deno run -A -r https://fresh.deno.dev/update .",
     "test_enc": "deno test tests/encryption.ts",
     "test_queryFilter": "deno run -A tests/queryFilter.ts --allow-net",

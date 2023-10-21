@@ -1,10 +1,11 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
-import BuyButtonPage, { ItemProps } from "../islands/buyButtonPage.tsx";
+import BuyButtonPage from "../islands/checkout/buyButtonPage.tsx";
 import { State } from "./_middleware.ts";
 import QueryBuilder from "../lib/backend/queryBuilder.ts";
 import { signInWithPassword } from "../lib/backend/auth.ts";
 import { parseEther } from "../lib/frontend/web3.ts";
 import { setSupaloginCookie } from "../lib/backend/cookies.ts";
+import { ItemProps } from "../lib/types/checkoutTypes.ts";
 
 function doesProfileExists(profileData: any) {
     if (profileData === null || profileData.length === 0) {
@@ -35,7 +36,9 @@ export const handler: Handlers<any, State> = {
 
         const { data: profileData } = await select.Profiles.byUserId();
 
-        return ctx.render({ ...ctx.state, notfound: false, itemData, accountData, profileExists: doesProfileExists(profileData), ethEncryptPublicKey, url })
+        const { data: authenticators } = await select.Authenticators.allByUserId();
+
+        return ctx.render({ ...ctx.state, notfound: false, itemData, accountData, profileExists: doesProfileExists(profileData), ethEncryptPublicKey, url, requires2Fa: authenticators.length > 0 })
 
     },
     async POST(req, ctx) {
@@ -112,9 +115,11 @@ export default function BuyItNow(props: PageProps) {
             ethEncryptPublicKey={props.data.ethEncryptPublicKey}
             profileExists={props.data.profileExists}
             accounts={sortAccounts(props.data.accountData)}
-            url={props.url}
+            url={props.url.toString()}
             item={getItemProps(item)}
-            isLoggedIn={props.data.token}></BuyButtonPage> : <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
+            isLoggedIn={props.data.token}
+            requires2Fa={props.data.requires2Fa}
+        ></BuyButtonPage> : <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
             <h1 class="text-2xl font-bold mb-6 text-center">Not Found</h1>
         </div>} </>
 }

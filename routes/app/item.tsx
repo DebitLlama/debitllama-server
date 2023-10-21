@@ -156,13 +156,33 @@ export default function Item(props: PageProps) {
                             <div class="rounded-full w-3 h-3 bg-yellow-500 mr-2"></div>
                             <div class="rounded-full w-3 h-3 bg-green-500 mr-2"></div>
                             <p class="text-xs text-white">Embed the buy Button on your Website </p>
-                            <CopyButton str={embeddedCode} iconColor="white"></CopyButton>
                         </div>
                         <div class="py-4 px-4 mt-1 text-white overflow-auto">
                             <pre class="text-sm">
-                                {embeddedCode}
+                                <pre class="text-sm break-all">
+                                    <span class="text-yellow-500">{`<a`}</span>{"\n "}
+                                    <span class="text-yellow-200">href="</span>
+                                    <span class="">{`https://debitllama.com/buyitnow/?q=`}</span>
+                                    <span class="text-red-300">{itemData.button_id}</span>
+                                    <span class="text-yellow-200">"</span>
+                                    <span class="text-yellow-500">{`>\n `}</span>
+                                    <span class="text-yellow-500">{`<img `}</span>
+                                    <span>{`\n  `}</span>
+                                    <span class="text-yellow-200">width="</span>
+                                    <span class="">{`140px`}</span>
+                                    <span class="text-yellow-200">"{`\n  `}</span>
+                                    <span class="text-yellow-200">src="</span>
+                                    <span class="">{`https://debitllama.com/buyitnow.png`}</span>
+                                    <span class="text-yellow-200">"</span>
+                                    <span class="text-yellow-500">{`/>\n`}</span>
+                                    <span class="text-yellow-500">{`</a>`}</span>
+                                </pre>
                             </pre>
                         </div>
+                        <div class="px-4 py-4 flex flex-row">
+                            <CopyButton str={embeddedCode} iconColor="white"></CopyButton>
+                        </div>
+
                     </div>
                 </div>
 

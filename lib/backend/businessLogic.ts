@@ -7,6 +7,11 @@ import {
   RelayerBalance,
 } from "../enums.ts";
 import { ChainIds } from "../shared/web3.ts";
+import {
+  getAuthenticationOptions,
+  getRegistrationOptions,
+  PasskeyUserModel,
+} from "../webauthn/backend.ts";
 import QueryBuilder from "./queryBuilder.ts";
 import {
   estimateRelayerGas,
@@ -658,4 +663,77 @@ export async function cancelDynamicPaymentRequestLogic(
   } else {
     return "Deleted Payment Request! The page will refresh in 10 seconds!";
   }
+}
+
+export async function registerAuthenticatorGET(
+  queryBuilder: QueryBuilder,
+  userid: string,
+) {
+  const select = queryBuilder.select();
+  const insert = queryBuilder.insert();
+
+  const { data: userChallenge } = await select
+    .UserChallenges.currentChallenge();
+
+  if (userChallenge.length === 0) {
+    const { data: emailData } = await select.RPC.emailByUserId(
+      userid,
+    );
+    const email = emailData[0].email;
+
+    // No challenge was saved yet, I will do insert
+    const userModel: PasskeyUserModel = {
+      id: userid,
+      username: email,
+      currentChallenge: "",
+    };
+    // There are no authenticators saved if there was no challenge yet!
+    const options = await getRegistrationOptions(userModel, []);
+    await insert.UserChallenges.newChallenge(options.challenge, email);
+
+    return options;
+  } else {
+    // I need to update the existing challenge
+    const { data: userChallengeModel } = await select.UserChallenges
+      .currentChallenge();
+    const userModel: PasskeyUserModel = {
+      id: userid as string,
+      username: userChallengeModel[0].email,
+      currentChallenge: userChallengeModel[0].currentChallenge,
+    };
+    const { data: authenticators } = await select.Authenticators
+      .allByUserId();
+
+    const options = await getRegistrationOptions(userModel, authenticators);
+    const update = queryBuilder.update();
+
+    await update.UserChallenges.challengeByUserId(options.challenge);
+
+    return options;
+  }
+}
+
+export async function authenticationVerifyGET(
+  queryBuilder: QueryBuilder,
+) {
+  const select = queryBuilder.select();
+  const update = queryBuilder.update();
+
+  const { data: userChallenge } = await select
+    .UserChallenges.currentChallenge();
+
+  if (userChallenge.length === 0) {
+    return [false, null];
+  }
+
+  const { data: authenticators } = await select.Authenticators
+    .allByUserId();
+
+  if (authenticators.length === 0) {
+    return [false, null];
+  }
+  const options = await getAuthenticationOptions(authenticators);
+
+  await update.UserChallenges.challengeByUserId(options.challenge);
+  return [true, options];
 }

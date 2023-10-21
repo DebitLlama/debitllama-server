@@ -321,3 +321,23 @@ export function NotFound(props: { title: string, children: ComponentChildren }) 
         {props.children}
     </div>
 }
+
+export function PasskeysAddedNotification(props: { addedPasskeys: number }) {
+    return props.addedPasskeys === 0
+        ? <div class="flex flex-row justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" height="50" viewBox="0 -960 960 960" width="50"><path d="M440-400v-360h80v360h-80Zm0 200v-80h80v80h-80Z" /></svg>
+            <div class="flex flex-col justify-center">
+                <p class="text-lg text-red-500">There are no passkeys added!</p>
+            </div>
+        </div>
+        : <div class="flex flex-row justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" height="50" viewBox="0 -960 960 960" width="50">
+                <path d="M480-80q-139-35-229.5-159.5T160-516v-244l320-120 320 120v244q0 152-90.5 276.5T480-80Zm0-84q104-33 172-132t68-220v-189l-240-90-240 90v189q0 121 68 220t172 132Zm0-316Zm-80 160h160q17 0 28.5-11.5T600-360v-120q0-17-11.5-28.5T560-520v-40q0-33-23.5-56.5T480-640q-33 0-56.5 23.5T400-560v40q-17 0-28.5 11.5T360-480v120q0 17 11.5 28.5T400-320Zm40-200v-40q0-17 11.5-28.5T480-600q17 0 28.5 11.5T520-560v40h-80Z" />
+            </svg>
+            <div class="flex flex-col justify-center">
+                <p class="text-lg text-green-500">
+                    {props.addedPasskeys} Passkey{props.addedPasskeys > 1 ? "s" : ""} added. 2FA is on.
+                </p>
+            </div>
+        </div >
+}

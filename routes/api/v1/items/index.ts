@@ -7,7 +7,6 @@ import {
 } from "../../../../lib/api_v1/responseBuilders.ts";
 import {
   EndpointNames_ApiV1,
-  Filter,
   getItemsSortBy,
   getSortableColumns,
   Items_sortBy,
