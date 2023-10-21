@@ -40,62 +40,66 @@ import * as $34 from "./routes/app/pagination/relayerTopupHistory.tsx";
 import * as $35 from "./routes/app/pagination/relayerTxHistory.tsx";
 import * as $36 from "./routes/app/pagination/relayerTxHistoryWithPaymentIntentId.tsx";
 import * as $37 from "./routes/app/pagination/subscriptions.tsx";
-import * as $38 from "./routes/app/payeePaymentIntents.tsx";
-import * as $39 from "./routes/app/paymentIntents.tsx";
-import * as $40 from "./routes/app/profile.tsx";
-import * as $41 from "./routes/app/refreshbalance.tsx";
-import * as $42 from "./routes/app/relayer.tsx";
-import * as $43 from "./routes/app/saveAccountAPI.ts";
-import * as $44 from "./routes/app/savePaymentIntent.ts";
-import * as $45 from "./routes/app/subscriptions.tsx";
-import * as $46 from "./routes/app/updateItemUrl.tsx";
-import * as $47 from "./routes/app/updateWebhook.tsx";
-import * as $48 from "./routes/buyitnow.tsx";
-import * as $49 from "./routes/buyitnowlogout.tsx";
-import * as $50 from "./routes/index.tsx";
-import * as $51 from "./routes/login.tsx";
-import * as $52 from "./routes/logout.tsx";
-import * as $53 from "./routes/passwordreset.tsx";
-import * as $54 from "./routes/privacyPolicy.tsx";
-import * as $55 from "./routes/signup.tsx";
-import * as $56 from "./routes/termsAndConditions.tsx";
-import * as $57 from "./routes/verifyEmail.tsx";
+import * as $38 from "./routes/app/passkeys.tsx";
+import * as $39 from "./routes/app/payeePaymentIntents.tsx";
+import * as $40 from "./routes/app/paymentIntents.tsx";
+import * as $41 from "./routes/app/profile.tsx";
+import * as $42 from "./routes/app/refreshbalance.tsx";
+import * as $43 from "./routes/app/relayer.tsx";
+import * as $44 from "./routes/app/saveAccountAPI.ts";
+import * as $45 from "./routes/app/savePaymentIntent.ts";
+import * as $46 from "./routes/app/subscriptions.tsx";
+import * as $47 from "./routes/app/updateItemUrl.tsx";
+import * as $48 from "./routes/app/updateWebhook.tsx";
+import * as $49 from "./routes/app/webauthn/register.ts";
+import * as $50 from "./routes/app/webauthn/revoke.ts";
+import * as $51 from "./routes/buyitnow.tsx";
+import * as $52 from "./routes/buyitnowlogout.tsx";
+import * as $53 from "./routes/index.tsx";
+import * as $54 from "./routes/login.tsx";
+import * as $55 from "./routes/logout.tsx";
+import * as $56 from "./routes/passwordreset.tsx";
+import * as $57 from "./routes/privacyPolicy.tsx";
+import * as $58 from "./routes/signup.tsx";
+import * as $59 from "./routes/termsAndConditions.tsx";
+import * as $60 from "./routes/verifyEmail.tsx";
 import * as $$0 from "./islands/AccessTokenUISwitcher.tsx";
 import * as $$1 from "./islands/AccountDisplayElement.tsx";
 import * as $$2 from "./islands/AccountTopupOrClose.tsx";
 import * as $$3 from "./islands/AccountsSelectButtons.tsx";
-import * as $$4 from "./islands/CancelDynamicPaymentRequestButton.tsx";
-import * as $$5 from "./islands/CancelPaymentIntentButton.tsx";
-import * as $$6 from "./islands/CookieBanner.tsx";
-import * as $$7 from "./islands/CurrencySelectDropdown.tsx";
-import * as $$8 from "./islands/DebitItemTableRow.tsx";
-import * as $$9 from "./islands/RelayerDetailsCard.tsx";
-import * as $$10 from "./islands/RelayerUISwitcher.tsx";
-import * as $$11 from "./islands/Sidebar.tsx";
-import * as $$12 from "./islands/SidebarToggleButton.tsx";
-import * as $$13 from "./islands/SlackInviteForm.tsx";
-import * as $$14 from "./islands/TestnetTokens.tsx";
-import * as $$15 from "./islands/TriggerDirectDebitButton.tsx";
-import * as $$16 from "./islands/WalletAddressSelector.tsx";
-import * as $$17 from "./islands/WalletApproveOrDisconnect.tsx";
-import * as $$18 from "./islands/WalletDetailsFetcher.tsx";
-import * as $$19 from "./islands/WebhooksUI.tsx";
-import * as $$20 from "./islands/accountCardCarousel.tsx";
-import * as $$21 from "./islands/accountCreatePageForm.tsx";
-import * as $$22 from "./islands/accountPasswordInput.tsx";
-import * as $$23 from "./islands/addNewDebitItemPageForm.tsx";
-import * as $$24 from "./islands/approvePaymentIsland.tsx";
-import * as $$25 from "./islands/buyButtonPage.tsx";
-import * as $$26 from "./islands/connectWalletPageForm.tsx";
-import * as $$27 from "./islands/copyButton.tsx";
-import * as $$28 from "./islands/pagination/AccessTokensTable.tsx";
-import * as $$29 from "./islands/pagination/DebitItemsTable.tsx";
-import * as $$30 from "./islands/pagination/PaymentIntentsPaginationForAccounts.tsx";
-import * as $$31 from "./islands/pagination/PaymentIntentsPaginationForAll.tsx";
-import * as $$32 from "./islands/pagination/PaymentIntentsPaginationForDebitItemsPage.tsx";
-import * as $$33 from "./islands/pagination/PaymentIntentsPaginationForItemPage.tsx";
-import * as $$34 from "./islands/pagination/RelayedTxHistoryWithPagination.tsx";
-import * as $$35 from "./islands/pagination/RelayerTopupHistory.tsx";
+import * as $$4 from "./islands/AddNewPasskeyButton.tsx";
+import * as $$5 from "./islands/CancelDynamicPaymentRequestButton.tsx";
+import * as $$6 from "./islands/CancelPaymentIntentButton.tsx";
+import * as $$7 from "./islands/CookieBanner.tsx";
+import * as $$8 from "./islands/CurrencySelectDropdown.tsx";
+import * as $$9 from "./islands/DebitItemTableRow.tsx";
+import * as $$10 from "./islands/RelayerDetailsCard.tsx";
+import * as $$11 from "./islands/RelayerUISwitcher.tsx";
+import * as $$12 from "./islands/Sidebar.tsx";
+import * as $$13 from "./islands/SidebarToggleButton.tsx";
+import * as $$14 from "./islands/SlackInviteForm.tsx";
+import * as $$15 from "./islands/TestnetTokens.tsx";
+import * as $$16 from "./islands/TriggerDirectDebitButton.tsx";
+import * as $$17 from "./islands/WalletAddressSelector.tsx";
+import * as $$18 from "./islands/WalletApproveOrDisconnect.tsx";
+import * as $$19 from "./islands/WalletDetailsFetcher.tsx";
+import * as $$20 from "./islands/WebhooksUI.tsx";
+import * as $$21 from "./islands/accountCardCarousel.tsx";
+import * as $$22 from "./islands/accountCreatePageForm.tsx";
+import * as $$23 from "./islands/accountPasswordInput.tsx";
+import * as $$24 from "./islands/addNewDebitItemPageForm.tsx";
+import * as $$25 from "./islands/approvePaymentIsland.tsx";
+import * as $$26 from "./islands/buyButtonPage.tsx";
+import * as $$27 from "./islands/connectWalletPageForm.tsx";
+import * as $$28 from "./islands/copyButton.tsx";
+import * as $$29 from "./islands/pagination/AccessTokensTable.tsx";
+import * as $$30 from "./islands/pagination/DebitItemsTable.tsx";
+import * as $$31 from "./islands/pagination/PaymentIntentsPaginationForAccounts.tsx";
+import * as $$32 from "./islands/pagination/PaymentIntentsPaginationForAll.tsx";
+import * as $$33 from "./islands/pagination/PaymentIntentsPaginationForDebitItemsPage.tsx";
+import * as $$34 from "./islands/pagination/PaymentIntentsPaginationForItemPage.tsx";
+import * as $$35 from "./islands/pagination/RelayedTxHistoryWithPagination.tsx";
+import * as $$36 from "./islands/pagination/RelayerTopupHistory.tsx";
 
 const manifest = {
   routes: {
@@ -137,64 +141,68 @@ const manifest = {
     "./routes/app/pagination/relayerTxHistory.tsx": $35,
     "./routes/app/pagination/relayerTxHistoryWithPaymentIntentId.tsx": $36,
     "./routes/app/pagination/subscriptions.tsx": $37,
-    "./routes/app/payeePaymentIntents.tsx": $38,
-    "./routes/app/paymentIntents.tsx": $39,
-    "./routes/app/profile.tsx": $40,
-    "./routes/app/refreshbalance.tsx": $41,
-    "./routes/app/relayer.tsx": $42,
-    "./routes/app/saveAccountAPI.ts": $43,
-    "./routes/app/savePaymentIntent.ts": $44,
-    "./routes/app/subscriptions.tsx": $45,
-    "./routes/app/updateItemUrl.tsx": $46,
-    "./routes/app/updateWebhook.tsx": $47,
-    "./routes/buyitnow.tsx": $48,
-    "./routes/buyitnowlogout.tsx": $49,
-    "./routes/index.tsx": $50,
-    "./routes/login.tsx": $51,
-    "./routes/logout.tsx": $52,
-    "./routes/passwordreset.tsx": $53,
-    "./routes/privacyPolicy.tsx": $54,
-    "./routes/signup.tsx": $55,
-    "./routes/termsAndConditions.tsx": $56,
-    "./routes/verifyEmail.tsx": $57,
+    "./routes/app/passkeys.tsx": $38,
+    "./routes/app/payeePaymentIntents.tsx": $39,
+    "./routes/app/paymentIntents.tsx": $40,
+    "./routes/app/profile.tsx": $41,
+    "./routes/app/refreshbalance.tsx": $42,
+    "./routes/app/relayer.tsx": $43,
+    "./routes/app/saveAccountAPI.ts": $44,
+    "./routes/app/savePaymentIntent.ts": $45,
+    "./routes/app/subscriptions.tsx": $46,
+    "./routes/app/updateItemUrl.tsx": $47,
+    "./routes/app/updateWebhook.tsx": $48,
+    "./routes/app/webauthn/register.ts": $49,
+    "./routes/app/webauthn/revoke.ts": $50,
+    "./routes/buyitnow.tsx": $51,
+    "./routes/buyitnowlogout.tsx": $52,
+    "./routes/index.tsx": $53,
+    "./routes/login.tsx": $54,
+    "./routes/logout.tsx": $55,
+    "./routes/passwordreset.tsx": $56,
+    "./routes/privacyPolicy.tsx": $57,
+    "./routes/signup.tsx": $58,
+    "./routes/termsAndConditions.tsx": $59,
+    "./routes/verifyEmail.tsx": $60,
   },
   islands: {
     "./islands/AccessTokenUISwitcher.tsx": $$0,
     "./islands/AccountDisplayElement.tsx": $$1,
     "./islands/AccountTopupOrClose.tsx": $$2,
     "./islands/AccountsSelectButtons.tsx": $$3,
-    "./islands/CancelDynamicPaymentRequestButton.tsx": $$4,
-    "./islands/CancelPaymentIntentButton.tsx": $$5,
-    "./islands/CookieBanner.tsx": $$6,
-    "./islands/CurrencySelectDropdown.tsx": $$7,
-    "./islands/DebitItemTableRow.tsx": $$8,
-    "./islands/RelayerDetailsCard.tsx": $$9,
-    "./islands/RelayerUISwitcher.tsx": $$10,
-    "./islands/Sidebar.tsx": $$11,
-    "./islands/SidebarToggleButton.tsx": $$12,
-    "./islands/SlackInviteForm.tsx": $$13,
-    "./islands/TestnetTokens.tsx": $$14,
-    "./islands/TriggerDirectDebitButton.tsx": $$15,
-    "./islands/WalletAddressSelector.tsx": $$16,
-    "./islands/WalletApproveOrDisconnect.tsx": $$17,
-    "./islands/WalletDetailsFetcher.tsx": $$18,
-    "./islands/WebhooksUI.tsx": $$19,
-    "./islands/accountCardCarousel.tsx": $$20,
-    "./islands/accountCreatePageForm.tsx": $$21,
-    "./islands/accountPasswordInput.tsx": $$22,
-    "./islands/addNewDebitItemPageForm.tsx": $$23,
-    "./islands/approvePaymentIsland.tsx": $$24,
-    "./islands/buyButtonPage.tsx": $$25,
-    "./islands/connectWalletPageForm.tsx": $$26,
-    "./islands/copyButton.tsx": $$27,
-    "./islands/pagination/AccessTokensTable.tsx": $$28,
-    "./islands/pagination/DebitItemsTable.tsx": $$29,
-    "./islands/pagination/PaymentIntentsPaginationForAccounts.tsx": $$30,
-    "./islands/pagination/PaymentIntentsPaginationForAll.tsx": $$31,
-    "./islands/pagination/PaymentIntentsPaginationForDebitItemsPage.tsx": $$32,
-    "./islands/pagination/PaymentIntentsPaginationForItemPage.tsx": $$33,
-    "./islands/pagination/RelayedTxHistoryWithPagination.tsx": $$34,
-    "./islands/pagination/RelayerTopupHistory.tsx": $$35,
+    "./islands/AddNewPasskeyButton.tsx": $$4,
+    "./islands/CancelDynamicPaymentRequestButton.tsx": $$5,
+    "./islands/CancelPaymentIntentButton.tsx": $$6,
+    "./islands/CookieBanner.tsx": $$7,
+    "./islands/CurrencySelectDropdown.tsx": $$8,
+    "./islands/DebitItemTableRow.tsx": $$9,
+    "./islands/RelayerDetailsCard.tsx": $$10,
+    "./islands/RelayerUISwitcher.tsx": $$11,
+    "./islands/Sidebar.tsx": $$12,
+    "./islands/SidebarToggleButton.tsx": $$13,
+    "./islands/SlackInviteForm.tsx": $$14,
+    "./islands/TestnetTokens.tsx": $$15,
+    "./islands/TriggerDirectDebitButton.tsx": $$16,
+    "./islands/WalletAddressSelector.tsx": $$17,
+    "./islands/WalletApproveOrDisconnect.tsx": $$18,
+    "./islands/WalletDetailsFetcher.tsx": $$19,
+    "./islands/WebhooksUI.tsx": $$20,
+    "./islands/accountCardCarousel.tsx": $$21,
+    "./islands/accountCreatePageForm.tsx": $$22,
+    "./islands/accountPasswordInput.tsx": $$23,
+    "./islands/addNewDebitItemPageForm.tsx": $$24,
+    "./islands/approvePaymentIsland.tsx": $$25,
+    "./islands/buyButtonPage.tsx": $$26,
+    "./islands/connectWalletPageForm.tsx": $$27,
+    "./islands/copyButton.tsx": $$28,
+    "./islands/pagination/AccessTokensTable.tsx": $$29,
+    "./islands/pagination/DebitItemsTable.tsx": $$30,
+    "./islands/pagination/PaymentIntentsPaginationForAccounts.tsx": $$31,
+    "./islands/pagination/PaymentIntentsPaginationForAll.tsx": $$32,
+    "./islands/pagination/PaymentIntentsPaginationForDebitItemsPage.tsx": $$33,
+    "./islands/pagination/PaymentIntentsPaginationForItemPage.tsx": $$34,
+    "./islands/pagination/RelayedTxHistoryWithPagination.tsx": $$35,
+    "./islands/pagination/RelayerTopupHistory.tsx": $$36,
   },
   baseUrl: import.meta.url,
 };

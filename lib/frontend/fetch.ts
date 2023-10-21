@@ -369,3 +369,39 @@ export async function updateWebhookUrl(
     },
   }).then((response) => response);
 }
+
+export async function requestNewPasskeyRegistration() {
+  return await fetch("/app/webauthn/register", {
+    credentials: "same-origin",
+    method: "GET",
+  }).then((response) => response);
+}
+
+export async function postVerifyPasskeyRegistration(attResp: any) {
+  return await fetch("/app/webauthn/register", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "same-origin",
+    body: JSON.stringify(attResp),
+  }).then((response) => response);
+}
+
+export async function getAuthenticationOptionsForRevoke() {
+  return await fetch("/app/webauthn/revoke", {
+    method: "GET",
+    credentials: "same-origin",
+  }).then((response) => response);
+}
+
+export async function verifyAuthenticationForRevoke(asseResp: any) {
+  return await fetch("/app/webauthn/revoke", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(asseResp),
+  });
+}
