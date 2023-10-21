@@ -7,6 +7,7 @@ import { decryptData } from "../../lib/backend/decryption.ts";
 import ApprovePaymentIsland from "../../islands/approvePaymentIsland.tsx";
 import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 import { AccountTypes } from "../../lib/enums.ts";
+import { verifyAuthentication } from "../../lib/webauthn/backend.ts";
 
 const ethEncryptPrivateKey = Deno.env.get("ETHENCRYPTPRIVATEKEY") || "";
 
@@ -19,6 +20,38 @@ export const handler: Handlers<any, State> = {
     const userid = ctx.state.userid;
     const queryBuilder = new QueryBuilder(ctx);
     const select = queryBuilder.select();
+
+    // Check if the 2fa is activated and it it is, then require the challenge data in the request!
+
+    const { data: authenticators } = await select.Authenticators.allByUserId();
+
+    if (authenticators.length !== 0) {
+      // 2Fa is required, the requiest must have sent the signed challenge!
+      const verificationOptions = form.get("verificationOptions") as string;
+      const { data: userChallenge } = await select.UserChallenges
+        .currentChallenge();
+
+      const [success, verification] = await verifyAuthentication(
+        JSON.parse(verificationOptions),
+        userChallenge[0],
+        authenticators[0],
+      );
+      // If the verification is successful then continue to the approve payment page, 
+      // if the verification is not successful, maybe I can navigate back to the item page with an error
+
+      if (!success || !verification.verified) {
+        const headers = new Headers();
+        const redirect = `/buyitnow?q=${debititem_buttonId}&error=Passkey Authentication Failed!`
+        headers.set("location", redirect);
+        return new Response(null, {
+          status: 303,
+          headers
+        });
+      }
+    }
+
+
+
     const { data: itemData } = await select.Items.byButtonId(debititem_buttonId);
 
     if (itemData === null || itemData.length === 0) {
@@ -86,7 +119,7 @@ export const handler: Handlers<any, State> = {
 
     return resp;
   },
-  async GET(req: any, ctx: any) {
+  GET(req: any, ctx: any) {
     return new Response(null, { status: 500 })
   }
 };

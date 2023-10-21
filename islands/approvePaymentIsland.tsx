@@ -4,8 +4,8 @@ import { createPaymentIntent, toNoteHex } from "../lib/frontend/directdebitlib.t
 import { aesDecryptData } from "../lib/frontend/encryption.ts";
 import { logoutRequest, redirectToRedirectPage, uploadPaymentIntent } from "../lib/frontend/fetch.ts";
 import { parseEther } from "../lib/frontend/web3.ts";
-import { ItemProps } from "./buyButtonPage.tsx";
 import { useState } from 'preact/hooks';
+import { ItemProps } from "../lib/types/checkoutTypes.ts";
 
 interface ApprovePaymentIslandProps {
     symmetricEncryptedNote: string,
@@ -124,6 +124,7 @@ export default function ApprovePaymentIsland(props: ApprovePaymentIslandProps) {
                         />
                     </div>
                     <button
+                        disabled={payClickLocked}
                         onClick={payClicked}
                         class="w-full flex flex-row justify-center text-xl font-bold mb-4 mt-4 text-white bg-indigo-700 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800 indigobg"
                     >Subscribe</button>

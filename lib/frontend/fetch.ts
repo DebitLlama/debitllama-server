@@ -405,3 +405,10 @@ export async function verifyAuthenticationForRevoke(asseResp: any) {
     body: JSON.stringify(asseResp),
   });
 }
+
+export async function getAuthenticationOptionsForCheckout() {
+  return await fetch("/app/webauthn/verify", {
+    method: "GET",
+    credentials: "same-origin",
+  }).then((response) => response);
+}
