@@ -1,4 +1,4 @@
-# DebitLlama Serice
+# DebitLlama Service
 
 This repository contains the user interface and server side logic for
 DebitLlama.
