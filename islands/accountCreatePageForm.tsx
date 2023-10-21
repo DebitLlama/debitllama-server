@@ -256,7 +256,7 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
     }
 
 
-    return <form onSubmit={onSubmitForm} class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md" method="POST">
+    return <form onSubmit={onSubmitForm} class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md border" method="POST">
         <Overlay show={showOverlay} error={showOverlayError}></Overlay>
         <h1 class="text-2xl font-bold text-left">New Virtual Account</h1>
         <h4 class="text-md mb-6">Virtual Accounts can hold native tokens like BTT or ERC-20 tokens. You need to deposit into the account and then you can spend from it without signing transactions with your wallet!</h4>
