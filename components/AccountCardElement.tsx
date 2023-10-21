@@ -14,7 +14,7 @@ export function AccountCardElement(props: AccountCardElementProps) {
     const currName = JSON.parse(props.currency).name;
     const info = <div class="visa_info">
         {props.closed ? <p style="color: red !important;">{currName} Account Closed</p> : <p>{props.balance}{" "}{currName} </p>}
-        <pre class="overflow-y-clip" >{props.name}</pre>
+        <pre class="overflow-y-clip text-white" >{props.name}</pre>
     </div>
 
     return <div class="accountCard_container">
