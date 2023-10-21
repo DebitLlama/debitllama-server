@@ -1,8 +1,8 @@
 import type { ComponentChildren } from "preact";
-import { ItemProps } from "../islands/buyButtonPage.tsx";
 import { Head } from "$fresh/runtime.ts";
-import { ChainIds, explorerUrl, explorerUrlAddressPath, networkNameFromId } from "../lib/shared/web3.ts";
+import { ChainIds, networkNameFromId } from "../lib/shared/web3.ts";
 import { ExplorerLinkForAddress, Tooltip, UnderlinedTd, getDebitIntervalText, getDebitIntervalTooltipText, getDebitTimesText, getMaxDebitColTitleFromPricing, getSubscriptionTooltipMessage, getTotalPaymentField, getTotalPaymentFieldTooltip } from "./components.tsx";
+import { ItemProps } from "../lib/types/checkoutTypes.ts";
 
 interface BuyPagelayoutProps {
     children: ComponentChildren,
