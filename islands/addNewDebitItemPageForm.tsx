@@ -45,7 +45,7 @@ export default function AddNewDebitItemPageForm(props: AddNewDebitItemFormProps)
     }
 
 
-    return <form id="itemForm" class="w-full mx-auto bg-white p-8 rounded-md shadow-md" method="POST" onSubmit={onformSubmit}>
+    return <form id="itemForm" class="w-full mx-auto bg-white p-8 rounded-md shadow-md border" method="POST" onSubmit={onformSubmit}>
         <h1 class="text-2xl font-bold mb-6 text-center">New Debit Item</h1>
 
         <div class="flex flex-row flex-wrap justify-around flex-gap 4">
