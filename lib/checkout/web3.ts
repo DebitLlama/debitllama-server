@@ -451,7 +451,7 @@ export function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
                 name: accountName,
                 networkId: args.chainId,
                 commitment: virtualaccount.commitment,
-                currency: args.accountCurrency,
+                currency: JSON.stringify(args.selectedCurrency),
                 accountType: AccountTypes.VIRTUALACCOUNT,
               },
             );
