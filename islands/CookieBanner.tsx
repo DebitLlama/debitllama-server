@@ -29,7 +29,7 @@ export default function CookieBanner() {
 
             <div class="flex flex-row justify-center text-center items-center mt-6 gap-x-4 shrink-0 lg:mt-0">
 
-                <button onClick={() => acceptCookies()} class="text-xs w-1/2 md:w-auto font-medium bg-gray-800 rounded-lg hover:bg-gray-700 text-white px-4 py-2.5 duration-300 transition-colors focus:outline-none">
+                <button aria-label={"Accept all cookies"} onClick={() => acceptCookies()} class="text-xs w-1/2 md:w-auto font-medium bg-gray-800 rounded-lg hover:bg-gray-700 text-white px-4 py-2.5 duration-300 transition-colors focus:outline-none">
                     Accept All Cookies
                 </button>
             </div>

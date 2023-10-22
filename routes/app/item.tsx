@@ -127,7 +127,7 @@ export default function Item(props: PageProps) {
                                         <form method={"POST"} action={"/app/updateItemUrl"} class="flex flex-col justify-left">
                                             <input type="hidden" name="button_id" value={itemData.button_id} />
                                             <input type="url" name="redirect_url" required value={itemData.redirect_url} class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500" />
-                                            <button class="w-32 text-md font-bold mb-2 mt-2 text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800" type="submit">Update Url</button>
+                                            <button aria-label={"Update redirect url button"} class="w-32 text-md font-bold mb-2 mt-2 text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800" type="submit">Update Url</button>
                                         </form>
                                     </div>
                                     </td>
@@ -216,7 +216,7 @@ function DeactivateComponent(props: DeactivateComponentProps) {
         <form method={"POST"} action={`/app/item`}>
             <input type={"hidden"} value={props.itemData.button_id} name="button_id" />
             <input type="hidden" value={`${!props.itemData.deleted}`} name="deleted" />
-            <button class={`bg-gradient-to-b w-max mx-auto text-${color}-500 font-semibold from-slate-50 to-${color}-100 px-10 py-3 rounded-2xl shadow-${color}-400 shadow-md border-b-4 hover border-b border-${color}-200 hover:shadow-sm transition-all duration-500`} type={"submit"}>{buttonTitle}</button>
+            <button aria-label="Deactivate button" class={`bg-gradient-to-b w-max mx-auto text-${color}-500 font-semibold from-slate-50 to-${color}-100 px-10 py-3 rounded-2xl shadow-${color}-400 shadow-md border-b-4 hover border-b border-${color}-200 hover:shadow-sm transition-all duration-500`} type={"submit"}>{buttonTitle}</button>
         </form>
         <div class="flex flex-col justify-center"> <Tooltip message={description}></Tooltip></div>
     </div>

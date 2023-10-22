@@ -54,6 +54,7 @@ export function NextBttnUi(props: {
 
         return <div class="flex p-3 rounded-xl">
             <button
+                aria-label={"Passkey authentication button"}
                 onClick={verifyPasskey}
                 class="w-full flex flex-row justify-center text-xl font-bold mb-4 mt-4 text-white bg-indigo-700 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800 indigobg">
                 <div class="flex flex-col justify-center">
@@ -74,6 +75,7 @@ export function NextBttnUi(props: {
             <input type="hidden" value={props.commitment} name="accountcommitment" />
             <input type="hidden" value={verificationOptions} name="verificationOptions" />
             <button
+            aria-label={"Finish checkout button"}
                 id="finish_checkout"
                 type={"submit"}
                 class="w-full flex flex-row justify-center text-xl font-bold mb-4 mt-4 text-white bg-indigo-700 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800 indigobg">

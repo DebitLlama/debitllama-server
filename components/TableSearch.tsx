@@ -46,9 +46,11 @@ export default function TableSearch(props: TableSearchProps) {
                 value={props.searchTerm}
                 onChange={(event: any) => props.setSearchTerm(event.target.value)}
                 class="w-64 mr-2 px-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
-                type="text" id="searchTerm" name="searchTerm" placeholder={getIdentifierPlaceholder()} />
+                type="text" id="searchTerm" name="searchTerm" placeholder={getIdentifierPlaceholder()} 
+                />
             <div class="flex flex-row">
                 <button
+                    aria-label="Search button"
                     id="searchButton"
                     class="mr-2 bg-gradient-to-b text-slate-500 font-semibold from-slate-50 to-slate-100 px-3 py-3 rounded-2xl shadow-slate-400 shadow-md border-b-4 hover border-b border-slate-200 hover:shadow-sm transition-all duration-500"
                     onClick={props.triggerSearch}

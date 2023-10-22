@@ -128,6 +128,7 @@ export default function RelayerDetailsCard(props: RelayerDetailsCardProps) {
                 value={topUpAmount} onChange={(event: any) => setTopupAmount(event.target.value)} type="number" id="amount" name="amount" placeholder="Amount" step="any" />
             {showError ? <p class="text-sm text-red-500">{errorMessage}</p> : null}
             <button
+                aria-label={"top up button"}
                 class="mt-2 w-full bg-indigo-500 text-white text-sm font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
                 type="submit">Top Up</button>
         </form>

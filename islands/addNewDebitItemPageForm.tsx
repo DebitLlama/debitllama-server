@@ -145,6 +145,7 @@ export default function AddNewDebitItemPageForm(props: AddNewDebitItemFormProps)
                         <p class="text-sm text-gray-600	">The Debit Item parameters are final and can't be edited. But you can deactivate the debit item and create a new one any time!</p>
                     </div>
                     <button
+                        aria-label="save button"
                         type="submit"
                         class="w-64 text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">
                         Save
