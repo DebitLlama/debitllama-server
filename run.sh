@@ -32,4 +32,7 @@ read -s smtpusername
 echo "Enter SMTP password"
 read -s smtppassword
 
-TESTACCESSTOKEN=asd ENV=production SMTP_HOSTNAME=${smtphostname} SMTP_USERNAME=${smtpusername} SMTP_PASSWORD=${smtppassword}  SUPABASE_URL=${supabase_url} SUPABASE_KEY=${supabase_key} ETHENCRYPTPUBLICKEY=${ethencryptpublickey} ETHENCRYPTPRIVATEKEY=${ethencryptprivatekey} pm2 start main.ts --interpreter="deno" --interpreter-args="run -A" 
+echo "Enter Slack Webhook for user feedbacks"
+read -s userfeedbackswebhook
+
+USER_FEEDBACKS_WEBHOOK=${userfeedbackswebhook} TESTACCESSTOKEN=asd ENV=production SMTP_HOSTNAME=${smtphostname} SMTP_USERNAME=${smtpusername} SMTP_PASSWORD=${smtppassword}  SUPABASE_URL=${supabase_url} SUPABASE_KEY=${supabase_key} ETHENCRYPTPUBLICKEY=${ethencryptpublickey} ETHENCRYPTPRIVATEKEY=${ethencryptprivatekey} pm2 start main.ts --interpreter="deno" --interpreter-args="run -A" 
