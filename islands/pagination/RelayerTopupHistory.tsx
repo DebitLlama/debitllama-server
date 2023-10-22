@@ -102,15 +102,15 @@ export default function RelayerTopupHistory(props: RelayerTopupHistoryProps) {
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead class="bg-gray-50 dark:bg-gray-800">
                 <tr>
-                    <th onClick={headerClicked(RelayerTopupHistoryColNames.Date)} tabIndex={1} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
+                    <th onClick={headerClicked(RelayerTopupHistoryColNames.Date)} tabIndex={1} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right   hover:bg-gray-200">
                         Date
                     </th>
-                    <th onClick={headerClicked(RelayerTopupHistoryColNames.Amount)} tabIndex={2} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
+                    <th onClick={headerClicked(RelayerTopupHistoryColNames.Amount)} tabIndex={2} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right   hover:bg-gray-200">
                         Amount
                     </th>
-                    <th onClick={headerClicked(RelayerTopupHistoryColNames.Network)} tabIndex={3} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
+                    <th onClick={headerClicked(RelayerTopupHistoryColNames.Network)} tabIndex={3} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right   hover:bg-gray-200">
                         Network                    </th>
-                    <th tabIndex={4} scope="col" class="w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                    <th tabIndex={4} scope="col" class="w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right  ">
                         Transaction
                     </th>
                 </tr>
@@ -118,14 +118,14 @@ export default function RelayerTopupHistory(props: RelayerTopupHistoryProps) {
             <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
                 {currentTopupHistoryData.map((data) => {
                     return <tr tabIndex={currentTopupHistoryData.indexOf(data) + 5} class="cursor-pointer bg-white hover:bg-gray-300" onClick={onRowClicked(getChainExplorerForChainId(data.network, data.transactionHash))}>
-                        <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
+                        <td class="px-4 py-4 text-sm font-medium  whitespace-nowrap">
                             {new Date(data.created_at).toLocaleString()}
                         </td>
-                        <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
+                        <td class="px-4 py-4 text-sm font-medium  whitespace-nowrap">
                             {data.Amount} {walletCurrency[data.network as ChainIds]}
                         </td>
-                        <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{networkNameFromId[data.network as ChainIds]}</td>
-                        <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+                        <td class="px-4 py-4 text-sm   whitespace-nowrap">{networkNameFromId[data.network as ChainIds]}</td>
+                        <td class="px-4 py-4 text-sm   whitespace-nowrap">
                             {formatTxHash(data.transactionHash)}
                         </td>
                     </tr>

@@ -59,7 +59,7 @@ export default function Item(props: PageProps) {
                 <div class="bg-gray-100 shadow-2xl rounded-2xl border-2 border-gray-50 w-full">
                     <div class="flex flex-col">
                         <div >
-                            <h1 class="text-2xl text-gray-500 font-bold text-center">Debit Item</h1>
+                            <h1 class="text-2xl  font-bold text-center">Debit Item</h1>
                         </div>
 
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -72,7 +72,7 @@ export default function Item(props: PageProps) {
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Checkout:</td>
+                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm   whitespace-nowrap"}>Checkout:</td>
                                     <td class={"px-4 py-4 text-sm whitespace-nowrap flex flex-row justify-start"}>
                                         <a target="_blank" href={`/buyitnow/?q=${itemData.button_id}`} class={"cursor-pointer"}>
                                             <img
@@ -86,43 +86,43 @@ export default function Item(props: PageProps) {
                                     <td><Tooltip message={"Navigate to the checkout page! This button is the same that you can link on your website!"}></Tooltip></td>
                                 </tr>
                                 <tr>
-                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Payee Address:</td>
+                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm   whitespace-nowrap"}>Payee Address:</td>
                                     <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData"> <small>{itemData.payee_address}</small> </div></td>
                                     <td><Tooltip message={"The address that will receive the payment from the subscriptions!"}></Tooltip></td>
                                 </tr>
                                 <tr>
-                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Name:</td>
+                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm   whitespace-nowrap"}>Name:</td>
                                     <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData"> {itemData.name}</div></td>
                                     <td><Tooltip message={"This is the name of the item the lets you identify it easily"}></Tooltip></td>
                                 </tr>
                                 <tr>
-                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Network:</td>
+                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm   whitespace-nowrap"}>Network:</td>
                                     <td class={"px-4 py-4 text-sm whitespace-nowrap"}>{networkNameFromId[itemData.network as ChainIds]}</td>
                                     <td><Tooltip message={"The blockchain network where the payments will be processed!"}></Tooltip></td>
                                 </tr>
                                 <tr>
-                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Max Debited:</td>
+                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm   whitespace-nowrap"}>Max Debited:</td>
                                     <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData">  {itemData.max_price} {JSON.parse(itemData.currency).name}</div></td>
                                     <td><Tooltip message={"The maximum allowed amount to debit. For fixed pricing this is the actual amount, for dynamic pricing this is the maximum amount"}></Tooltip></td>
                                 </tr>
                                 <tr>
-                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Debit Times:</td>
+                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm   whitespace-nowrap"}>Debit Times:</td>
                                     <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData"> {itemData.debit_times}</div></td>
                                     <td><Tooltip message={"The amount of times the amount will be debited."}></Tooltip></td>
 
                                 </tr>
                                 <tr>
-                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Debit Interval (Days):</td>
+                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm   whitespace-nowrap"}>Debit Interval (Days):</td>
                                     <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData"> {itemData.debit_interval}</div></td>
                                     <td><Tooltip message={"The interval of days that need to pass after the last payment date, before the next one can be processed!"}></Tooltip></td>
                                 </tr>
                                 <tr>
-                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Pricing</td>
+                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm   whitespace-nowrap"}>Pricing</td>
                                     <td class={"px-4 py-4 text-sm whitespace-nowrap"}>{itemData.pricing}</td>
                                     <td><Tooltip message={"Pricing defines if the payment is automatically processed or it must be initiated manually with a custom payment amount!"}></Tooltip></td>
                                 </tr>
                                 <tr>
-                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Redirect URL:</td>
+                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm   whitespace-nowrap"}>Redirect URL:</td>
                                     <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class={"overflow-x-auto overflowingTableData max-w-sm"}>
                                         <form method={"POST"} action={"/app/updateItemUrl"} class="flex flex-col justify-left">
                                             <input type="hidden" name="button_id" value={itemData.button_id} />
@@ -135,7 +135,7 @@ export default function Item(props: PageProps) {
                                 </tr>
 
                                 <tr>
-                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Identifier:</td>
+                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm   whitespace-nowrap"}>Identifier:</td>
                                     <td class={"px-4 py-4 text-sm whitespace-nowrap flex flex-row"}><div class="overflow-x-auto overflowingTableData"> <p class="text-xs mt-1"> {itemData.button_id} </p>
                                         <CopyButton str={itemData.button_id} iconColor="black"></CopyButton>
                                     </div>
