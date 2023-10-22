@@ -1,5 +1,5 @@
 export default function TermsAndConditions() {
-    return <div class="flex flex-row justify-center">
+    return <html lang="en"><div class="flex flex-row justify-center">
         <div class="border shadow-xl h-full flex flex-col justify-center max-w-4xl	p-5">
             <div class="flex flex-row justify-center">
                 <img alt="logo" src="logo.svg" width="100" />
@@ -70,4 +70,5 @@ export default function TermsAndConditions() {
 
         </div>
     </div>
+    </html>
 }
