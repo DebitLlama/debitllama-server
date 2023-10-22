@@ -25,7 +25,6 @@ export default function AccessTokensTable(props: AccessTokensTableProps) {
         })
         if (res.status === 200) {
             const json = await res.json();
-            console.log(json)
             setCurrentAccessTokens(json.data)
             setPageData({
                 currentPage: json.currentPage,

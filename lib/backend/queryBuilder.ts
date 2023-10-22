@@ -704,7 +704,6 @@ export default class QueryBuilder {
           return this.responseHandler(res);
         },
         byCredentialId: async (credentialID: string) => {
-          console.log(credentialID);
           const res = await this.client.from("Authenticators")
             .select()
             .eq("user_id", this.userid)
