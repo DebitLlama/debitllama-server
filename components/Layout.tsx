@@ -16,14 +16,17 @@ export default function Layout(props: LayoutProps) {
       <Head>
         <title>DebitLlama</title>
         <link rel="stylesheet" href="/styles.css" />
+
+      </Head>
+      <body>
+        <Nav loggedIn={props.isLoggedIn} />
+        <SideBar renderSidebarOpen={props.renderSidebarOpen}></SideBar>
+        <div class="mx-auto layoutheight overflow-auto" id="layout-children">
+          {props.children}
+        </div>
         <script src="/zxcvbn.js"></script>
         <script src="/directdebit_bundle.js"></script>
-      </Head>
-      <Nav loggedIn={props.isLoggedIn} />
-      <SideBar renderSidebarOpen={props.renderSidebarOpen}></SideBar>
-      <div class="mx-auto layoutheight overflow-auto" id="layout-children">
-        {props.children}
-      </div>
+      </body>
     </>
   );
 }

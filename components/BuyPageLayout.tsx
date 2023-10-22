@@ -1,5 +1,4 @@
 import type { ComponentChildren } from "preact";
-import { Head } from "$fresh/runtime.ts";
 import { ChainIds, networkNameFromId } from "../lib/shared/web3.ts";
 import { ExplorerLinkForAddress, Tooltip, UnderlinedTd, getDebitIntervalText, getDebitIntervalTooltipText, getDebitTimesText, getMaxDebitColTitleFromPricing, getSubscriptionTooltipMessage, getTotalPaymentField, getTotalPaymentFieldTooltip } from "./components.tsx";
 import { ItemProps } from "../lib/types/checkoutTypes.ts";
@@ -16,12 +15,6 @@ export default function BuyPageLayout(props: BuyPagelayoutProps) {
     const networkName = networkNameFromId[chainId];
 
     return <>
-        <Head>
-            <title>DebitLlama</title>
-            <link rel="stylesheet" href="/styles.css" />
-            <script src="/zxcvbn.js"></script>
-            <script src="/directdebit_bundle.js"></script>
-        </Head>
         <div class="md:pr-4 md:pl-4 pb-4 pt-4 mx-auto max-w-screen-lg">
             <div class="flex flex-row flex-wrap gap-2 justify-between">
                 <div class="flex flex-col">
