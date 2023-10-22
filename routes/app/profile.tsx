@@ -91,7 +91,7 @@ export default function Profile(props: PageProps) {
     success = null;
   }
   return (
-    <Layout renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
+    <Layout url={props.url.toString()} renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
       <div class="mt-10 px-5 mx-auto flex max-w-screen-md flex-col justify-center">
         <div>
           <h1 class="text-2xl font-bold mb-5">Profile</h1>

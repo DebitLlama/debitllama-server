@@ -25,7 +25,7 @@ export const handler: Handlers<any, State> = {
 }
 
 export default function NewConnectedWallet(props: PageProps) {
-    return <Layout renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
+    return <Layout url={props.url.toString()} renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
         <div class="container mx-auto py-8">
             <ConnectWalletPageForm
                 ethEncryptPublicKey={props.data.ethEncryptPublicKey}

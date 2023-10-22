@@ -162,7 +162,7 @@ export default function CreatedPaymentIntents(props: PageProps) {
 
     const currName = JSON.parse(pi.debit_item_id.currency).name;
 
-    return <Layout renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
+    return <Layout url={props.url.toString()} renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
         <div class="container mx-auto py-8">
             <div class="bg-gray-100 border border-gray-200 dark:border-gray-700 md:rounded-lg">
                 <div class="text-center"><h1 class="text-2xl font-bold mb-2 text-gray-500 dark:text-gray-40">Payment Intent</h1></div>

@@ -103,7 +103,7 @@ export default function Account(props: PageProps) {
 
     const showBalanceMessage = missedPayments === BigInt("0") ? null : balanceMessage
 
-    return <Layout renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token} >
+    return <Layout url={props.url.toString()} renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token} >
         <div class="container mx-auto py-8">
             <div class="flex items-center justify-center h-full">
                 <div class="bg-white shadow-2xl p-6 rounded-2xl border-2 border-gray-50">

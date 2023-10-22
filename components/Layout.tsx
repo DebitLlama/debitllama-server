@@ -8,9 +8,13 @@ interface LayoutProps {
   isLoggedIn: boolean;
   renderSidebarOpen: string;
   children: ComponentChildren;
+  url: string;
 }
 
 export default function Layout(props: LayoutProps) {
+  const pathname = new URL(props.url).pathname;
+  const injectDeps = pathname === "/app/newConnectedWallet" || pathname === "/app/addNewAccount"
+
   return (
     <>
       <Head>
@@ -24,8 +28,10 @@ export default function Layout(props: LayoutProps) {
         <div class="mx-auto layoutheight overflow-auto" id="layout-children">
           {props.children}
         </div>
-        <script src="/zxcvbn.js"></script>
-        <script src="/directdebit_bundle.js"></script>
+        {injectDeps ? <script src="/zxcvbn.js" async></script>
+          : <></>}
+        {injectDeps ? <script src="/directdebit_bundle.js" async></script>
+          : <></>}
       </body>
     </>
   );
