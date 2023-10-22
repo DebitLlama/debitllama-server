@@ -17,22 +17,24 @@ export default function Layout(props: LayoutProps) {
 
   return (
     <>
-      <Head>
-        <title>DebitLlama</title>
-        <link rel="stylesheet" href="/styles.css" />
-        <meta name="description" content="DebitLlama - Subscription Payments"/>
-      </Head>
-      <body>
-        <Nav loggedIn={props.isLoggedIn} />
-        <SideBar renderSidebarOpen={props.renderSidebarOpen}></SideBar>
-        <div class="mx-auto layoutheight overflow-auto" id="layout-children">
-          {props.children}
-        </div>
-        {injectDeps ? <script src="/zxcvbn.js" async></script>
-          : <></>}
-        {injectDeps ? <script src="/directdebit_bundle.js" async></script>
-          : <></>}
-      </body>
+      <html lang="en">
+        <Head>
+          <title>DebitLlama</title>
+          <link rel="stylesheet" href="/styles.css" />
+          <meta name="description" content="DebitLlama - Subscription Payments" />
+        </Head>
+        <body>
+          <Nav loggedIn={props.isLoggedIn} />
+          <SideBar renderSidebarOpen={props.renderSidebarOpen}></SideBar>
+          <div class="mx-auto layoutheight overflow-auto" id="layout-children">
+            {props.children}
+          </div>
+          {injectDeps ? <script src="/zxcvbn.js" async></script>
+            : <></>}
+          {injectDeps ? <script src="/directdebit_bundle.js" async></script>
+            : <></>}
+        </body>
+      </html>
     </>
   );
 }
