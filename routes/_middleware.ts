@@ -4,6 +4,7 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { getCookies } from "$std/http/cookie.ts";
 import { getUser } from "../lib/backend/auth.ts";
 import { AuthWhitelist } from "../lib/enums.ts";
+import { createSQLiteClient } from "../lib/sqlite/db.ts";
 
 export interface State {
   token: string | null;
@@ -21,6 +22,9 @@ export async function handler(
     Deno.env.get("SUPABASE_KEY") || "",
     { auth: { persistSession: false } },
   );
+
+  const sqliteClient = createSQLiteClient();
+
   const url = new URL(req.url);
   ctx.state.supabaseClient = client;
 
@@ -34,6 +38,7 @@ export async function handler(
     const renderSidebarOpen = getCookies(req.headers)["renderSidebarOpen"] as
       | "true"
       | "false";
+
     const { error, data: { user } } = await getUser(client, supaCreds);
     if (error) {
       ctx.state.token = null;

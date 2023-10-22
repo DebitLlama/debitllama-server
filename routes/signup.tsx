@@ -11,13 +11,12 @@ export const handler: Handlers<any, State> = {
         const email = form.get("email") as string;
         const password = form.get("password") as string;
 
-        const { error } = await signUp(ctx.state.supabaseClient, email, password);
-
+        const signUpRes = await signUp(ctx.state.supabaseClient, email, password);
         const headers = new Headers();
 
-        let redirect = "/"
-        if (error) {
-            redirect = `/signup?error=${error.message}`
+        let redirect = "/login"
+        if (signUpRes.error) {
+            redirect = `/signup?error=${signUpRes.error.message}`
         }
 
         headers.set("location", redirect);

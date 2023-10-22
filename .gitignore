@@ -7,3 +7,5 @@
 todo.md
 # Ignore fresh build directory
 _fresh/
+
+service.db
