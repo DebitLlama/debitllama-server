@@ -23,7 +23,7 @@ export default function Nav({ loggedIn }: NavProps) {
             <SidebarToggleButton></SidebarToggleButton>
             <a href="/app/accounts">
                 <div class="text-2xl  ml-1 font-bold flex flex-row">
-                    <img src="/logo.svg" width="45" class={"mr-3"} />{" "}
+                    <img alt="debitllama logo" src="/logo.svg" width="45" height="45" class={"mr-3"} />{" "}
                     <span class="mt-1">Debit</span><span class="text-gray-600 mt-1">Llama</span>
                 </div>
             </a>

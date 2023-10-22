@@ -114,6 +114,7 @@ export default function BuyItNow(props: PageProps) {
     return <> <Head>
         <title>DebitLlama</title>
         <link rel="stylesheet" href="/styles.css" />
+        <meta name="description" content="DebitLlama - Subscription Payments"/>
     </Head>
         <body>
             {!notfound ? <BuyButtonPage

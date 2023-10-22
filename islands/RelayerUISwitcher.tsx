@@ -32,7 +32,7 @@ export default function RelayerUISwitcher(props: RelayerUISwitcherProps) {
                     <div class="bg-white shadow-2xl p-6 rounded-2xl border-2 border-gray-50 w-96">
                         <div class="flex flex-col">
                             <div class={"flex flex-row justify-start"}>
-                                <img src="/blockchain.png" width="40px" />
+                                <img src="/blockchain.png" width="40px" alt="relayer logo" />
                                 <p class={"text-xl font-extrabold leading-10 pl-6"}>Relayer</p>
                             </div>
                             <RelayerDetailsCard

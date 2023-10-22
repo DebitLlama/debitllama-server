@@ -22,7 +22,7 @@ export function SlackInviteBox() {
                 Join Workspace
             </a>
             <div class="w-36 flex flex-col justify-center">
-                <img src="/slackLogo.webp" alt="Slack" class="mx-auto" />
+                <img src="/slackLogo.webp" alt="Slack" class="mx-auto" width="inherit" height="inherit" />
             </div>
         </div>
     </div>

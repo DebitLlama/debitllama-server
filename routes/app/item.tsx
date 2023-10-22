@@ -51,7 +51,7 @@ export default function Item(props: PageProps) {
 
     const itemData = props.data.itemData[0];
 
-    const embeddedCode = `<a href="https://debitllama.com/buyitnow/?q=${itemData.button_id}"><img width="140px" src="https://debitllama.com/buyitnow.png"/></a>`
+    const embeddedCode = `<a href="https://debitllama.com/buyitnow/?q=${itemData.button_id}"><img alt="Buy it now with DebitLlama" width="140px" src="https://debitllama.com/buyitnow.png"/></a>`
 
     return <Layout url={props.url.toString()} renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
         <div class="container mx-auto py-8">
@@ -77,11 +77,11 @@ export default function Item(props: PageProps) {
                                         <a target="_blank" href={`/buyitnow/?q=${itemData.button_id}`} class={"cursor-pointer"}>
                                             <img
                                                 width="140px"
-
+                                                alt="Buy it now with DebitLlama"
                                                 src={"/buyitnow.png"}
                                             />
                                         </a>
-                                        <img class="blink mb-2" src="/arrowLeft.svg" width={"30"} />
+                                        <img alt="Click here to buy it now" class="blink mb-2" src="/arrowLeft.svg" width={"30"} />
                                     </td>
                                     <td><Tooltip message={"Navigate to the checkout page! This button is the same that you can link on your website!"}></Tooltip></td>
                                 </tr>
@@ -170,6 +170,9 @@ export default function Item(props: PageProps) {
                                     <span>{`\n  `}</span>
                                     <span class="text-yellow-200">width="</span>
                                     <span class="">{`140px`}</span>
+                                    <span class="text-yellow-200">"{`\n  `}</span>
+                                    <span class="text-yellow-200">alt="</span>
+                                    <span class="">{`Buy it now with DebitLlama`}</span>
                                     <span class="text-yellow-200">"{`\n  `}</span>
                                     <span class="text-yellow-200">src="</span>
                                     <span class="">{`https://debitllama.com/buyitnow.png`}</span>

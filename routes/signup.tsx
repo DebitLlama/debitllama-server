@@ -39,7 +39,7 @@ export default function SignUp(props: PageProps) {
             <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
                 <div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0 " >
                     <div class={"mx-auto"}>
-                        <img src="/ridingALlama.png" />
+                        <img alt="Lets fly to space on a Llama rocket" src="/ridingALlama.png" />
                     </div>
                     <div class="mx-auto">
                         <h2 class="text-2xl text-gray-500 mb-5 text-center">Sign up for a Free Account!</h2>
