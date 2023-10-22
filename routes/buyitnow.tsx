@@ -6,6 +6,7 @@ import { signInWithPassword } from "../lib/backend/auth.ts";
 import { parseEther } from "../lib/frontend/web3.ts";
 import { setSupaloginCookie } from "../lib/backend/cookies.ts";
 import { ItemProps } from "../lib/types/checkoutTypes.ts";
+import { Head } from "$fresh/runtime.ts";
 
 function doesProfileExists(profileData: any) {
     if (profileData === null || profileData.length === 0) {
@@ -110,16 +111,23 @@ function sortAccounts(accounts: Array<any> | null): Array<any> | null {
 export default function BuyItNow(props: PageProps) {
     const notfound = props.data.notfound;
     const item = props.data.itemData[0];
-    return <>
-        {!notfound ? <BuyButtonPage
-            ethEncryptPublicKey={props.data.ethEncryptPublicKey}
-            profileExists={props.data.profileExists}
-            accounts={sortAccounts(props.data.accountData)}
-            url={props.url.toString()}
-            item={getItemProps(item)}
-            isLoggedIn={props.data.token}
-            requires2Fa={props.data.requires2Fa}
-        ></BuyButtonPage> : <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
-            <h1 class="text-2xl font-bold mb-6 text-center">Not Found</h1>
-        </div>} </>
+    return <> <Head>
+        <title>DebitLlama</title>
+        <link rel="stylesheet" href="/styles.css" />
+    </Head>
+        <body>
+            {!notfound ? <BuyButtonPage
+                ethEncryptPublicKey={props.data.ethEncryptPublicKey}
+                profileExists={props.data.profileExists}
+                accounts={sortAccounts(props.data.accountData)}
+                url={props.url.toString()}
+                item={getItemProps(item)}
+                isLoggedIn={props.data.token}
+                requires2Fa={props.data.requires2Fa}
+            ></BuyButtonPage> : <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
+                <h1 class="text-2xl font-bold mb-6 text-center">Not Found</h1>
+            </div>}
+            <script src="/zxcvbn.js"></script>
+            <script src="/directdebit_bundle.js"></script>
+        </body> </>
 }
