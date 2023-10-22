@@ -7,13 +7,14 @@ export default function Home() {
             <title>DebitLlama</title>
             <link rel="stylesheet" href="/home.css" />
             <link rel="stylesheet" href="/styles.css" />
+            <meta name="description" content="DebitLlama - Subscription Payments" />
         </Head>
 
         <div>
             <div class="flex flex-row flex-wrap gap-2 justify-between p-2 border-b shadow">
                 <div class="flex flex-col">
                     <div class="text-2xl  ml-1 font-bold flex flex-row">
-                        <img src="/logo.svg" width="45" class={"mr-3"} />{" "}
+                        <img alt="debitllama logo" src="/logo.svg" width="45" height="45" class={"mr-3"} />{" "}
                         <span class="mt-1">Debit</span><span class="text-gray-600 mt-1">Llama</span>
                     </div>
                 </div>
@@ -33,8 +34,8 @@ export default function Home() {
             <section class="bg-gradient-gray-to-white-variant2">
                 <div class="flex flex-col justify-center pt-10  max-w-7xl rounded mx-auto">
                     <div class="flex flex-row justify-center rounded border shadow-lg max-w-7xl mx-auto">
-                        <img class="bigScreen" src="https://raw.githubusercontent.com/StrawberryChocolateFudge/debitLLama-server/API_V1/static/DashboardScreenshot.png" />
-                        <img class="smallScreen" src="https://raw.githubusercontent.com/StrawberryChocolateFudge/debitLLama-server/API_V1/static/AccountScreenshot.png" />
+                        <img alt="dashboard screenshot" width="inherit" height="inherit" class="bigScreen" src="https://raw.githubusercontent.com/StrawberryChocolateFudge/debitLLama-server/API_V1/static/DashboardScreenshot.png" />
+                        <img alt="mobile screenshot" width="inherit" height="inherit" class="smallScreen" src="https://raw.githubusercontent.com/StrawberryChocolateFudge/debitLLama-server/API_V1/static/AccountScreenshot.png" />
                     </div>
                     <div class="flex flex-row justify-center mt-5">
                         <div class="flex flex-col flex-wrap justify-around flex-wrap  p-8 rounded max-w-7xl">
@@ -51,7 +52,7 @@ export default function Home() {
                         <div class="flex flex-col justify-center text-center">
                             <h2 class="text-4xl font-bold text-gray-800 text-gradient-gray-to-white">Easy merchant integration!</h2>
                             <div class="flex flex-row justify-center mt-2">
-                                <img src="/buyitnow.png" width="150px" />
+                                <img alt="Buy It Now with DebitLlama" src="/buyitnow.png" width="150px" height="inherit" />
                             </div>
                         </div>
 
@@ -74,6 +75,9 @@ export default function Home() {
                                     <span>{`\n  `}</span>
                                     <span class="text-yellow-200">width="</span>
                                     <span class="">{`140px`}</span>
+                                    <span class="text-yellow-200">"{`\n  `}</span>
+                                    <span class="text-yellow-200">alt="</span>
+                                    <span class="">{`Buy it now with DebitLlama`}</span>
                                     <span class="text-yellow-200">"{`\n  `}</span>
                                     <span class="text-yellow-200">src="</span>
                                     <span class="">{`https://debitllama.com/buyitnow.png`}</span>
@@ -99,7 +103,7 @@ export default function Home() {
                             <h1 class="text-center mx-auto text-4xl font-bold mt-2 text-gray-800 ">Learn more about how it works</h1>
                         </div>
                         <div class="flex flex-col justify-center">
-                            <img src="/explainerLlama.png" alt="explainerLlamaPic" width="100px" class="mx-auto" />
+                            <img src="https://raw.githubusercontent.com/StrawberryChocolateFudge/debitLLama-server/master/static/explainerLlama.png" alt="explainerLlamaPic" width="100px" height="100px" class="mx-auto" />
 
                             <a href="https://debitllama.gitbook.io/debitllama/" class="font-bold h-12 w-42 text-white bg-black hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-lg px-5 py-2.5 text-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800">Read the Docs </a>
                         </div>

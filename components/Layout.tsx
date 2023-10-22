@@ -20,7 +20,7 @@ export default function Layout(props: LayoutProps) {
       <Head>
         <title>DebitLlama</title>
         <link rel="stylesheet" href="/styles.css" />
-
+        <meta name="description" content="DebitLlama - Subscription Payments"/>
       </Head>
       <body>
         <Nav loggedIn={props.isLoggedIn} />
