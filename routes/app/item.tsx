@@ -53,7 +53,7 @@ export default function Item(props: PageProps) {
 
     const embeddedCode = `<a href="https://debitllama.com/buyitnow/?q=${itemData.button_id}"><img width="140px" src="https://debitllama.com/buyitnow.png"/></a>`
 
-    return <Layout renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
+    return <Layout url={props.url.toString()} renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
         <div class="container mx-auto py-8">
             <div>
                 <div class="bg-gray-100 shadow-2xl rounded-2xl border-2 border-gray-50 w-full">

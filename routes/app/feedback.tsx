@@ -38,7 +38,7 @@ export default function Feedback(props: PageProps) {
     const err = props.url.searchParams.get("error");
     const success = props.url.searchParams.get("success");
 
-    return <Layout renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
+    return <Layout url={props.url.toString()} renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
         <div class="mt-10 px-5 mx-auto flex  flex-col justify-center">
             <div class="mx-auto text-center max-w-xl">
                 <h1 class="text-5xl font-bold mb-5">Send Us Feedback</h1>

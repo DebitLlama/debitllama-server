@@ -20,7 +20,7 @@ export default function Passkeys(props: PageProps) {
 
   const addedPasskeys = props.data.authenticatorCount;
 
-  return <Layout renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
+  return <Layout url={props.url.toString()} renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
     <div class="mt-10 px-5 mx-auto flex max-w-screen-md flex-col justify-center">
       <div class="flex flex-row justify-center">
         <h1 class="text-5xl font-bold mb-5">Passkeys</h1>

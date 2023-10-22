@@ -79,7 +79,7 @@ export const handler: Handlers<any, State> = {
 }
 
 export default function ApiAccess(props: PageProps) {
-    return <Layout renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
+    return <Layout url={props.url.toString()} renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
         <AccessTokenUISwitcher data={props.data}></AccessTokenUISwitcher>
     </Layout>
 }

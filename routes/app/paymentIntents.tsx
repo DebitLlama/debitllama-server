@@ -10,7 +10,7 @@ export const handler: Handlers<any, State> = {
 }
 
 export default function paymentIntents(props: PageProps) {
-    return <Layout renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
+    return <Layout url={props.url.toString()} renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
         <hr
             class="my-1 h-3 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
         <section class="container px-4 mx-auto">
