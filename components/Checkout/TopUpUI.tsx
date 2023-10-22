@@ -34,6 +34,7 @@ export function TopUpUI(props: {
                         <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
                             value={inputValue} onChange={(event: any) => props.setTopupAmount(parseFloat(event.target.value))} type="number" id="amount" name="amount" placeholder="Amount" />
                         <button
+                            aria-label="top up balance"
                             onClick={topupbalance({
                                 topupAmount: inputValue,
                                 commitment: props.selectedAccount.commitment,

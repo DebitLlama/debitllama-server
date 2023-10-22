@@ -113,33 +113,33 @@ export default function DebitItemsTable(props: DebitItemsDataProps) {
                                     <th scope="col" class="relative py-3.5 px-4">
                                         <span class="sr-only">View</span>
                                     </th>
-                                    <th onClick={headerClicked(DebitItemTableColNames.PaymentIntentsCount)} tabIndex={1} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
+                                    <th onClick={headerClicked(DebitItemTableColNames.PaymentIntentsCount)} tabIndex={1} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right   hover:bg-gray-200">
                                         Payment Intents
                                     </th>
 
-                                    <th onClick={headerClicked(DebitItemTableColNames.Name)} tabIndex={2} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
+                                    <th onClick={headerClicked(DebitItemTableColNames.Name)} tabIndex={2} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right   hover:bg-gray-200">
                                         Name
                                     </th>
 
-                                    <th onClick={headerClicked(DebitItemTableColNames.Network)} tabIndex={3} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
+                                    <th onClick={headerClicked(DebitItemTableColNames.Network)} tabIndex={3} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right   hover:bg-gray-200">
                                         Network
                                     </th>
-                                    <th onClick={headerClicked(DebitItemTableColNames.Pricing)} tabIndex={4} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
+                                    <th onClick={headerClicked(DebitItemTableColNames.Pricing)} tabIndex={4} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right   hover:bg-gray-200">
                                         Pricing
                                     </th>
 
-                                    <th tabIndex={5} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
+                                    <th tabIndex={5} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right   hover:bg-gray-200">
                                         Amount
                                     </th>
 
-                                    <th onClick={headerClicked(DebitItemTableColNames.DebitInterval)} tabIndex={6} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
+                                    <th onClick={headerClicked(DebitItemTableColNames.DebitInterval)} tabIndex={6} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right   hover:bg-gray-200">
                                         Debit interval (Days)
                                     </th>
 
-                                    <th onClick={headerClicked(DebitItemTableColNames.DebitTimes)} tabIndex={7} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
+                                    <th onClick={headerClicked(DebitItemTableColNames.DebitTimes)} tabIndex={7} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right   hover:bg-gray-200">
                                         Debit Times
                                     </th>
-                                    <th onClick={headerClicked(DebitItemTableColNames.CreatedAt)} tabIndex={8} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
+                                    <th onClick={headerClicked(DebitItemTableColNames.CreatedAt)} tabIndex={8} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right   hover:bg-gray-200">
                                         Created Date
                                     </th>
                                 </tr>

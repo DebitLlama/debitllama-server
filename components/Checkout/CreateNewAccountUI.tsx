@@ -96,6 +96,7 @@ export function CreateNewAccountUI(props: {
             ></AccountPasswordInput>
             <div class="text-center">
                 <button
+                    aria-label={"Submit transaction button"}
                     disabled={props.isButtonDisabled()}
                     type="submit"
                     class="mb-4 mt-2 bg-indigo-500 text-white text-xl font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"

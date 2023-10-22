@@ -115,8 +115,8 @@ export default function AddNewPassKeyButton() {
             <p class={notification.isError ? "text-red-800 text-lg" : "text-green-800 text-lg"}>{notification.show ? notification.message : ""}</p>
         </div>
         <div class="flex flex-row justify-around">
-            <button onClick={requestRegistrationOptions} class="mt-2 bg-indigo-500 text-white text-xl font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300">Register</button>
-            <button onClick={revokeRegistrationOptions} class="mt-2 bg-indigo-500 text-white text-xl font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300">Remove</button>
+            <button aria-label="Register passkey button" onClick={requestRegistrationOptions} class="mt-2 bg-indigo-500 text-white text-xl font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300">Register</button>
+            <button aria-label="Remove passkey button" onClick={revokeRegistrationOptions} class="mt-2 bg-indigo-500 text-white text-xl font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300">Remove</button>
         </div>
     </div>
 }

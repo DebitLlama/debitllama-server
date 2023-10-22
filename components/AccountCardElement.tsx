@@ -20,7 +20,7 @@ export function AccountCardElement(props: AccountCardElementProps) {
     return <div class="accountCard_container">
         <div class="account_card">
             <div class="visa_logo">
-                <img src="/logo_white.svg" alt="" />
+                <img src="/logo_white.svg" alt="DebitLlama logo" />
             </div>
             {info}
             <div class="visa_crinfo">
@@ -43,22 +43,4 @@ function formatAccountType(accountTypes: AccountTypes) {
         default:
             return ""
     }
-}
-
-//TODO: create one for checkout also!
-
-export function CheckoutAccountCardElement(props: AccountCardElementProps) {
-    return <div class="checkout_accountCard_container">
-        <div class="checkout_account_card">
-            {/* <div class="checkout_visa_logo">
-                <img src="/logo_white.svg" alt="" />
-            </div> */}
-            <div class="checkout_visa_info">
-                <p>{props.name}</p>
-            </div>
-            <div class="checkout_visa_crinfo">
-                <p>{props.balance}{" "}{JSON.parse(props.currency).name} </p>
-            </div>
-        </div>
-    </div>
 }

@@ -100,6 +100,7 @@ export default function CancelPaymentIntentButton(props: CancelPaymentIntentButt
         <Overlay show={showOvelay} error={showOverlayError}></Overlay>
         {props.paymentIntent.statusText === PaymentIntentStatus.CANCELLED ? <p class="text-sm text-red-500">Payment Intent Cancelled!</p> :
             <button
+                aria-label={"Cancel all subsciptions"}
                 disabled={props.paymentIntent.statusText === PaymentIntentStatus.CANCELLED}
                 class="bg-gradient-to-b w-max text-red-500 font-semibold from-slate-50 to-red-100 px-10 py-3 rounded-2xl shadow-red-400 shadow-md border-b-4 hover border-b border-red-200 hover:shadow-sm transition-all duration-500"
                 onClick={cancelClicked}
