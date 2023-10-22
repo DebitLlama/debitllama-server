@@ -220,6 +220,7 @@ export default function Profile(props: PageProps) {
               class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
             <div class="flex flex-row">
               <button
+                aria-label={"Save your profile changes"}
                 type="submit"
                 class="w-64 mx-auto text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">
                 Save

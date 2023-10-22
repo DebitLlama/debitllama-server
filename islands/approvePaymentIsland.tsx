@@ -124,6 +124,7 @@ export default function ApprovePaymentIsland(props: ApprovePaymentIslandProps) {
                         />
                     </div>
                     <button
+                        aria-label="Accept this subsciption"
                         disabled={payClickLocked}
                         onClick={payClicked}
                         class="w-full flex flex-row justify-center text-xl font-bold mb-4 mt-4 text-white bg-indigo-700 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800 indigobg"

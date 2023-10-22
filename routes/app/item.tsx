@@ -51,7 +51,7 @@ export default function Item(props: PageProps) {
 
     const itemData = props.data.itemData[0];
 
-    const embeddedCode = `<a href="https://debitllama.com/buyitnow/?q=${itemData.button_id}"><img width="140px" src="https://debitllama.com/buyitnow.png"/></a>`
+    const embeddedCode = `<a href="https://debitllama.com/buyitnow/?q=${itemData.button_id}"><img alt="Buy it now with DebitLlama" width="140px" src="https://debitllama.com/buyitnow.png"/></a>`
 
     return <Layout url={props.url.toString()} renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
         <div class="container mx-auto py-8">
@@ -59,7 +59,7 @@ export default function Item(props: PageProps) {
                 <div class="bg-gray-100 shadow-2xl rounded-2xl border-2 border-gray-50 w-full">
                     <div class="flex flex-col">
                         <div >
-                            <h1 class="text-2xl text-gray-500 font-bold text-center">Debit Item</h1>
+                            <h1 class="text-2xl  font-bold text-center">Debit Item</h1>
                         </div>
 
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -72,62 +72,62 @@ export default function Item(props: PageProps) {
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Checkout:</td>
+                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm   whitespace-nowrap"}>Checkout:</td>
                                     <td class={"px-4 py-4 text-sm whitespace-nowrap flex flex-row justify-start"}>
                                         <a target="_blank" href={`/buyitnow/?q=${itemData.button_id}`} class={"cursor-pointer"}>
                                             <img
                                                 width="140px"
-
+                                                alt="Buy it now with DebitLlama"
                                                 src={"/buyitnow.png"}
                                             />
                                         </a>
-                                        <img class="blink mb-2" src="/arrowLeft.svg" width={"30"} />
+                                        <img alt="Click here to buy it now" class="blink mb-2" src="/arrowLeft.svg" width={"30"} />
                                     </td>
                                     <td><Tooltip message={"Navigate to the checkout page! This button is the same that you can link on your website!"}></Tooltip></td>
                                 </tr>
                                 <tr>
-                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Payee Address:</td>
+                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm   whitespace-nowrap"}>Payee Address:</td>
                                     <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData"> <small>{itemData.payee_address}</small> </div></td>
                                     <td><Tooltip message={"The address that will receive the payment from the subscriptions!"}></Tooltip></td>
                                 </tr>
                                 <tr>
-                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Name:</td>
+                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm   whitespace-nowrap"}>Name:</td>
                                     <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData"> {itemData.name}</div></td>
                                     <td><Tooltip message={"This is the name of the item the lets you identify it easily"}></Tooltip></td>
                                 </tr>
                                 <tr>
-                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Network:</td>
+                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm   whitespace-nowrap"}>Network:</td>
                                     <td class={"px-4 py-4 text-sm whitespace-nowrap"}>{networkNameFromId[itemData.network as ChainIds]}</td>
                                     <td><Tooltip message={"The blockchain network where the payments will be processed!"}></Tooltip></td>
                                 </tr>
                                 <tr>
-                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Max Debited:</td>
+                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm   whitespace-nowrap"}>Max Debited:</td>
                                     <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData">  {itemData.max_price} {JSON.parse(itemData.currency).name}</div></td>
                                     <td><Tooltip message={"The maximum allowed amount to debit. For fixed pricing this is the actual amount, for dynamic pricing this is the maximum amount"}></Tooltip></td>
                                 </tr>
                                 <tr>
-                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Debit Times:</td>
+                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm   whitespace-nowrap"}>Debit Times:</td>
                                     <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData"> {itemData.debit_times}</div></td>
                                     <td><Tooltip message={"The amount of times the amount will be debited."}></Tooltip></td>
 
                                 </tr>
                                 <tr>
-                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Debit Interval (Days):</td>
+                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm   whitespace-nowrap"}>Debit Interval (Days):</td>
                                     <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData"> {itemData.debit_interval}</div></td>
                                     <td><Tooltip message={"The interval of days that need to pass after the last payment date, before the next one can be processed!"}></Tooltip></td>
                                 </tr>
                                 <tr>
-                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Pricing</td>
+                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm   whitespace-nowrap"}>Pricing</td>
                                     <td class={"px-4 py-4 text-sm whitespace-nowrap"}>{itemData.pricing}</td>
                                     <td><Tooltip message={"Pricing defines if the payment is automatically processed or it must be initiated manually with a custom payment amount!"}></Tooltip></td>
                                 </tr>
                                 <tr>
-                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Redirect URL:</td>
+                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm   whitespace-nowrap"}>Redirect URL:</td>
                                     <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class={"overflow-x-auto overflowingTableData max-w-sm"}>
                                         <form method={"POST"} action={"/app/updateItemUrl"} class="flex flex-col justify-left">
                                             <input type="hidden" name="button_id" value={itemData.button_id} />
                                             <input type="url" name="redirect_url" required value={itemData.redirect_url} class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500" />
-                                            <button class="w-32 text-md font-bold mb-2 mt-2 text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800" type="submit">Update Url</button>
+                                            <button aria-label={"Update redirect url button"} class="w-32 text-md font-bold mb-2 mt-2 text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800" type="submit">Update Url</button>
                                         </form>
                                     </div>
                                     </td>
@@ -135,7 +135,7 @@ export default function Item(props: PageProps) {
                                 </tr>
 
                                 <tr>
-                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap"}>Identifier:</td>
+                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm   whitespace-nowrap"}>Identifier:</td>
                                     <td class={"px-4 py-4 text-sm whitespace-nowrap flex flex-row"}><div class="overflow-x-auto overflowingTableData"> <p class="text-xs mt-1"> {itemData.button_id} </p>
                                         <CopyButton str={itemData.button_id} iconColor="black"></CopyButton>
                                     </div>
@@ -170,6 +170,9 @@ export default function Item(props: PageProps) {
                                     <span>{`\n  `}</span>
                                     <span class="text-yellow-200">width="</span>
                                     <span class="">{`140px`}</span>
+                                    <span class="text-yellow-200">"{`\n  `}</span>
+                                    <span class="text-yellow-200">alt="</span>
+                                    <span class="">{`Buy it now with DebitLlama`}</span>
                                     <span class="text-yellow-200">"{`\n  `}</span>
                                     <span class="text-yellow-200">src="</span>
                                     <span class="">{`https://debitllama.com/buyitnow.png`}</span>
@@ -213,7 +216,7 @@ function DeactivateComponent(props: DeactivateComponentProps) {
         <form method={"POST"} action={`/app/item`}>
             <input type={"hidden"} value={props.itemData.button_id} name="button_id" />
             <input type="hidden" value={`${!props.itemData.deleted}`} name="deleted" />
-            <button class={`bg-gradient-to-b w-max mx-auto text-${color}-500 font-semibold from-slate-50 to-${color}-100 px-10 py-3 rounded-2xl shadow-${color}-400 shadow-md border-b-4 hover border-b border-${color}-200 hover:shadow-sm transition-all duration-500`} type={"submit"}>{buttonTitle}</button>
+            <button aria-label="Deactivate button" class={`bg-gradient-to-b w-max mx-auto text-${color}-500 font-semibold from-slate-50 to-${color}-100 px-10 py-3 rounded-2xl shadow-${color}-400 shadow-md border-b-4 hover border-b border-${color}-200 hover:shadow-sm transition-all duration-500`} type={"submit"}>{buttonTitle}</button>
         </form>
         <div class="flex flex-col justify-center"> <Tooltip message={description}></Tooltip></div>
     </div>

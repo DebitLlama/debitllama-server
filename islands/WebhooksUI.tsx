@@ -39,7 +39,7 @@ export default function WebhooksSettings(props: WebhookSettingsProps) {
                     <div class="bg-indigo-100 border-t border-b border-indigo-500 text-indigo-700 px-4 py-3 w-64 mt-2 w-full" role="alert">
                         <p class="font-bold">Success</p>
                         <p class="text-sm">The webhook url was updated!</p>
-                    </div> : <button type="submit" class="w-64 mt-2 w-full text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
+                    </div> : <button aria-label="Update webhook link" type="submit" class="w-64 mt-2 w-full text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
                     >Update Webhook</button>}
             </form>
 

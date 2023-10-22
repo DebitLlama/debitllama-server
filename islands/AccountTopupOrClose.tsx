@@ -202,6 +202,7 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
             <input required class="max-w-lg px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
                 value={amount} onChange={(event: any) => setAmount(event.target.value)} type="number" id="amount" name="amount" placeholder="Amount" step="any" />
             <button
+                aria-label={"Top up buttons"}
                 class="max-w-md bg-indigo-500 text-white text-sm font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
                 disabled={props.accountClosed}
                 type="submit">Top Up</button>
@@ -209,6 +210,7 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
     </div>
         <div class="my-6 text-center">
             <button
+                aria-label="withdraw and close account"
                 disabled={props.accountClosed}
                 class="mx-auto mt-2 max-w-md text-sm font-bold py-2 px-4 rounded-md transition duration-300"
                 onClick={withdrawAndClose}

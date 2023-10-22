@@ -2,7 +2,7 @@ export default function TermsAndConditions() {
     return <div class="flex flex-row justify-center">
         <div class="border shadow-xl h-full flex flex-col justify-center max-w-4xl	p-5">
             <div class="flex flex-row justify-center">
-                <img src="logo.svg" width="100" />
+                <img alt="logo" src="logo.svg" width="100" />
             </div>
             <h2 class={"text-center mt-5 mb-5 text-3xl"}>DebitLlama Terms and Conditions</h2>
             <p>Please read these terms and conditions carefully before using the website debitllama.com.</p>

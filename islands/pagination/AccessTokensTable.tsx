@@ -90,22 +90,22 @@ export default function AccessTokensTable(props: AccessTokensTableProps) {
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-800 select-none">
                                 <tr>
-                                    <th onClick={headerClicked("created_at")} tabIndex={8} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
+                                    <th onClick={headerClicked("created_at")} tabIndex={8} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right   hover:bg-gray-200">
                                         Created Date
                                     </th>
-                                    <th tabIndex={1} scope="col" class="cursor-pointer w-1/12 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
+                                    <th tabIndex={1} scope="col" class="cursor-pointer w-1/12 px-4 py-3.5 text-sm font-normal text-left rtl:text-right   hover:bg-gray-200">
                                         Valid
                                     </th>
 
-                                    <th tabIndex={2} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
+                                    <th tabIndex={2} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right   hover:bg-gray-200">
                                         Access Token
                                     </th>
 
 
-                                    <th tabIndex={3} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
+                                    <th tabIndex={3} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right   hover:bg-gray-200">
                                         Expiry Date
                                     </th>
-                                    <th tabIndex={4} scope="col" class="cursor-pointer w-1/12 px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400 hover:bg-gray-200">
+                                    <th tabIndex={4} scope="col" class="cursor-pointer w-1/12 px-4 py-3.5 text-sm font-normal text-left rtl:text-right   hover:bg-gray-200">
                                         Delete
                                     </th>
 
@@ -113,14 +113,14 @@ export default function AccessTokensTable(props: AccessTokensTableProps) {
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
                                 {currentAccessTokens.map((d: any) => <tr>
-                                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{new Date(d.created_at).toLocaleString()}</td>
-                                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{getValidIcon(d.expiry_date_utc)}</td>
-                                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{d.access_token}</td>
-                                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{new Date(d.expiry_date_utc).toLocaleString()}</td>
-                                    <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+                                    <td class="px-4 py-4 text-sm   whitespace-nowrap">{new Date(d.created_at).toLocaleString()}</td>
+                                    <td class="px-4 py-4 text-sm   whitespace-nowrap">{getValidIcon(d.expiry_date_utc)}</td>
+                                    <td class="px-4 py-4 text-sm   whitespace-nowrap">{d.access_token}</td>
+                                    <td class="px-4 py-4 text-sm   whitespace-nowrap">{new Date(d.expiry_date_utc).toLocaleString()}</td>
+                                    <td class="px-4 py-4 text-sm   whitespace-nowrap">
                                         <form onSubmit={onDeleteSubmit}>
                                             <input name="accesstoken" type="hidden" value={d.access_token} />
-                                            <button class="rounded-full bg-gray-50 hover:bg-gray-100 p-4 shadow-lg">
+                                            <button aria-label={"Delete Access token "} class="rounded-full bg-gray-50 hover:bg-gray-100 p-4 shadow-lg">
                                                 <svg fill={"currentColor"} xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" /></svg>
                                             </button>
                                         </form>

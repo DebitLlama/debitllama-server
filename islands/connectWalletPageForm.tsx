@@ -38,7 +38,7 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
 
     const [connectWalletButtonText, setConnectWalletButtonText] = useState("Connect Wallet");
     const [selectedNetwork, setSelectedNetwork] = useState(availableNetworks[0]);
-    
+
     const [selectableCurrencyArray, setSelectableCurrencyArray] = useState<SelectableCurrency[]>(getCurrenciesForNetworkName[selectedNetwork as NetworkNames].filter((curr) => curr.native === false));
     const [selectedCurrency, setSelectedCurrency] = useState<SelectableCurrency>(selectableCurrencyArray[0]);
 
@@ -197,6 +197,7 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
         </div>
         {walletTokenUsedError ? <p class="text-sm text-red-500">Your wallet is already connected to that token on the current network!</p> : ""}
         <button
+            aria-label={"connect you wallet buttons"}
             disabled={isButtonDisabled()}
             class="w-full bg-indigo-500 text-white text-sm font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
             type="submit">{connectWalletButtonText}</button>

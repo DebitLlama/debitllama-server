@@ -19,7 +19,7 @@ export default function BuyPageLayout(props: BuyPagelayoutProps) {
             <div class="flex flex-row flex-wrap gap-2 justify-between">
                 <div class="flex flex-col">
                     <div class="text-2xl  ml-1 font-bold flex flex-row">
-                        <img src="/logo.svg" width="45" class={"mr-3"} />{" "}
+                        <img src="/logo.svg" alt="debitLlama logo" width="45" height="45" class={"mr-3"} />{" "}
                         <span class="mt-1">Debit</span><span class="text-gray-600 mt-1">Llama</span>
                     </div>
                 </div>

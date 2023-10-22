@@ -45,6 +45,7 @@ export function RefreshBalanceUI(props: {
                         <input required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
                             value={inputValue} onChange={(event: any) => props.setTopupAmount(parseFloat(event.target.value))} type="number" id="amount" name="amount" placeholder="Amount" />
                         <button
+                            aria-label={"Approve spend"}
                             onClick={approveBalance({
                                 topupAmount: inputValue,
                                 commitment: props.selectedAccount.commitment,
@@ -68,6 +69,7 @@ export function RefreshBalanceUI(props: {
                     <UnderlinedTd extraStyles="importantNoPaddingLeft rounded-lg bg-gray-50 dark:bg-black-800 text-black-400 dark:text-black-200 text-sm font-bold" >
                         <p>You just added balance to the connected wallet, but can't see it?</p>
                         <button
+                            aria-label={"refresh balance"}
                             onClick={refreshBalanceClick({
                                 topupAmount: inputValue,
                                 commitment: props.selectedAccount.commitment,

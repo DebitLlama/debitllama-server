@@ -13,6 +13,7 @@ export default function SidebarToggleButton() {
         }
     }
     return <button
+        aria-label="Sidebar trigger button"
         class="text-gray-600 w-10 h-10 rounded-full hover:bg-gray-200 shadow-2xl active:shadow-lg mouse shadow transition ease-in duration-200 focus:outline-none" onClick={toggleSidebar}>
         <MenuIcon></MenuIcon>
     </button>

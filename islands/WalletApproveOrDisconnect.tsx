@@ -101,6 +101,7 @@ export default function WalletApproveOrDisconnect(props: WalletApproveOrDisconne
                 <input required class="max-w-lg px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
                     value={approveAmount} onChange={(event: any) => setApproveAmount(event.target.value)} type="number" id="amount" name="amount" placeholder="Amount" step="any" />
                 <button
+                    aria-label="Update your approved allowance"
                     class="max-w-md bg-indigo-500 text-white text-sm font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
                     disabled={props.accountClosed}
                     type="submit">Update Allowance</button>
@@ -112,6 +113,7 @@ export default function WalletApproveOrDisconnect(props: WalletApproveOrDisconne
         </div>
         <div class="my-6 text-center">
             <button
+                aria-label="Disconnect your account"
                 disabled={props.accountClosed}
                 class="mx-auto mt-2 max-w-md text-sm font-bold py-2 px-4 rounded-md transition duration-300"
                 onClick={disconnectAccount}

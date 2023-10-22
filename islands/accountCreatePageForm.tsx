@@ -296,6 +296,7 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
         </div>
         {walletMismatchError ? <p class="text-sm text-red-500">Your browser wallet does not match your profile!</p> : ""}
         <button
+            aria-label="Create new account"
             disabled={isButtonDisabled()}
             class="w-full bg-indigo-500 text-white text-sm font-bold py-2 px-4 rounded-md  hover:bg-indigo-600 disabled:bg-indigo-100 transition duration-300"
             type="submit">{createAccountButtonText}</button>

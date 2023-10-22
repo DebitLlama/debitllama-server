@@ -39,7 +39,7 @@ export default function SignUp(props: PageProps) {
             <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
                 <div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0 " >
                     <div class={"mx-auto"}>
-                        <img src="/ridingALlama.png" />
+                        <img alt="Lets fly to space on a Llama rocket" src="/ridingALlama.png" />
                     </div>
                     <div class="mx-auto">
                         <h2 class="text-2xl text-gray-500 mb-5 text-center">Sign up for a Free Account!</h2>
@@ -61,7 +61,7 @@ export default function SignUp(props: PageProps) {
                                 <input type="password" name="password" id="password" placeholder="••••••••" class="border border-gray-300 sm:text-sm rounded-lg focus:ring-indigo-600 focus:border-indigo-600 block w-full p-2.5 dark:focus:ring-indigo-500 dark:focus:border-indigo-500" />
                             </div>
 
-                            <button type="submit" class="w-full text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-2xl px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">Sign Up</button>
+                            <button aria-label="Sign up button" type="submit" class="w-full text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-2xl px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">Sign Up</button>
                             <p class="text-sm font-light text-gray-500 dark:text-gray-400">
                                 Already have an account? <a href="/login" class="font-medium text-indigo-600 hover:underline dark:text-indigo-500">Login here</a>
                             </p>

@@ -61,7 +61,7 @@ export default function Login(props: PageProps) {
             <section class="bg-gray-200 h-screen">
                 <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
                     <div class="mx-auto mb-5">
-                        <img src="/logo.svg" width="100" />
+                        <img alt="debitllama logo" src="/logo.svg" width="100" height="100" />
                     </div>
                     <div class="mx-auto">
                         <h2 class="text-2xl font-bold mb-5 text-center">Welcome to <span>Debit</span><span class="text-gray-600">Llama</span></h2>

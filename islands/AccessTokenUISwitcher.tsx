@@ -18,7 +18,7 @@ function UiSwitcherButtons(props: {
     navigateTo: AccessTokenUIState;
     setStateTo: () => void;
 }) {
-    return <button disabled={props.currentState === props.navigateTo} onClick={props.setStateTo} class="disabled:opacity-50 disabled:cursor-not-allowed mx-2 mb-2 bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">{props.text}</button>
+    return <button aria-label="switch between access token and webhook tab" disabled={props.currentState === props.navigateTo} onClick={props.setStateTo} class="disabled:opacity-50 disabled:cursor-not-allowed mx-2 mb-2 bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">{props.text}</button>
 }
 
 
@@ -45,7 +45,7 @@ export default function AccessTokenUISwitcher(props: AccessTokenUISwitcher) {
                                     <option value={TokenExpiry.ONEYEAR} >One Year</option>
                                 </select>
                             </div>
-                            <button type="submit" class=" w-64 mt-2 w-full text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
+                            <button aria-label="get new access token" type="submit" class=" w-64 mt-2 w-full text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"
                             >Get New Token</button>
                         </form>
                         <div class="text-center">

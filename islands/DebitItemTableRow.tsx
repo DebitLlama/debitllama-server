@@ -27,38 +27,38 @@ export default function DebitItemTableRow(props: DebitItemTableRowProps) {
                 {GetRowIcon(props.deleted)}
             </div>
         </td>
-        <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{props.payment_intents_count}</td>
-        <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
+        <td class="px-4 py-4 text-sm   whitespace-nowrap">{props.payment_intents_count}</td>
+        <td class="px-4 py-4 text-sm font-medium  whitespace-nowrap">
             <div class="flex items-center gap-x-2">
                 <div>
-                    <p class="text-xs font-normal text-gray-600 dark:text-gray-400">{props.name}</p>
+                    <p class="text-xs font-normal  ">{props.name}</p>
                 </div>
             </div>
         </td>
-        <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
+        <td class="px-4 py-4 text-sm font-medium  whitespace-nowrap">
             <div class="flex items-center gap-x-2">
                 <div>
-                    <p class="text-xs font-normal text-gray-600 dark:text-gray-400">{network}</p>
+                    <p class="text-xs font-normal  ">{network}</p>
                 </div>
             </div>
         </td>
-        <td class="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
+        <td class="px-4 py-4 text-sm font-medium  whitespace-nowrap">
             <div class="flex items-center gap-x-2">
                 <div>
-                    <p class="text-xs font-normal text-gray-600 dark:text-gray-400">{props.pricing}</p>
+                    <p class="text-xs font-normal  ">{props.pricing}</p>
                 </div>
             </div>
         </td>
-        <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+        <td class="px-4 py-4 text-sm   whitespace-nowrap">
             <div class="flex items-center gap-x-2">
                 <div>
-                    <p class="text-xs font-normal text-gray-600 dark:text-gray-400">{props.maxDebitAmount} {props.currency}</p>
+                    <p class="text-xs font-normal  ">{props.maxDebitAmount} {props.currency}</p>
                 </div>
             </div>
         </td>
-        <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{props.debitInterval}</td>
-        <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{props.debitTimes}</td>
-        <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">{new Date(props.created_at).toLocaleString()}</td>
+        <td class="px-4 py-4 text-sm   whitespace-nowrap">{props.debitInterval}</td>
+        <td class="px-4 py-4 text-sm   whitespace-nowrap">{props.debitTimes}</td>
+        <td class="px-4 py-4 text-sm   whitespace-nowrap">{new Date(props.created_at).toLocaleString()}</td>
     </tr>
 }
 

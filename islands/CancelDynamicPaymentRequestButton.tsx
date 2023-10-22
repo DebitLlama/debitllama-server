@@ -40,6 +40,7 @@ export default function CancelDynamicPaymentRequestButton(props: CancelDynamicPa
         {props.paymentIntent.statusText === PaymentIntentStatus.CANCELLED ? <p class="text-sm text-red-500">Payment Intent Cancelled!</p> :
             <div class={"flex flex-col justify-center"}>
                 <button
+                    aria-label="Cancel dynamic payment request button"
                     disabled={props.paymentIntent.statusText === PaymentIntentStatus.CANCELLED}
                     class="bg-gradient-to-b w-max text-slate-500 font-semibold from-slate-50 to-slate-100 px-10 py-3 rounded-2xl shadow-slate-400 shadow-md border-b-4 hover border-b border-slate-200 hover:shadow-sm transition-all duration-500"
                     onClick={cancelDynamicPayment}

@@ -45,8 +45,10 @@ export async function handler(
     }
     return await ctx.next();
   }
-
-  return await ctx.next();
+  // All other pages I can cache!
+  const res = await ctx.next();
+  res.headers.append("Cache-Control", " max-age=31536000");
+  return res;
 }
 
 function shouldCheckAuth(pathname: string) {
