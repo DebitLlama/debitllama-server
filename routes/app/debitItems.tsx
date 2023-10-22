@@ -21,7 +21,7 @@ export const handler: Handlers<any, State> = {
 export default function DebitItems(props: PageProps) {
     const debitItemsData = props.data.debitItemsData;
     const totalPages = props.data.totalPages;
-    return <Layout renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
+    return <Layout url={props.url.toString()} renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
         <hr class="w-48 h-1 mx-auto my-8 border-0 rounded md:my-10 " />
         <section class="container px-4 mx-auto">
             <DebitItemsTable debitItems={debitItemsData} totalPages={totalPages}></DebitItemsTable>

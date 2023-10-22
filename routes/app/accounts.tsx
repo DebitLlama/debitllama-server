@@ -19,7 +19,7 @@ export const handler: Handlers<any, State> = {
 
 export default function Accounts(props: PageProps) {
     return (
-        <Layout renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
+        <Layout url={props.url.toString()} renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
             <AccountCardCarousel
                 page="active"
                 missedPayments={props.data.missedPayments}
