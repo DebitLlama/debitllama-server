@@ -576,7 +576,6 @@ export async function addDynamicPaymentRequest(
       relayerBalanceDataArr[0].id,
     );
     id = insertedRequestRes.data[0].id;
-    console.log("insertedRequestRes", insertedRequestRes);
 
     await updateRelayerBalanceWithAllocatedAmount(
       queryBuilder,

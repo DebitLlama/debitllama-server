@@ -8,6 +8,7 @@ import ApprovePaymentIsland from "../../islands/approvePaymentIsland.tsx";
 import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 import { AccountTypes } from "../../lib/enums.ts";
 import { verifyAuthentication } from "../../lib/webauthn/backend.ts";
+import { Head } from "$fresh/runtime.ts";
 
 const ethEncryptPrivateKey = Deno.env.get("ETHENCRYPTPRIVATEKEY") || "";
 
@@ -127,23 +128,32 @@ export const handler: Handlers<any, State> = {
 export default function Approvepayments(props: PageProps) {
   const notfound = props.data.notfound;
   const item = props.data.itemData[0];
-  return <>{!notfound ? <BuyPageLayout
-    isLoggedIn={props.data.token}
-    item={getItemProps(item)}
-  >
-    <ApprovePaymentIsland
-      symmetricEncryptedNote={props.data.symmetricEncryptedNote}
-      itemData={getItemProps(item)}
-      accountcommitment={props.data.accountcommitment}
-      accountName={props.data.accountName}
-      accountBalance={props.data.accountBalance}
-      accountCurrency={props.data.accountCurrency}
-      accountType={props.data.accountType}
-      closed={props.data.closed}
-    ></ApprovePaymentIsland>
-  </BuyPageLayout> : <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
-    <h1 class="text-2xl font-bold mb-6 text-center">Not Found</h1>
-  </div>
-  }
+  return <>
+    <Head>
+      <title>DebitLlama</title>
+      <link rel="stylesheet" href="/styles.css" />
+    </Head>
+    <body>
+      {!notfound ? <BuyPageLayout
+        isLoggedIn={props.data.token}
+        item={getItemProps(item)}
+      >
+        <ApprovePaymentIsland
+          symmetricEncryptedNote={props.data.symmetricEncryptedNote}
+          itemData={getItemProps(item)}
+          accountcommitment={props.data.accountcommitment}
+          accountName={props.data.accountName}
+          accountBalance={props.data.accountBalance}
+          accountCurrency={props.data.accountCurrency}
+          accountType={props.data.accountType}
+          closed={props.data.closed}
+        ></ApprovePaymentIsland>
+      </BuyPageLayout> : <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
+        <h1 class="text-2xl font-bold mb-6 text-center">Not Found</h1>
+      </div>
+      }
+      <script src="/zxcvbn.js"></script>
+      <script src="/directdebit_bundle.js"></script>
+    </body>
   </>
 }
