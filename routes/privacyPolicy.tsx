@@ -1,5 +1,5 @@
 export default function PrivacyPolicy() {
-    return <div class="flex flex-row justify-center">
+    return <html lang="en"> <div class="flex flex-row justify-center">
         <div class="border shadow-xl h-full flex flex-col justify-center max-w-4xl	p-5">
             <h2 class={"text-center mt-5 mb-5 text-3xl"}>Privacy Policy</h2>
             <p>At DebitLlama.com, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy outlines our practices regarding the collection, use, and disclosure of your personal data when you visit our website.</p>
@@ -23,4 +23,5 @@ export default function PrivacyPolicy() {
                 Thank you for choosing DebitLlama.com. Your privacy is important to us, and we are dedicated to providing you with a secure and enjoyable online experience while respecting your GDPR rights.</p>
         </div>
     </div>
+    </html>
 }
