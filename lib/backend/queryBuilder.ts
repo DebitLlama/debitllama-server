@@ -711,6 +711,30 @@ export default class QueryBuilder {
           return this.responseHandler(res);
         },
       },
+      AffiliateCodes: {
+        byCreatorId: async () => {
+          const res = await this.client.from("AffiliateCodes")
+            .select()
+            .eq("user_id", this.userid);
+
+          return this.responseHandler(res);
+        },
+        codeExists: async (code: string) => {
+          const res = await this.client.from("AffiliateCodes")
+            .select()
+            .eq("code", code);
+          return this.responseHandler(res);
+        },
+      },
+      AffiliatedAccounts: {
+        byCommitment: async (commitment: string) => {
+          const res = await this.client.from("AffiliatedAccounts")
+            .select()
+            .eq("account_commitment", commitment)
+            .eq("user_id", this.userid);
+          return this.responseHandler(res);
+        },
+      },
     };
   }
 
@@ -1006,6 +1030,30 @@ export default class QueryBuilder {
           return this.responseHandler(res);
         },
       },
+      AffiliateCodes: {
+        forCreatorId: async (walletAddress: string, code: string) => {
+          const res = await this.client.from("AffiliateCodes")
+            .insert({
+              created_at: new Date().toUTCString(),
+              user_id: this.userid,
+              walletAddress,
+              code,
+            });
+          return this.responseHandler(res);
+        },
+      },
+      AffiliatedAccounts: {
+        byCommitment: async (commitment: string, code: string) => {
+          const res = await this.client.from("AffiliatedAccounts")
+            .insert({
+              created_at: new Date().toUTCString(),
+              account_commitment: commitment,
+              affiliate_code: code,
+              user_id: this.userid,
+            });
+          return this.responseHandler(res);
+        },
+      },
     };
   }
 
@@ -1205,6 +1253,26 @@ export default class QueryBuilder {
           return this.responseHandler(res);
         },
       },
+      AffiliateCodes: {
+        forCreatorId: async (walletAddress: string, code: string) => {
+          const res = await this.client.from("AffiliateCodes")
+            .update({
+              walletAddress,
+              code,
+            }).eq("user_id", this.userid);
+          return this.responseHandler(res);
+        },
+      },
+      AffiliatedAccounts: {
+        byCommitment: async (commitment: string, code: string) => {
+          const res = await this.client.from("AffiliatedAccounts")
+            .update({
+              affiliate_code: code,
+            }).eq("account_commitment", commitment)
+            .eq("user_id", this.userid);
+          return this.responseHandler(res);
+        },
+      },
     };
   }
 
@@ -1281,6 +1349,16 @@ export default class QueryBuilder {
             .eq("credentialID", credentialID)
             .eq("user_id", this.userid);
 
+          return this.responseHandler(res);
+        },
+      },
+      AffiliatedAccounts: {
+        byCommitment: async (commitment: string) => {
+          const res = await this.client.from("AffiliatedAccounts")
+            .delete().eq("account_commitment", commitment).eq(
+              "user_id",
+              this.userid,
+            );
           return this.responseHandler(res);
         },
       },
