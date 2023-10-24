@@ -2,7 +2,7 @@ import { AccountTypes } from "../lib/enums.ts";
 import { useEffect, useState } from 'preact/hooks';
 import { ChainIds, getConnectedWalletsContractAddress } from "../lib/shared/web3.ts";
 
-import { balanceOf, formatEther, getAllowance, getContract, getJSONRPCProvider, isZero, isAddress } from "../lib/frontend/web3.ts";
+import { balanceOf, formatEther, getAllowance, getContract, getJSONRPCProvider, isZero, isAddress, getRpcContract } from "../lib/frontend/web3.ts";
 import { ExplorerLinkForAddress } from "../components/components.tsx";
 
 
@@ -22,7 +22,7 @@ export default function WalletDetailsFetcher(props: ConnectedWalletDetailsFetche
     async function fetchAndSetBalanceAndApproval() {
         const connectedWalletContractAddress = getConnectedWalletsContractAddress[props.networkId];
         const provider = getJSONRPCProvider(props.networkId);
-        const erc20Contract = await getContract(provider, props.tokenAddress, "/ERC20.json").catch(console.error);
+        const erc20Contract = await getRpcContract(provider, props.tokenAddress, "/ERC20.json").catch(console.error);
         const balance = await balanceOf(erc20Contract, props.creatorAddress).catch(console.error);;
         const allowance = await getAllowance(erc20Contract, props.creatorAddress, connectedWalletContractAddress).catch(console.error);
         setConnectedWalletBalance(formatEther(balance) + " " + props.currencyName);
