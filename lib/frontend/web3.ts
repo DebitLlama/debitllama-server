@@ -173,6 +173,12 @@ export async function getContract(
   const signer = await provider.getSigner();
   return new ethers.Contract(at, artifact.abi, signer);
 }
+
+export async function getRpcContract(provider: any, at: string, abiPath: string): Promise<any> {
+    const artifact = await fetchAbi(abiPath);
+    return new ethers.Contract(at, artifact.abi, provider);
+}
+
 // Smart contract functions start here
 
 export async function getAccount(contract: any, commitment: string) {

@@ -212,7 +212,7 @@ export default function AccountTopupOrClose(props: AccountTopupOrCloseProps) {
             <button
                 aria-label="withdraw and close account"
                 disabled={props.accountClosed}
-                class="mx-auto mt-2 max-w-md text-sm font-bold py-2 px-4 rounded-md transition duration-300"
+                class="bg-gray-300 mx-auto mt-2 max-w-md text-sm font-bold py-2 px-4 rounded-md transition duration-300"
                 onClick={withdrawAndClose}
                 type="button">Withdraw and Close</button>
         </div></>

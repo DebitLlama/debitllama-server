@@ -115,7 +115,7 @@ export default function WalletApproveOrDisconnect(props: WalletApproveOrDisconne
             <button
                 aria-label="Disconnect your account"
                 disabled={props.accountClosed}
-                class="mx-auto mt-2 max-w-md text-sm font-bold py-2 px-4 rounded-md transition duration-300"
+                class="bg-gray-300 mx-auto mt-2 max-w-md text-sm font-bold py-2 px-4 rounded-md transition duration-300"
                 onClick={disconnectAccount}
                 type="button">Disconnect Account</button>
         </div>
