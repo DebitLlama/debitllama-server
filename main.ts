@@ -10,7 +10,6 @@ import { start } from "$fresh/server.ts";
 import manifest from "./fresh.gen.ts";
 import config from "./fresh.config.ts";
 import { ethencryptInitTest, supabaseEnvVarTests } from "./tests/initTests.ts";
-import { registerSubscribers } from "./lib/backend/pubsub/subscribe.ts";
 
 //Running a test on env vars so PM2 don't start this if I entered them incorrectly.
 ethencryptInitTest();
@@ -25,6 +24,5 @@ console.error = (msg) => {
   origConsoleError(msg);
 };
 
-registerSubscribers();
 
 await start(manifest, config);
