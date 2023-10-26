@@ -14,7 +14,5 @@ console.error = (msg) => {
   origConsoleError(msg);
 };
 
-console.log("registering subscribers");
-
 
 await dev(import.meta.url, "./main.ts", config);
