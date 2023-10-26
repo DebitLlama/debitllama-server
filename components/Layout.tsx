@@ -29,9 +29,9 @@ export default function Layout(props: LayoutProps) {
           <div class="mx-auto layoutheight overflow-auto" id="layout-children">
             {props.children}
           </div>
-          {injectDeps ? <script src="/zxcvbn.js" async></script>
+          {injectDeps ? <script src="/zxcvbn.js" defer></script>
             : <></>}
-          {injectDeps ? <script src="/directdebit_bundle.js" async></script>
+          {injectDeps ? <script src="/directdebit_bundle.js" defer></script>
             : <></>}
         </body>
       </html>
