@@ -6,7 +6,7 @@ export default function SlacKInviteForm() {
                 <div class="flex flex-row justify-center text-center pb-5">
                     <h2 class="text-4xl font-bold text-gray-800 ">Do you have any questions? </h2>
                 </div>
-                <a href="https://debitllama.gitbook.io/debitllama/" class="mx-auto font-bold w-72 text-white bg-black hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-lg px-5 py-2.5 text-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800">See we compare to others!</a>
+                <a href="https://debitllama.gitbook.io/debitllama/how-we-compare-to-others" class="mx-auto font-bold w-72 text-white bg-black hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-lg px-5 py-2.5 text-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800">See we compare to others!</a>
             </div>
 
             <SlackInviteBox></SlackInviteBox>
