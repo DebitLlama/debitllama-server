@@ -51,7 +51,7 @@ export const handler: Handlers<any, State> = {
       }
     }
 
-
+    //TODO: RPC CALL!!
 
     const { data: itemData } = await select.Items.byButtonId(debititem_buttonId);
 
@@ -154,8 +154,8 @@ export default function Approvepayments(props: PageProps) {
           <h1 class="text-2xl font-bold mb-6 text-center">Not Found</h1>
         </div>
         }
-        <script src="/zxcvbn.js"></script>
-        <script src="/directdebit_bundle.js"></script>
+        <script src="/zxcvbn.js" defer></script>
+        <script src="/directdebit_bundle.js" defer></script>
       </body>
     </html>
   </>
