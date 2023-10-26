@@ -56,23 +56,6 @@ export default class QueryBuilder {
             .order("created_at", { ascending: false });
           return this.responseHandler(res);
         },
-        allForAPIV1: async (
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-          filter: Array<{ parameter: string; value: string }>,
-        ) => {
-          const query = this.client.from("Items")
-            .select("*", { count: "exact" })
-            .order(order, { ascending })
-            .range(rangeFrom, rangeTo);
-          for (let i = 0; i < filter.length; i++) {
-            query.eq(filter[i].parameter, filter[i].value);
-          }
-          const res = await query;
-          return this.responseHandler(res);
-        },
       },
       Accounts: {
         // selectOpenAccountsFromUserByNetworkAndCurrency
@@ -96,13 +79,6 @@ export default class QueryBuilder {
             "commitment",
             commitment,
           ).eq("user_id", this.userid);
-          return this.responseHandler(res);
-        },
-        byCommitmentAPiV1: async (commitment: string) => {
-          const res = await this.client.from("Accounts").select().eq(
-            "commitment",
-            commitment,
-          );
           return this.responseHandler(res);
         },
         //selectOpenAccountsByIdDESC
@@ -130,30 +106,6 @@ export default class QueryBuilder {
             .select()
             .eq("user_id", this.userid)
             .order("last_modified", { ascending: false });
-          return this.responseHandler(res);
-        },
-        allApiV1: async (
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-          filter: Array<{ parameter: string; value: string }>,
-        ) => {
-          const query = this.client
-            .from("Accounts")
-            .select("*", { count: "exact" })
-            .order(order, { ascending })
-            .range(rangeFrom, rangeTo);
-
-          for (let i = 0; i < filter.length; i++) {
-            const param = filter[i].parameter === "account_type"
-              ? "accountType"
-              : filter[i].parameter;
-
-            query.eq(param, filter[i].value);
-          }
-
-          const res = await query;
           return this.responseHandler(res);
         },
       },
@@ -204,14 +156,6 @@ export default class QueryBuilder {
             .eq("statusText", PaymentIntentStatus.ACCOUNTBALANCETOOLOW);
           return this.responseHandler(res);
         },
-        //API v1 lets ya fetch without creator_user_id!
-        forAccountbyAccountBalanceTooLowAPIV1: async (account_id: number) => {
-          const res = await this.client.from("PaymentIntents")
-            .select("*,debit_item_id(*)")
-            .eq("account_id", account_id)
-            .eq("statusText", PaymentIntentStatus.ACCOUNTBALANCETOOLOW);
-          return this.responseHandler(res);
-        },
         //selectPaymentIntentsByRelayerBalanceTooLow
         byRelayerBalanceTooLowAndUserIdForPayee: async (network: ChainIds) => {
           const res = await this.client.from("PaymentIntents").select("*")
@@ -249,69 +193,6 @@ export default class QueryBuilder {
               debit_item_id,
             ).order("created_at", { ascending: false });
           return this.responseHandler(res);
-        },
-        allByCreatorIdApiV1FilterCommitment: async (
-          commitment: string,
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-          filter: Array<{ parameter: string; value: string }>,
-        ) => {
-          const query = this.client
-            .from("PaymentIntents")
-            .select("*,debit_item_id(*)", { count: "exact" })
-            .eq("commitment", commitment)
-            .order(order, { ascending })
-            .range(rangeFrom, rangeTo);
-          for (let i = 0; i < filter.length; i++) {
-            query.eq(filter[i].parameter, filter[i].value);
-          }
-          const res = await query;
-          return this.responseHandler(res);
-        },
-        allByCreatorIdApiV1: async (
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-          filter: Array<{ parameter: string; value: string }>,
-        ) => {
-          const query = this.client
-            .from("PaymentIntents")
-            .select("*,debit_item_id(*),account_id(*)", { count: "exact" })
-            .eq("creator_user_id", this.userid)
-            .order(order, { ascending })
-            .range(rangeFrom, rangeTo);
-          for (let i = 0; i < filter.length; i++) {
-            query.eq(filter[i].parameter, filter[i].value);
-          }
-          const res = await query;
-          return this.responseHandler(res);
-        },
-        allApiV1: async (
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-          filter: Array<{ parameter: string; value: string }>,
-        ) => {
-          const query = this.client
-            .from("PaymentIntents")
-            .select("*,debit_item_id(*),account_id(*)", { count: "exact" })
-            .order(order, { ascending })
-            .range(rangeFrom, rangeTo);
-          for (let i = 0; i < filter.length; i++) {
-            query.eq(filter[i].parameter, filter[i].value);
-          }
-          const res = await query;
-          return this.responseHandler(res);
-        },
-        byPaymentIntentApiV1: async (paymentIntent: string) => {
-          const query = await this.client.from("PaymentIntents")
-            .select("*,debit_item_id(*),account_id(*)", { count: "exact" })
-            .eq("paymentIntent", paymentIntent);
-          return this.responseHandler(query);
         },
       },
 

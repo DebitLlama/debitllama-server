@@ -22,6 +22,11 @@ import {
   refreshDBBalance,
 } from "../../../../lib/backend/businessLogic.ts";
 import QueryBuilder from "../../../../lib/backend/db/queryBuilder.ts";
+import {
+  selectAccountsByCommitmentAPiV1,
+  selectAllPaymentIntentsByCreatorIdApiV1FilterCommitment,
+  selectPaymentIntentsForAccountbyAccountBalanceTooLowAPIV1,
+} from "../../../../lib/backend/db/v1.ts";
 import { formatEther, parseEther } from "../../../../lib/backend/web3.ts";
 import { State } from "../../../_middleware.ts";
 
@@ -90,9 +95,10 @@ export const handler = {
       );
 
       const queryBuilder = new QueryBuilder(ctx);
-      const select = queryBuilder.select();
 
-      const { data } = await select.Accounts.byCommitmentAPiV1(slug);
+      const { data } = await selectAccountsByCommitmentAPiV1(ctx, {
+        commitment: slug,
+      });
 
       if (data.length === 0) {
         throw new Error("Account not found!");
@@ -118,15 +124,17 @@ export const handler = {
       // I don't update the balance if it's closed..
       // I just return the account
 
-      const allPaymentIntents = await select.PaymentIntents
-        .allByCreatorIdApiV1FilterCommitment(
-          slug,
-          sort_by,
-          sort_direction === "ASC",
-          from,
-          to,
-          mappedFilterParameters as Array<{ parameter: string; value: string }>,
-        );
+      const allPaymentIntents =
+        await selectAllPaymentIntentsByCreatorIdApiV1FilterCommitment(ctx, {
+          commitment: slug,
+          order: sort_by,
+          ascending: sort_direction === "ASC",
+          rangeFrom: from,
+          rangeTo: to,
+          filter: mappedFilterParameters as Array<
+            { parameter: string; value: string }
+          >,
+        });
 
       if (allPaymentIntents.error) {
         throw new Error(
@@ -136,8 +144,10 @@ export const handler = {
       }
 
       const total_pages = getTotalPages(allPaymentIntents.count, page_size);
-      const { data: missedPayments } = await select.PaymentIntents
-        .forAccountbyAccountBalanceTooLowAPIV1(data[0].id);
+      const { data: missedPayments } =
+        await selectPaymentIntentsForAccountbyAccountBalanceTooLowAPIV1(ctx, {
+          account_id: data[0].id,
+        });
 
       return v1Success(AccountResponseBuilder({
         commitment: slug,

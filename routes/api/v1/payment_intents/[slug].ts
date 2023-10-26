@@ -11,6 +11,7 @@ import {
   cancelDynamicPaymentRequestLogic,
 } from "../../../../lib/backend/businessLogic.ts";
 import QueryBuilder from "../../../../lib/backend/db/queryBuilder.ts";
+import { selectPaymentIntentByPaymentIntentAPIV1 } from "../../../../lib/backend/db/v1.ts";
 import { State } from "../../../_middleware.ts";
 
 export const handler = {
@@ -22,9 +23,9 @@ export const handler = {
       }
       const queryBuilder = new QueryBuilder(ctx);
       const select = queryBuilder.select();
-      const paymentIntent = await select.PaymentIntents.byPaymentIntentApiV1(
-        slug,
-      );
+      const paymentIntent = await selectPaymentIntentByPaymentIntentAPIV1(ctx, {
+        paymentIntent: slug,
+      });
 
       if (paymentIntent.data.length === 0) {
         throw new Error("Payment Intent not found");

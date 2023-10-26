@@ -18,7 +18,7 @@ import {
   getPagination,
   getTotalPages,
 } from "../../../../lib/backend/businessLogic.ts";
-import QueryBuilder from "../../../../lib/backend/db/queryBuilder.ts";
+import { selectAllAccountsAPIV1 } from "../../../../lib/backend/db/v1.ts";
 import { State } from "../../../_middleware.ts";
 
 export const handler = {
@@ -190,16 +190,13 @@ export const handler = {
       page_size,
     );
 
-    const queryBuilder = new QueryBuilder(ctx);
-    const select = queryBuilder.select();
-
-    const accounts = await select.Accounts.allApiV1(
-      sort_by,
-      sort_direction === "ASC",
-      from,
-      to,
-      filterParameters as Array<{ parameter: string; value: string }>,
-    );
+    const accounts = await selectAllAccountsAPIV1(ctx, {
+      order: sort_by,
+      ascending: sort_direction === "ASC",
+      rangeFrom: from,
+      rangeTo: to,
+      filter: filterParameters as Array<{ parameter: string; value: string }>,
+    });
     const total_pages = getTotalPages(accounts.count, page_size);
 
     if (accounts.error) {
