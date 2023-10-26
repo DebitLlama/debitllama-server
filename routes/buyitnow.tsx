@@ -7,13 +7,8 @@ import { parseEther } from "../lib/frontend/web3.ts";
 import { setSupaloginCookie } from "../lib/backend/cookies.ts";
 import { ItemProps } from "../lib/types/checkoutTypes.ts";
 import { Head } from "$fresh/runtime.ts";
+import { selectBuyitnowAccounts } from "../lib/backend/plpgsql/rpc.ts";
 
-function doesProfileExists(profileData: any) {
-    if (profileData === null || profileData.length === 0) {
-        return false;
-    }
-    return true;
-}
 const ethEncryptPublicKey = Deno.env.get("ETHENCRYPTPUBLICKEY") || "";
 
 export const handler: Handlers<any, State> = {
@@ -21,25 +16,34 @@ export const handler: Handlers<any, State> = {
         const url = new URL(req.url);
         const query = url.searchParams.get("q") || "";
         const queryBuilder = new QueryBuilder(ctx);
-        const select = queryBuilder.select();
-        const { data: itemData, error: itemError } = await select.Items.byButtonId(query);
+        const { data: itemData } = await queryBuilder.select().Items.byButtonId(query);
 
         if (itemData === null || itemData.length === 0) {
             return ctx.render({ ...ctx.state, notfound: true, itemData: [] });
         }
 
-        //isLoggedOut?
         if (!ctx.state.token) {
             return ctx.render({ ...ctx.state, notfound: false, itemData, accountData: [], profileExists: false, ethEncryptPublicKey, url })
         }
 
-        const { data: accountData } = await select.Accounts.whereOpenByNetworkAndCurrencyAndUserId(itemData[0].network, itemData[0].currency);
+        const rpcRes = await selectBuyitnowAccounts(ctx,
+            {
+                networkId: itemData[0].network,
+                currency: itemData[0].currency,
+                button_id: query
+            })
 
-        const { data: profileData } = await select.Profiles.byUserId();
-
-        const { data: authenticators } = await select.Authenticators.allByUserId();
-
-        return ctx.render({ ...ctx.state, notfound: false, itemData, accountData, profileExists: doesProfileExists(profileData), ethEncryptPublicKey, url, requires2Fa: authenticators.length > 0 })
+        return ctx.render(
+            {
+                ...ctx.state,
+                notfound: false,
+                itemData,
+                accountData: rpcRes.data.accountData,
+                profileExists: rpcRes.data.isProfileSet,
+                ethEncryptPublicKey,
+                url,
+                requires2Fa: rpcRes.data.isAuthenticatorsSet
+            })
 
     },
     async POST(req, ctx) {
@@ -130,8 +134,8 @@ export default function BuyItNow(props: PageProps) {
                 ></BuyButtonPage> : <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
                     <h1 class="text-2xl font-bold mb-6 text-center">Not Found</h1>
                 </div>}
-                <script src="/zxcvbn.js"></script>
-                <script src="/directdebit_bundle.js"></script>
+                <script defer src="/zxcvbn.js" ></script>
+                <script defer src="/directdebit_bundle.js"></script>
             </body>
         </html>
     </>

@@ -31,19 +31,10 @@ export const handler: Handlers<any, State> = {
         if (error) {
             redirect = `/login?error=${`Unable to Log in!`}`
         }
-        // else {
-        // EMAIL VERIFICATION IS DISABLED AND WILL BE DONE BY SUPABASE INSTEAD
-        //     const select = new QueryBuilder(ctx).select();
-
-        //     const { data: verifiedEmail, error: verifiedEmailErr } = await select.VerifiedEmails.byUserId(data.user.id);
-
-        //     if (verifiedEmail.length === 0 || verifiedEmailErr !== null || !verifiedEmail[0].verified) {
-        //         redirect = `/login?error=You need to verify your email address! Check your emails for the verification link!`
-        //     }
-        // }
-
 
         headers.set("location", redirect);
+
+
         return new Response(null, {
             status: 303,
             headers,
