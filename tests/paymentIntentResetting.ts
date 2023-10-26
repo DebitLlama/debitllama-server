@@ -2,7 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { ChainIds } from "../lib/shared/web3.ts";
 import "$std/dotenv/load.ts";
 import { findPaymentIntentsThatCanBeReset, getGasPrice } from "../lib/backend/businessLogic.ts";
-import QueryBuilder from "../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../lib/backend/db/queryBuilder.ts";
 
 // Integration tests on a live database for the query builder!
 

@@ -1,7 +1,8 @@
 // Api endpoints for the pagination API
 import { Handlers } from "$fresh/server.ts";
 import { getPagination, getTotalPages } from "../../../lib/backend/businessLogic.ts";
-import QueryBuilder from "../../../lib/backend/queryBuilder.ts";
+import { selectRelayerHistoryByPayeeUserIdPaginated, selectRelayerHistoryByPayeeUserIdPaginatedWithTxSearch } from "../../../lib/backend/db/pagination.ts";
+import QueryBuilder from "../../../lib/backend/db/queryBuilder.ts";
 import { errorResponseBuilder } from "../../../lib/backend/responseBuilders.ts";
 import { MapRelayerTxHistoryColnamesToDbColNames, RELAYERTRANSACTIONHISTORYPAGESIZE, RelayerTxHistoryColNames } from "../../../lib/enums.ts";
 import { State } from "../../_middleware.ts";
@@ -29,28 +30,28 @@ export const handler: Handlers<any, State> = {
         if (!order) {
             return errorResponseBuilder("Invalid column name!")
         }
-        const queryBuilder = new QueryBuilder(ctx);
-        const select = queryBuilder.select();
         const { from, to } = getPagination(currentPage, RELAYERTRANSACTIONHISTORYPAGESIZE)
 
         let data = [];
         let rowCount = 0;
         if (searchTerm === "") {
-            const { data: rows, count } = await select.RelayerHistory.byPayeeUserIdPaginated(
+            const { data: rows, count } = await selectRelayerHistoryByPayeeUserIdPaginated(ctx, {
                 order,
-                sortDirection === "ASC",
-                from,
-                to
+                ascending: sortDirection === "ASC",
+                rangeFrom: from,
+                rangeTo: to
+            }
             )
             data = rows;
             rowCount = count;
         } else {
-            const { data: rows, count } = await select.RelayerHistory.byPayeeUserIdPaginatedWithTxSearch(
+            const { data: rows, count } = await selectRelayerHistoryByPayeeUserIdPaginatedWithTxSearch(ctx, {
                 order,
-                sortDirection === "ASC",
-                from,
-                to,
+                ascending: sortDirection === "ASC",
+                rangeFrom: from,
+                rangeTo: to,
                 searchTerm
+            }
             );
             data = rows;
             rowCount = count;
@@ -63,4 +64,5 @@ export const handler: Handlers<any, State> = {
             totalPages
         }), { status: 200 })
     }
+    //TODO: Add a GET REQUEST THAT RETURNS THE RELAYER HISTORY INITIAL PAGINATION AND MOVE THE CODE FROM RELAYER PAGE!
 }

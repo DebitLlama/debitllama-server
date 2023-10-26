@@ -12,7 +12,8 @@ import {
   getRegistrationOptions,
   PasskeyUserModel,
 } from "../webauthn/backend.ts";
-import QueryBuilder from "./queryBuilder.ts";
+import QueryBuilder from "./db/queryBuilder.ts";
+import { getEmailByUserId } from "./db/rpc.ts";
 import {
   estimateRelayerGas,
   formatEther,
@@ -47,7 +48,7 @@ export async function updateRelayerBalanceAndHistorySwitchNetwork(
         parseEther(addedBalance),
       );
       const id = relayerBalance[0].id;
-
+      //TODO: Refactor to 1 RPC call!
       await update.RelayerBalance.Missing_BTT_Donau_Testnet_BalanceById(
         newBalance,
         newMissingBalance,
@@ -426,10 +427,12 @@ export async function refreshDBBalance(
   );
 
   // If account on chain is active but the balance is not the same as the balance I saved
+  // /?TODO; REFACTOR THESE TO 1 RPC CALL
   if (
     onChainAccount.account[0] &&
     parseEther(data[0].balance) !== onChainAccount.account[3]
   ) {
+    //TODO: RPC CALL INSTEAD OF THESE!!
     //Check if there were payment intents with account balance too low and
     // calculate how much balance was added and set them to recurring or created where possible
     await updatePaymentIntentsWhereAccountBalanceWasAdded(
@@ -638,6 +641,7 @@ export async function cancelDynamicPaymentRequestLogic(
 ) {
   const select = queryBuilder.select();
   const deleteQ = queryBuilder.delete();
+  //TODO: REFACTOR to 1 RPC call
   const { data: selectedDynamicPaymentRequest } = await select
     .DynamicPaymentRequestJobs.byJobId(requestId);
   // this will delete the row by id if it was created by the user and the row is not locked!
@@ -665,18 +669,19 @@ export async function cancelDynamicPaymentRequestLogic(
 }
 
 export async function registerAuthenticatorGET(
+  ctx: any,
   queryBuilder: QueryBuilder,
   userid: string,
 ) {
   const select = queryBuilder.select();
   const insert = queryBuilder.insert();
-
+  //TODO: Refactor to 1 RPC call
   const { data: userChallenge } = await select
     .UserChallenges.currentChallenge();
 
   if (userChallenge.length === 0) {
-    const { data: emailData } = await select.RPC.emailByUserId(
-      userid,
+    const { data: emailData } = await getEmailByUserId(ctx,{
+      userid}
     );
     const email = emailData[0].email;
 
@@ -718,6 +723,7 @@ export async function authenticationVerifyGET(
   const select = queryBuilder.select();
   const update = queryBuilder.update();
 
+  //TODO: refactor these 2 to 1 RPC call
   const { data: userChallenge } = await select
     .UserChallenges.currentChallenge();
 

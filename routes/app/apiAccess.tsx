@@ -2,12 +2,13 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import Layout from "../../components/Layout.tsx";
 import AccessTokenUISwitcher from "../../islands/AccessTokenUISwitcher.tsx";
-import { generateApiAuthToken } from "../../lib/backend/auth.ts";
+import { generateApiAuthToken } from "../../lib/backend/db/auth.ts";
 import { getTotalPages } from "../../lib/backend/businessLogic.ts";
-import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import { errorResponseBuilder, successResponseBuilder } from "../../lib/backend/responseBuilders.ts";
 import { ApiAccessErrors, TokenExpiry, monthsToDate } from "../../lib/enums.ts";
 import { State } from "../_middleware.ts";
+import { selectApiAuthTokensByUseridPaginated } from "../../lib/backend/db/pagination.ts";
 
 export const handler: Handlers<any, State> = {
     async POST(req, ctx) {
@@ -32,11 +33,12 @@ export const handler: Handlers<any, State> = {
         })
 
         const select = queryBuilder.select();
-        const { data: accesstokens, error, count } = await select.ApiAuthTokens.byUseridPaginated(
-            "created_at",
-            false,
-            0,
-            9
+        const { data: accesstokens, error, count } = await selectApiAuthTokensByUseridPaginated(ctx, {
+            order: "created_at",
+            ascending: false,
+            rangeFrom: 0,
+            rangeTo: 9
+        }
         );
 
         const totalPages = getTotalPages(count, 10);
@@ -51,11 +53,12 @@ export const handler: Handlers<any, State> = {
     async GET(_req, ctx) {
         const queryBuilder = new QueryBuilder(ctx);
         const select = queryBuilder.select();
-        const { data: accesstokens, error, count } = await select.ApiAuthTokens.byUseridPaginated(
-            "created_at",
-            false,
-            0,
-            9
+        const { data: accesstokens, error, count } = await selectApiAuthTokensByUseridPaginated(ctx, {
+            order: "created_at",
+            ascending: false,
+            rangeFrom: 0,
+            rangeTo: 9
+        }
         );
 
         const totalPages = getTotalPages(count, 10);

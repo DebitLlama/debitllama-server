@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import { State } from "../_middleware.ts";
 
 // Update the item url by button_id and user_id

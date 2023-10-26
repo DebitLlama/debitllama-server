@@ -1,13 +1,13 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import BuyButtonPage from "../islands/checkout/buyButtonPage.tsx";
 import { State } from "./_middleware.ts";
-import QueryBuilder from "../lib/backend/queryBuilder.ts";
-import { signInWithPassword } from "../lib/backend/auth.ts";
+import QueryBuilder from "../lib/backend/db/queryBuilder.ts";
+import { signInWithPassword } from "../lib/backend/db/auth.ts";
 import { parseEther } from "../lib/frontend/web3.ts";
 import { setSupaloginCookie } from "../lib/backend/cookies.ts";
 import { ItemProps } from "../lib/types/checkoutTypes.ts";
 import { Head } from "$fresh/runtime.ts";
-import { selectBuyitnowAccounts } from "../lib/backend/plpgsql/rpc.ts";
+import { selectBuyitnowAccounts } from "../lib/backend/db/rpc.ts";
 
 const ethEncryptPublicKey = Deno.env.get("ETHENCRYPTPUBLICKEY") || "";
 

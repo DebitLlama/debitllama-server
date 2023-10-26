@@ -2,12 +2,13 @@ import Layout from "../../components/Layout.tsx";
 import { State } from "../_middleware.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import AccountCardCarousel from "../../islands/accountCardCarousel.tsx";
-import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(_req, ctx) {
         const queryBuilder = new QueryBuilder(ctx);
         const select = queryBuilder.select();
+        //THESE 2 Can be 1 RPC call
         const { data: accountsData } = await select.Accounts.whereClosedByUserIdOrderDesc();
 
         const { data: missedPayments } = await select.PaymentIntents.byAccountBalanceTooLowByUserIdForCreatorDesc();

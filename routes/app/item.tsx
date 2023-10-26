@@ -3,10 +3,10 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
 import CopyButton from "../../islands/copyButton.tsx";
 import { ChainIds, networkNameFromId } from "../../lib/shared/web3.ts";
-import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import PaymentIntentsPaginationForItemPage from "../../islands/pagination/PaymentIntentsPaginationForItemPage.tsx";
 import { Tooltip } from "../../components/components.tsx";
-import { selectItem } from "../../lib/backend/plpgsql/rpc.ts";
+import { selectItem } from "../../lib/backend/db/rpc.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(req: any, ctx: any) {

@@ -1,6 +1,6 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
-import { rand } from "../lib/backend/auth.ts";
-import QueryBuilder from "../lib/backend/queryBuilder.ts";
+import { rand } from "../lib/backend/db/auth.ts";
+import QueryBuilder from "../lib/backend/db/queryBuilder.ts";
 import { doSendPasswordResetEmailMessage } from "../lib/email/doSend.ts";
 import { State } from "./_middleware.ts";
 

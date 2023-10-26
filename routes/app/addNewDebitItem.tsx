@@ -3,7 +3,7 @@ import { State } from "../_middleware.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import AddNewDebitItemPageForm from "../../islands/addNewDebitItemPageForm.tsx";
 import { NetworkNames, chainIdFromNetworkName, getCurrenciesForNetworkName } from "../../lib/shared/web3.ts";
-import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import { Pricing } from "../../lib/enums.ts";
 import { errorResponseBuilder } from "../../lib/backend/responseBuilders.ts";
 import { validateAddress } from "../../lib/backend/web3.ts";
@@ -48,7 +48,7 @@ export const handler: Handlers<any, State> = {
         const { data: relayerBalanceData } = await select.RelayerBalance.byUserId();
         // I'm gonna add the id of the relayerBalance to the debit item so I can join tables later more easily
         if (relayerBalanceData === null || relayerBalanceData.length === 0) {
-            //TODO: The insert here could select!
+            //TODO: Refactor these to 1 RPC call
             await insert.RelayerBalance.newRelayerBalance()
             const { data: relayerBalanceData2, error: relayerBalanceDataError2 } = await select.RelayerBalance.byUserId();
             relayerBalanceId = relayerBalanceData2[0].id;

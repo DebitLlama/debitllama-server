@@ -1,7 +1,7 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import Layout from "../../components/Layout.tsx";
 import { SlackInviteBox } from "../../components/SlackInviteForm.tsx";
-import { insertFeedback } from "../../lib/backend/plpgsql/rpc.ts";
+import { insertFeedback } from "../../lib/backend/db/rpc.ts";
 import { State } from "../_middleware.ts";
 export const handler: Handlers<any, State> = {
     async POST(req, ctx) {

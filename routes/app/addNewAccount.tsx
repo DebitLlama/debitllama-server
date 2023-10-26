@@ -2,8 +2,7 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import Layout from "../../components/Layout.tsx";
 import AccountCreatePageForm from "../../islands/accountCreatePageForm.tsx";
 import { setProfileRedirectCookie } from "../../lib/backend/cookies.ts";
-import QueryBuilder from "../../lib/backend/queryBuilder.ts";
-import { CookieNames } from "../../lib/enums.ts";
+import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import { State } from "../_middleware.ts";
 
 const ethEncryptPublicKey = Deno.env.get("ETHENCRYPTPUBLICKEY") || "";

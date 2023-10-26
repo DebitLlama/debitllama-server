@@ -7,7 +7,8 @@ import RelayedTxHistory from "../../islands/pagination/RelayedTxHistoryWithPagin
 import CancelPaymentIntentButton from "../../islands/CancelPaymentIntentButton.tsx";
 import { ChainIds, networkNameFromId, rpcUrl } from "../../lib/shared/web3.ts";
 import { getPaymentIntentHistory } from "../../lib/backend/web3.ts";
-import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
+import { selectRelayerHistoryByPaymentIntentIdPaginated } from "../../lib/backend/db/pagination.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(req: any, ctx: any) {
@@ -15,17 +16,21 @@ export const handler: Handlers<any, State> = {
         const query = url.searchParams.get("q") || "";
         const queryBuilder = new QueryBuilder(ctx);
         const select = queryBuilder.select();
+
+        //TODO: THESE 2 CAN BE 1 RPC CALL!
         const { data: paymentIntentData } = await select.PaymentIntents.byPaymentIntentAndUserIdForCreator(query);
 
         if (paymentIntentData === null || paymentIntentData.length === 0) {
             return ctx.render({ ...ctx.state, notfound: true });
         }
 
-        const { data: paymentIntentHistory, count: paymentIntentHistoryTotalpages } = await select.RelayerHistory
-            .byPaymentIntentIdPaginated(
-                paymentIntentData[0].id,
-                "created_at", false, 0, RELAYERTRANSACTIONHISTORYPAGESIZE - 1
-            );
+        const { data: paymentIntentHistory, count: paymentIntentHistoryTotalpages } = await selectRelayerHistoryByPaymentIntentIdPaginated(ctx, {
+            paymentIntentid: paymentIntentData[0].id,
+            order: "created_at",
+            ascending: false,
+            rangeFrom: 0, rangeTo: RELAYERTRANSACTIONHISTORYPAGESIZE - 1
+        }
+        );
 
         return ctx.render({ ...ctx.state, notfound: false, paymentIntentData, paymentIntentHistory, paymentIntentHistoryTotalpages });
     },

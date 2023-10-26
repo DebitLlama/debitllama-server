@@ -1,6 +1,6 @@
 // Api endpoints for the pagination API
 import { Handlers } from "$fresh/server.ts";
-import QueryBuilder from "../../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../../lib/backend/db/queryBuilder.ts";
 import { State } from "../../_middleware.ts";
 import { registerAuthenticatorGET } from "../../../lib/backend/businessLogic.ts";
 import {
@@ -46,6 +46,7 @@ export const handler: Handlers<any, State> = {
   async GET(_req, ctx) {
     const queryBuilder = new QueryBuilder(ctx);
     const options = await registerAuthenticatorGET(
+      ctx,
       queryBuilder,
       ctx.state.userid as string,
     );

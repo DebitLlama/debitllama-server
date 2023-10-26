@@ -1,7 +1,7 @@
 // Api endpoints for the pagination API
 import { Handlers } from "$fresh/server.ts";
 
-import QueryBuilder from "../../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../../lib/backend/db/queryBuilder.ts";
 import { State } from "../../_middleware.ts";
 import { authenticationVerifyGET } from "../../../lib/backend/businessLogic.ts";
 

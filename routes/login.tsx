@@ -2,7 +2,7 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { deleteCookie, getCookies } from "$std/http/cookie.ts";
 import { Head } from "$fresh/runtime.ts";
-import { signInWithPassword } from "../lib/backend/auth.ts";
+import { signInWithPassword } from "../lib/backend/db/auth.ts";
 import { State } from "./_middleware.ts";
 import { CookieNames } from "../lib/enums.ts";
 import { setRenderSidebarOpen, setSupaloginCookie } from "../lib/backend/cookies.ts";

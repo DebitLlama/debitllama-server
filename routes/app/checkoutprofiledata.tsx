@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import { State } from "../_middleware.ts";
 
 
@@ -15,6 +15,7 @@ export const handler: Handlers<any, State> = {
         const country = json.country;
         const queryBuilder = new QueryBuilder(ctx);
         const select = queryBuilder.select();
+        // TODO: THis could be jsut 1 RPC call: SELECT AND INSERT!
         const { data: profileData } = await select.Profiles.byUserId();
 
         if (profileData === null || profileData.length === 0) {

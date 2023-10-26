@@ -1,5 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
-import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
+import { getEmailByUserId } from "../../lib/backend/db/rpc.ts";
 import { estimateRelayerGas } from "../../lib/backend/web3.ts";
 import { sendPaymentIntentCreatedEmail } from "../../lib/email/doSend.ts";
 import { AccountTypes, PaymentIntentStatus, Pricing } from "../../lib/enums.ts";
@@ -21,6 +22,7 @@ export const handler: Handlers<any, State> = {
     const select = queryBuilder.select();
     const insert = queryBuilder.insert();
     const update = queryBuilder.update();
+    //TODO: RPC CALL!!
     // Get the debit item using th button_id
     const { data: itemData } = await select.Items.byButtonId(
       item_button_id,
@@ -46,6 +48,8 @@ export const handler: Handlers<any, State> = {
         ? maxDebitAmount
         : "0";
 
+    //TODO: Maybe these gas pre-estimations I'm not using for anything right now..
+
     const estimatedGas = await estimateRelayerGas(
       {
         proof,
@@ -60,6 +64,7 @@ export const handler: Handlers<any, State> = {
       accountData[0].accountType,
     );
 
+    //TODO: REFACTO THIS TO BE 1 RPC CALL!
     // Now I save it to the database if it succeeds I return ok afterwards!
     const { error: insertError } = await insert.PaymentIntent
       .newPaymentIntent(
@@ -87,11 +92,17 @@ export const handler: Handlers<any, State> = {
     }
 
     // Send an email to the creator of the payment intent to notify him that it was saved!
-    const customerEmailData = await select.RPC.emailByUserId(
-      ctx.state.userid as string,
+    //TODO: REFACTOR THIS TO BE 1 RPC CALL
+    const customerEmailData = await getEmailByUserId(
+      ctx,
+      { userid: ctx.state.userid as string },
     );
-    const payeeEmailData = await select.RPC.emailByUserId(itemData[0].payee_id);
-
+    const payeeEmailData = await getEmailByUserId(ctx, {
+      userid: itemData[0].payee_id,
+    });
+    //TODO: SEND THE EMAIL VIA TRIGGER!
+    // REFACTOR THIS TO USE SERVERLESS FUNC!
+    //THEN I CAN FORGET ABOUT GETTING THE EMAILS HERE ALSO!! NICE!
     await sendPaymentIntentCreatedEmail(
       customerEmailData.data[0].email,
       payeeEmailData.data[0].email,

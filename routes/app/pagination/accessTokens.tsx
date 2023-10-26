@@ -1,7 +1,7 @@
 // Api endpoints for the pagination API
 import { Handlers } from "$fresh/server.ts";
 import { getPagination, getTotalPages } from "../../../lib/backend/businessLogic.ts";
-import QueryBuilder from "../../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../../lib/backend/db/queryBuilder.ts";
 import { errorResponseBuilder } from "../../../lib/backend/responseBuilders.ts";
 import { RELAYERTOPUPHISTORYPAGESIZE } from "../../../lib/enums.ts";
 import { State } from "../../_middleware.ts";

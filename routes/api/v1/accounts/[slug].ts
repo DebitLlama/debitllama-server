@@ -21,7 +21,7 @@ import {
   getTotalPages,
   refreshDBBalance,
 } from "../../../../lib/backend/businessLogic.ts";
-import QueryBuilder from "../../../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../../../lib/backend/db/queryBuilder.ts";
 import { formatEther, parseEther } from "../../../../lib/backend/web3.ts";
 import { State } from "../../../_middleware.ts";
 

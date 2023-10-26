@@ -1,33 +1,4 @@
-export type SupabaseQueryResult = {
-  error: any;
-  data: any;
-  count: any;
-  status: number;
-  statusText: string;
-};
-
-function unwrapContext(
-  ctx: { state: { supabaseClient: any; userid: string | null } },
-) {
-  return { client: ctx.state.supabaseClient, userid: ctx.state.userid };
-}
-
-function responseHandler(
-  res: SupabaseQueryResult,
-  params: { rpc: string; args: object },
-) {
-  if (res.error !== null) {
-    console.error("QUERY ERROR!");
-    console.log(res.statusText, " ", res.status);
-    console.error(res.error.code);
-    console.log(res.error.details);
-    console.log(res.error.hint);
-    console.log(res.error.message);
-    console.error("RPC ", params.rpc);
-    console.error("Args: ", JSON.stringify(params.args));
-  }
-  return { ...res };
-}
+import { responseHandler, unwrapContext } from "./utils.ts";
 
 export async function insertFeedback(
   ctx: any,
@@ -78,6 +49,17 @@ export async function selectItem(ctx: any, args: {
   });
   return responseHandler(res, {
     rpc: "select_item",
-    args: { ...args, payeeid: userid },
+    args: { ...args, userid },
+  });
+}
+
+export async function getEmailByUserId(ctx: any, args: { userid: string }) {
+  const { client, userid } = unwrapContext(ctx);
+  const res = await client.rpc("get_email_by_user_uuid2", {
+    user_id: args.userid,
+  });
+  return responseHandler(res, {
+    rpc: "getEmailByUserId",
+    args: { ...args, userid },
   });
 }

@@ -10,7 +10,7 @@ import {
   addDynamicPaymentRequest,
   cancelDynamicPaymentRequestLogic,
 } from "../../../../lib/backend/businessLogic.ts";
-import QueryBuilder from "../../../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../../../lib/backend/db/queryBuilder.ts";
 import { State } from "../../../_middleware.ts";
 
 export const handler = {

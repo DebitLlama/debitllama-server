@@ -2,7 +2,7 @@
 import { MiddlewareHandlerContext } from "$fresh/server.ts";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { getCookies } from "$std/http/cookie.ts";
-import { getUser } from "../lib/backend/auth.ts";
+import { getUser } from "../lib/backend/db/auth.ts";
 import { AuthWhitelist } from "../lib/enums.ts";
 
 export interface State {
@@ -48,6 +48,7 @@ export async function handler(
   // All other pages I can cache!
   const res = await ctx.next();
   res.headers.append("Cache-Control", " max-age=31536000");
+
   return res;
 }
 

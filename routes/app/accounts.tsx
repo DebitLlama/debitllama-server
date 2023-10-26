@@ -2,7 +2,7 @@ import Layout from "../../components/Layout.tsx";
 import { State } from "../_middleware.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import AccountCardCarousel from "../../islands/accountCardCarousel.tsx";
-import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(_req, ctx) {
@@ -12,7 +12,6 @@ export const handler: Handlers<any, State> = {
 
         const { data: missedPayments } = await select.PaymentIntents.byAccountBalanceTooLowByUserIdForCreatorDesc();
 
-        // Add pagination for both!
         return ctx.render({ ...ctx.state, accountsData, missedPayments })
     }
 }

@@ -5,7 +5,7 @@ import { getItemProps } from "../buyitnow.tsx";
 import { formatEther, getAccount, getEncryptedNote, parseEther } from "../../lib/backend/web3.ts";
 import { decryptData } from "../../lib/backend/decryption.ts";
 import ApprovePaymentIsland from "../../islands/approvePaymentIsland.tsx";
-import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import { AccountTypes } from "../../lib/enums.ts";
 import { verifyAuthentication } from "../../lib/webauthn/backend.ts";
 import { Head } from "$fresh/runtime.ts";

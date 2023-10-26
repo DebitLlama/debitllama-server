@@ -2,7 +2,7 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
 import Layout from "../../components/Layout.tsx";
 import AddNewPassKeyButton from "../../islands/AddNewPasskeyButton.tsx";
-import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import { PasskeysAddedNotification } from "../../components/components.tsx";
 
 export const handler: Handlers<any, State> = {
