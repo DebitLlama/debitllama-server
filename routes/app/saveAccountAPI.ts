@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import {
   errorResponseBuilder,
   successResponseBuilder,
@@ -55,6 +55,7 @@ export const handler: Handlers<any, State> = {
     const accountData = await getAccount(commitment, networkId, accountType);
 
     if (accountData.exists) {
+      // ..TODO? RPC CALL!
       const { data } = await select.Accounts.byCommitment(commitment);
       if (data.length !== 0) {
         return errorResponseBuilder("Account already exists!");

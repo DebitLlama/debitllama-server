@@ -3,10 +3,10 @@ import {
   DynamicPaymentRequestJobsStatus,
   PaymentIntentRow,
   PaymentIntentStatus,
-} from "../enums.ts";
-import { ChainIds } from "../shared/web3.ts";
-import { Authenticator } from "../webauthn/backend.ts";
-import { formatEther } from "./web3.ts";
+} from "../../enums.ts";
+import { ChainIds } from "../../shared/web3.ts";
+import { Authenticator } from "../../webauthn/backend.ts";
+import { formatEther } from "../web3.ts";
 
 export type SupabaseQueryResult = {
   error: any;
@@ -56,51 +56,6 @@ export default class QueryBuilder {
             .order("created_at", { ascending: false });
           return this.responseHandler(res);
         },
-        byUserIdForPayeePaginated: async (
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-        ) => {
-          const res = await this.client.from("Items")
-            .select("*", { count: "exact" })
-            .order(order, { ascending })
-            .eq("payee_id", this.userid)
-            .range(rangeFrom, rangeTo);
-          return this.responseHandler(res);
-        },
-        byUserIdForPayeePaginatedWithSearchName: async (
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-          searchTerm: string,
-        ) => {
-          const res = await this.client.from("Items")
-            .select("*", { count: "exact" })
-            .order(order, { ascending })
-            .textSearch("name", searchTerm)
-            .eq("payee_id", this.userid)
-            .range(rangeFrom, rangeTo);
-          return this.responseHandler(res);
-        },
-        allForAPIV1: async (
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-          filter: Array<{ parameter: string; value: string }>,
-        ) => {
-          const query = this.client.from("Items")
-            .select("*", { count: "exact" })
-            .order(order, { ascending })
-            .range(rangeFrom, rangeTo);
-          for (let i = 0; i < filter.length; i++) {
-            query.eq(filter[i].parameter, filter[i].value);
-          }
-          const res = await query;
-          return this.responseHandler(res);
-        },
       },
       Accounts: {
         // selectOpenAccountsFromUserByNetworkAndCurrency
@@ -124,13 +79,6 @@ export default class QueryBuilder {
             "commitment",
             commitment,
           ).eq("user_id", this.userid);
-          return this.responseHandler(res);
-        },
-        byCommitmentAPiV1: async (commitment: string) => {
-          const res = await this.client.from("Accounts").select().eq(
-            "commitment",
-            commitment,
-          );
           return this.responseHandler(res);
         },
         //selectOpenAccountsByIdDESC
@@ -158,30 +106,6 @@ export default class QueryBuilder {
             .select()
             .eq("user_id", this.userid)
             .order("last_modified", { ascending: false });
-          return this.responseHandler(res);
-        },
-        allApiV1: async (
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-          filter: Array<{ parameter: string; value: string }>,
-        ) => {
-          const query = this.client
-            .from("Accounts")
-            .select("*", { count: "exact" })
-            .order(order, { ascending })
-            .range(rangeFrom, rangeTo);
-
-          for (let i = 0; i < filter.length; i++) {
-            const param = filter[i].parameter === "account_type"
-              ? "accountType"
-              : filter[i].parameter;
-
-            query.eq(param, filter[i].value);
-          }
-
-          const res = await query;
           return this.responseHandler(res);
         },
       },
@@ -232,14 +156,6 @@ export default class QueryBuilder {
             .eq("statusText", PaymentIntentStatus.ACCOUNTBALANCETOOLOW);
           return this.responseHandler(res);
         },
-        //API v1 lets ya fetch without creator_user_id!
-        forAccountbyAccountBalanceTooLowAPIV1: async (account_id: number) => {
-          const res = await this.client.from("PaymentIntents")
-            .select("*,debit_item_id(*)")
-            .eq("account_id", account_id)
-            .eq("statusText", PaymentIntentStatus.ACCOUNTBALANCETOOLOW);
-          return this.responseHandler(res);
-        },
         //selectPaymentIntentsByRelayerBalanceTooLow
         byRelayerBalanceTooLowAndUserIdForPayee: async (network: ChainIds) => {
           const res = await this.client.from("PaymentIntents").select("*")
@@ -278,195 +194,6 @@ export default class QueryBuilder {
             ).order("created_at", { ascending: false });
           return this.responseHandler(res);
         },
-        byAccountIdPaginated: async (
-          accountId: number,
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-        ) => {
-          const res = await this.client.from("PaymentIntents")
-            .select("*,debit_item_id(*)", { count: "exact" })
-            .order(order, { ascending })
-            .eq("account_id", accountId)
-            .range(rangeFrom, rangeTo);
-          return this.responseHandler(res);
-        },
-        byAccountIdPaginatedWithSearch: async (
-          accountId: number,
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-          searchTerm: string,
-        ) => {
-          const res = await this.client.from("PaymentIntents")
-            .select("*,debit_item_id(*)", { count: "exact" })
-            .order(order, { ascending })
-            .like("paymentIntent", searchTerm)
-            .eq("account_id", accountId)
-            .range(rangeFrom, rangeTo);
-          return this.responseHandler(res);
-        },
-        byPayeeUserIdPaginated: async (
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-        ) => {
-          const res = await this.client.from("PaymentIntents")
-            .select("*,account_id(*),debit_item_id(*)", { count: "exact" })
-            .order(order, { ascending })
-            .eq("payee_user_id", this.userid)
-            .range(rangeFrom, rangeTo);
-          return this.responseHandler(res);
-        },
-        byPayeeUserIdPaginatedWithSearch: async (
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-          searchTerm: string,
-        ) => {
-          const res = await this.client.from("PaymentIntents")
-            .select("*,account_id(*),debit_item_id(*)", { count: "exact" })
-            .order(order, { ascending })
-            .like("paymentIntent", searchTerm)
-            .eq("payee_user_id", this.userid)
-            .range(rangeFrom, rangeTo);
-          return this.responseHandler(res);
-        },
-        byDebitItemIdPaginated: async (
-          debit_item_id: number,
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-        ) => {
-          const res = await this.client.from("PaymentIntents")
-            .select("*,account_id(*),debit_item_id(*)", { count: "exact" })
-            .order(order, { ascending })
-            .eq("debit_item_id", debit_item_id)
-            .range(rangeFrom, rangeTo);
-          return this.responseHandler(res);
-        },
-        byDebitItemIdPaginatedWithSearch: async (
-          debit_item_id: number,
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-          searchTerm: string,
-        ) => {
-          const res = await this.client.from("PaymentIntents")
-            .select("*,account_id(*),debit_item_id(*)", { count: "exact" })
-            .order(order, { ascending })
-            .like("paymentIntent", searchTerm)
-            .eq("debit_item_id", debit_item_id)
-            .range(rangeFrom, rangeTo);
-          return this.responseHandler(res);
-        },
-        allByUserIdForCreatorPaginated: async (
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-        ) => {
-          const res = await this.client.from("PaymentIntents").select(
-            "*,debit_item_id(*)",
-            { count: "exact" },
-          ).eq(
-            "creator_user_id",
-            this.userid,
-          ).order(
-            order,
-            { ascending },
-          ).range(rangeFrom, rangeTo);
-          return this.responseHandler(res);
-        },
-        allByUserIdForCreatorPaginatedWithSearch: async (
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-          searchTerm: string,
-        ) => {
-          const res = await this.client.from("PaymentIntents").select(
-            "*,debit_item_id(*)",
-            { count: "exact" },
-          ).eq(
-            "creator_user_id",
-            this.userid,
-          ).order(
-            order,
-            { ascending },
-          ).range(rangeFrom, rangeTo)
-            .like("paymentIntent", searchTerm);
-          return this.responseHandler(res);
-        },
-        allByCreatorIdApiV1FilterCommitment: async (
-          commitment: string,
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-          filter: Array<{ parameter: string; value: string }>,
-        ) => {
-          const query = this.client
-            .from("PaymentIntents")
-            .select("*,debit_item_id(*)", { count: "exact" })
-            .eq("commitment", commitment)
-            .order(order, { ascending })
-            .range(rangeFrom, rangeTo);
-          for (let i = 0; i < filter.length; i++) {
-            query.eq(filter[i].parameter, filter[i].value);
-          }
-          const res = await query;
-          return this.responseHandler(res);
-        },
-        allByCreatorIdApiV1: async (
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-          filter: Array<{ parameter: string; value: string }>,
-        ) => {
-          const query = this.client
-            .from("PaymentIntents")
-            .select("*,debit_item_id(*),account_id(*)", { count: "exact" })
-            .eq("creator_user_id", this.userid)
-            .order(order, { ascending })
-            .range(rangeFrom, rangeTo);
-          for (let i = 0; i < filter.length; i++) {
-            query.eq(filter[i].parameter, filter[i].value);
-          }
-          const res = await query;
-          return this.responseHandler(res);
-        },
-        allApiV1: async (
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-          filter: Array<{ parameter: string; value: string }>,
-        ) => {
-          const query = this.client
-            .from("PaymentIntents")
-            .select("*,debit_item_id(*),account_id(*)", { count: "exact" })
-            .order(order, { ascending })
-            .range(rangeFrom, rangeTo);
-          for (let i = 0; i < filter.length; i++) {
-            query.eq(filter[i].parameter, filter[i].value);
-          }
-          const res = await query;
-          return this.responseHandler(res);
-        },
-        byPaymentIntentApiV1: async (paymentIntent: string) => {
-          const query = await this.client.from("PaymentIntents")
-            .select("*,debit_item_id(*),account_id(*)", { count: "exact" })
-            .eq("paymentIntent", paymentIntent);
-          return this.responseHandler(query);
-        },
       },
 
       RelayerHistory: {
@@ -482,65 +209,6 @@ export default class QueryBuilder {
           const res = await this.client.from("RelayerHistory")
             .select("*")
             .eq("payee_user_id", this.userid);
-          return this.responseHandler(res);
-        },
-        byPayeeUserIdPaginated: async (
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-        ) => {
-          const res = await this.client.from("RelayerHistory")
-            .select("*", { count: "exact" })
-            .order(order, { ascending })
-            .eq("payee_user_id", this.userid)
-            .range(rangeFrom, rangeTo);
-
-          return this.responseHandler(res);
-        },
-        byPayeeUserIdPaginatedWithTxSearch: async (
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-          searchTerm: string,
-        ) => {
-          const res = await this.client.from("RelayerHistory")
-            .select("*", { count: "exact" })
-            .order(order, { ascending })
-            .textSearch("submittedTransaction", searchTerm)
-            .eq("payee_user_id", this.userid)
-            .range(rangeFrom, rangeTo);
-          return this.responseHandler(res);
-        },
-        byPaymentIntentIdPaginated: async (
-          paymentIntentid: number,
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-        ) => {
-          const res = await this.client.from("RelayerHistory")
-            .select("*", { count: "exact" })
-            .order(order, { ascending })
-            .eq("paymentIntent_id", paymentIntentid)
-            .range(rangeFrom, rangeTo);
-          return this.responseHandler(res);
-        },
-        byPaymentIntentIdPaginatedWithTxSearch: async (
-          paymentIntentid: number,
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-          searchTerm: string,
-        ) => {
-          const res = await this.client.from("RelayerHistory")
-            .select("*", { count: "exact" })
-            .eq("paymentIntent_id", paymentIntentid)
-            .order(order, { ascending })
-            .textSearch("submittedTransaction", searchTerm)
-            .range(rangeFrom, rangeTo);
           return this.responseHandler(res);
         },
       },
@@ -569,50 +237,6 @@ export default class QueryBuilder {
               "user_id",
               this.userid,
             ).order("created_at", { ascending: false });
-          return this.responseHandler(res);
-        },
-        byUserIdPaginated: async (
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-        ) => {
-          const res = await this.client.from("RelayerTopUpHistory")
-            .select("*", { count: "exact" })
-            .order(order, { ascending })
-            .eq("user_id", this.userid)
-            .range(rangeFrom, rangeTo);
-
-          return this.responseHandler(res);
-        },
-        byUserIdPaginatedWithTxSearch: async (
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-          searchTerm: string,
-        ) => {
-          const res = await this.client.from("RelayerTopUpHistory")
-            .select("*", { count: "exact" })
-            .order(order, { ascending })
-            .textSearch("transactionHash", searchTerm)
-            .eq("user_id", this.userid)
-            .range(rangeFrom, rangeTo);
-          return this.responseHandler(res);
-        },
-      },
-      ApiAuthTokens: {
-        byUseridPaginated: async (
-          order: string,
-          ascending: boolean,
-          rangeFrom: number,
-          rangeTo: number,
-        ) => {
-          const res = await this.client.from("ApiAuthTokens")
-            .select("*", { count: "exact" })
-            .order(order, { ascending })
-            .eq("creator_id", this.userid)
-            .range(rangeFrom, rangeTo);
           return this.responseHandler(res);
         },
       },

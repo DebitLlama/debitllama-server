@@ -7,7 +7,7 @@ import {
   AccessTokensQuery,
   getAuthTokenFromHeader,
   tokenExpired,
-} from "../../../lib/backend/auth.ts";
+} from "../../../lib/backend/db/auth.ts";
 
 export async function handler(
   _req: Request,

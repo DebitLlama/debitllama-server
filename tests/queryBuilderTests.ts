@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import "$std/dotenv/load.ts";
-import QueryBuilder from "../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../lib/backend/db/queryBuilder.ts";
 
 async function main() {
   const client = createClient(

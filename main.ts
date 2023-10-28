@@ -18,8 +18,11 @@ supabaseEnvVarTests();
 // Remove the buggy warnings from the console. Hope Fresh fixes it soon
 const origConsoleError = console.error;
 console.error = (msg) => {
-  if (typeof msg === "string" && msg.includes("Improper nesting of table")) return;
+  if (typeof msg === "string" && msg.includes("Improper nesting of table")) {
+    return;
+  }
   origConsoleError(msg);
 };
+
 
 await start(manifest, config);

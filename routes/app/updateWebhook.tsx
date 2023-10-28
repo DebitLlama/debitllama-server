@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import { State } from "../_middleware.ts";
 
 export const handler: Handlers<any, State> = {
@@ -11,7 +11,7 @@ export const handler: Handlers<any, State> = {
         const insert = queryBuilder.insert();
         const json = await _req.json();
         const webhook_url = json.webhook_url as string;
-
+// /?TODO:RPC CALL!
         const webhooks = await select.Webhooks.byUserId();
 
         if (webhooks.data.length === 0) {

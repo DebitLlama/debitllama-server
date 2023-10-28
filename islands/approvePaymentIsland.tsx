@@ -74,13 +74,15 @@ export default function ApprovePaymentIsland(props: ApprovePaymentIslandProps) {
                     // Success is true!
                     setSuccess(true)
                     // Log out so the back button will not reload the page
-                    await logoutRequest();
-                    // navigate to the redirect page
-                    setTimeout(() => {
-                        redirectToRedirectPage(
-                            props.itemData.redirectUrl,
-                            toNoteHex(paymentIntent.publicSignals[0]));
-                    }, 3000)
+                    await logoutRequest().then(() => {
+                        // navigate to the redirect page but only after we logged out!
+                        setTimeout(() => {
+                            redirectToRedirectPage(
+                                props.itemData.redirectUrl,
+                                toNoteHex(paymentIntent.publicSignals[0]));
+                        }, 3000)
+                    });
+
                 } else {
                     setErrorMessage("Unable to save Payment Intent");
                     setLockPayClicked(false);

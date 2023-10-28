@@ -1,4 +1,4 @@
-import { AccessTokenRow } from "../enums.ts";
+import { AccessTokenRow } from "../../enums.ts";
 
 //AUTH
 export async function signUp(

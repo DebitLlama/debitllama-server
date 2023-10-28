@@ -13,7 +13,7 @@ interface LayoutProps {
 
 export default function Layout(props: LayoutProps) {
   const pathname = new URL(props.url).pathname;
-  const injectDeps = pathname === "/app/newConnectedWallet" || pathname === "/app/addNewAccount"
+  const injectDeps = pathname === "/app/newConnectedWallet" || pathname === "/app/addNewAccount" || pathname === "/app/createdPaymentIntents" || pathname === "/app/payeePaymentIntents"
 
   return (
     <>

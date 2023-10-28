@@ -3,25 +3,20 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
 import CopyButton from "../../islands/copyButton.tsx";
 import { ChainIds, networkNameFromId } from "../../lib/shared/web3.ts";
-import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import PaymentIntentsPaginationForItemPage from "../../islands/pagination/PaymentIntentsPaginationForItemPage.tsx";
 import { Tooltip } from "../../components/components.tsx";
+import { selectItem } from "../../lib/backend/db/rpc.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(req: any, ctx: any) {
         const url = new URL(req.url);
         const query = url.searchParams.get("q") || "";
-        const queryBuilder = new QueryBuilder(ctx);
-        const select = queryBuilder.select();
-
-        const { data: itemData } = await select.Items.byButtonIdForPayeeOnly(query);
-        if (itemData === null || itemData.length === 0) {
+        const selectedItem = await selectItem(ctx, { buttonid: query })
+        if (selectedItem.data.itemData === null || selectedItem.data.itemData.length === 0) {
             return ctx.render({ ...ctx.state, notfound: true });
         }
-
-        const { data: paymentIntentData, error: paymentIntentError } = await select.PaymentIntents.byItemIdAndUserIdForPayeeOrderDesc(itemData[0].id);
-
-        return ctx.render({ ...ctx.state, notfound: false, itemData, paymentIntentData });
+        return ctx.render({ ...ctx.state, notfound: false, itemData: selectedItem.data.itemData, impressions: selectedItem.data.impressions });
     },
     async POST(req: any, ctx: any) {
         const form = await req.formData();
@@ -29,10 +24,7 @@ export const handler: Handlers<any, State> = {
         const button_id = form.get("button_id") as string;
         const queryBuilder = new QueryBuilder(ctx);
         const update = queryBuilder.update();
-
         await update.Items.deletedByButtonIdForPayee(deleted, button_id);
-
-
         return new Response("", {
             status: 301,
             headers: { Location: "/app/debitItems" }
@@ -141,6 +133,11 @@ export default function Item(props: PageProps) {
                                     </div>
                                     </td>
                                     <td><Tooltip message={"This is the custom identifier of this item, used for the checkout page link!"}></Tooltip></td>
+                                </tr>
+                                <tr>
+                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm   whitespace-nowrap"}>Checkout visits:</td>
+                                    <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData"> {props.data.impressions}</div></td>
+                                    <td><Tooltip message={"This value shows how many impressions your checkout page had. It counts how many times the checkout page was loaded by a logged in user."}></Tooltip></td>
                                 </tr>
 
                             </tbody>

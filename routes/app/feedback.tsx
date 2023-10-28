@@ -1,32 +1,29 @@
-// deno-lint-ignore-file no-explicit-any
 import { Handlers, PageProps } from "$fresh/server.ts";
 import Layout from "../../components/Layout.tsx";
-import SlacKInviteForm, { SlackInviteBox } from "../../components/SlackInviteForm.tsx";
-import QueryBuilder from "../../lib/backend/queryBuilder.ts";
-import { triggerUserFeedbackWebhook } from "../../lib/slack/triggers.ts";
+import { SlackInviteBox } from "../../components/SlackInviteForm.tsx";
+import { insertFeedback } from "../../lib/backend/db/rpc.ts";
 import { State } from "../_middleware.ts";
 export const handler: Handlers<any, State> = {
     async POST(req, ctx) {
         const form = await req.formData();
         const subject = form.get("subject") as string;
         const message = form.get("message") as string;
-        const queryBuilder = new QueryBuilder(ctx);
-        const insert = queryBuilder.insert();
-        const { data } = await queryBuilder.select().RPC.emailByUserId(ctx.state.userid as string);
-        const email = data[0].email;
-        const { error } = await insert.Feedback.newFeedback(subject, message, email);
         const headers = new Headers();
+
+        if (subject.length === 0 || message.length === 0) {
+            headers.set("location", `/app/feedback?error=${"Unable to save feedback. Empty subject or message fields!"}`);
+            return new Response(null, { status: 303, headers })
+        }
+
+        const { data: email, error } = await insertFeedback(ctx, { subject, message });
 
         if (error) {
             headers.set("location", `/app/feedback?error=${"Unable to save feedback"}`)
         } else {
             headers.set("location", `/app/feedback?success=${"Message sent!"}`)
 
-            await triggerUserFeedbackWebhook({ subject, message, fromEmail: email });
         }
-
         return new Response(null, { status: 303, headers })
-
     },
 
     GET(_req, ctx) {
@@ -53,10 +50,22 @@ export default function Feedback(props: PageProps) {
                             id="feedbackSubject"
                             name="subject"
                             placeholder={"Subject"}
+                            required
                         />
 
                     </div>
                     <p class="text-lg mb-5">Your message will be sent to our slack channel.</p>
+                    {err && (
+                        <div class="bg-red-400 border-l-4 p-4" role="alert">
+                            <p class="font-bold">Something went wrong!</p>
+                            <p>{err}</p>
+                        </div>
+                    )}
+                    {success && (
+                        <div class="bg-green-400 border-l-4 p-4" role="alert">
+                            <p class="font-bold">Message Sent!</p>
+                        </div>
+                    )}
                     <div class="relative mb-6" data-te-input-wrapper-init>
                         <textarea
                             class="text-body-color border-[f0f0f0] focus:border-primary w-full resize-none rounded border py-3 px-[14px] text-base outline-none focus-visible:shadow-none"
@@ -64,6 +73,7 @@ export default function Feedback(props: PageProps) {
                             rows={3}
                             placeholder="Your message"
                             name="message"
+                            required
                         ></textarea>
 
                     </div>
@@ -74,17 +84,7 @@ export default function Feedback(props: PageProps) {
                         Send
                     </button>
                 </form>
-                {err && (
-                    <div class="bg-red-400 border-l-4 p-4" role="alert">
-                        <p class="font-bold">Something went wrong!</p>
-                        <p>{err}</p>
-                    </div>
-                )}
-                {success && (
-                    <div class="bg-green-400 border-l-4 p-4" role="alert">
-                        <p class="font-bold">Message Sent!</p>
-                    </div>
-                )}
+
 
             </div>
         </div>

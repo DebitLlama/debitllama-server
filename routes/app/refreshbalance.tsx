@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
 import { updatePaymentIntentsWhereAccountBalanceWasAdded } from "../../lib/backend/businessLogic.ts";
-import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import { errorResponseBuilder } from "../../lib/backend/responseBuilders.ts";
 import { getAccount } from "../../lib/backend/web3.ts";
 import { ChainIds, rpcUrl } from "../../lib/shared/web3.ts";
@@ -33,7 +33,7 @@ export const handler: Handlers<any, State> = {
 
         if (onChainAccount.exists) {
             const update = queryBuilder.update();
-
+            //TODO: THESE COULD BE 1 RPC CALL
             //Check if there were payment intents with account balance too low and 
             // calculate how much balance was added and set them to recurring or created where possible
             await updatePaymentIntentsWhereAccountBalanceWasAdded(queryBuilder, onChainAccount.account[3], data[0].id);

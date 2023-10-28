@@ -4,14 +4,16 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import { fetchTopUpEvent, getRelayerTopUpContract } from "../../lib/backend/web3.ts";
 import RelayerUISwitcher from "../../islands/RelayerUISwitcher.tsx";
 import { getTotalPages, updateRelayerBalanceAndHistorySwitchNetwork } from "../../lib/backend/businessLogic.ts";
-import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import { RELAYERTOPUPHISTORYPAGESIZE, RELAYERTRANSACTIONHISTORYPAGESIZE } from "../../lib/enums.ts";
 import { setProfileRedirectCookie } from "../../lib/backend/cookies.ts";
+import { selectRelayerHistoryByPayeeUserIdPaginated, selectRelayerTopUpHistoryByUserIdPaginated } from "../../lib/backend/db/pagination.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(_req, ctx) {
         const queryBuilder = new QueryBuilder(ctx);
         const select = queryBuilder.select();
+        //TODO :REFACTOR TO RPC CALLS!
         const { data: relayerBalanceDataFetched } = await select.RelayerBalance.byUserId();
         let relayerBalanceData = relayerBalanceDataFetched;
         if (relayerBalanceData === null || relayerBalanceData.length === 0) {
@@ -32,17 +34,24 @@ export const handler: Handlers<any, State> = {
             return new Response(null, { status: 303, headers })
         }
 
-        const { data: relayerTopUpHistoryData, count: topupHistoryDataCount } = await select.RelayerTopUpHistory.byUserIdPaginated(
-            "created_at", false, 0, 9
+        // Used to fetch the top up data when the user clicks on the page
+        // I could move this to fetch only when the tab icon is clicked!
+        const { data: relayerTopUpHistoryData, count: topupHistoryDataCount } = await selectRelayerTopUpHistoryByUserIdPaginated(ctx, {
+            order: "created_at",
+            ascending: false,
+            rangeFrom: 0,
+            rangeTo: 9
+        }
+
         );
         const totalPagesForTopupHistory = getTotalPages(topupHistoryDataCount, RELAYERTOPUPHISTORYPAGESIZE);
 
-
-        const { data: relayerTxHistoryData, count: txHistoryCount } = await select.RelayerHistory.byPayeeUserIdPaginated(
-            "created_at", false, 0, RELAYERTRANSACTIONHISTORYPAGESIZE - 1
+        const { data: relayerTxHistoryData, count: txHistoryCount } = await selectRelayerHistoryByPayeeUserIdPaginated(ctx, {
+            order: "created_at", ascending: false, rangeFrom: 0, rangeTo: RELAYERTRANSACTIONHISTORYPAGESIZE - 1
+        }
         );
-        const totalPagesForRelayerTxHistory = getTotalPages(txHistoryCount, RELAYERTRANSACTIONHISTORYPAGESIZE)
 
+        const totalPagesForRelayerTxHistory = getTotalPages(txHistoryCount, RELAYERTRANSACTIONHISTORYPAGESIZE)
         return ctx.render({ ...ctx.state, relayerBalanceData, profileData, relayerTopUpHistoryData, totalPagesForTopupHistory, relayerTxHistoryData, totalPagesForRelayerTxHistory });
     },
     async POST(_req, ctx) {
@@ -55,7 +64,7 @@ export const handler: Handlers<any, State> = {
         const queryBuilder = new QueryBuilder(ctx);
         const select = queryBuilder.select();
         // I need to decode the json sent to the server, 
-
+        // /?TODO: RPC CALLS!
         const { data: profileData } = await select.Profiles.byUserId();
         if (profileData === null || profileData.length === 0) {
             return new Response("Invalid user Profile!", { status: 500 })
