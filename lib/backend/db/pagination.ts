@@ -298,7 +298,6 @@ export async function selectRelayerHistoryByPaymentIntentIdPaginated(
       ctx,
       args,
       impl: async (p) => {
-        console.log("selectRelayerHistoryByByPaymentIntentIdPaginated");
         return await p.client.from("RelayerHistory")
           .select("*", { count: "exact" })
           .order(p.args.order, { ascending: p.args.ascending })
