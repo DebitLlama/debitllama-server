@@ -63,3 +63,36 @@ export async function getEmailByUserId(ctx: any, args: { userid: string }) {
     args: { ...args, userid },
   });
 }
+
+export type UpsertWebhookDataArgs = {
+  webhookurl: string;
+  _authorization_arg: string;
+  onsubscriptioncreated: boolean;
+  onsubscriptioncancelled: boolean;
+  onpaymentsuccess: boolean;
+  onpaymentfailure: boolean;
+  ondynamicpaymentrequestrejected: boolean;
+};
+
+export async function upsert_webhook_data(
+  ctx: any,
+  args: UpsertWebhookDataArgs,
+) {
+  const { client, userid } = unwrapContext(ctx);
+
+  const res = await client.rpc("upsert_webhook_data", {
+    userid: userid,
+    _authorization_arg: args._authorization_arg,
+    webhookurl: args.webhookurl,
+    onsubscriptioncreated: args.onsubscriptioncreated,
+    onsubscriptioncancelled: args.onsubscriptioncancelled,
+    onpaymentsuccess: args.onpaymentsuccess,
+    onpaymentfailure: args.onpaymentfailure,
+    ondynamicpaymentrequestrejected: args.ondynamicpaymentrequestrejected,
+  });
+
+  return responseHandler(res, {
+    rpc: "upsert_webhook_data",
+    args: { ...args, userid },
+  });
+}

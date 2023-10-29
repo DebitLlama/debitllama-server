@@ -240,14 +240,6 @@ export default class QueryBuilder {
           return this.responseHandler(res);
         },
       },
-      Webhooks: {
-        byUserId: async () => {
-          const res = await this.client.from("Webhooks")
-            .select("*")
-            .eq("creator_id", this.userid);
-          return this.responseHandler(res);
-        },
-      },
       DynamicPaymentRequestJobs: {
         //selectDynamicPaymentRequestJobByPaymentIntentIdAndUserId
         byPaymentIntentIdAndUserId: async (paymentIntent_id: string) => {
@@ -541,22 +533,8 @@ export default class QueryBuilder {
           return this.responseHandler(res);
         },
       },
-      ApiAuthTokens: {
-        newToken: async (
-          access_token: string,
-          expiryDate: string,
-        ) => {
-          const res = await this.client.from("ApiAuthTokens")
-            .insert({
-              created_at: new Date().toUTCString(),
-              access_token,
-              creator_id: this.userid,
-              expiry_date_utc: expiryDate,
-            });
-          return this.responseHandler(res);
-        },
-      },
       Webhooks: {
+        //TODO: THIS GOES TO RPC
         newUrl: async (
           webhook_url: string,
         ) => {
@@ -670,16 +648,6 @@ export default class QueryBuilder {
             payment_intents_count,
           }).eq("button_id", button_id);
 
-          return this.responseHandler(res);
-        },
-        updateRedirectUrlForItem: async (
-          button_id: string,
-          redirect_url: string,
-        ) => {
-          const res = await this.client.from("Items").update({
-            redirect_url,
-          }).eq("button_id", button_id)
-            .eq("payee_id", this.userid);
           return this.responseHandler(res);
         },
       },
