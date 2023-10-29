@@ -1,11 +1,11 @@
 import Layout from "../../components/Layout.tsx";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
-import CopyButton from "../../islands/copyButton.tsx";
+import CopyButton from "../../islands/utils/copyButton.tsx";
 import { ChainIds, networkNameFromId } from "../../lib/shared/web3.ts";
 import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import PaymentIntentsPaginationForItemPage from "../../islands/pagination/PaymentIntentsPaginationForItemPage.tsx";
-import { Tooltip } from "../../components/components.tsx";
+import { DynamicFeedLogo, Tooltip } from "../../components/components.tsx";
 import { selectItem } from "../../lib/backend/db/rpc.ts";
 
 export const handler: Handlers<any, State> = {
@@ -116,7 +116,7 @@ export default function Item(props: PageProps) {
                                 <tr>
                                     <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm   whitespace-nowrap"}>Redirect URL:</td>
                                     <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class={"overflow-x-auto overflowingTableData max-w-sm"}>
-                                        <form method={"POST"} action={"/app/updateItemUrl"} class="flex flex-col justify-left">
+                                        <form method={"POST"} action={"/app/post/updateItemUrl"} class="flex flex-col justify-left">
                                             <input type="hidden" name="button_id" value={itemData.button_id} />
                                             <input type="url" name="redirect_url" required value={itemData.redirect_url} class="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500" />
                                             <button aria-label={"Update redirect url button"} class="w-32 text-md font-bold mb-2 mt-2 text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800" type="submit">Update Url</button>
@@ -136,8 +136,19 @@ export default function Item(props: PageProps) {
                                 </tr>
                                 <tr>
                                     <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm   whitespace-nowrap"}>Checkout visits:</td>
-                                    <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData"> {props.data.impressions}</div></td>
+                                    <td class={"px-4 py-4 text-sm whitespace-nowrap"}><div class="overflow-x-auto overflowingTableData"> {props.data.impressions === null ? 0 : props.data.impressions}</div></td>
                                     <td><Tooltip message={"This value shows how many impressions your checkout page had. It counts how many times the checkout page was loaded by a logged in user."}></Tooltip></td>
+                                </tr>
+                                <tr>
+                                    <td class={"bg-gray-50 dark:bg-gray-800 px-4 py-4 text-sm   whitespace-nowrap"}>Receive Email Notifications:</td>
+                                    <td class={"px-4 py-4 text-sm whitespace-nowrap"}>
+                                        <form method="POST" action="/app/post/addEmailNotifications">
+                                            <input type="hidden" name="email_notifications" value={`${itemData.email_notifications}`} />
+                                            <input type="hidden" name="button_id" value={itemData.button_id} />
+                                            <button type={"submit"} class={`border p-2 hover:bg-gray-300 ${itemData.email_notifications ? 'bg-gray-400 shadow-lg' : ""}`}> {itemData.email_notifications ? "ON" : "OFF"} <DynamicFeedLogo></DynamicFeedLogo></button>
+                                        </form>
+                                    </td>
+                                    <td><Tooltip message={"We can send you an email notification each time a subscription is created or updated. You can turn it on and off any time!"}></Tooltip></td>
                                 </tr>
 
                             </tbody>
