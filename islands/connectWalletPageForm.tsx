@@ -7,7 +7,7 @@ import { connectWallet, connectedWalletAlready, getContract, handleNetworkSelect
 import { setUpAccount } from '../lib/frontend/directdebitlib.ts';
 import { redirectToAccountPage, saveAccount } from '../lib/frontend/fetch.ts';
 import { AccountTypes } from "../lib/enums.ts";
-import TestnetTokens from "./TestnetTokens.tsx";
+import TestnetTokens from "./utils/TestnetTokens.tsx";
 
 export const strength = [
     "Worst ☹",

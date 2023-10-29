@@ -6,7 +6,7 @@ import { signInWithPassword } from "../lib/backend/db/auth.ts";
 import { State } from "./_middleware.ts";
 import { CookieNames } from "../lib/enums.ts";
 import { setRenderSidebarOpen, setSupaloginCookie } from "../lib/backend/cookies.ts";
-import CookieBanner from "../islands/CookieBanner.tsx";
+import CookieBanner from "../islands/utils/CookieBanner.tsx";
 
 export const handler: Handlers<any, State> = {
 
