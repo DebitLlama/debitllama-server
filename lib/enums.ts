@@ -41,7 +41,7 @@ export enum DocsLinks {
   LINKTODOCSSTART = "https://debitllama.gitbook.io/debitllama/",
   REDIRECTURLSPEC = "https://debitllama.gitbook.io/debitllama/",
   APIDOCS = "https://debitllama.gitbook.io/debitllama/",
-  WEBHOOKDOCS = "https://debitllama.gitbook.io/debitllama/",
+  WEBHOOKDOCS = "https://debitllama.gitbook.io/debitllama/rest-api-v1/configuring-webhooks",
 }
 
 export type PaymentIntentRow = {
