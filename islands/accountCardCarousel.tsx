@@ -1,12 +1,12 @@
 import { useState } from 'preact/hooks';
 import { ChainIds, networkNameFromId } from "../lib/shared/web3.ts";
-import AccountDisplayElement from "../islands/AccountDisplayElement.tsx";
+import AccountDisplayElement from "./utils/AccountDisplayElement.tsx";
 import { parseEther } from "../lib/frontend/web3.ts";
 import { formatEther } from "../ethers.min.js";
 import { TooltipWithTitle } from '../components/components.tsx';
 import { AccountTypes, Pricing } from '../lib/enums.ts';
 import PaymentIntentsPaginationForAccounts from './pagination/PaymentIntentsPaginationForAccounts.tsx';
-import AccountsSelectButtons from './AccountsSelectButtons.tsx';
+import AccountsSelectButtons from './utils/AccountsSelectButtons.tsx';
 
 interface AccountCardCarouselProps {
     accountData: Array<any>,

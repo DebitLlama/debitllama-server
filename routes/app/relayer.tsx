@@ -2,7 +2,7 @@ import Layout from "../../components/Layout.tsx";
 import { State } from "../_middleware.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { fetchTopUpEvent, getRelayerTopUpContract } from "../../lib/backend/web3.ts";
-import RelayerUISwitcher from "../../islands/RelayerUISwitcher.tsx";
+import RelayerUISwitcher from "../../islands/routes/RelayerUISwitcher.tsx";
 import { getTotalPages, updateRelayerBalanceAndHistorySwitchNetwork } from "../../lib/backend/businessLogic.ts";
 import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import { RELAYERTOPUPHISTORYPAGESIZE, RELAYERTRANSACTIONHISTORYPAGESIZE } from "../../lib/enums.ts";

@@ -2,7 +2,7 @@
 import { Head } from "$fresh/runtime.ts";
 import type { ComponentChildren } from "preact";
 import Nav from "./Nav.tsx";
-import SideBar from "../islands/Sidebar.tsx";
+import SideBar from "../islands/routes/Sidebar.tsx";
 
 interface LayoutProps {
   isLoggedIn: boolean;

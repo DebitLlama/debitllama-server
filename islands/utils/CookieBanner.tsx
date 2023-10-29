@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import { getCookiesAcceptedFromSS, setCookiesAcceptedToSS } from "../lib/frontend/other.ts";
+import { getCookiesAcceptedFromSS, setCookiesAcceptedToSS } from "../../lib/frontend/other.ts";
 
 export default function CookieBanner() {
     const [showBanner, setShowBanner] = useState(false);

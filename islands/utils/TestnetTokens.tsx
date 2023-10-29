@@ -1,5 +1,5 @@
-import { getContract, handleNetworkSelect, mintToken, requestAccounts, watchAsset } from "../lib/frontend/web3.ts";
-import { ChainIds, DonauTestnetTokens } from "../lib/shared/web3.ts";
+import { getContract, handleNetworkSelect, mintToken, requestAccounts, watchAsset } from "../../lib/frontend/web3.ts";
+import { ChainIds, DonauTestnetTokens } from "../../lib/shared/web3.ts";
 
 export interface TestnetTokensProps {
     chainId: ChainIds,

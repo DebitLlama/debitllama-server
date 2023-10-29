@@ -1,10 +1,10 @@
 import { Handlers } from "$fresh/server.ts";
-import { updatePaymentIntentsWhereAccountBalanceWasAdded } from "../../lib/backend/businessLogic.ts";
-import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
-import { errorResponseBuilder } from "../../lib/backend/responseBuilders.ts";
-import { getAccount } from "../../lib/backend/web3.ts";
-import { ChainIds, rpcUrl } from "../../lib/shared/web3.ts";
-import { State } from "../_middleware.ts";
+import { updatePaymentIntentsWhereAccountBalanceWasAdded } from "../../../lib/backend/businessLogic.ts";
+import QueryBuilder from "../../../lib/backend/db/queryBuilder.ts";
+import { errorResponseBuilder } from "../../../lib/backend/responseBuilders.ts";
+import { getAccount } from "../../../lib/backend/web3.ts";
+import { ChainIds, rpcUrl } from "../../../lib/shared/web3.ts";
+import { State } from "../../_middleware.ts";
 
 //This is used to refresh the balance of an already existing account!
 // Refresh balance always updates the database!

@@ -1,4 +1,4 @@
-import SidebarToggleButton from "../islands/SidebarToggleButton.tsx";
+import SidebarToggleButton from "../islands/utils/SidebarToggleButton.tsx";
 
 interface NavProps {
     loggedIn: boolean

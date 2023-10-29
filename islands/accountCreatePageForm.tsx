@@ -4,11 +4,11 @@ import CurrencySelectDropdown from "./CurrencySelectDropdown.tsx";
 import AccountPasswordInput from "./accountPasswordInput.tsx";
 import { approveSpend, depositEth, depositToken, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts } from "../lib/frontend/web3.ts";
 import { setUpAccount } from '../lib/frontend/directdebitlib.ts';
-import { ChainIds, NetworkNames, SelectableCurrency, availableNetworks, bittorrentCurrencies, bttMainnetCurrencies, chainIdFromNetworkName, getVirtualAccountsContractAddress } from "../lib/shared/web3.ts";
+import { ChainIds, NetworkNames, SelectableCurrency, availableNetworks,  bttMainnetCurrencies, chainIdFromNetworkName, getVirtualAccountsContractAddress } from "../lib/shared/web3.ts";
 import Overlay from '../components/Overlay.tsx';
 import { redirectToAccountsPage, saveAccount } from '../lib/frontend/fetch.ts';
 import { AccountTypes } from '../lib/enums.ts';
-import TestnetTokens from './TestnetTokens.tsx';
+import TestnetTokens from './utils/TestnetTokens.tsx';
 
 export const strength = [
     "Worst ☹",

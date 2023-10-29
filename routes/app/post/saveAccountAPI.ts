@@ -1,18 +1,18 @@
 import { Handlers } from "$fresh/server.ts";
-import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
+import QueryBuilder from "../../../lib/backend/db/queryBuilder.ts";
 import {
   errorResponseBuilder,
   successResponseBuilder,
-} from "../../lib/backend/responseBuilders.ts";
-import { getAccount } from "../../lib/backend/web3.ts";
-import { AccountTypes } from "../../lib/enums.ts";
+} from "../../../lib/backend/responseBuilders.ts";
+import { getAccount } from "../../../lib/backend/web3.ts";
+import { AccountTypes } from "../../../lib/enums.ts";
 import {
   ChainIds,
   getCurrenciesForNetworkName,
   networkNameFromId,
   rpcUrl,
-} from "../../lib/shared/web3.ts";
-import { State } from "../_middleware.ts";
+} from "../../../lib/shared/web3.ts";
+import { State } from "../../_middleware.ts";
 
 //Save the newly created account!
 

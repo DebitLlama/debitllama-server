@@ -2,7 +2,7 @@ import { useState } from 'preact/hooks';
 import { SelectableCurrency, availableNetworks, bittorrentCurrencies } from "../lib/shared/web3.ts";
 import CurrencySelectDropdown from './CurrencySelectDropdown.tsx';
 import { DocsLinks, Pricing } from "../lib/enums.ts";
-import WalletAddressSelector from "./WalletAddressSelector.tsx";
+import WalletAddressSelector from "./utils/WalletAddressSelector.tsx";
 
 export const debitPricing = [Pricing.Fixed, Pricing.Dynamic]
 

@@ -1,10 +1,12 @@
 import { useState } from "preact/hooks";
 import { deleteAccessToken, fetchPaginatedAccessTokens } from "../../lib/frontend/fetch.ts";
 import { PaginationButtons } from "../../components/Pagination.tsx";
+import ShowAndHideContent from "../utils/ShowAndContent.tsx";
 
 interface AccessTokensTableProps {
     accesstokens: Array<any>,
-    totalPages: number
+    totalPages: number,
+    toHighlightId: string,
 }
 
 export default function AccessTokensTable(props: AccessTokensTableProps) {
@@ -74,6 +76,13 @@ export default function AccessTokensTable(props: AccessTokensTableProps) {
         return false;
     }
 
+    function highlightRow(id: number) {
+        if (id.toString() === props.toHighlightId) {
+            return "bg-indigo-100"
+        } else {
+            return ""
+        }
+    }
 
     if (props.accesstokens.length === 0 || props.accesstokens === null) {
         return <div class="flex flex-col">
@@ -93,7 +102,7 @@ export default function AccessTokensTable(props: AccessTokensTableProps) {
                                     <th onClick={headerClicked("created_at")} tabIndex={8} scope="col" class="cursor-pointer w-1/6 px-4 py-3.5 text-sm font-normal text-left rtl:text-right   hover:bg-gray-200">
                                         Created Date
                                     </th>
-                                    <th tabIndex={1} scope="col" class="cursor-pointer w-1/12 px-4 py-3.5 text-sm font-normal text-left rtl:text-right   hover:bg-gray-200">
+                                    <th tabIndex={1} scope="col" class="cursor-pointer w-1/12 px-4 py-3.5 text-sm font-normal text-left rtl:text-right  hover:bg-gray-200">
                                         Valid
                                     </th>
 
@@ -112,10 +121,12 @@ export default function AccessTokensTable(props: AccessTokensTableProps) {
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
-                                {currentAccessTokens.map((d: any) => <tr>
+                                {currentAccessTokens.map((d: any) => <tr class={highlightRow(d.id)}>
                                     <td class="px-4 py-4 text-sm   whitespace-nowrap">{new Date(d.created_at).toLocaleString()}</td>
-                                    <td class="px-4 py-4 text-sm   whitespace-nowrap">{getValidIcon(d.expiry_date_utc)}</td>
-                                    <td class="px-4 py-4 text-sm   whitespace-nowrap">{d.access_token}</td>
+                                    <td class="px-4 py-4 text-sm   whitespace-nowrap">
+                                        {getValidIcon(d.expiry_date_utc)}
+                                    </td>
+                                    <td class="px-4 py-4 text-sm   whitespace-nowrap"><ShowAndHideContent content={d.access_token}></ShowAndHideContent></td>
                                     <td class="px-4 py-4 text-sm   whitespace-nowrap">{new Date(d.expiry_date_utc).toLocaleString()}</td>
                                     <td class="px-4 py-4 text-sm   whitespace-nowrap">
                                         <form onSubmit={onDeleteSubmit}>
@@ -146,9 +157,16 @@ export default function AccessTokensTable(props: AccessTokensTableProps) {
 export function getValidIcon(expiryDate: string) {
     const isValid = new Date() < new Date(new Date(expiryDate).toLocaleString());
 
+    let icon;
+    let color;
+
     if (isValid) {
-        return <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z" /></svg>
+        icon = <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z" /></svg>
+        color = "text-indigo-400"
     } else {
-        return <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v-406Zm0 406v-406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z" /></svg>
+        icon = <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v-406Zm0 406v-406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z" /></svg>
+        color = "textred-700";
     }
+
+    return <div class={color}>{icon}</div>
 }
