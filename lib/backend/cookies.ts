@@ -40,7 +40,10 @@ export function setRenderSidebarOpen(
 export function setLoginRedirect(headers: Headers, url: URL) {
   setCookie(headers, {
     name: CookieNames.loginRedirect,
-    value: url.pathname + url.search,
+    value: url.pathname.includes("/app/post")
+      // If my last request was a post for some reason then I don't want to set the cookie at all
+      ? "/app/accounts"
+      : url.pathname + url.search,
     maxAge: 600, // 10 minutes max,
     path: "/",
   });
