@@ -41,7 +41,7 @@ export async function requestBalanceRefresh(
   calledFrom: "app" | "buyPage",
 ) {
   // If I call refresh balance from the app route then I don't need to have app in the url!
-  const getUrl = calledFrom === "app" ? "refreshbalance" : "app/refreshbalance";
+  const getUrl = calledFrom === "app" ? "refreshbalance" : "app/post/refreshbalance";
   return await fetch(getUrl, {
     credentials: "same-origin",
     method: "POST",
@@ -63,7 +63,7 @@ export interface UpdateProfileDataArgs {
 }
 
 export async function uploadProfileData(args: UpdateProfileDataArgs) {
-  return await fetch("app/checkoutprofiledata", {
+  return await fetch("app/post/checkoutprofiledata", {
     credentials: "same-origin",
     method: "POST",
     body: JSON.stringify(args),
@@ -85,7 +85,7 @@ export interface UploadPaymentIntentArgs {
 }
 
 export async function uploadPaymentIntent(args: UploadPaymentIntentArgs) {
-  return await fetch("/app/savePaymentIntent", {
+  return await fetch("/app/post/savePaymentIntent", {
     credentials: "same-origin",
     method: "POST",
     body: JSON.stringify(args),
@@ -156,7 +156,7 @@ export async function cancelDynamicPaymentRequest(
     dynamicPaymentRequestId: number;
   },
 ) {
-  return await fetch("/app/cancelDynamicPayment", {
+  return await fetch("/app/post/cancelDynamicPayment", {
     credentials: "same-origin",
     method: "POST",
     body: JSON.stringify(args),
@@ -303,20 +303,7 @@ export async function saveAccount(args: {
   currency: string;
   accountType: AccountTypes;
 }) {
-  return await fetch("/app/saveAccountAPI", {
-    credentials: "same-origin",
-    method: "POST",
-    body: JSON.stringify(args),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  }).then((response) => response);
-}
-
-export async function updateRedirectUrl(args: {
-  redirectTo: string;
-}) {
-  return await fetch("/app/saveAccountAPI", {
+  return await fetch("/app/post/saveAccountAPI", {
     credentials: "same-origin",
     method: "POST",
     body: JSON.stringify(args),
@@ -345,7 +332,7 @@ export async function deleteAccessToken(
     accesstoken: string;
   },
 ) {
-  return await fetch("/app/apiAccess", {
+  return await fetch("/app/manage_api/rest", {
     credentials: "same-origin",
     method: "DELETE",
     body: JSON.stringify(args),
@@ -354,13 +341,20 @@ export async function deleteAccessToken(
     },
   }).then((response) => response);
 }
+interface WebhookStoredProcedureFormatArgs {
+  webhookurl: string;
+  _authorization_arg: string;
+  onsubscriptioncreated: boolean;
+  onsubscriptioncancelled: boolean;
+  onpaymentsuccess: boolean;
+  onpaymentfailure: boolean;
+  ondynamicpaymentrequestrejected: boolean;
+}
 
 export async function updateWebhookUrl(
-  args: {
-    webhook_url: string;
-  },
+  args: WebhookStoredProcedureFormatArgs,
 ) {
-  return await fetch("/app/updateWebhook", {
+  return await fetch("/app/manage_api/webhooks", {
     credentials: "same-origin",
     method: "POST",
     body: JSON.stringify(args),
@@ -409,6 +403,13 @@ export async function verifyAuthenticationForRevoke(asseResp: any) {
 export async function getAuthenticationOptionsForCheckout() {
   return await fetch("/app/webauthn/verify", {
     method: "GET",
+    credentials: "same-origin",
+  }).then((response) => response);
+}
+
+export async function deleteWebhooks() {
+  return await fetch("/app/manage_api/webhooks", {
+    method: "DELETE",
     credentials: "same-origin",
   }).then((response) => response);
 }
