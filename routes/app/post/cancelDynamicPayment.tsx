@@ -1,9 +1,9 @@
 import { Handlers } from "$fresh/server.ts";
-import { cancelDynamicPaymentRequestLogic } from "../../lib/backend/businessLogic.ts";
-import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
-import { errorResponseBuilder, successResponseBuilder } from "../../lib/backend/responseBuilders.ts";
+import { cancelDynamicPaymentRequestLogic } from "../../../lib/backend/businessLogic.ts";
+import QueryBuilder from "../../../lib/backend/db/queryBuilder.ts";
+import { errorResponseBuilder, successResponseBuilder } from "../../../lib/backend/responseBuilders.ts";
 
-import { State } from "../_middleware.ts";
+import { State } from "../../_middleware.ts";
 
 
 export const handler: Handlers<any, State> = {

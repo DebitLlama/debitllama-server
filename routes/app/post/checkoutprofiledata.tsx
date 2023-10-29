@@ -1,6 +1,6 @@
 import { Handlers } from "$fresh/server.ts";
-import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
-import { State } from "../_middleware.ts";
+import QueryBuilder from "../../../lib/backend/db/queryBuilder.ts";
+import { State } from "../../_middleware.ts";
 
 
 export const handler: Handlers<any, State> = {
