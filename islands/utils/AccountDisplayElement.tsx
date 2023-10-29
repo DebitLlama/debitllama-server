@@ -1,5 +1,5 @@
-import { AccountTypes } from "../lib/enums.ts";
-import { AccountCardElement } from "../components/AccountCardElement.tsx";
+import { AccountTypes } from "../../lib/enums.ts";
+import { AccountCardElement } from "../../components/AccountCardElement.tsx";
 
 interface AccountDisplayElementProps {
     amount: string,

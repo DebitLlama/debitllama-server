@@ -1,4 +1,4 @@
-import { setSidebarOpenCookie } from "../lib/frontend/other.ts";
+import { setSidebarOpenCookie } from "../../lib/frontend/other.ts";
 
 export default function SidebarToggleButton() {
     const toggleSidebar = () => {

@@ -1,7 +1,7 @@
 import { useState } from "preact/hooks";
-import RelayerDetailsCard from "./RelayerDetailsCard.tsx";
-import RelayerTopupHistory from "./pagination/RelayerTopupHistory.tsx";
-import RelayedTxHistory from "./pagination/RelayedTxHistoryWithPagination.tsx";
+import RelayerDetailsCard from "../RelayerDetailsCard.tsx";
+import RelayerTopupHistory from "../pagination/RelayerTopupHistory.tsx";
+import RelayedTxHistory from "../pagination/RelayedTxHistoryWithPagination.tsx";
 
 export interface RelayerUISwitcherProps {
     data: any

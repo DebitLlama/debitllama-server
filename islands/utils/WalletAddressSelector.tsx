@@ -1,5 +1,5 @@
 
-import { isEthereumUndefined, redirectToMetamask, requestAccounts } from "../lib/frontend/web3.ts";
+import { isEthereumUndefined, redirectToMetamask, requestAccounts } from "../../lib/frontend/web3.ts";
 
 // if window.ethereum is undefined it should open metamask's page to prompt download 
 export default function WalletAddressSelector() {
