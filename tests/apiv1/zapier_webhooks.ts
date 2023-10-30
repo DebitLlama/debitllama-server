@@ -1,5 +1,9 @@
 import "$std/dotenv/load.ts";
-import { AuthenticatedDELETE, AuthenticatedPOST } from "./fetch.ts";
+import {
+  AuthenticatedDELETE,
+  AuthenticatedGET,
+  AuthenticatedPOST,
+} from "./fetch.ts";
 
 Deno.test("api/v1/payment_intents", async () => {
   const accesstoken = Deno.env.get("TESTACCESSTOKEN") || "";
@@ -12,7 +16,7 @@ Deno.test("api/v1/payment_intents", async () => {
 
   if (!deleteIt) {
     const res = await AuthenticatedPOST({
-      url: "http://localhost:3000/api/v1/zapier/webhooks",
+      url: "http://localhost:3000/api/v1/zapier",
       accesstoken,
       body: JSON.stringify({
         hookType: "SubscriptionCreated",
@@ -23,8 +27,8 @@ Deno.test("api/v1/payment_intents", async () => {
     const json = await res.json();
     console.log(json);
   } else {
-      const res = await AuthenticatedDELETE({
-      url: "http://localhost:3000/api/v1/zapier/webhooks",
+    const res = await AuthenticatedDELETE({
+      url: "http://localhost:3000/api/v1/zapier",
       accesstoken,
       body: JSON.stringify({
         hookType: "SubscriptionCreated",
@@ -34,4 +38,10 @@ Deno.test("api/v1/payment_intents", async () => {
     const json = await res.json();
     console.log(json);
   }
+
+  const res2 = await AuthenticatedGET({
+    url: "http://localhost:3000/api/v1/zapier",
+    accesstoken,
+  });
+  console.log(await res2.json());
 });
