@@ -45,6 +45,47 @@ export const checkRole: { [key in Role]: boolean } = {
   [Role.MERCHANT]: true,
 };
 
+export enum ZapierHookTypes {
+  SubscriptionCreated = "SubscriptionCreated",
+  SubscriptionCancelled = "SubscriptionCancelled",
+  SubscriptionEnded = "SubscriptionEnded",
+  Payment = "Payment",
+  PaymentFailure = "PaymentFailure",
+  DynamicPaymentRequestRejected = "DynamicPaymentRequestRejected",
+}
+
+export const getZapierHookTypesStringList = () => {
+  let buff = "";
+  for (const ht in ZapierHookTypes) {
+    buff += "," + ht;
+  }
+  // Remove the first extra comma
+  return buff.slice(1);
+};
+
+export const verifyHookType: {
+  [key in ZapierHookTypes]: boolean;
+} = {
+  [ZapierHookTypes.SubscriptionCreated]: true,
+  [ZapierHookTypes.SubscriptionCancelled]: true,
+  [ZapierHookTypes.SubscriptionEnded]: true,
+  [ZapierHookTypes.Payment]: true,
+  [ZapierHookTypes.PaymentFailure]: true,
+  [ZapierHookTypes.DynamicPaymentRequestRejected]: true,
+};
+
+export const mapHookTypeToDbColName: {
+  [key in ZapierHookTypes]: string;
+} = {
+  [ZapierHookTypes.SubscriptionCreated]: "subscription_created_url",
+  [ZapierHookTypes.SubscriptionCancelled]: "subscription_cancelled_url",
+  [ZapierHookTypes.SubscriptionEnded]: "subscription_ended_url",
+  [ZapierHookTypes.Payment]: "payment_url",
+  [ZapierHookTypes.PaymentFailure]: "payment_failure_url",
+  [ZapierHookTypes.DynamicPaymentRequestRejected]:
+    "dynamic_payment_request_rejected_url",
+};
+
 export const validatePaymentIntentStatus_ApiV1: {
   [key in PaymentIntentStatus_ApiV1]: boolean;
 } = {
