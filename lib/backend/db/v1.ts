@@ -1,6 +1,10 @@
 // The API V1 Queries are here
 
-import { Role } from "../../api_v1/types.ts";
+import {
+  mapHookTypeToDbColName,
+  Role,
+  ZapierHookTypes,
+} from "../../api_v1/types.ts";
 import { PaymentIntentStatus } from "../../enums.ts";
 import { PaginationArgs } from "./pagination.ts";
 import { query } from "./utils.ts";
@@ -205,5 +209,51 @@ export async function selectPaymentIntentByPaymentIntentAPIV1(
       return await q;
     },
     name: "selectPaymentIntentByPaymentIntentAPIV1",
+  });
+}
+
+// RPC CALLS
+
+export type UpsertZapierWebhookArgs = {
+  hookType: ZapierHookTypes;
+  hookUrl: string;
+};
+
+export async function upsertZapierWebhook(
+  ctx: any,
+  args: UpsertZapierWebhookArgs,
+) {
+  return await query<UpsertZapierWebhookArgs>({
+    ctx,
+    args,
+    impl: async (p) => {
+      return await p.client.rpc("upsert_zapier_webhook", {
+        hooktype_col: mapHookTypeToDbColName[p.args.hookType],
+        hookurl: p.args.hookUrl,
+        userid: p.userid,
+      });
+    },
+    name: "upsertZapierWebhook",
+  });
+}
+
+export type DeleteZapierWebhookArgs = {
+  hookType: ZapierHookTypes;
+};
+
+export async function deleteZapierWebhook(
+  ctx: any,
+  args: DeleteZapierWebhookArgs,
+) {
+  return await query<DeleteZapierWebhookArgs>({
+    ctx,
+    args,
+    impl: async (p) => {
+      return await p.client.rpc("delete_zapier_webhook", {
+        hooktype_col: mapHookTypeToDbColName[p.args.hookType],
+        userid: p.userid,
+      });
+    },
+    name: "deleteZapierWebhook",
   });
 }
