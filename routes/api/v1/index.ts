@@ -8,4 +8,7 @@ export const handler = {
   GET(_req: Request, _ctx: HandlerContext) {
     return v1Success(V1ResponseBuilder());
   },
+  POST(_req:Request,_ctx: HandlerContext){
+    return v1Success(V1ResponseBuilder())
+  }
 };
