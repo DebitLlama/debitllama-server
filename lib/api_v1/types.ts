@@ -35,6 +35,16 @@ export enum PaymentIntentStatus_ApiV1 {
   ACCOUNTBALANCETOOLOW = "ACCOUNTBALANCETOOLOW",
 }
 
+export enum Role {
+  CUSTOMER = "customer",
+  MERCHANT = "merchant",
+}
+
+export const checkRole: { [key in Role]: boolean } = {
+  [Role.CUSTOMER]: true,
+  [Role.MERCHANT]: true,
+};
+
 export const validatePaymentIntentStatus_ApiV1: {
   [key in PaymentIntentStatus_ApiV1]: boolean;
 } = {
