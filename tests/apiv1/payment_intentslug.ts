@@ -1,10 +1,16 @@
-import { AuthenticatedPOST, UnAuthenticatedGET } from "./fetch.ts";
+import {
+  AuthenticatedGET,
+} from "./fetch.ts";
 import "$std/dotenv/load.ts";
 
 Deno.test("GET api/v1/payment_intents/slug", async () => {
-  const res = await UnAuthenticatedGET(
-    "http://localhost:3000/api/v1/payment_intents/0x0f4d5f05dbe525279ba04ebf294e44f6c22fdd88dcfb575d1097165a1547727a",
-  );
+  const accesstoken = Deno.env.get("TESTACCESSTOKEN") || "";
+
+  const res = await AuthenticatedGET({
+    url:
+      "http://localhost:3000/api/v1/payment_intents/0x0f4d5f05dbe525279ba04ebf294e44f6c22fdd88dcfb575d1097165a1547727a?role=customer",
+    accesstoken,
+  });
 
   const json = await res.json();
   console.log(json);
