@@ -14,6 +14,14 @@ import {
 } from "../../../../lib/backend/db/v1.ts";
 
 export const handler = {
+  GET(_req: Request, ctx: HandlerContext) {
+    // Return the Zapier Perform List must return an array.
+
+    // I need to return an array of payment intents that were Created for the payee
+
+    return new Response(JSON.stringify([]), { status: 200 });
+  },
+
   async POST(_req: Request, ctx: HandlerContext) {
     const json = await _req.json();
 
