@@ -6,6 +6,7 @@ import {
 } from "../enums.ts";
 import {
   bittorrentCurrencies,
+  bttMainnetCurrencies,
   ChainIds,
   ConnectedWalletsContractAddress,
   getCurrenciesForNetworkName,
@@ -106,6 +107,21 @@ export function V1ResponseBuilder() {
         connected_wallets_contract: ConnectedWalletsContractAddress.BTT_TESTNET,
         currency: "BTT",
         available_currencies: bittorrentCurrencies.map((curr) => {
+          return {
+            name: curr.name,
+            native: curr.native,
+            contractAddress: curr.contractAddress,
+          };
+        }),
+      },
+      {
+        name: NetworkNames.BTT_MAINNET,
+        rpc: rpcUrl[ChainIds.BTT_MAINNET_ID],
+        chain_id: ChainIds.BTT_MAINNET_ID,
+        virtual_accounts_contract: VirtualAccountsContractAddress.BTT_MAINNET,
+        connected_wallets_contract: ConnectedWalletsContractAddress.BTT_MAINNET,
+        currency: "BTT",
+        available_currencies: bttMainnetCurrencies.map((curr) => {
           return {
             name: curr.name,
             native: curr.native,
