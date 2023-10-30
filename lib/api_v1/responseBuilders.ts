@@ -669,7 +669,7 @@ function mapDynamicPaymentRequestRowToApiV1(
   };
 }
 
-function mapPaymentIntentsRowToPaymentIntentsApiV1(
+export function mapPaymentIntentsRowToPaymentIntentsApiV1(
   row: PaymentIntentRow,
 ): PaymentIntent_ApiV1 {
   const currency = JSON.parse(row.currency);
@@ -710,7 +710,7 @@ function mapPaymentIntentsRowToPaymentIntentsApiV1(
     commitment: row.commitment,
     estimated_gas: row.estimatedGas,
     status_text: row.statusText as PaymentIntentStatus_ApiV1,
-    last_payment_date: row.lastPaymentDate,
+    last_payment_date: row.lastPaymentDate === null ? "" : row.lastPaymentDate,
     next_payment_date: row.nextPaymentDate,
     pricing: row.pricing as Pricing_ApiV1,
     currency,
