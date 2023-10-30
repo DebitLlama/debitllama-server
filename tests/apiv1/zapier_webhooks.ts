@@ -40,8 +40,11 @@ Deno.test("api/v1/payment_intents", async () => {
   }
 
   const res2 = await AuthenticatedGET({
-    url: "http://localhost:3000/api/v1/zapier",
+    url: "http://localhost:3000/api/v1/zapier?hooktype=SubscriptionCreated",
     accesstoken,
   });
-  console.log(await res2.json());
+
+  const json2 = await res2.json();
+
+  console.log(JSON.stringify(json2[0]));
 });

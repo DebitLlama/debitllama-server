@@ -257,3 +257,21 @@ export async function deleteZapierWebhook(
     name: "deleteZapierWebhook",
   });
 }
+
+export async function getLatestSubscriptionsCreatedForPayee(
+  ctx: any,
+  args: {},
+) {
+  return await query<{}>({
+    ctx,
+    args,
+    impl: async (p) => {
+      return await p.client.from("PaymentIntents")
+        .select("*,debit_item_id(*),account_id(*)")
+        .eq("statusText", PaymentIntentStatus.CREATED)
+        .eq("payee_user_id", p.userid)
+        .order("created_at", { ascending: false });
+    },
+    name: "getLatestSubscriptionsCreatedForPayee",
+  });
+}
