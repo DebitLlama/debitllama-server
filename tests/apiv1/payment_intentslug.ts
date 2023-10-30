@@ -8,7 +8,7 @@ Deno.test("GET api/v1/payment_intents/slug", async () => {
 
   const res = await AuthenticatedGET({
     url:
-      "http://localhost:3000/api/v1/payment_intents/0x0f4d5f05dbe525279ba04ebf294e44f6c22fdd88dcfb575d1097165a1547727a?role=customer",
+      "https://debitllama-stage.deno.dev/api/v1/payment_intents/0x0f4d5f05dbe525279ba04ebf294e44f6c22fdd88dcfb575d1097165a1547727a?role=customer",
     accesstoken,
   });
 
