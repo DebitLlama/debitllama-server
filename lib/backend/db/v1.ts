@@ -1,5 +1,6 @@
 // The API V1 Queries are here
 
+import { Role } from "../../api_v1/types.ts";
 import { PaymentIntentStatus } from "../../enums.ts";
 import { PaginationArgs } from "./pagination.ts";
 import { query } from "./utils.ts";
@@ -21,7 +22,8 @@ export async function selectAllItemsForAPIV1(
       const q = p.client.from("Items")
         .select("*", { count: "exact" })
         .order(p.args.order, { ascending: p.args.ascending })
-        .range(p.args.rangeFrom, p.args.rangeTo);
+        .range(p.args.rangeFrom, p.args.rangeTo)
+        .eq("payee_id", p.userid);
       for (let i = 0; i < p.args.filter.length; i++) {
         q.eq(p.args.filter[i].parameter, p.args.filter[i].value);
       }
@@ -46,7 +48,7 @@ export async function selectAccountsByCommitmentAPiV1(
       return await p.client.from("Accounts").select().eq(
         "commitment",
         p.args.commitment,
-      );
+      ).eq("user_id", p.userid);
     },
     name: "selectAccountsByCommitmentAPiV1",
   });
@@ -60,12 +62,12 @@ export async function selectAllAccountsAPIV1(
     ctx,
     args,
     impl: async (p) => {
-      console.log("select alla account query");
       const query = p.client
         .from("Accounts")
         .select("*", { count: "exact" })
         .order(p.args.order, { ascending: p.args.ascending })
-        .range(p.args.rangeFrom, p.args.rangeTo);
+        .range(p.args.rangeFrom, p.args.rangeTo)
+        .eq("user_id", p.userid);
 
       for (let i = 0; i < p.args.filter.length; i++) {
         const param = p.args.filter[i].parameter === "account_type"
@@ -180,6 +182,7 @@ export async function selectAllPaymentIntentsAPIV1(
 
 export type SelectPaymentIntentByPaymentIntentAPIV1 = {
   paymentIntent: string;
+  role: Role;
 };
 
 export async function selectPaymentIntentByPaymentIntentAPIV1(
@@ -190,9 +193,16 @@ export async function selectPaymentIntentByPaymentIntentAPIV1(
     ctx,
     args,
     impl: async (p) => {
-      return await p.client.from("PaymentIntents")
+      const q = p.client.from("PaymentIntents")
         .select("*,debit_item_id(*),account_id(*)", { count: "exact" })
         .eq("paymentIntent", p.args.paymentIntent);
+
+      if (args.role === Role.CUSTOMER) {
+        q.eq("creator_user_id", p.userid);
+      } else {
+        q.eq("payee_user_id", p.userid);
+      }
+      return await q;
     },
     name: "selectPaymentIntentByPaymentIntentAPIV1",
   });

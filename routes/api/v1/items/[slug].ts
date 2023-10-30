@@ -15,6 +15,8 @@ export const handler = {
   },
   POST(_req: Request, ctx: HandlerContext) {
     //TODO: Update an item redirect url or set it to deactivated!
+    //TODO: Update an the the email sending
+    //TODO: Add a new item dynamically to create user tailored debit items!
     return new Response(null, { status: 200 });
   },
 };

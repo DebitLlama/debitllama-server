@@ -5,7 +5,11 @@ import {
   v1Error,
   v1Success,
 } from "../../../../lib/api_v1/responseBuilders.ts";
-import { DynamicPaymentRequestResponseMessage } from "../../../../lib/api_v1/types.ts";
+import {
+  checkRole,
+  DynamicPaymentRequestResponseMessage,
+  Role,
+} from "../../../../lib/api_v1/types.ts";
 import {
   addDynamicPaymentRequest,
   cancelDynamicPaymentRequestLogic,
@@ -21,10 +25,19 @@ export const handler = {
       if (slug.length === 0) {
         throw new Error("Missing paymentIntent parameter");
       }
+
+      const url = new URL(_req.url);
+      const role = url.searchParams.get("role") || "";
+
+      if (!checkRole[role as Role]) {
+        throw new Error("Missing role");
+      }
+
       const queryBuilder = new QueryBuilder(ctx);
       const select = queryBuilder.select();
       const paymentIntent = await selectPaymentIntentByPaymentIntentAPIV1(ctx, {
         paymentIntent: slug,
+        role: role as Role,
       });
 
       if (paymentIntent.data.length === 0) {
