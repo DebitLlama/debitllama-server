@@ -1,4 +1,5 @@
 import "$std/dotenv/load.ts";
+import { ZapierHookTypes } from "../../lib/api_v1/types.ts";
 import {
   AuthenticatedDELETE,
   AuthenticatedGET,
@@ -39,12 +40,17 @@ Deno.test("api/v1/payment_intents", async () => {
     console.log(json);
   }
 
-  const res2 = await AuthenticatedGET({
-    url: "http://localhost:3000/api/v1/zapier?hooktype=SubscriptionCreated",
-    accesstoken,
-  });
-
-  const json2 = await res2.json();
-
-  console.log(JSON.stringify(json2[0]));
+  for (const key in ZapierHookTypes) {
+    const hooktype = ZapierHookTypes[key as ZapierHookTypes];
+    const res = await AuthenticatedGET({
+      url: `http://localhost:3000/api/v1/zapier?hooktype=${hooktype}`,
+      accesstoken,
+    });
+    const json = await res.json();
+    console.log(
+      `Requested ${hooktype}\nGot ${json.length} results\nFirst one is ${
+        JSON.stringify(json[0])
+      }\n\n`,
+    );
+  }
 });
