@@ -2,6 +2,7 @@
 
 import {
   mapHookTypeToDbColName,
+  Pricing_ApiV1,
   Role,
   ZapierHookTypes,
 } from "../../api_v1/types.ts";
@@ -260,18 +261,77 @@ export async function deleteZapierWebhook(
 
 export async function getLatestSubscriptionsCreatedForPayee(
   ctx: any,
-  args: {},
+  args: {
+    statusText: PaymentIntentStatus;
+  },
 ) {
-  return await query<{}>({
+  return await query<{
+    statusText: PaymentIntentStatus;
+  }>({
     ctx,
     args,
     impl: async (p) => {
       return await p.client.from("PaymentIntents")
         .select("*,debit_item_id(*),account_id(*)")
-        .eq("statusText", PaymentIntentStatus.CREATED)
+        .eq("statusText", p.args.statusText)
         .eq("payee_user_id", p.userid)
         .order("created_at", { ascending: false });
     },
     name: "getLatestSubscriptionsCreatedForPayee",
+  });
+}
+
+export async function getLatestSubscriptionWithFailureForPayee(ctx: any) {
+  return await query<{}>({
+    ctx,
+    args: {},
+    impl: async (p) => {
+      return await p.client.from("PaymentIntents")
+        .select("*,debit_item_id(*),account_id(*)")
+        //TODO: This is probably not good
+        .neq("statusText", PaymentIntentStatus.CANCELLED)
+        .neq("statusText", PaymentIntentStatus.CREATED)
+        .neq("statusText", PaymentIntentStatus.PAID)
+        .neq("statusText", PaymentIntentStatus.RECURRING)
+        .eq("payee_user_id", p.userid)
+        .order("created_at", { ascending: false });
+    },
+    name: "getLatestSubscriptionWithFailureForPayee",
+  });
+}
+
+export async function getLatestSubscriptionWhereAccountBalanceLowAndFailedDynamicPayment(
+  ctx: any,
+) {
+  return await query<{}>({
+    ctx,
+    args: {},
+    impl: async (p) => {
+      // List the Payment intents where the status is account balance too low
+      // for the payee_user_id, where the pricing is dynamic
+      return await p.client.from("PaymentIntents")
+        .select("*,debit_item_id(*),account_id(*)")
+        .neq("statusText", PaymentIntentStatus.ACCOUNTBALANCETOOLOW)
+        .eq("payee_user_id", p.userid)
+        .eq("pricing", Pricing_ApiV1.Dynamic);
+    },
+    name: "getLatestSubscriptionWhereAccountBalanceLowAndFailedDynamicPaymentAmount",
+  });
+}
+
+export async function getLatestSubscriptionWhereDynamicPaymentRequestCreated(
+  ctx: any,
+) {
+  return await query<{}>({
+    ctx,
+    args: {},
+    impl: async (p) => {
+      return await p.client.from("DynamicPaymentRequestJobs")
+        .select("*,paymentIntent_id(*)")
+        .eq("request_creator_id", p.userid)
+        .eq("status", "Created")
+        .order("last_modified", { ascending: false });
+    },
+    name: "getLatestSubscriptionWhereDynamicPaymentRequestCreated",
   });
 }

@@ -1,21 +1,26 @@
 import { HandlerContext } from "$fresh/server.ts";
 import {
-  mapPaymentIntentsRowToPaymentIntentsApiV1,
+  mapPaymentIntentsRowToZapierFriendlyResponse,
   v1Error,
   V1ErrorResponseBuilder,
 } from "../../../../lib/api_v1/responseBuilders.ts";
 import {
   getZapierHookTypesStringList,
-  PaymentIntent_ApiV1,
+  PaymentIntent_ZapierFormat,
   verifyHookType,
   ZapierHookTypes,
 } from "../../../../lib/api_v1/types.ts";
 import {
   deleteZapierWebhook,
   getLatestSubscriptionsCreatedForPayee,
+  getLatestSubscriptionWhereAccountBalanceLowAndFailedDynamicPayment,
+  getLatestSubscriptionWithFailureForPayee,
   upsertZapierWebhook,
 } from "../../../../lib/backend/db/v1.ts";
-import { PaymentIntentRow } from "../../../../lib/enums.ts";
+import {
+  PaymentIntentRow,
+  PaymentIntentStatus,
+} from "../../../../lib/enums.ts";
 
 export const handler = {
   async GET(_req: Request, ctx: HandlerContext) {
@@ -40,19 +45,44 @@ export const handler = {
       case ZapierHookTypes.SubscriptionCreated:
         res = await getLatestSubscriptionsCreatedForPayee(
           ctx,
-          {},
+          {
+            statusText: PaymentIntentStatus.CREATED,
+          },
         );
         break;
       case ZapierHookTypes.SubscriptionCancelled:
-        //TODO:
+        res = await getLatestSubscriptionsCreatedForPayee(
+          ctx,
+          {
+            statusText: PaymentIntentStatus.CANCELLED,
+          },
+        );
         break;
       case ZapierHookTypes.SubscriptionEnded:
+        res = await getLatestSubscriptionsCreatedForPayee(
+          ctx,
+          {
+            statusText: PaymentIntentStatus.PAID,
+          },
+        );
         break;
       case ZapierHookTypes.Payment:
+        res = await getLatestSubscriptionsCreatedForPayee(
+          ctx,
+          {
+            statusText: PaymentIntentStatus.RECURRING,
+          },
+        );
         break;
       case ZapierHookTypes.PaymentFailure:
+        res = await getLatestSubscriptionWithFailureForPayee(ctx);
         break;
       case ZapierHookTypes.DynamicPaymentRequestRejected:
+        //F***ing naming innit? haha It's expressive :P
+        res =
+          await getLatestSubscriptionWhereAccountBalanceLowAndFailedDynamicPayment(
+            ctx,
+          );
         break;
       default:
         break;
@@ -73,9 +103,10 @@ export const handler = {
       );
     }
 
-    const api_res: Array<PaymentIntent_ApiV1> = data.map(
+    const api_res: Array<PaymentIntent_ZapierFormat> = data.map(
       (pi: PaymentIntentRow) => {
-        return mapPaymentIntentsRowToPaymentIntentsApiV1(pi);
+        //This is returning a more zapier friendly response
+        return mapPaymentIntentsRowToZapierFriendlyResponse(pi);
       },
     );
 
