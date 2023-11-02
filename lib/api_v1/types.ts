@@ -689,3 +689,24 @@ export const getSortableColumns: {
   [EndpointNames_ApiV1.transactions]: [],
   [EndpointNames_ApiV1.transactionsSlug]: [],
 };
+
+
+export interface PaymentIntent_ZapierFormat {
+  name: string;
+  created_at: string;
+  payment_intent: string;
+  status_text: PaymentIntentStatus_ApiV1,
+  payee_address: string;
+  max_debit_amount: string;
+  debit_times: number;
+  debit_interval: number;
+  last_payment_date: string; // UTC strinng
+  next_payment_date: string; // UTC string
+  pricing: Pricing_ApiV1;
+  currency_name: string;
+  native_currency: string;
+  currency_address: string;
+  network: string;
+  transactions_left: number; // calulated like: debit_interval - used_for
+  failed_dynamic_payment_amount: string;
+}
