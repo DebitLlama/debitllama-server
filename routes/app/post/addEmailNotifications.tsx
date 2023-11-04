@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { updateItemEmailNotifications } from "../../../lib/backend/db/admin.ts";
+import { updateItemEmailNotifications } from "../../../lib/backend/db/tables/Items.ts";
 import { State } from "../../_middleware.ts";
 
 // Update the item email_notifications by button_id for the creator!

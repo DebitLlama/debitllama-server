@@ -5,7 +5,7 @@ import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import { DEBITITEMSTABLEPAGESIZE } from "../../lib/enums.ts";
 import { getTotalPages } from "../../lib/backend/businessLogic.ts";
 import DebitItemsTable from "../../islands/pagination/DebitItemsTable.tsx";
-import { selectItemsbyUserIdForPayeePaginated } from "../../lib/backend/db/pagination.ts";
+import { selectItemsbyUserIdForPayeePaginated } from "../../lib/backend/db/tables/Items.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(_req, ctx) {

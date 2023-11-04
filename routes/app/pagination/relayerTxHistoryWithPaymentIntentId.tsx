@@ -1,7 +1,7 @@
 // Api endpoints for the pagination API
 import { Handlers } from "$fresh/server.ts";
 import { getPagination, getTotalPages } from "../../../lib/backend/businessLogic.ts";
-import { selectRelayerHistoryByPaymentIntentIdPaginated, selectRelayerHistorybyPaymentIntentIdPaginatedWithTxSearch } from "../../../lib/backend/db/pagination.ts";
+import { selectRelayerHistoryByPaymentIntentIdPaginated, selectRelayerHistorybyPaymentIntentIdPaginatedWithTxSearch } from "../../../lib/backend/db/tables/RelayerHistory.ts";
 import { errorResponseBuilder } from "../../../lib/backend/responseBuilders.ts";
 import { MapRelayerTxHistoryColnamesToDbColNames, RELAYERTRANSACTIONHISTORYPAGESIZE, RelayerTxHistoryColNames } from "../../../lib/enums.ts";
 import { State } from "../../_middleware.ts";

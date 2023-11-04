@@ -2,8 +2,8 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import { AccessTokenUIState, UiSwitcherButtons } from "../../../components/APiUi.tsx";
 import Layout from "../../../components/Layout.tsx";
 import WebhooksSettings from "../../../islands/WebhooksUI.tsx";
-import { deleteWebhookData, selectWebhooksByUserid } from "../../../lib/backend/db/admin.ts";
 import { UpsertWebhookDataArgs, upsert_webhook_data } from "../../../lib/backend/db/rpc.ts";
+import { deleteWebhookData, selectWebhooksByUserid } from "../../../lib/backend/db/tables/Webhooks.ts";
 import { State } from "../../_middleware.ts";
 
 export const handler: Handlers<any, State> = {

@@ -7,7 +7,8 @@ import { getTotalPages, updateRelayerBalanceAndHistorySwitchNetwork } from "../.
 import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import { RELAYERTOPUPHISTORYPAGESIZE, RELAYERTRANSACTIONHISTORYPAGESIZE } from "../../lib/enums.ts";
 import { setProfileRedirectCookie } from "../../lib/backend/cookies.ts";
-import { selectRelayerHistoryByPayeeUserIdPaginated, selectRelayerTopUpHistoryByUserIdPaginated } from "../../lib/backend/db/pagination.ts";
+import { selectRelayerHistoryByPayeeUserIdPaginated } from "../../lib/backend/db/tables/RelayerHistory.ts";
+import { selectRelayerTopUpHistoryByUserIdPaginated } from "../../lib/backend/db/tables/RelayerTopUpHistory.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(_req, ctx) {

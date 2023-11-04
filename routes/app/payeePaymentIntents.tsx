@@ -12,7 +12,7 @@ import { addDynamicPaymentRequest } from "../../lib/backend/businessLogic.ts";
 import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import RelayedTxHistory from "../../islands/pagination/RelayedTxHistoryWithPagination.tsx";
 import { getTotalPaymentValue } from "../../components/PaymentIntentsTable.tsx";
-import { selectRelayerHistoryByPaymentIntentIdPaginated } from "../../lib/backend/db/pagination.ts";
+import { selectRelayerHistoryByPaymentIntentIdPaginated } from "../../lib/backend/db/tables/RelayerHistory.ts";
 
 
 
