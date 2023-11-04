@@ -2,16 +2,13 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
 import Layout from "../../components/Layout.tsx";
 import AddNewPassKeyButton from "../../islands/AddNewPasskeyButton.tsx";
-import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import { PasskeysAddedNotification } from "../../components/components.tsx";
+import { selectAllAuthenticatorsByUserId } from "../../lib/backend/db/tables/Authenticators.ts";
 
 export const handler: Handlers<any, State> = {
   async GET(req, ctx) {
     // It should get the authentication devices count and return it
-    const queryBuilder = new QueryBuilder(ctx);
-    const authenticators = queryBuilder.select().Authenticators;
-    const { data } = await authenticators.allByUserId();
-
+    const { data } = await selectAllAuthenticatorsByUserId(ctx, {});
     return ctx.render({ ...ctx.state, authenticatorCount: data.length ?? 0 });
   },
 };

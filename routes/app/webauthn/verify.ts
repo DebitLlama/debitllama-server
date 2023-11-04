@@ -9,6 +9,7 @@ export const handler: Handlers<any, State> = {
   async GET(_req, ctx) {
     const queryBuilder = new QueryBuilder(ctx);
     const [success, options] = await authenticationVerifyGET(
+      ctx,
       queryBuilder,
     );
 

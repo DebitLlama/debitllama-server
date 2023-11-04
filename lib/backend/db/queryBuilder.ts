@@ -1,4 +1,5 @@
 import {
+  AccountAccess,
   AccountTypes,
   DynamicPaymentRequestJobsStatus,
   PaymentIntentRow,
@@ -312,21 +313,6 @@ export default class QueryBuilder {
           return this.responseHandler(res);
         },
       },
-      Authenticators: {
-        allByUserId: async () => {
-          const res = await this.client.from("Authenticators")
-            .select()
-            .eq("user_id", this.userid);
-          return this.responseHandler(res);
-        },
-        byCredentialId: async (credentialID: string) => {
-          const res = await this.client.from("Authenticators")
-            .select()
-            .eq("user_id", this.userid)
-            .eq("credentialID", credentialID);
-          return this.responseHandler(res);
-        },
-      },
     };
   }
 
@@ -342,6 +328,7 @@ export default class QueryBuilder {
           balance: string,
           accountType: AccountTypes,
           creator_address: string,
+          accountAccess: AccountAccess,
         ) => {
           const res = await this.client.from("Accounts").insert({
             created_at: new Date().toUTCString(),
@@ -355,6 +342,7 @@ export default class QueryBuilder {
             last_modified: new Date().toUTCString(),
             accountType,
             creator_address,
+            account_access: accountAccess,
           });
 
           return this.responseHandler(res);
@@ -583,31 +571,6 @@ export default class QueryBuilder {
           return this.responseHandler(res);
         },
       },
-      Authenticators: {
-        insertNew: async (
-          {
-            credentialID,
-            credentialPublicKey,
-            counter,
-            credentialDeviceType,
-            credentialBackedUp,
-            transports,
-          }: Authenticator,
-        ) => {
-          const res = await this.client.from("Authenticators")
-            .insert({
-              created_at: new Date().toUTCString(),
-              user_id: this.userid,
-              credentialID,
-              credentialPublicKey,
-              counter,
-              credentialDeviceType,
-              credentialBackedUp,
-              transports: JSON.stringify(transports),
-            });
-          return this.responseHandler(res);
-        },
-      },
     };
   }
 
@@ -771,6 +734,7 @@ export default class QueryBuilder {
               requestedAmount,
               status: DynamicPaymentRequestJobsStatus.CREATED,
               allocatedGas,
+              last_modified: new Date().toUTCString(),
             }).eq("paymentIntent_id", paymentIntent_id)
             .eq("request_creator_id", this.userid).select();
 
@@ -863,16 +827,6 @@ export default class QueryBuilder {
           const res = await this.client.from("PasswordResetUrls")
             .delete()
             .eq("q", q);
-          return this.responseHandler(res);
-        },
-      },
-      Authenticators: {
-        byCredentialIDForUser: async (credentialID: string) => {
-          const res = await this.client.from("Authenticators")
-            .delete()
-            .eq("credentialID", credentialID)
-            .eq("user_id", this.userid);
-
           return this.responseHandler(res);
         },
       },

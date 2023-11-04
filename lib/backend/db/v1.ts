@@ -7,8 +7,7 @@ import {
   ZapierHookTypes,
 } from "../../api_v1/types.ts";
 import { PaymentIntentStatus } from "../../enums.ts";
-import { PaginationArgs } from "./pagination.ts";
-import { query } from "./utils.ts";
+import { PaginationArgs, query } from "./utils.ts";
 
 export type Filter = Array<{ parameter: string; value: string }>;
 

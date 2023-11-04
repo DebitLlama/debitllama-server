@@ -10,10 +10,13 @@ import { ChainIds } from "../shared/web3.ts";
 import {
   getAuthenticationOptions,
   getRegistrationOptions,
+  getRegistrationOptionsWithLargeBlob,
   PasskeyUserModel,
 } from "../webauthn/backend.ts";
 import QueryBuilder from "./db/queryBuilder.ts";
 import { getEmailByUserId } from "./db/rpc.ts";
+import { selectAllAccountAuthenticatorsByUserId } from "./db/tables/AccountAuthenticators.ts";
+import { selectAllAuthenticatorsByUserId } from "./db/tables/Authenticators.ts";
 import {
   estimateRelayerGas,
   formatEther,
@@ -680,9 +683,9 @@ export async function registerAuthenticatorGET(
     .UserChallenges.currentChallenge();
 
   if (userChallenge.length === 0) {
-    const { data: emailData } = await getEmailByUserId(ctx,{
-      userid}
-    );
+    const { data: emailData } = await getEmailByUserId(ctx, {
+      userid,
+    });
     const email = emailData[0].email;
 
     // No challenge was saved yet, I will do insert
@@ -705,8 +708,8 @@ export async function registerAuthenticatorGET(
       username: userChallengeModel[0].email,
       currentChallenge: userChallengeModel[0].currentChallenge,
     };
-    const { data: authenticators } = await select.Authenticators
-      .allByUserId();
+    const { data: authenticators } = await selectAllAuthenticatorsByUserId(ctx,{});
+
 
     const options = await getRegistrationOptions(userModel, authenticators);
     const update = queryBuilder.update();
@@ -718,6 +721,7 @@ export async function registerAuthenticatorGET(
 }
 
 export async function authenticationVerifyGET(
+  ctx: any,
   queryBuilder: QueryBuilder,
 ) {
   const select = queryBuilder.select();
@@ -731,8 +735,7 @@ export async function authenticationVerifyGET(
     return [false, null];
   }
 
-  const { data: authenticators } = await select.Authenticators
-    .allByUserId();
+  const { data: authenticators } = await selectAllAuthenticatorsByUserId(ctx,{});
 
   if (authenticators.length === 0) {
     return [false, null];
@@ -741,4 +744,58 @@ export async function authenticationVerifyGET(
 
   await update.UserChallenges.challengeByUserId(options.challenge);
   return [true, options];
+}
+
+
+export async function registerAuthenticatorGETForAccount(
+  ctx: any,
+  queryBuilder: QueryBuilder,
+  userid: string,
+) {
+  const select = queryBuilder.select();
+  const insert = queryBuilder.insert();
+  //TODO: Refactor to 1 RPC call
+  const { data: userChallenge } = await select
+    .UserChallenges.currentChallenge();
+
+  if (userChallenge.length === 0) {
+    const { data: emailData } = await getEmailByUserId(ctx, {
+      userid,
+    });
+    const email = emailData[0].email;
+
+    // No challenge was saved yet, I will do insert
+    const userModel: PasskeyUserModel = {
+      id: userid,
+      username: email,
+      currentChallenge: "",
+    };
+    // There are no authenticators saved if there was no challenge yet!
+    const options = await getRegistrationOptionsWithLargeBlob(userModel, []);
+    await insert.UserChallenges.newChallenge(options.challenge, email);
+
+    return options;
+  } else {
+    // I need to update the existing challenge
+    const { data: userChallengeModel } = await select.UserChallenges
+      .currentChallenge();
+    const userModel: PasskeyUserModel = {
+      id: userid as string,
+      username: userChallengeModel[0].email,
+      currentChallenge: userChallengeModel[0].currentChallenge,
+    };
+
+    //Using a different authenticators table here
+
+    const { data: authenticators } = await selectAllAccountAuthenticatorsByUserId(ctx,{});
+    const options = await getRegistrationOptionsWithLargeBlob(
+      userModel,
+      authenticators,
+    );
+    const update = queryBuilder.update();
+
+    await update.UserChallenges.challengeByUserId(options.challenge);
+
+    return options;
+  }
 }

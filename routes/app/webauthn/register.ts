@@ -8,6 +8,7 @@ import {
   encodeUint8ArrayToBase64,
   verifyRegistration,
 } from "../../../lib/webauthn/backend.ts";
+import { insertNewAuthenticator } from "../../../lib/backend/db/tables/Authenticators.ts";
 
 export const handler: Handlers<any, State> = {
   async POST(_req, ctx) {
@@ -37,7 +38,7 @@ export const handler: Handlers<any, State> = {
       transports: json.response.transports,
     };
 
-    await queryBuilder.insert().Authenticators.insertNew(newAuthenticator);
+    await insertNewAuthenticator(ctx, { authenticator: newAuthenticator });
 
     return new Response(JSON.stringify({ success: verified[1].verified }), {
       status: 200,

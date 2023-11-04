@@ -1,4 +1,4 @@
-import { PaginationArgs, PaginationArgsWithSearch } from "../pagination.ts";
+import { PaginationArgs, PaginationArgsWithSearch } from "../utils.ts";
 import { query } from "../utils.ts";
 
 

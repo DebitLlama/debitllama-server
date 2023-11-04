@@ -1,6 +1,6 @@
 // INSERT QUERIES
 
-import { PaginationArgs } from "../pagination.ts";
+import { PaginationArgs } from "../utils.ts";
 import { query, responseHandler, unwrapContext } from "../utils.ts";
 
 export async function insertNewAccessToken(
