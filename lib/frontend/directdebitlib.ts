@@ -22,6 +22,24 @@ export async function setUpAccount(
   return { encryptedNote: packed, commitment };
 }
 
+/**
+ * This is used for creating an account with metamask or passkey, it doesn't rely on a passwords
+ */
+export async function setUpAccountWithoutPassword(ethEncryptPublicKey: string) {
+  const note = newAccountSecrets();
+  const secrets = decodeAccountSecrets(note);
+  const commitment = toNoteHex(secrets.commitment);
+
+  //Encrypt the note with the public key
+  const encryptedNote = await ethEncryptData(
+    ethEncryptPublicKey,
+    note,
+  );
+  const packed = await packEncryptedMessage(encryptedNote);
+
+  return { encryptedNote: packed, commitment };
+}
+
 export function newAccountSecrets() {
   //@ts-ignore this dependency is imported through a browser script tag
   return directdebitlib.newAccountSecrets();
@@ -68,6 +86,16 @@ export function ethEncryptData(publicKey: any, data: any) {
 export function packEncryptedMessage(encryptedMessage: any) {
   //@ts-ignore this dependency is imported through a browser script tag
   return directdebitlib.packEncryptedMessage(encryptedMessage);
+}
+
+export function unpackEncryptedMessage(encryptedMessage: string): {
+  version: string;
+  nonce: string;
+  ephemPublicKey: string;
+  ciphertext: string;
+} {
+  //@ts-ignore this dependency is imported through a browser script tag
+  return directdebitlib.unpackEncryptedMessage(encryptedMessage);
 }
 
 export type PaymentIntentSecret = {
