@@ -1,6 +1,6 @@
 import { ProfileProps } from "../../components/BuyPageProfile.tsx";
 import { AccountPasswordInputProps } from "../../islands/accountPasswordInput.tsx";
-import { AccountTypes } from "../enums.ts";
+import { AccountAccess, AccountTypes } from "../enums.ts";
 
 export interface Currency {
   name: string;
@@ -89,6 +89,7 @@ export interface onCreateAccountSubmitArgs {
   accountCurrency: string;
   setShowOverlay: (to: boolean) => void;
   accountTypeSwitchValue: AccountTypes;
+  accountAccessSelected: AccountAccess;
 }
 
 export interface LoggedInUiProps {

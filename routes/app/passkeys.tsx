@@ -19,7 +19,7 @@ export const handler: Handlers<any, State> = {
 export default function Passkeys(props: PageProps) {
 
   const addedPasskeys = props.data.authenticatorCount;
-
+  // TODO: ADD EMAIL 2FA WHEN ADDING A NEW PASSKEY
   return <Layout url={props.url.toString()} renderSidebarOpen={props.data.renderSidebarOpen} isLoggedIn={props.data.token}>
     <div class="mt-10 px-5 mx-auto flex max-w-screen-md flex-col justify-center">
       <div class="flex flex-row justify-center">
