@@ -41,7 +41,8 @@ export enum DocsLinks {
   LINKTODOCSSTART = "https://debitllama.gitbook.io/debitllama/",
   REDIRECTURLSPEC = "https://debitllama.gitbook.io/debitllama/",
   APIDOCS = "https://debitllama.gitbook.io/debitllama/",
-  WEBHOOKDOCS = "https://debitllama.gitbook.io/debitllama/rest-api-v1/configuring-webhooks",
+  WEBHOOKDOCS =
+    "https://debitllama.gitbook.io/debitllama/rest-api-v1/configuring-webhooks",
 }
 
 export type PaymentIntentRow = {
@@ -263,4 +264,10 @@ export enum EMAILCONSTANTS {
   newSubscription = "New subscription",
   createdPaymentIntents = "https://debitllama.com/app/createdPaymentIntents?q=",
   payeePaymentIntents = "https://debitllama.com/app/payeePaymentIntents?q=",
+}
+
+export enum AccountAccess {
+  password = "password",
+  metamask = "metamask",
+  passkey = "passkey",
 }
