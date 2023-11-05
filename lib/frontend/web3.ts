@@ -20,6 +20,7 @@ import {
   getAuthenticationOptionsForAccount,
   postVerifyPasskeyRegistrationForAccount,
 } from "./fetch.ts";
+import { Buffer } from "https://deno.land/x/node_buffer@1.1.0/mod.ts";
 
 export function isEthereumUndefined() {
   //@ts-ignore This runs in the browser only. Checking if the browser has window.ethereum
@@ -415,6 +416,14 @@ export async function eth_decrypt(encryptedMessage: any, address: string) {
   });
 }
 
+/**
+ *  This function generates an ethereum private key used only for encryption, the private key is stored inside an authenticator device largeBlob extension!
+ * @returns an ethereum private key
+ */
+function getRandomEncryptionPrivateKey() {
+  return ethers.Wallet.createRandom().privateKey;
+}
+
 export async function switch_setupAccount(
   ethEncryptDebitllamaPublicKey: string,
   password: string,
@@ -528,10 +537,13 @@ export async function switch_recoverAccount(
         return "";
       }
       const address = await requestAccounts();
-      const unpackedCipherText = unpackEncryptedMessage(cipherNote);
-      return await eth_decrypt(unpackedCipherText, address).catch((_err) => {
-        return "";
-      });
+      const unpacked = unpackEncryptedMessage(cipherNote);
+      const buff = Buffer.from(JSON.stringify(unpacked), "utf-8");
+      return await eth_decrypt("0x" + buff.toString("hex"), address).catch(
+        (_err) => {
+          return "";
+        },
+      );
     }
     case AccountAccess.password: {
       return await aesDecryptData(cipherNote, password);
