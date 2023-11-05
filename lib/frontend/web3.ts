@@ -1,4 +1,6 @@
+import { startRegistration } from "@simplewebauthn/browser";
 import { ethers, ZeroAddress } from "../../ethers.min.js";
+import { AccountAccess } from "../enums.ts";
 import {
   ChainIds,
   explorerUrl,
@@ -7,7 +9,17 @@ import {
   RPCURLS,
   walletCurrency,
 } from "../shared/web3.ts";
-import { SolidityProof } from "./directdebitlib.ts";
+import {
+  setUpAccount,
+  setUpAccountWithoutPassword,
+  SolidityProof,
+  unpackEncryptedMessage,
+} from "./directdebitlib.ts";
+import { aesDecryptData } from "./encryption.ts";
+import {
+  getAuthenticationOptionsForAccount,
+  postVerifyPasskeyRegistrationForAccount,
+} from "./fetch.ts";
 
 export function isEthereumUndefined() {
   //@ts-ignore This runs in the browser only. Checking if the browser has window.ethereum
@@ -174,9 +186,13 @@ export async function getContract(
   return new ethers.Contract(at, artifact.abi, signer);
 }
 
-export async function getRpcContract(provider: any, at: string, abiPath: string): Promise<any> {
-    const artifact = await fetchAbi(abiPath);
-    return new ethers.Contract(at, artifact.abi, provider);
+export async function getRpcContract(
+  provider: any,
+  at: string,
+  abiPath: string,
+): Promise<any> {
+  const artifact = await fetchAbi(abiPath);
+  return new ethers.Contract(at, artifact.abi, provider);
 }
 
 // Smart contract functions start here
@@ -357,24 +373,164 @@ export async function mintToken(contract: any, address: "string") {
 }
 
 export async function watchAsset(erc20Params: any, onError: any) {
-    //@ts-ignore window.ethereum should exist, I run this after onboarding!
-    await window.ethereum
-        .request({
-            method: "wallet_watchAsset",
-            params: {
-                type: "ERC20",
-                options: {
-                    address: erc20Params.address,
-                    symbol: erc20Params.symbol,
-                    decimals: erc20Params.decimals,
-                },
-            },
-        })
-        .then((success: any) => {
-            if (success) {
-            } else {
-                onError();
-            }
-        })
-        .catch(console.error);
+  //@ts-ignore window.ethereum should exist, I run this after onboarding!
+  await window.ethereum
+    .request({
+      method: "wallet_watchAsset",
+      params: {
+        type: "ERC20",
+        options: {
+          address: erc20Params.address,
+          symbol: erc20Params.symbol,
+          decimals: erc20Params.decimals,
+        },
+      },
+    })
+    .then((success: any) => {
+      if (!success) {
+        onError();
+      }
+    })
+    .catch(console.error);
+}
+
+export async function get_EncryptionPublicKey(address: string) {
+  //@ts-ignore window.ethereum should exist, I run this after checking for wallet!
+  return await window.ethereum.request({
+    "method": "eth_getEncryptionPublicKey",
+    "params": [
+      address,
+    ],
+  });
+}
+
+export async function eth_decrypt(encryptedMessage: any, address: string) {
+  //@ts-ignore window.ethereum should exists!
+  return await window.ethereum.request({
+    "method": "eth_decrypt",
+    "params": [
+      encryptedMessage,
+      address,
+    ],
+  });
+}
+
+export async function switch_setupAccount(
+  ethEncryptDebitllamaPublicKey: string,
+  password: string,
+  address: string,
+  accountAccessSelected: AccountAccess,
+): Promise<[{ commitment: string; encryptedNote: string }, boolean, string]> {
+  switch (accountAccessSelected) {
+    case AccountAccess.metamask: {
+      try {
+        const pubkey = await get_EncryptionPublicKey(address);
+        const acc = await setUpAccountWithoutPassword(pubkey);
+        return [acc, false, ""];
+      } catch (_err) {
+        return [
+          { commitment: "", encryptedNote: "" },
+          true,
+          "Unable to create an account!",
+        ];
+      }
+    }
+    case AccountAccess.password:
+      return [
+        await setUpAccount(password, ethEncryptDebitllamaPublicKey),
+        false,
+        "",
+      ];
+    case AccountAccess.passkey: {
+      const res = await getAuthenticationOptionsForAccount();
+
+      let attRes;
+      const json = await res.json();
+      try {
+        attRes = await startRegistration(json);
+      } catch (error: any) {
+        if (error.name === "InvalidStateError") {
+          return [
+            { commitment: "", encryptedNote: "" },
+            true,
+            "Error: Authenticator was probably already registered by user",
+          ];
+        } else if (error.name === "NotAllowedError") {
+          return [
+            { commitment: "", encryptedNote: "" },
+            true,
+            "Error: Authentication not allowed",
+          ];
+        } else {
+          return [
+            { commitment: "", encryptedNote: "" },
+            true,
+            error.message,
+          ];
+        }
+      }
+      console.log(attRes);
+      const clientExtensionResults = attRes.clientExtensionResults;
+      //@ts-ignore largeBlob can exist in the results yes!
+      const largeBlob = clientExtensionResults?.largeBlob?.supported;
+
+      if (!largeBlob) {
+        return [
+          { commitment: "", encryptedNote: "" },
+          true,
+          "Device is not compatible!",
+        ];
+      }
+
+      const verifyRes = await postVerifyPasskeyRegistrationForAccount(attRes);
+      console.log(await verifyRes.json());
+      // TODO: It should connect and do the passkey,
+      // CHeck if it supports largeBlob extension!
+      // then create an ethereum private key for the passkey
+      // Store the ethereum key in the largeBlob
+      // And get the public key for the largeBlob
+      // const acc = await setUpAccountWithoutPassword();
+      // /?TODO: WRITE THE LARGE BLOB!
+      // https://github.com/w3c/webauthn/wiki/Explainer:-WebAuthn-Large-Blob-Extension/019a0ebf97b75397f08d9ce5b91628b9505a43bc
+
+      return [
+        { commitment: "", encryptedNote: "" },
+        true,
+        "Not finished function",
+      ];
+    }
+    default:
+      throw new Error("Invalid account access selected!");
+  }
+}
+
+export async function switch_recoverAccount(
+  account_access: AccountAccess,
+  cipherNote: string,
+  password: string,
+  chainId: ChainIds,
+  handleError: any,
+) {
+  switch (account_access) {
+    case AccountAccess.metamask: {
+      const provider = await handleNetworkSelect(chainId, handleError);
+
+      if (!provider) {
+        return "";
+      }
+      const address = await requestAccounts();
+      const unpackedCipherText = unpackEncryptedMessage(cipherNote);
+      return await eth_decrypt(unpackedCipherText, address).catch((_err) => {
+        return "";
+      });
+    }
+    case AccountAccess.password: {
+      return await aesDecryptData(cipherNote, password);
+    }
+    case AccountAccess.passkey:
+      return "";
+
+    default:
+      return "";
+  }
 }
