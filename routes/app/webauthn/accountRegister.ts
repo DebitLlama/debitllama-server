@@ -1,6 +1,5 @@
 // Api endpoints for the pagination API
 import { Handlers } from "$fresh/server.ts";
-import QueryBuilder from "../../../lib/backend/db/queryBuilder.ts";
 import { State } from "../../_middleware.ts";
 import {
   registerAuthenticatorGETForAccount,
@@ -11,14 +10,12 @@ import {
   verifyRegistration,
 } from "../../../lib/webauthn/backend.ts";
 import { insertNewAccountAuthenticator } from "../../../lib/backend/db/tables/AccountAuthenticators.ts";
+import { selectCurrentUserChallenge } from "../../../lib/backend/db/tables/UserChallenges.ts";
 
 export const handler: Handlers<any, State> = {
   async POST(_req, ctx) {
     const json = await _req.json();
-    const queryBuilder = new QueryBuilder(ctx);
-    const select = queryBuilder.select();
-    const { data: userChallenge } = await select.UserChallenges
-      .currentChallenge();
+    const { data: userChallenge } = await selectCurrentUserChallenge(ctx, {});
 
     const verified = await verifyRegistration(json, userChallenge[0]);
 
@@ -48,10 +45,8 @@ export const handler: Handlers<any, State> = {
     });
   },
   async GET(_req, ctx) {
-    const queryBuilder = new QueryBuilder(ctx);
     const options = await registerAuthenticatorGETForAccount(
       ctx,
-      queryBuilder,
       ctx.state.userid as string,
     );
 
