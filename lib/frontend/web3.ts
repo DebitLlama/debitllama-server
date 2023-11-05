@@ -420,18 +420,21 @@ export async function switch_setupAccount(
   password: string,
   address: string,
   accountAccessSelected: AccountAccess,
-): Promise<[{ commitment: string; encryptedNote: string }, boolean, string]> {
+): Promise<
+  [{ commitment: string; encryptedNote: string }, boolean, string, string]
+> {
   switch (accountAccessSelected) {
     case AccountAccess.metamask: {
       try {
         const pubkey = await get_EncryptionPublicKey(address);
         const acc = await setUpAccountWithoutPassword(pubkey);
-        return [acc, false, ""];
+        return [acc, false, "", ""];
       } catch (_err) {
         return [
           { commitment: "", encryptedNote: "" },
           true,
           "Unable to create an account!",
+          "",
         ];
       }
     }
@@ -439,6 +442,7 @@ export async function switch_setupAccount(
       return [
         await setUpAccount(password, ethEncryptDebitllamaPublicKey),
         false,
+        "",
         "",
       ];
     case AccountAccess.passkey: {
@@ -454,22 +458,24 @@ export async function switch_setupAccount(
             { commitment: "", encryptedNote: "" },
             true,
             "Error: Authenticator was probably already registered by user",
+            "",
           ];
         } else if (error.name === "NotAllowedError") {
           return [
             { commitment: "", encryptedNote: "" },
             true,
             "Error: Authentication not allowed",
+            "",
           ];
         } else {
           return [
             { commitment: "", encryptedNote: "" },
             true,
             error.message,
+            "",
           ];
         }
       }
-      console.log(attRes);
       const clientExtensionResults = attRes.clientExtensionResults;
       //@ts-ignore largeBlob can exist in the results yes!
       const largeBlob = clientExtensionResults?.largeBlob?.supported;
@@ -479,6 +485,7 @@ export async function switch_setupAccount(
           { commitment: "", encryptedNote: "" },
           true,
           "Device is not compatible!",
+          "",
         ];
       }
 
@@ -492,11 +499,13 @@ export async function switch_setupAccount(
       // const acc = await setUpAccountWithoutPassword();
       // /?TODO: WRITE THE LARGE BLOB!
       // https://github.com/w3c/webauthn/wiki/Explainer:-WebAuthn-Large-Blob-Extension/019a0ebf97b75397f08d9ce5b91628b9505a43bc
+      const credentialID = "TODO: CREDENTIAL ID!!";
 
       return [
         { commitment: "", encryptedNote: "" },
         true,
         "Not finished function",
+        credentialID,
       ];
     }
     default:
