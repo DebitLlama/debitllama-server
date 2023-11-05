@@ -8,7 +8,7 @@ import CancelPaymentIntentButton from "../../islands/CancelPaymentIntentButton.t
 import { ChainIds, networkNameFromId, rpcUrl } from "../../lib/shared/web3.ts";
 import { getPaymentIntentHistory } from "../../lib/backend/web3.ts";
 import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
-import { selectRelayerHistoryByPaymentIntentIdPaginated } from "../../lib/backend/db/pagination.ts";
+import { selectRelayerHistoryByPaymentIntentIdPaginated } from "../../lib/backend/db/tables/RelayerHistory.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(req: any, ctx: any) {
