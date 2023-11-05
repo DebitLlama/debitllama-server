@@ -18,6 +18,11 @@ import { getEmailByUserId } from "./db/rpc.ts";
 import { selectAllAccountAuthenticatorsByUserId } from "./db/tables/AccountAuthenticators.ts";
 import { selectAllAuthenticatorsByUserId } from "./db/tables/Authenticators.ts";
 import {
+  insertNewChallenge,
+  selectCurrentUserChallenge,
+  updateUserChallengeByUserId,
+} from "./db/tables/UserChallenges.ts";
+import {
   estimateRelayerGas,
   formatEther,
   getAccount,
@@ -673,14 +678,10 @@ export async function cancelDynamicPaymentRequestLogic(
 
 export async function registerAuthenticatorGET(
   ctx: any,
-  queryBuilder: QueryBuilder,
   userid: string,
 ) {
-  const select = queryBuilder.select();
-  const insert = queryBuilder.insert();
   //TODO: Refactor to 1 RPC call
-  const { data: userChallenge } = await select
-    .UserChallenges.currentChallenge();
+  const { data: userChallenge } = await selectCurrentUserChallenge(ctx, {});
 
   if (userChallenge.length === 0) {
     const { data: emailData } = await getEmailByUserId(ctx, {
@@ -696,25 +697,28 @@ export async function registerAuthenticatorGET(
     };
     // There are no authenticators saved if there was no challenge yet!
     const options = await getRegistrationOptions(userModel, []);
-    await insert.UserChallenges.newChallenge(options.challenge, email);
+    await insertNewChallenge(ctx, { challenge: options.challenge, email });
 
     return options;
   } else {
     // I need to update the existing challenge
-    const { data: userChallengeModel } = await select.UserChallenges
-      .currentChallenge();
+    const { data: userChallengeModel } = await selectCurrentUserChallenge(
+      ctx,
+      {},
+    );
     const userModel: PasskeyUserModel = {
       id: userid as string,
       username: userChallengeModel[0].email,
       currentChallenge: userChallengeModel[0].currentChallenge,
     };
-    const { data: authenticators } = await selectAllAuthenticatorsByUserId(ctx,{});
-
+    const { data: authenticators } = await selectAllAuthenticatorsByUserId(
+      ctx,
+      {},
+    );
 
     const options = await getRegistrationOptions(userModel, authenticators);
-    const update = queryBuilder.update();
 
-    await update.UserChallenges.challengeByUserId(options.challenge);
+    await updateUserChallengeByUserId(ctx, { challenge: options.challenge });
 
     return options;
   }
@@ -722,41 +726,34 @@ export async function registerAuthenticatorGET(
 
 export async function authenticationVerifyGET(
   ctx: any,
-  queryBuilder: QueryBuilder,
 ) {
-  const select = queryBuilder.select();
-  const update = queryBuilder.update();
-
   //TODO: refactor these 2 to 1 RPC call
-  const { data: userChallenge } = await select
-    .UserChallenges.currentChallenge();
+  const { data: userChallenge } = await selectCurrentUserChallenge(ctx, {});
 
   if (userChallenge.length === 0) {
     return [false, null];
   }
 
-  const { data: authenticators } = await selectAllAuthenticatorsByUserId(ctx,{});
+  const { data: authenticators } = await selectAllAuthenticatorsByUserId(
+    ctx,
+    {},
+  );
 
   if (authenticators.length === 0) {
     return [false, null];
   }
   const options = await getAuthenticationOptions(authenticators);
+  await updateUserChallengeByUserId(ctx, { challenge: options.challenge });
 
-  await update.UserChallenges.challengeByUserId(options.challenge);
   return [true, options];
 }
 
-
 export async function registerAuthenticatorGETForAccount(
   ctx: any,
-  queryBuilder: QueryBuilder,
   userid: string,
 ) {
-  const select = queryBuilder.select();
-  const insert = queryBuilder.insert();
   //TODO: Refactor to 1 RPC call
-  const { data: userChallenge } = await select
-    .UserChallenges.currentChallenge();
+  const { data: userChallenge } = await selectCurrentUserChallenge(ctx, {});
 
   if (userChallenge.length === 0) {
     const { data: emailData } = await getEmailByUserId(ctx, {
@@ -772,13 +769,15 @@ export async function registerAuthenticatorGETForAccount(
     };
     // There are no authenticators saved if there was no challenge yet!
     const options = await getRegistrationOptionsWithLargeBlob(userModel, []);
-    await insert.UserChallenges.newChallenge(options.challenge, email);
+    await insertNewChallenge(ctx, { challenge: options.challenge, email });
 
     return options;
   } else {
     // I need to update the existing challenge
-    const { data: userChallengeModel } = await select.UserChallenges
-      .currentChallenge();
+    const { data: userChallengeModel } = await selectCurrentUserChallenge(
+      ctx,
+      {},
+    );
     const userModel: PasskeyUserModel = {
       id: userid as string,
       username: userChallengeModel[0].email,
@@ -787,14 +786,13 @@ export async function registerAuthenticatorGETForAccount(
 
     //Using a different authenticators table here
 
-    const { data: authenticators } = await selectAllAccountAuthenticatorsByUserId(ctx,{});
+    const { data: authenticators } =
+      await selectAllAccountAuthenticatorsByUserId(ctx, {});
     const options = await getRegistrationOptionsWithLargeBlob(
       userModel,
       authenticators,
     );
-    const update = queryBuilder.update();
-
-    await update.UserChallenges.challengeByUserId(options.challenge);
+    await updateUserChallengeByUserId(ctx,{challenge: options.challenge});
 
     return options;
   }

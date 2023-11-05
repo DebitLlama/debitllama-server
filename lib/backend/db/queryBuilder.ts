@@ -6,7 +6,6 @@ import {
   PaymentIntentStatus,
 } from "../../enums.ts";
 import { ChainIds } from "../../shared/web3.ts";
-import { Authenticator } from "../../webauthn/backend.ts";
 import { formatEther } from "../web3.ts";
 
 export type SupabaseQueryResult = {
@@ -16,6 +15,9 @@ export type SupabaseQueryResult = {
   status: number;
   statusText: string;
 };
+
+//TODO: THIS QUERYBUILDER IS BEING REFACTORED TO INIDIVIDUAL FUNCTIONS STORED IN THE ./tables DIRECTORY
+//WHY? ALLOCATING A NEW OBJECT FOR EACH QUERY IS NOT MEMORY EFFICIENT AND SO THE CLASS WILL BE REMOVED COMPLETELY
 
 export default class QueryBuilder {
   client: any;
@@ -305,14 +307,6 @@ export default class QueryBuilder {
           return this.responseHandler(res);
         },
       },
-      UserChallenges: {
-        currentChallenge: async () => {
-          const res = await this.client.from("UserChallenges")
-            .select()
-            .eq("user_id", this.userid);
-          return this.responseHandler(res);
-        },
-      },
     };
   }
 
@@ -329,6 +323,7 @@ export default class QueryBuilder {
           accountType: AccountTypes,
           creator_address: string,
           accountAccess: AccountAccess,
+          authenticator_credential_id: string,
         ) => {
           const res = await this.client.from("Accounts").insert({
             created_at: new Date().toUTCString(),
@@ -343,6 +338,7 @@ export default class QueryBuilder {
             accountType,
             creator_address,
             account_access: accountAccess,
+            authenticator_credential_id,
           });
 
           return this.responseHandler(res);
@@ -558,19 +554,6 @@ export default class QueryBuilder {
           return this.responseHandler(res);
         },
       },
-      UserChallenges: {
-        newChallenge: async (challenge: string, email: string) => {
-          const res = await this.client.from("UserChallenges")
-            .insert({
-              created_at: new Date().toUTCString(),
-              user_id: this.userid,
-              currentChallenge: challenge,
-              lastUpdated: new Date().toUTCString(),
-              email,
-            });
-          return this.responseHandler(res);
-        },
-      },
     };
   }
 
@@ -748,16 +731,6 @@ export default class QueryBuilder {
               verified: true,
             }).eq("user_id", user_id);
 
-          return this.responseHandler(res);
-        },
-      },
-      UserChallenges: {
-        challengeByUserId: async (challenge: string) => {
-          const res = await this.client.from("UserChallenges")
-            .update({
-              currentChallenge: challenge,
-              lastUpdated: new Date().toUTCString(),
-            }).eq("user_id", this.userid);
           return this.responseHandler(res);
         },
       },
