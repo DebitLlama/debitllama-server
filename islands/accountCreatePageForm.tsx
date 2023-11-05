@@ -40,7 +40,6 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
 
     const [depositAmount, setDepositAmount] = useState("");
 
-    const [walletMismatchError, setShowWalletMismatchError] = useState(false);
 
     const [showOverlay, setShowOverlay] = useState(false);
     const [showOverlayError, setShowOverlayError] = useState({
@@ -163,7 +162,6 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
 
     async function onSubmitForm(event: any) {
         event.preventDefault();
-        setShowWalletMismatchError(false);
 
         // I check if I can find a wallet
         const chainId = chainIdFromNetworkName[selectedNetwork as NetworkNames];
@@ -315,9 +313,7 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
         ></AccountPasswordInput>
         <div class="mb-4">
             <p class="text-sm ...">{getGoodToKnowMessage(accountAccessSelected)}</p>
-
         </div>
-        {walletMismatchError ? <p class="text-sm text-red-500">Your browser wallet does not match your profile!</p> : ""}
         <button
             aria-label="Create new account"
             disabled={isButtonDisabled()}
