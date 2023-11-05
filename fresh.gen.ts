@@ -54,19 +54,20 @@ import * as $48 from "./routes/app/profile.tsx";
 import * as $49 from "./routes/app/relayer.tsx";
 import * as $50 from "./routes/app/subscriptions.tsx";
 import * as $51 from "./routes/app/webauthn/accountRegister.ts";
-import * as $52 from "./routes/app/webauthn/register.ts";
-import * as $53 from "./routes/app/webauthn/revoke.ts";
-import * as $54 from "./routes/app/webauthn/verify.ts";
-import * as $55 from "./routes/buyitnow.tsx";
-import * as $56 from "./routes/buyitnowlogout.tsx";
-import * as $57 from "./routes/index.tsx";
-import * as $58 from "./routes/login.tsx";
-import * as $59 from "./routes/logout.tsx";
-import * as $60 from "./routes/passwordreset.tsx";
-import * as $61 from "./routes/privacyPolicy.tsx";
-import * as $62 from "./routes/signup.tsx";
-import * as $63 from "./routes/termsAndConditions.tsx";
-import * as $64 from "./routes/verifyEmail.tsx";
+import * as $52 from "./routes/app/webauthn/accountVerify.ts";
+import * as $53 from "./routes/app/webauthn/register.ts";
+import * as $54 from "./routes/app/webauthn/revoke.ts";
+import * as $55 from "./routes/app/webauthn/verify.ts";
+import * as $56 from "./routes/buyitnow.tsx";
+import * as $57 from "./routes/buyitnowlogout.tsx";
+import * as $58 from "./routes/index.tsx";
+import * as $59 from "./routes/login.tsx";
+import * as $60 from "./routes/logout.tsx";
+import * as $61 from "./routes/passwordreset.tsx";
+import * as $62 from "./routes/privacyPolicy.tsx";
+import * as $63 from "./routes/signup.tsx";
+import * as $64 from "./routes/termsAndConditions.tsx";
+import * as $65 from "./routes/verifyEmail.tsx";
 import * as $$0 from "./islands/AccountTopupOrClose.tsx";
 import * as $$1 from "./islands/AddNewPasskeyButton.tsx";
 import * as $$2 from "./islands/CancelDynamicPaymentRequestButton.tsx";
@@ -160,19 +161,20 @@ const manifest = {
     "./routes/app/relayer.tsx": $49,
     "./routes/app/subscriptions.tsx": $50,
     "./routes/app/webauthn/accountRegister.ts": $51,
-    "./routes/app/webauthn/register.ts": $52,
-    "./routes/app/webauthn/revoke.ts": $53,
-    "./routes/app/webauthn/verify.ts": $54,
-    "./routes/buyitnow.tsx": $55,
-    "./routes/buyitnowlogout.tsx": $56,
-    "./routes/index.tsx": $57,
-    "./routes/login.tsx": $58,
-    "./routes/logout.tsx": $59,
-    "./routes/passwordreset.tsx": $60,
-    "./routes/privacyPolicy.tsx": $61,
-    "./routes/signup.tsx": $62,
-    "./routes/termsAndConditions.tsx": $63,
-    "./routes/verifyEmail.tsx": $64,
+    "./routes/app/webauthn/accountVerify.ts": $52,
+    "./routes/app/webauthn/register.ts": $53,
+    "./routes/app/webauthn/revoke.ts": $54,
+    "./routes/app/webauthn/verify.ts": $55,
+    "./routes/buyitnow.tsx": $56,
+    "./routes/buyitnowlogout.tsx": $57,
+    "./routes/index.tsx": $58,
+    "./routes/login.tsx": $59,
+    "./routes/logout.tsx": $60,
+    "./routes/passwordreset.tsx": $61,
+    "./routes/privacyPolicy.tsx": $62,
+    "./routes/signup.tsx": $63,
+    "./routes/termsAndConditions.tsx": $64,
+    "./routes/verifyEmail.tsx": $65,
   },
   islands: {
     "./islands/AccountTopupOrClose.tsx": $$0,
