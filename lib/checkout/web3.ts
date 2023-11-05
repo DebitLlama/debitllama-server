@@ -260,6 +260,7 @@ export async function handleTokenTX(
   setShowOverlay: (to: boolean) => void,
   selectedAccountType: AccountTypes,
   accountAccessSelected: AccountAccess,
+  authenticator_credential_id: string,
 ) { // The TX is either a deposit or a connected wallet!
   const tx = selectedAccountType === AccountTypes.VIRTUALACCOUNT
     ? await depositToken(
@@ -290,6 +291,7 @@ export async function handleTokenTX(
           currency: JSON.stringify(selectedCurrency),
           accountType: selectedAccountType,
           accountAccess: accountAccessSelected,
+          authenticator_credential_id: authenticator_credential_id,
         });
         if (resp.status === 500) {
           setShowOverlay(false);
@@ -334,12 +336,13 @@ export function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
         return;
       }
     }
-    const [virtualaccount, error, errorMessage] = await switch_setupAccount(
-      args.ethEncryptPublicKey,
-      args.passwordProps.password,
-      address,
-      args.accountAccessSelected,
-    );
+    const [virtualaccount, error, errorMessage, credentialID] =
+      await switch_setupAccount(
+        args.ethEncryptPublicKey,
+        args.passwordProps.password,
+        address,
+        args.accountAccessSelected,
+      );
 
     if (error) {
       handleError(errorMessage);
@@ -407,6 +410,7 @@ export function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
           args.setShowOverlay,
           args.accountTypeSwitchValue,
           args.accountAccessSelected,
+          credentialID,
         ).catch((err: any) => {
           args.setShowOverlay(false);
         });
@@ -434,6 +438,7 @@ export function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
                 args.setShowOverlay,
                 args.accountTypeSwitchValue,
                 args.accountAccessSelected,
+                credentialID,
               ).catch((err: any) => {
                 args.setShowOverlay(false);
               });
@@ -465,6 +470,7 @@ export function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
                 currency: JSON.stringify(args.selectedCurrency),
                 accountType: AccountTypes.VIRTUALACCOUNT,
                 accountAccess: args.accountAccessSelected,
+                authenticator_credential_id: credentialID,
               },
             );
             if (resp.status === 500) {

@@ -305,6 +305,7 @@ export async function saveAccount(args: {
   currency: string;
   accountType: AccountTypes;
   accountAccess: string;
+  authenticator_credential_id: string
 }) {
   return await fetch("/app/post/saveAccountAPI", {
     credentials: "same-origin",

@@ -118,7 +118,7 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
         const walletAddr = await requestAccounts();
 
         // It's a virtual account variable but will be used with connected wallet!
-        const [virtualaccount, error, errorMessage] = await switch_setupAccount(
+        const [virtualaccount, error, errorMessage, authenticator_credential_id] = await switch_setupAccount(
             props.ethEncryptPublicKey,
             password,
             walletAddr,
@@ -162,7 +162,8 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
                         commitment: virtualaccount.commitment,
                         currency: JSON.stringify(selectedCurrency),
                         accountType: AccountTypes.CONNECTEDWALLET,
-                        accountAccess: accountAccessSelected
+                        accountAccess: accountAccessSelected,
+                        authenticator_credential_id
                     })
                     if (res.status === 200) {
                         redirectToAccountPage(virtualaccount.commitment);
