@@ -10,6 +10,7 @@ import { AccountAccess, AccountTypes } from "../../lib/enums.ts";
 import { verifyAuthentication } from "../../lib/webauthn/backend.ts";
 import { Head } from "$fresh/runtime.ts";
 import { selectAllAuthenticatorsByUserId } from "../../lib/backend/db/tables/Authenticators.ts";
+import { selectCurrentUserChallenge } from "../../lib/backend/db/tables/UserChallenges.ts";
 
 const ethEncryptPrivateKey = Deno.env.get("ETHENCRYPTPRIVATEKEY") || "";
 
@@ -30,8 +31,7 @@ export const handler: Handlers<any, State> = {
     if (authenticators.length !== 0) {
       // 2Fa is required, the requiest must have sent the signed challenge!
       const verificationOptions = form.get("verificationOptions") as string;
-      const { data: userChallenge } = await select.UserChallenges
-        .currentChallenge();
+      const { data: userChallenge } = await selectCurrentUserChallenge(ctx,{})
 
       const [success, verification] = await verifyAuthentication(
         JSON.parse(verificationOptions),
