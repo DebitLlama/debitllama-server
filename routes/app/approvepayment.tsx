@@ -9,6 +9,7 @@ import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import { AccountAccess, AccountTypes } from "../../lib/enums.ts";
 import { verifyAuthentication } from "../../lib/webauthn/backend.ts";
 import { Head } from "$fresh/runtime.ts";
+import { selectAllAuthenticatorsByUserId } from "../../lib/backend/db/tables/Authenticators.ts";
 
 const ethEncryptPrivateKey = Deno.env.get("ETHENCRYPTPRIVATEKEY") || "";
 
@@ -24,7 +25,7 @@ export const handler: Handlers<any, State> = {
 
     // Check if the 2fa is activated and it it is, then require the challenge data in the request!
 
-    const { data: authenticators } = await select.Authenticators.allByUserId();
+    const { data: authenticators } = await selectAllAuthenticatorsByUserId(ctx, {});
 
     if (authenticators.length !== 0) {
       // 2Fa is required, the requiest must have sent the signed challenge!
