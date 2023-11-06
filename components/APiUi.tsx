@@ -7,7 +7,7 @@ export enum AccessTokenUIState {
 
 export function UiSwitcherButtons(props: {
     text: string;
-    navigateTo: AccessTokenUIState;
+    navigateTo: AccessTokenUIState | string;
     disabled: boolean
 }) {
     return <form action={props.navigateTo} method="GET"><button
