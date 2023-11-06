@@ -120,7 +120,6 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
         },
         erc20Contract: string,
         chainId: string,
-        authenticator_credential_id: string
     ) {
 
         const depositTx = await depositToken(
@@ -141,8 +140,7 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
                         commitment: virtualaccount.commitment,
                         currency: JSON.stringify(selectedCurrency),
                         accountType: AccountTypes.VIRTUALACCOUNT,
-                        accountAccess: accountAccessSelected,
-                        authenticator_credential_id
+                        accountAccess: accountAccessSelected
                     });
                     if (res.status === 200) {
                         redirectToAccountsPage()
@@ -174,7 +172,7 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
 
         const address = await requestAccounts();
 
-        const [virtualaccount, error, errorMessage, authenticator_credential_id] = await switch_setupAccount(
+        const [virtualaccount, error, errorMessage] = await switch_setupAccount(
             props.ethEncryptPublicKey,
             password,
             address,
@@ -208,7 +206,7 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
             if (allowance >= parseEther(depositAmount)) {
                 // Just deposit
 
-                await handleTokenDeposit(virtualAccountsContrat, virtualaccount, erc20Contract, chainId, authenticator_credential_id)
+                await handleTokenDeposit(virtualAccountsContrat, virtualaccount, erc20Contract, chainId)
             } else {
                 // Add allowance and then deposit 
                 const approveTx = await approveSpend(
@@ -221,7 +219,7 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
                 if (approveTx !== undefined) {
                     await approveTx.wait().then(async (receipt: any) => {
                         if (receipt.status === 1) {
-                            await handleTokenDeposit(virtualAccountsContrat, virtualaccount, erc20Contract, chainId, authenticator_credential_id)
+                            await handleTokenDeposit(virtualAccountsContrat, virtualaccount, erc20Contract, chainId)
                         }
                     }).catch((err: any) => {
                         setShowOverlayError({ ...showOverlayError, showError: true, message: "Transaction failed!" })
@@ -256,7 +254,6 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
                             currency: JSON.stringify(selectedCurrency),
                             accountType: AccountTypes.VIRTUALACCOUNT,
                             accountAccess: accountAccessSelected,
-                            authenticator_credential_id
                         });
                         if (res.status === 200) {
                             redirectToAccountsPage();

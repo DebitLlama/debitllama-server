@@ -323,7 +323,6 @@ export default class QueryBuilder {
           accountType: AccountTypes,
           creator_address: string,
           accountAccess: AccountAccess,
-          authenticator_credential_id: string,
         ) => {
           const res = await this.client.from("Accounts").insert({
             created_at: new Date().toUTCString(),
@@ -337,8 +336,7 @@ export default class QueryBuilder {
             last_modified: new Date().toUTCString(),
             accountType,
             creator_address,
-            account_access: accountAccess,
-            authenticator_credential_id,
+            account_access: accountAccess
           });
 
           return this.responseHandler(res);
