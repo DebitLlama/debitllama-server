@@ -9,13 +9,18 @@ import {
 import { ChainIds } from "../shared/web3.ts";
 import {
   getAuthenticationOptions,
+  getAuthenticationOptionsWithLargeBlobRead,
+  getAuthenticationOptionsWithLargeBlobWrite,
   getRegistrationOptions,
   getRegistrationOptionsWithLargeBlob,
   PasskeyUserModel,
 } from "../webauthn/backend.ts";
 import QueryBuilder from "./db/queryBuilder.ts";
 import { getEmailByUserId } from "./db/rpc.ts";
-import { selectAllAccountAuthenticatorsByUserId } from "./db/tables/AccountAuthenticators.ts";
+import {
+  selectAccountAuthenticatorByCredentialId,
+  selectAllAccountAuthenticatorsByUserId,
+} from "./db/tables/AccountAuthenticators.ts";
 import { selectAllAuthenticatorsByUserId } from "./db/tables/Authenticators.ts";
 import {
   insertNewChallenge,
@@ -784,16 +789,73 @@ export async function registerAuthenticatorGETForAccount(
       currentChallenge: userChallengeModel[0].currentChallenge,
     };
 
-    //Using a different authenticators table here
-
     const { data: authenticators } =
-      await selectAllAccountAuthenticatorsByUserId(ctx, {});
+      await selectAllAccountAuthenticatorsByUserId(
+        ctx,
+        {},
+      );
+
     const options = await getRegistrationOptionsWithLargeBlob(
       userModel,
       authenticators,
     );
-    await updateUserChallengeByUserId(ctx,{challenge: options.challenge});
+    await updateUserChallengeByUserId(ctx, { challenge: options.challenge });
 
     return options;
   }
+}
+
+export async function account_AuthenticationLargeBlobWrite(
+  ctx: any,
+  credentialID: string,
+) {
+  //TODO: refactor these 2 to 1 RPC call
+  const { data: userChallenge } = await selectCurrentUserChallenge(ctx, {});
+
+  if (userChallenge.length === 0) {
+    return [false, null];
+  }
+
+  const { data: authenticators } =
+    await selectAccountAuthenticatorByCredentialId(ctx, {
+      credentialID,
+    });
+
+  if (authenticators.length === 0) {
+    return [false, null];
+  }
+
+  const options = await getAuthenticationOptionsWithLargeBlobWrite(
+    authenticators,
+  );
+  await updateUserChallengeByUserId(ctx, { challenge: options.challenge });
+
+  return [true, options];
+}
+
+export async function account_AuthenticationLargeBlobRead(
+  ctx: any,
+) {
+  //TODO: refactor these 2 to 1 RPC call
+  const { data: userChallenge } = await selectCurrentUserChallenge(ctx, {});
+
+  if (userChallenge.length === 0) {
+    return [false, null];
+  }
+
+  const { data: authenticators } = await selectAllAccountAuthenticatorsByUserId(
+    ctx,
+    {},
+  );
+
+  if (authenticators.length === 0) {
+    return [false, null];
+  }
+
+  const options = await getAuthenticationOptionsWithLargeBlobRead(
+    authenticators,
+  );
+  await updateUserChallengeByUserId(ctx, { challenge: options.challenge });
+
+  return [true, options];
 }
