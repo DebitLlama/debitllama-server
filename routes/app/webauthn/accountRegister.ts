@@ -36,20 +36,41 @@ export const handler: Handlers<any, State> = {
       credentialBackedUp: true,
       transports: json.response.transports,
     };
-    await insertNewAccountAuthenticator(ctx, {
-      authenticator: newAuthenticator,
-    });
 
-    return new Response(JSON.stringify({ success: verified[1].verified }), {
-      status: 200,
-    });
+    // Check if authenticator exists already and if it does then don't insert and return the credentialID
+    try {
+      await insertNewAccountAuthenticator(ctx, {
+        authenticator: newAuthenticator,
+      });
+      // If the insert succeeds then this is a new insert and the authenticator was not registered yet
+      return new Response(
+        JSON.stringify({
+          success: verified[1].verified,
+          credentialID: encodeUint8ArrayToBase64(credentialID),
+          alreadyRegistered: false,
+        }),
+        {
+          status: 200,
+        },
+      );
+    } catch (err) {
+      // if the insert fails then then the authenticator was probably registered already
+      return new Response(
+        JSON.stringify({
+          error: verified[1],
+          message: "Error inserting failed! Account already exists!",
+        }),
+        {
+          status: 400,
+        },
+      );
+    }
   },
   async GET(_req, ctx) {
     const options = await registerAuthenticatorGETForAccount(
       ctx,
       ctx.state.userid as string,
     );
-
     return new Response(JSON.stringify(options), { status: 200 });
   },
 };
