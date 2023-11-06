@@ -305,7 +305,6 @@ export async function saveAccount(args: {
   currency: string;
   accountType: AccountTypes;
   accountAccess: string;
-  authenticator_credential_id: string
 }) {
   return await fetch("/app/post/saveAccountAPI", {
     credentials: "same-origin",
@@ -433,5 +432,22 @@ export async function postVerifyPasskeyRegistrationForAccount(attResp: any) {
     },
     credentials: "same-origin",
     body: JSON.stringify(attResp),
+  }).then((response) => response);
+}
+
+export async function getAuthenticationOptionsForLargeBlobWrite(
+  credentialID: string,
+) {
+  return await fetch("/app/webauthn/verify?q=write", {
+    method: "POST",
+    credentials: "same-origin",
+    body: JSON.stringify({ credentialID }),
+  }).then((response) => response);
+}
+
+export async function getAuthenticationOptionsForLargeBlobRead() {
+  return await fetch("/app/webauthn/verify?q=read", {
+    method: "POST",
+    credentials: "same-origin",
   }).then((response) => response);
 }
