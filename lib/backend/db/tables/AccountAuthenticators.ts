@@ -16,6 +16,21 @@ export async function selectAllAccountAuthenticatorsByUserId(
   });
 }
 
+export async function selectAccountAuthenticatorByCredentialId(ctx: any, args: {
+  credentialID: string;
+}) {
+  const { client, userid } = unwrapContext(ctx);
+  const res = await client.from("account_authenticators")
+    .select()
+    .eq("user_id", userid)
+    .eq("credentialID", args.credentialID);
+
+  return responseHandler(res, {
+    rpc: "selectAccountAuthenticatorByCredentialId",
+    args: { ...args, userid },
+  });
+}
+
 export async function insertNewAccountAuthenticator(
   ctx: any,
   args: {
