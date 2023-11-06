@@ -37,6 +37,11 @@ export type Authenticator = {
   transports: string;
 };
 
+export type AccountAuthenticator = Authenticator & {
+  name: string;
+  disabled: boolean;
+};
+
 const rpName = "Debit Llama";
 
 const env = Deno.env.get("ENV") || "";
@@ -216,14 +221,56 @@ export async function getRegistrationOptionsWithLargeBlob(
       largeBlob: {
         support: "preferred",
       },
-      // Prevent users from re-registering existing authenticators
-      excludeCredentials: userAuthenticators.map((authenticator) => ({
-        id: decodeUint8ArrayFromBase64(authenticator.credentialID),
-        type: "public-key",
-        // Optional
-        transports: JSON.parse(authenticator.transports),
-      })),
     },
+    // Prevent users from re-registering existing authenticators
+    excludeCredentials: userAuthenticators.map((authenticator) => ({
+      id: decodeUint8ArrayFromBase64(authenticator.credentialID),
+      type: "public-key",
+      // Optional
+      transports: JSON.parse(authenticator.transports),
+    })),
   });
   return options;
+}
+
+export async function getAuthenticationOptionsWithLargeBlobRead(
+  userAuthenticators: Authenticator[],
+) {
+  return await generateAuthenticationOptions({
+    // Require users to use a previously-registered authenticator
+    allowCredentials: userAuthenticators.map((authenticator) => ({
+      id: decodeUint8ArrayFromBase64(authenticator.credentialID),
+      type: "public-key",
+      // Optional
+      transports: JSON.parse(authenticator.transports),
+    })),
+    userVerification: "preferred",
+    extensions: {
+      //@ts-ignore largeBlob is needed!
+      largeBlob: {
+        read: true,
+      },
+    },
+  });
+}
+
+export async function getAuthenticationOptionsWithLargeBlobWrite(
+  userAuthenticators: Authenticator[],
+) {
+  return await generateAuthenticationOptions({
+    // Require users to use a previously-registered authenticator
+    allowCredentials: userAuthenticators.map((authenticator) => ({
+      id: decodeUint8ArrayFromBase64(authenticator.credentialID),
+      type: "public-key",
+      // Optional
+      transports: JSON.parse(authenticator.transports),
+    })),
+    userVerification: "preferred",
+    extensions: {
+      //@ts-ignore largeBlob is needed!
+      largeBlob: {
+        write: new Uint8Array(1),
+      },
+    },
+  });
 }
