@@ -1,4 +1,4 @@
-import { startRegistration } from "@simplewebauthn/browser";
+import { startAuthentication } from "@simplewebauthn/browser";
 import { ethers, ZeroAddress } from "../../ethers.min.js";
 import { AccountAccess } from "../enums.ts";
 import {
@@ -16,10 +16,7 @@ import {
   unpackEncryptedMessage,
 } from "./directdebitlib.ts";
 import { aesDecryptData } from "./encryption.ts";
-import {
-  getAuthenticationOptionsForAccount,
-  postVerifyPasskeyRegistrationForAccount,
-} from "./fetch.ts";
+import { getAuthenticationOptionsForLargeBlobRead } from "./fetch.ts";
 import { Buffer } from "https://deno.land/x/node_buffer@1.1.0/mod.ts";
 
 export function isEthereumUndefined() {
@@ -420,8 +417,10 @@ export async function eth_decrypt(encryptedMessage: any, address: string) {
  *  This function generates an ethereum private key used only for encryption, the private key is stored inside an authenticator device largeBlob extension!
  * @returns an ethereum private key
  */
-function getRandomEncryptionPrivateKey() {
-  return ethers.Wallet.createRandom().privateKey;
+export function getRandomEncryptionPrivateKeyBlob() {
+  const privateKey = ethers.Wallet.createRandom().privateKey;
+  const textEncoder = new TextEncoder();
+  return textEncoder.encode(privateKey);
 }
 
 export async function switch_setupAccount(
@@ -455,66 +454,50 @@ export async function switch_setupAccount(
         "",
       ];
     case AccountAccess.passkey: {
-      const res = await getAuthenticationOptionsForAccount();
-
-      let attRes;
-      const json = await res.json();
-      try {
-        attRes = await startRegistration(json);
-      } catch (error: any) {
-        if (error.name === "InvalidStateError") {
-          return [
-            { commitment: "", encryptedNote: "" },
-            true,
-            "Error: Authenticator was probably already registered by user",
-            "",
-          ];
-        } else if (error.name === "NotAllowedError") {
-          return [
-            { commitment: "", encryptedNote: "" },
-            true,
-            "Error: Authentication not allowed",
-            "",
-          ];
-        } else {
-          return [
-            { commitment: "", encryptedNote: "" },
-            true,
-            error.message,
-            "",
-          ];
-        }
-      }
-      const clientExtensionResults = attRes.clientExtensionResults;
-      //@ts-ignore largeBlob can exist in the results yes!
-      const largeBlob = clientExtensionResults?.largeBlob?.supported;
-
-      if (!largeBlob) {
+      // TODO ONLY NEED TO READ LARGEBLOB!
+      const resp = await getAuthenticationOptionsForLargeBlobRead();
+      const authenticationJson = await resp.json();
+      if (resp.status !== 200) {
         return [
           { commitment: "", encryptedNote: "" },
           true,
-          "Device is not compatible!",
+          authenticationJson.error,
           "",
         ];
       }
 
-      const verifyRes = await postVerifyPasskeyRegistrationForAccount(attRes);
-      console.log(await verifyRes.json());
-      // TODO: It should connect and do the passkey,
-      // CHeck if it supports largeBlob extension!
-      // then create an ethereum private key for the passkey
-      // Store the ethereum key in the largeBlob
-      // And get the public key for the largeBlob
-      // const acc = await setUpAccountWithoutPassword();
-      // /?TODO: WRITE THE LARGE BLOB!
-      // https://github.com/w3c/webauthn/wiki/Explainer:-WebAuthn-Large-Blob-Extension/019a0ebf97b75397f08d9ce5b91628b9505a43bc
-      const credentialID = "TODO: CREDENTIAL ID!!";
+      if (!authenticationJson.extensions.largeBlob.read) {
+        return [
+          { commitment: "", encryptedNote: "" },
+          true,
+          "Unable to read from passkey",
+          "",
+        ];
+      }
+
+      const credentials = await startAuthentication(authenticationJson);
+
+      console.log(credentials);
+      console.log(credentials.clientExtensionResults.largeBlob);
+      //@ts-ignore largeBlob should exist!
+      if (Object.keys(credentials.clientExtensionResults.largeBlob).length) {
+        const decoder = new TextDecoder();
+        const key =
+          //@ts-ignore should exist!
+          decoder.decode(credentials.clientExtensionResults.largeBlob.blob);
+
+        console.log(key);
+        //TODO: get a public encryption key from the private key
+        // Encrypt the account data and return the commitment and encryptedNote!
+      } else {
+        // Return with an error...
+      }
 
       return [
         { commitment: "", encryptedNote: "" },
         true,
         "Not finished function",
-        credentialID,
+        "",
       ];
     }
     default:
