@@ -1,5 +1,5 @@
 import { startAuthentication, startRegistration } from "@simplewebauthn/browser";
-import { getAuthenticationOptionsForAccount, getAuthenticationOptionsForLargeBlobWrite, postVerifyPasskeyRegistrationForAccount } from "../lib/frontend/fetch.ts";
+import { deleteAccountAuthenticator, getAuthenticationOptionsForAccount, getAuthenticationOptionsForLargeBlobWrite, postVerifyPasskeyRegistrationForAccount } from "../lib/frontend/fetch.ts";
 import { useState } from "preact/hooks";
 import { AccountAuthenticator } from "../lib/webauthn/backend.ts";
 import { getRandomEncryptionPrivateKeyBlob } from "../lib/frontend/web3.ts";
@@ -28,29 +28,29 @@ export default function AddNewAccountPasskeyButton(props: AddNewAccountPasskeyBu
         try {
             attRes = await startRegistration(json);
         } catch (error: any) {
-            console.log(error);
             if (error.name === "InvalidStateError") {
-                return [
-                    { commitment: "", encryptedNote: "" },
-                    true,
-                    "Error: Authenticator was probably already registered by user",
-                    "",
-                ];
+                setNotification({
+                    show: true,
+                    message: "Error: Authenticator was probably already registered by user",
+                    isError: true
+                })
+
             } else if (error.name === "NotAllowedError") {
-                return [
-                    { commitment: "", encryptedNote: "" },
-                    true,
-                    "Error: Authentication not allowed",
-                    "",
-                ];
+
+                setNotification({
+                    show: true,
+                    message: "Error: Authenticaton not allowed. Incompatible device!",
+                    isError: true
+                })
+
             } else {
-                return [
-                    { commitment: "", encryptedNote: "" },
-                    true,
-                    error.message,
-                    "",
-                ];
+                setNotification({
+                    show: true,
+                    message: "Error: Authenticaton failed",
+                    isError: true
+                })
             }
+            return;
         }
         const clientExtensionResults = attRes.clientExtensionResults;
 
@@ -90,7 +90,7 @@ export default function AddNewAccountPasskeyButton(props: AddNewAccountPasskeyBu
                 message: authenticationJson.error,
                 isError: true
             })
-
+            await deleteAccountAuthenticator(verificationJSON.credentialID)
             return;
         }
 
@@ -100,6 +100,7 @@ export default function AddNewAccountPasskeyButton(props: AddNewAccountPasskeyBu
                 message: "Unable to write to passkey",
                 isError: true
             })
+            await deleteAccountAuthenticator(verificationJSON.credentialID)
             return;
         }
         const walletBlob = getRandomEncryptionPrivateKeyBlob();
@@ -118,19 +119,29 @@ export default function AddNewAccountPasskeyButton(props: AddNewAccountPasskeyBu
             return;
         }
 
-        //TODO: Check if writing was successful!
-
-        //IF not then delete the authenticator from the backend!
-        console.log(asseResp);
         //@ts-ignore largeBlob should exists
         const written = asseResp.clientExtensionResults.largeBlob.written;
         if (!written) {
-            // SEND A REQUEST TO DELETE THE AUTHENTICATOR! writing was not a success!
+            // SEND A REQUEST TO DELETE THE AUTHENTICATOR! WRITING WAS NOT A SUCCESS!
+            setNotification({
+                show: true,
+                message: "Error: Writing authenticator failed!",
+                isError: true
+            })
+
+            await deleteAccountAuthenticator(verificationJSON.credentialID)
+            return;
+
         } else {
             // SUCCESS WRITTEN !
-            //TODO: DO THIS!
+            setNotification({
+                show: true,
+                message: "Authenticator device setup success!",
+                isError: false
+            })
+            return;
         }
-  
+
     }
 
     return <div class="flex flex-col justify-center w-full">
