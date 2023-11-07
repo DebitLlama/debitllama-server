@@ -10,6 +10,8 @@ import {
   walletCurrency,
 } from "../shared/web3.ts";
 import {
+  decryptData,
+  getPublicKeyFromPrivateKey,
   setUpAccount,
   setUpAccountWithoutPassword,
   SolidityProof,
@@ -429,20 +431,19 @@ export async function switch_setupAccount(
   address: string,
   accountAccessSelected: AccountAccess,
 ): Promise<
-  [{ commitment: string; encryptedNote: string }, boolean, string, string]
+  [{ commitment: string; encryptedNote: string }, boolean, string]
 > {
   switch (accountAccessSelected) {
     case AccountAccess.metamask: {
       try {
         const pubkey = await get_EncryptionPublicKey(address);
         const acc = await setUpAccountWithoutPassword(pubkey);
-        return [acc, false, "", ""];
+        return [acc, false, ""];
       } catch (_err) {
         return [
           { commitment: "", encryptedNote: "" },
           true,
           "Unable to create an account!",
-          "",
         ];
       }
     }
@@ -451,10 +452,8 @@ export async function switch_setupAccount(
         await setUpAccount(password, ethEncryptDebitllamaPublicKey),
         false,
         "",
-        "",
       ];
     case AccountAccess.passkey: {
-      // TODO ONLY NEED TO READ LARGEBLOB!
       const resp = await getAuthenticationOptionsForLargeBlobRead();
       const authenticationJson = await resp.json();
       if (resp.status !== 200) {
@@ -462,7 +461,6 @@ export async function switch_setupAccount(
           { commitment: "", encryptedNote: "" },
           true,
           authenticationJson.error,
-          "",
         ];
       }
 
@@ -471,34 +469,31 @@ export async function switch_setupAccount(
           { commitment: "", encryptedNote: "" },
           true,
           "Unable to read from passkey",
-          "",
         ];
       }
 
       const credentials = await startAuthentication(authenticationJson);
+      try {
+        //@ts-ignore largeBlob should exist!
+        if (Object.keys(credentials.clientExtensionResults.largeBlob).length) {
+          const decoder = new TextDecoder();
+          const privkey =
+            //@ts-ignore should exist!
+            decoder.decode(credentials.clientExtensionResults.largeBlob.blob);
+          const pubKey = getPublicKeyFromPrivateKey(privkey.substring(2));
 
-      console.log(credentials);
-      console.log(credentials.clientExtensionResults.largeBlob);
-      //@ts-ignore largeBlob should exist!
-      if (Object.keys(credentials.clientExtensionResults.largeBlob).length) {
-        const decoder = new TextDecoder();
-        const key =
-          //@ts-ignore should exist!
-          decoder.decode(credentials.clientExtensionResults.largeBlob.blob);
-
-        console.log(key);
-        //TODO: get a public encryption key from the private key
-        // Encrypt the account data and return the commitment and encryptedNote!
-      } else {
-        // Return with an error...
+          const acc = await setUpAccountWithoutPassword(pubKey);
+          return [acc, false, ""];
+        } else {
+          throw new Error();
+        }
+      } catch (_err) {
+        return [
+          { commitment: "", encryptedNote: "" },
+          true,
+          "Unable to read passkey data!",
+        ];
       }
-
-      return [
-        { commitment: "", encryptedNote: "" },
-        true,
-        "Not finished function",
-        "",
-      ];
     }
     default:
       throw new Error("Invalid account access selected!");
@@ -531,9 +526,34 @@ export async function switch_recoverAccount(
     case AccountAccess.password: {
       return await aesDecryptData(cipherNote, password);
     }
-    case AccountAccess.passkey:
-      return "";
+    case AccountAccess.passkey: {
+      const resp = await getAuthenticationOptionsForLargeBlobRead();
+      const authenticationJson = await resp.json();
+      if (resp.status !== 200) {
+        return "";
+      }
+      if (!authenticationJson.extensions.largeBlob.read) {
+        return "";
+      }
+      const credentials = await startAuthentication(authenticationJson);
+      try {
+        //@ts-ignore largeBlob should exist!
+        if (Object.keys(credentials.clientExtensionResults.largeBlob).length) {
+          const decoder = new TextDecoder();
+          const privkey =
+            //@ts-ignore should exist!
+            decoder.decode(credentials.clientExtensionResults.largeBlob.blob);
 
+          const unpacked = unpackEncryptedMessage(cipherNote);
+
+          return decryptData(privkey, unpacked);
+        } else {
+          throw new Error();
+        }
+      } catch (_err) {
+        return "";
+      }
+    }
     default:
       return "";
   }
