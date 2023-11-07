@@ -1,9 +1,9 @@
 import AccountPasswordInput, { AccountPasswordInputProps } from "../../islands/accountPasswordInput.tsx";
 import { onCreateAccountSubmit } from "../../lib/checkout/web3.ts";
-import { AccountTypes } from "../../lib/enums.ts";
+import { AccountAccess, AccountTypes } from "../../lib/enums.ts";
 import { ItemProps } from "../../lib/types/checkoutTypes.ts";
 import BuyPageProfile, { ProfileProps } from "../BuyPageProfile.tsx";
-import { TooltipWithTitle } from "../components.tsx";
+import { TooltipWithTitle, getGoodToKnowMessage } from "../components.tsx";
 import { handleError } from "./HandleCheckoutError.ts";
 
 export function CreateNewAccountUI(props: {
@@ -19,7 +19,8 @@ export function CreateNewAccountUI(props: {
     sentAndcheckPasswordMatch: (setTo: string) => void;
     accountTypeSwitchValue: AccountTypes;
     setAccountTypeSwitchValue: (to: AccountTypes) => void;
-
+    accountAccessSelected: AccountAccess,
+    setAccountAccessSelected: (to:AccountAccess) => void;
 }) {
     const isERC20 = !props.item.currency.native;
 
@@ -34,7 +35,8 @@ export function CreateNewAccountUI(props: {
         ethEncryptPublicKey: props.ethEncryptPublicKey,
         accountCurrency: props.item.currency.name,
         setShowOverlay: props.setShowOverlay,
-        accountTypeSwitchValue: props.accountTypeSwitchValue
+        accountTypeSwitchValue: props.accountTypeSwitchValue,
+        accountAccessSelected: props.accountAccessSelected
     })}>
         <BuyPageProfile
             profileExists={props.profileExists}
@@ -93,7 +95,12 @@ export function CreateNewAccountUI(props: {
                 setPasswordAgain={props.sentAndcheckPasswordMatch}
                 passwordMatchError={props.newAccountPasswordProps.passwordMatchError}
                 passwordStrengthNotification={props.newAccountPasswordProps.passwordStrengthNotification}
+                accountAccessSelected={props.accountAccessSelected}
+                setAccountAccessSelected={props.setAccountAccessSelected}
             ></AccountPasswordInput>
+            <div class="mb-4">
+                <p class="text-sm ...">{getGoodToKnowMessage(props.accountAccessSelected)}</p>
+            </div>
             <div class="text-center">
                 <button
                     aria-label={"Submit transaction button"}

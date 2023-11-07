@@ -2,8 +2,8 @@ import { startRegistration, startAuthentication } from "@simplewebauthn/browser"
 import { requestNewPasskeyRegistration, postVerifyPasskeyRegistration, getAuthenticationOptionsForRevoke, verifyAuthenticationForRevoke } from "../lib/frontend/fetch.ts";
 import { useState } from "preact/hooks";
 
-export default function AddNewPassKeyButton() {
-
+export default function AddNew2FAPassKeyButton() {
+    //TODO: IF one is added, the second one should require some sort of verification
     const [notification, setNotification] = useState({
         show: false,
         message: "",

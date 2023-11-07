@@ -24,7 +24,8 @@ export const handler: Handlers<any, State> = {
     const name = json.name;
     const currency = json.currency;
     const accountType = json.accountType;
-
+    const accountAccess = json.accountAccess;
+    
     const queryBuilder = new QueryBuilder(ctx);
     const select = queryBuilder.select();
     const networkExists = rpcUrl[networkId as ChainIds];
@@ -68,7 +69,8 @@ export const handler: Handlers<any, State> = {
         currency,
         accountData.account[3],
         accountType,
-        accountData.account[1]
+        accountData.account[1],
+        accountAccess,
       );
       return successResponseBuilder("Account Saved");
     } else {

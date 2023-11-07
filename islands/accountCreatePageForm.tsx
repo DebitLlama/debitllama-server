@@ -2,13 +2,13 @@ import { useState } from 'preact/hooks';
 
 import CurrencySelectDropdown from "./CurrencySelectDropdown.tsx";
 import AccountPasswordInput from "./accountPasswordInput.tsx";
-import { approveSpend, depositEth, depositToken, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts } from "../lib/frontend/web3.ts";
-import { setUpAccount } from '../lib/frontend/directdebitlib.ts';
-import { ChainIds, NetworkNames, SelectableCurrency, availableNetworks,  bttMainnetCurrencies, chainIdFromNetworkName, getVirtualAccountsContractAddress } from "../lib/shared/web3.ts";
+import { approveSpend, depositEth, depositToken, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts, switch_setupAccount } from "../lib/frontend/web3.ts";
+import { ChainIds, NetworkNames, SelectableCurrency, availableNetworks, bttMainnetCurrencies, chainIdFromNetworkName, getVirtualAccountsContractAddress } from "../lib/shared/web3.ts";
 import Overlay from '../components/Overlay.tsx';
 import { redirectToAccountsPage, saveAccount } from '../lib/frontend/fetch.ts';
-import { AccountTypes } from '../lib/enums.ts';
+import { AccountAccess, AccountTypes } from '../lib/enums.ts';
 import TestnetTokens from './utils/TestnetTokens.tsx';
+import { getGoodToKnowMessage } from "../components/components.tsx";
 
 export const strength = [
     "Worst ☹",
@@ -40,7 +40,6 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
 
     const [depositAmount, setDepositAmount] = useState("");
 
-    const [walletMismatchError, setShowWalletMismatchError] = useState(false);
 
     const [showOverlay, setShowOverlay] = useState(false);
     const [showOverlayError, setShowOverlayError] = useState({
@@ -48,6 +47,8 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
         message: "",
         action: () => setShowOverlay(false)
     })
+
+    const [accountAccessSelected, setAccountAccessSelected] = useState<AccountAccess>(AccountAccess.metamask);
 
     function setPasswordAndCheck(to: string) {
         if (to === "") {
@@ -79,6 +80,10 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
     }
 
     function isButtonDisabled(): boolean {
+        if (accountAccessSelected === AccountAccess.metamask || accountAccessSelected === AccountAccess.passkey) {
+            return false;
+        }
+
         if (passwordScore < 3) {
             return true;
         }
@@ -114,7 +119,7 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
             commitment: any;
         },
         erc20Contract: string,
-        chainId: string
+        chainId: string,
     ) {
 
         const depositTx = await depositToken(
@@ -134,7 +139,8 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
                         networkId: chainId,
                         commitment: virtualaccount.commitment,
                         currency: JSON.stringify(selectedCurrency),
-                        accountType: AccountTypes.VIRTUALACCOUNT
+                        accountType: AccountTypes.VIRTUALACCOUNT,
+                        accountAccess: accountAccessSelected
                     });
                     if (res.status === 200) {
                         redirectToAccountsPage()
@@ -154,7 +160,6 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
 
     async function onSubmitForm(event: any) {
         event.preventDefault();
-        setShowWalletMismatchError(false);
 
         // I check if I can find a wallet
         const chainId = chainIdFromNetworkName[selectedNetwork as NetworkNames];
@@ -167,7 +172,17 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
 
         const address = await requestAccounts();
 
-        const virtualaccount = await setUpAccount(password, props.ethEncryptPublicKey);
+        const [virtualaccount, error, errorMessage] = await switch_setupAccount(
+            props.ethEncryptPublicKey,
+            password,
+            address,
+            accountAccessSelected);
+
+        if (error) {
+            handleError(errorMessage);
+            return;
+        }
+
 
         const contractAddress = getVirtualAccountsContractAddress[chainId as ChainIds];
 
@@ -237,7 +252,8 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
                             networkId: chainId,
                             commitment: virtualaccount.commitment,
                             currency: JSON.stringify(selectedCurrency),
-                            accountType: AccountTypes.VIRTUALACCOUNT
+                            accountType: AccountTypes.VIRTUALACCOUNT,
+                            accountAccess: accountAccessSelected,
                         });
                         if (res.status === 200) {
                             redirectToAccountsPage();
@@ -289,12 +305,12 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
             setPasswordAgain={sentAndcheckPasswordMatch}
             passwordMatchError={passwordMatchError}
             passwordStrengthNotification={passwordStrengthNotification}
+            accountAccessSelected={accountAccessSelected}
+            setAccountAccessSelected={setAccountAccessSelected}
         ></AccountPasswordInput>
         <div class="mb-4">
-            <p class="text-sm ...">The password is used for encrypting your account and it's needed for spending. Do not reuse your login password. The accounts are non-custodial and if you loose your password we can't recover it for you. You can always close the account and withdraw the deposit with the wallet you created it with.</p>
-
+            <p class="text-sm ...">{getGoodToKnowMessage(accountAccessSelected)}</p>
         </div>
-        {walletMismatchError ? <p class="text-sm text-red-500">Your browser wallet does not match your profile!</p> : ""}
         <button
             aria-label="Create new account"
             disabled={isButtonDisabled()}

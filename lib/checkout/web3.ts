@@ -1,6 +1,5 @@
 import { handleError } from "../../components/Checkout/HandleCheckoutError.ts";
-import { AccountTypes } from "../enums.ts";
-import { setUpAccount } from "../frontend/directdebitlib.ts";
+import { AccountAccess, AccountTypes } from "../enums.ts";
 import {
   requestBalanceRefresh,
   saveAccount,
@@ -17,6 +16,7 @@ import {
   handleNetworkSelect,
   parseEther,
   requestAccounts,
+  switch_setupAccount,
   topUpETH,
   topUpTokens,
 } from "../frontend/web3.ts";
@@ -259,7 +259,8 @@ export async function handleTokenTX(
   selectedCurrency: Currency,
   setShowOverlay: (to: boolean) => void,
   selectedAccountType: AccountTypes,
-) { // The TX is either a deposit or a connected wallet!
+  accountAccessSelected: AccountAccess
+  ) { // The TX is either a deposit or a connected wallet!
   const tx = selectedAccountType === AccountTypes.VIRTUALACCOUNT
     ? await depositToken(
       debitcontract,
@@ -288,6 +289,7 @@ export async function handleTokenTX(
           commitment: virtualaccount.commitment,
           currency: JSON.stringify(selectedCurrency),
           accountType: selectedAccountType,
+          accountAccess: accountAccessSelected,
         });
         if (resp.status === 500) {
           setShowOverlay(false);
@@ -332,10 +334,18 @@ export function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
         return;
       }
     }
-    const virtualaccount = await setUpAccount(
-      args.passwordProps.password,
-      args.ethEncryptPublicKey,
-    );
+    const [virtualaccount, error, errorMessage] =
+      await switch_setupAccount(
+        args.ethEncryptPublicKey,
+        args.passwordProps.password,
+        address,
+        args.accountAccessSelected,
+      );
+
+    if (error) {
+      handleError(errorMessage);
+      return;
+    }
 
     const debitContractAddress =
       args.accountTypeSwitchValue === AccountTypes.VIRTUALACCOUNT
@@ -397,6 +407,7 @@ export function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
           args.selectedCurrency,
           args.setShowOverlay,
           args.accountTypeSwitchValue,
+          args.accountAccessSelected,
         ).catch((err: any) => {
           args.setShowOverlay(false);
         });
@@ -423,6 +434,7 @@ export function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
                 args.selectedCurrency,
                 args.setShowOverlay,
                 args.accountTypeSwitchValue,
+                args.accountAccessSelected,
               ).catch((err: any) => {
                 args.setShowOverlay(false);
               });
@@ -453,6 +465,7 @@ export function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
                 commitment: virtualaccount.commitment,
                 currency: JSON.stringify(args.selectedCurrency),
                 accountType: AccountTypes.VIRTUALACCOUNT,
+                accountAccess: args.accountAccessSelected,
               },
             );
             if (resp.status === 500) {

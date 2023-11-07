@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { updateItemRedirectUrl } from "../../../lib/backend/db/admin.ts";
+import { updateItemRedirectUrl } from "../../../lib/backend/db/tables/Items.ts";
 import { State } from "../../_middleware.ts";
 
 // Update the item url by button_id and user_id

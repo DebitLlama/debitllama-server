@@ -41,7 +41,9 @@ export async function requestBalanceRefresh(
   calledFrom: "app" | "buyPage",
 ) {
   // If I call refresh balance from the app route then I don't need to have app in the url!
-  const getUrl = calledFrom === "app" ? "refreshbalance" : "app/post/refreshbalance";
+  const getUrl = calledFrom === "app"
+    ? "refreshbalance"
+    : "app/post/refreshbalance";
   return await fetch(getUrl, {
     credentials: "same-origin",
     method: "POST",
@@ -302,6 +304,7 @@ export async function saveAccount(args: {
   commitment: string;
   currency: string;
   accountType: AccountTypes;
+  accountAccess: string;
 }) {
   return await fetch("/app/post/saveAccountAPI", {
     credentials: "same-origin",
@@ -411,5 +414,48 @@ export async function deleteWebhooks() {
   return await fetch("/app/manage_api/webhooks", {
     method: "DELETE",
     credentials: "same-origin",
+  }).then((response) => response);
+}
+
+export async function getAuthenticationOptionsForAccount() {
+  return await fetch("/app/webauthn/accountRegister", {
+    credentials: "same-origin",
+    method: "GET",
+  }).then((response) => response);
+}
+
+export async function postVerifyPasskeyRegistrationForAccount(attResp: any) {
+  return await fetch("/app/webauthn/accountRegister", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "same-origin",
+    body: JSON.stringify(attResp),
+  }).then((response) => response);
+}
+
+export async function getAuthenticationOptionsForLargeBlobWrite(
+  credentialID: string,
+) {
+  return await fetch("/app/webauthn/verify?q=write", {
+    method: "POST",
+    credentials: "same-origin",
+    body: JSON.stringify({ credentialID }),
+  }).then((response) => response);
+}
+
+export async function getAuthenticationOptionsForLargeBlobRead() {
+  return await fetch("/app/webauthn/verify?q=read", {
+    method: "POST",
+    credentials: "same-origin",
+  }).then((response) => response);
+}
+
+export async function deleteAccountAuthenticator(credentialID: string) {
+  return await fetch("/app/webauthn/accountRegister", {
+    method: "DELETE",
+    credentials: "same-origin",
+    body: JSON.stringify({ credentialID }),
   }).then((response) => response);
 }

@@ -3,8 +3,7 @@ import Layout from "../../components/Layout.tsx";
 import { State } from "../_middleware.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import PaymentIntentsPaginationForAll from "../../islands/pagination/PaymentIntentsPaginationForAll.tsx";
-import { selectPaymentIntentsAllByUserIdForCreatorPaginated } from "../../lib/backend/db/pagination.ts";
-
+import { selectPaymentIntentsAllByUserIdForCreatorPaginated } from "../../lib/backend/db/tables/PaymentIntents.ts";
 export const handler: Handlers<any, State> = {
     async GET(_req, ctx) {
         const { data: subscriptions } = await selectPaymentIntentsAllByUserIdForCreatorPaginated(ctx, {

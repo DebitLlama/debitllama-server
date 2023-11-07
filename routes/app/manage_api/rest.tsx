@@ -7,10 +7,9 @@ import QueryBuilder from "../../../lib/backend/db/queryBuilder.ts";
 import { errorResponseBuilder, successResponseBuilder } from "../../../lib/backend/responseBuilders.ts";
 import { ApiAccessErrors, DocsLinks, TokenExpiry, monthsToDate } from "../../../lib/enums.ts";
 import { State } from "../../_middleware.ts";
-import { selectApiAuthTokensByUseridPaginated } from "../../../lib/backend/db/pagination.ts";
 import AccessTokensTable from "../../../islands/pagination/AccessTokensTable.tsx";
 import { AccessTokenUIState, UiSwitcherButtons } from "../../../components/APiUi.tsx";
-import { insertNewAccessToken } from "../../../lib/backend/db/admin.ts";
+import { insertNewAccessToken, selectApiAuthTokensByUseridPaginated } from "../../../lib/backend/db/tables/ApiAuthTokens.ts";
 
 export const handler: Handlers<any, State> = {
     async POST(req, ctx) {

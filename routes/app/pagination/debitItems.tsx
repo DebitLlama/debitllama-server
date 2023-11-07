@@ -1,7 +1,7 @@
 // Api endpoints for the pagination API
 import { Handlers } from "$fresh/server.ts";
 import { getPagination, getTotalPages } from "../../../lib/backend/businessLogic.ts";
-import { selectItemsbyUserIdForPayeePaginated, selectItemsbyUserIdForPayeePaginatedWithSearchName } from "../../../lib/backend/db/pagination.ts";
+import { selectItemsbyUserIdForPayeePaginated, selectItemsbyUserIdForPayeePaginatedWithSearchName } from "../../../lib/backend/db/tables/Items.ts";
 import { errorResponseBuilder } from "../../../lib/backend/responseBuilders.ts";
 import { DEBITITEMSTABLEPAGESIZE, DebitItemTableColNames, MapDebitItemsTableColNamesToDbColNames } from "../../../lib/enums.ts";
 import { State } from "../../_middleware.ts";

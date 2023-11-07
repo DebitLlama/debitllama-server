@@ -1,5 +1,5 @@
 import { ComponentChildren } from "preact";
-import { DynamicPaymentRequestJobsStatus, PaymentIntentStatus, Pricing } from "../lib/enums.ts";
+import { AccountAccess, DynamicPaymentRequestJobsStatus, PaymentIntentStatus, Pricing } from "../lib/enums.ts";
 import { formatEther, parseEther } from "../lib/frontend/web3.ts";
 import { ChainIds, explorerUrl, explorerUrlAddressPath } from "../lib/shared/web3.ts";
 
@@ -375,4 +375,25 @@ export function EmailLogo() {
 
 export function DynamicFeedLogo() {
     return <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M160-120q-33 0-56.5-23.5T80-200v-280h80v280h360v80H160Zm160-160q-33 0-56.5-23.5T240-360v-280h80v280h360v80H320Zm160-160q-33 0-56.5-23.5T400-520v-240q0-33 23.5-56.5T480-840h320q33 0 56.5 23.5T880-760v240q0 33-23.5 56.5T800-440H480Zm0-80h320v-160H480v160Z" /></svg>;
+}
+
+export function PasswordLogo() {
+    return <svg class="mx-auto" xmlns="http://www.w3.org/2000/svg" height="45" viewBox="0 -960 960 960" width="45"><path d="M80-200v-80h800v80H80Zm46-242-52-30 34-60H40v-60h68l-34-58 52-30 34 58 34-58 52 30-34 58h68v60h-68l34 60-52 30-34-60-34 60Zm320 0-52-30 34-60h-68v-60h68l-34-58 52-30 34 58 34-58 52 30-34 58h68v60h-68l34 60-52 30-34-60-34 60Zm320 0-52-30 34-60h-68v-60h68l-34-58 52-30 34 58 34-58 52 30-34 58h68v60h-68l34 60-52 30-34-60-34 60Z" /></svg>
+}
+
+export function KeyLogo() {
+    return <svg class="mx-auto" xmlns="http://www.w3.org/2000/svg" height="45" viewBox="0 -960 960 960" width="45"><path d="M280-400q-33 0-56.5-23.5T200-480q0-33 23.5-56.5T280-560q33 0 56.5 23.5T360-480q0 33-23.5 56.5T280-400Zm0 160q-100 0-170-70T40-480q0-100 70-170t170-70q67 0 121.5 33t86.5 87h352l120 120-180 180-80-60-80 60-85-60h-47q-32 54-86.5 87T280-240Zm0-80q56 0 98.5-34t56.5-86h125l58 41 82-61 71 55 75-75-40-40H435q-14-52-56.5-86T280-640q-66 0-113 47t-47 113q0 66 47 113t113 47Z" /></svg>
+}
+
+export function getGoodToKnowMessage(accountAccessSelected: AccountAccess) {
+    switch (accountAccessSelected) {
+        case AccountAccess.metamask:
+            return "Your account is encrypted using your wallet's public key. This feature relies on Metamask for decryption and might not work with other wallets!";
+        case AccountAccess.password:
+            return "Wallet abstraction with double encryption. The password is used for securing your account and it's needed for spending. Do not reuse your login password. The accounts are non-custodial and if you loose your password we can't recover it for you. You can always disconnect your wallet if you don't want to continue using it! ";
+        case AccountAccess.passkey:
+            return "Your account is stored inside a hardware authenticator device like a Yubi key or IPhone. This feature is experimental and not all authenticator devices are supported. IOS 17 and Safari 17 is Required! You can connect a device to see if it's supported!";
+        default:
+            return "";
+    }
 }

@@ -37,6 +37,11 @@ export type Authenticator = {
   transports: string;
 };
 
+export type AccountAuthenticator = Authenticator & {
+  name: string;
+  disabled: boolean;
+};
+
 const rpName = "Debit Llama";
 
 const env = Deno.env.get("ENV") || "";
@@ -192,4 +197,80 @@ function base64URLStringToBuffer(base64URLString: string): ArrayBuffer {
   }
 
   return buffer;
+}
+
+// for authenticators with a largeBlob extension!
+export async function getRegistrationOptionsWithLargeBlob(
+  user: PasskeyUserModel,
+  userAuthenticators: Authenticator[],
+) {
+  const options = await generateRegistrationOptions({
+    rpName,
+    rpID,
+    userID: user.id,
+    userName: user.username,
+    // Don't prompt users for additional information about the authenticator
+    // (Recommended for smoother UX)
+    attestationType: "none",
+    authenticatorSelection: {
+      residentKey: "required",
+      userVerification: "required",
+    },
+    extensions: {
+      //@ts-ignore it's not in the type but I need to request this extension!
+      largeBlob: {
+        support: "preferred",
+      },
+    },
+    // Prevent users from re-registering existing authenticators
+    excludeCredentials: userAuthenticators.map((authenticator) => ({
+      id: decodeUint8ArrayFromBase64(authenticator.credentialID),
+      type: "public-key",
+      // Optional
+      transports: JSON.parse(authenticator.transports),
+    })),
+  });
+  return options;
+}
+
+export async function getAuthenticationOptionsWithLargeBlobRead(
+  userAuthenticators: Authenticator[],
+) {
+  return await generateAuthenticationOptions({
+    // Require users to use a previously-registered authenticator
+    allowCredentials: userAuthenticators.map((authenticator) => ({
+      id: decodeUint8ArrayFromBase64(authenticator.credentialID),
+      type: "public-key",
+      // Optional
+      transports: JSON.parse(authenticator.transports),
+    })),
+    userVerification: "preferred",
+    extensions: {
+      //@ts-ignore largeBlob is needed!
+      largeBlob: {
+        read: true,
+      },
+    },
+  });
+}
+
+export async function getAuthenticationOptionsWithLargeBlobWrite(
+  userAuthenticators: Authenticator[],
+) {
+  return await generateAuthenticationOptions({
+    // Require users to use a previously-registered authenticator
+    allowCredentials: userAuthenticators.map((authenticator) => ({
+      id: decodeUint8ArrayFromBase64(authenticator.credentialID),
+      type: "public-key",
+      // Optional
+      transports: JSON.parse(authenticator.transports),
+    })),
+    userVerification: "preferred",
+    extensions: {
+      //@ts-ignore largeBlob is needed!
+      largeBlob: {
+        write: new Uint8Array(1),
+      },
+    },
+  });
 }

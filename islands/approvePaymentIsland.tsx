@@ -1,21 +1,23 @@
 import { AccountCardElement } from "../components/AccountCardElement.tsx";
-import { AccountTypes } from "../lib/enums.ts";
+import { AccountAccess, AccountTypes } from "../lib/enums.ts";
 import { createPaymentIntent, toNoteHex } from "../lib/frontend/directdebitlib.ts";
-import { aesDecryptData } from "../lib/frontend/encryption.ts";
 import { logoutRequest, redirectToRedirectPage, uploadPaymentIntent } from "../lib/frontend/fetch.ts";
-import { parseEther } from "../lib/frontend/web3.ts";
+import { parseEther, switch_recoverAccount } from "../lib/frontend/web3.ts";
 import { useState } from 'preact/hooks';
 import { ItemProps } from "../lib/types/checkoutTypes.ts";
+import { ChainIds } from "../lib/shared/web3.ts";
 
 interface ApprovePaymentIslandProps {
-    symmetricEncryptedNote: string,
+    cipherNote: string,
     itemData: ItemProps,
     accountcommitment: string,
     accountName: string,
     accountBalance: string,
     accountCurrency: string,
     accountType: AccountTypes,
-    closed: boolean
+    closed: boolean,
+    account_access: AccountAccess,
+    chainId: string
 }
 
 
@@ -29,9 +31,17 @@ export default function ApprovePaymentIsland(props: ApprovePaymentIslandProps) {
 
     async function payClicked() {
 
-        const decryptedNote = await aesDecryptData(props.symmetricEncryptedNote, password);
+        const decryptedNote = await switch_recoverAccount(
+            props.account_access,
+            props.cipherNote,
+            password,
+            props.chainId as ChainIds,
+            setErrorMessage
+
+        );
+
         if (decryptedNote === "") {
-            setErrorMessage("Invalid password");
+            setErrorMessage("Unable to decrypt account!");
             return;
         } else {
             setErrorMessage("");
@@ -40,6 +50,8 @@ export default function ApprovePaymentIsland(props: ApprovePaymentIslandProps) {
             }
             setLockPayClicked(true);
         }
+
+
         const paymentIntent = await createPaymentIntent({
             paymentIntentSecret: {
                 note: decryptedNote,
@@ -113,18 +125,27 @@ export default function ApprovePaymentIsland(props: ApprovePaymentIslandProps) {
 
                 </div>
                 <form class="flex flex-col margin_0_auto" onSubmit={disableOnSubmit}>
-                    <div class="mx-auto mt-4">
-                        <label for="password" class="block mb-2 text-sm font-medium">Decrypt your Account with the Password</label>
-                        <input
-                            value={password}
-                            onChange={(event: any) => setPassword(event.target.value)}
-                            type="password"
-                            name="password"
-                            id="password"
-                            placeholder="••••••••"
-                            class="width-320px border border-gray-300 sm:text-sm rounded-lg focus:ring-indigo-600 focus:border-indigo-600 block w-full p-2.5 dark:focus:ring-indigo-500 dark:focus:border-indigo-500"
-                        />
-                    </div>
+                    {props.account_access === "password" ?
+                        <div class="mx-auto mt-4">
+                            <label for="password" class="block mb-2 text-sm font-medium">Decrypt your Account with the Password</label>
+                            <input
+                                value={password}
+                                onChange={(event: any) => setPassword(event.target.value)}
+                                type="password"
+                                name="password"
+                                id="password"
+                                placeholder="••••••••"
+                                class="width-320px border border-gray-300 sm:text-sm rounded-lg focus:ring-indigo-600 focus:border-indigo-600 block w-full p-2.5 dark:focus:ring-indigo-500 dark:focus:border-indigo-500"
+                            />
+                        </div>
+                        :
+                        <div class="mx-auto mt-4">
+                            <label for="password" class="block mb-2 text-sm font-medium">{
+                                props.account_access === AccountAccess.metamask
+                                    ? "Decrypt you account using Metamask"
+                                    : "Access your account using Passkey"}</label>
+                        </div>
+                    }
                     <button
                         aria-label="Accept this subsciption"
                         disabled={payClickLocked}
