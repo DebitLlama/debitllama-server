@@ -98,6 +98,16 @@ export function unpackEncryptedMessage(encryptedMessage: string): {
   return directdebitlib.unpackEncryptedMessage(encryptedMessage);
 }
 
+export function getPublicKeyFromPrivateKey(privatekey: string){
+    //@ts-ignore this dependency is imported through a browser script tag
+  return directdebitlib.getPublicKeyFromPrivateKey(privatekey);
+}
+
+export function decryptData(privateKey: string, encryptedData: any){
+    //@ts-ignore this dependency is imported through a browser script tag
+  return directdebitlib.decryptData(privateKey,encryptedData);
+}
+
 export type PaymentIntentSecret = {
   note: string;
   payee: string;
