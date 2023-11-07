@@ -9,7 +9,10 @@ import {
   encodeUint8ArrayToBase64,
   verifyRegistration,
 } from "../../../lib/webauthn/backend.ts";
-import { insertNewAccountAuthenticator } from "../../../lib/backend/db/tables/AccountAuthenticators.ts";
+import {
+  deleteAccountAuthenticatorByCredentialIdForUser,
+  insertNewAccountAuthenticator,
+} from "../../../lib/backend/db/tables/AccountAuthenticators.ts";
 import { selectCurrentUserChallenge } from "../../../lib/backend/db/tables/UserChallenges.ts";
 
 export const handler: Handlers<any, State> = {
@@ -72,5 +75,15 @@ export const handler: Handlers<any, State> = {
       ctx.state.userid as string,
     );
     return new Response(JSON.stringify(options), { status: 200 });
+  },
+  async DELETE(_req, ctx) {
+    const json = await _req.json();
+    const credentialID = json.credentialID;
+
+    await deleteAccountAuthenticatorByCredentialIdForUser(ctx, {
+      credentialID,
+    });
+
+    return new Response(null, { status: 200 });
   },
 };
