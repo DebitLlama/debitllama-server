@@ -451,3 +451,11 @@ export async function getAuthenticationOptionsForLargeBlobRead() {
     credentials: "same-origin",
   }).then((response) => response);
 }
+
+export async function deleteAccountAuthenticator(credentialID: string) {
+  return await fetch("/app/webauthn/accountRegister", {
+    method: "DELETE",
+    credentials: "same-origin",
+    body: JSON.stringify({ credentialID }),
+  }).then((response) => response);
+}
