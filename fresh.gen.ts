@@ -5,69 +5,73 @@
 import * as $0 from "./routes/_500.tsx";
 import * as $1 from "./routes/_app.tsx";
 import * as $2 from "./routes/_middleware.ts";
-import * as $3 from "./routes/api/v1/_middleware.ts";
-import * as $4 from "./routes/api/v1/accounts/[slug].ts";
-import * as $5 from "./routes/api/v1/accounts/index.ts";
-import * as $6 from "./routes/api/v1/index.ts";
-import * as $7 from "./routes/api/v1/items/[slug].ts";
-import * as $8 from "./routes/api/v1/items/index.ts";
-import * as $9 from "./routes/api/v1/payment_intents/[slug].ts";
-import * as $10 from "./routes/api/v1/payment_intents/index.ts";
-import * as $11 from "./routes/api/v1/relayer/[slug].ts";
-import * as $12 from "./routes/api/v1/relayer/index.ts";
-import * as $13 from "./routes/api/v1/transactions/index.ts";
-import * as $14 from "./routes/api/v1/zapier/index.ts";
-import * as $15 from "./routes/app/_middleware.ts";
-import * as $16 from "./routes/app/account.tsx";
-import * as $17 from "./routes/app/accounts.tsx";
-import * as $18 from "./routes/app/addNewAccount.tsx";
-import * as $19 from "./routes/app/addNewDebitItem.tsx";
-import * as $20 from "./routes/app/approvepayment.tsx";
-import * as $21 from "./routes/app/createdPaymentIntents.tsx";
-import * as $22 from "./routes/app/debitItems.tsx";
-import * as $23 from "./routes/app/feedback.tsx";
-import * as $24 from "./routes/app/inactiveAccounts.tsx";
-import * as $25 from "./routes/app/item.tsx";
-import * as $26 from "./routes/app/manage_api/rest.tsx";
-import * as $27 from "./routes/app/manage_api/webhooks.tsx";
-import * as $28 from "./routes/app/newConnectedWallet.tsx";
-import * as $29 from "./routes/app/pagination/accessTokens.tsx";
-import * as $30 from "./routes/app/pagination/accountPaymentIntents.tsx";
-import * as $31 from "./routes/app/pagination/debitItems.tsx";
-import * as $32 from "./routes/app/pagination/debitItemsPaymentIntents.tsx";
-import * as $33 from "./routes/app/pagination/itemPaymentIntents.tsx";
-import * as $34 from "./routes/app/pagination/relayerTopupHistory.tsx";
-import * as $35 from "./routes/app/pagination/relayerTxHistory.tsx";
-import * as $36 from "./routes/app/pagination/relayerTxHistoryWithPaymentIntentId.tsx";
-import * as $37 from "./routes/app/pagination/subscriptions.tsx";
-import * as $38 from "./routes/app/payeePaymentIntents.tsx";
-import * as $39 from "./routes/app/paymentIntents.tsx";
-import * as $40 from "./routes/app/post/addEmailNotifications.tsx";
-import * as $41 from "./routes/app/post/cancelDynamicPayment.tsx";
-import * as $42 from "./routes/app/post/checkoutprofiledata.tsx";
-import * as $43 from "./routes/app/post/refreshbalance.tsx";
-import * as $44 from "./routes/app/post/saveAccountAPI.ts";
-import * as $45 from "./routes/app/post/savePaymentIntent.ts";
-import * as $46 from "./routes/app/post/updateItemUrl.tsx";
-import * as $47 from "./routes/app/profile.tsx";
-import * as $48 from "./routes/app/relayer.tsx";
-import * as $49 from "./routes/app/subscriptions.tsx";
-import * as $50 from "./routes/app/webauthn/2fa.tsx";
-import * as $51 from "./routes/app/webauthn/accountRegister.ts";
-import * as $52 from "./routes/app/webauthn/accounts.tsx";
-import * as $53 from "./routes/app/webauthn/register.ts";
-import * as $54 from "./routes/app/webauthn/revoke.ts";
-import * as $55 from "./routes/app/webauthn/verify.ts";
-import * as $56 from "./routes/buyitnow.tsx";
-import * as $57 from "./routes/buyitnowlogout.tsx";
-import * as $58 from "./routes/index.tsx";
-import * as $59 from "./routes/login.tsx";
-import * as $60 from "./routes/logout.tsx";
-import * as $61 from "./routes/passwordreset.tsx";
-import * as $62 from "./routes/privacyPolicy.tsx";
-import * as $63 from "./routes/signup.tsx";
-import * as $64 from "./routes/termsAndConditions.tsx";
-import * as $65 from "./routes/verifyEmail.tsx";
+import * as $3 from "./routes/api/relayer/balance.ts";
+import * as $4 from "./routes/api/relayer/fixedpayments.ts";
+import * as $5 from "./routes/api/relayer/lock.ts";
+import * as $6 from "./routes/api/relayer/relayingfailed.ts";
+import * as $7 from "./routes/api/v1/_middleware.ts";
+import * as $8 from "./routes/api/v1/accounts/[slug].ts";
+import * as $9 from "./routes/api/v1/accounts/index.ts";
+import * as $10 from "./routes/api/v1/index.ts";
+import * as $11 from "./routes/api/v1/items/[slug].ts";
+import * as $12 from "./routes/api/v1/items/index.ts";
+import * as $13 from "./routes/api/v1/payment_intents/[slug].ts";
+import * as $14 from "./routes/api/v1/payment_intents/index.ts";
+import * as $15 from "./routes/api/v1/relayer/[slug].ts";
+import * as $16 from "./routes/api/v1/relayer/index.ts";
+import * as $17 from "./routes/api/v1/transactions/index.ts";
+import * as $18 from "./routes/api/v1/zapier/index.ts";
+import * as $19 from "./routes/app/_middleware.ts";
+import * as $20 from "./routes/app/account.tsx";
+import * as $21 from "./routes/app/accounts.tsx";
+import * as $22 from "./routes/app/addNewAccount.tsx";
+import * as $23 from "./routes/app/addNewDebitItem.tsx";
+import * as $24 from "./routes/app/approvepayment.tsx";
+import * as $25 from "./routes/app/createdPaymentIntents.tsx";
+import * as $26 from "./routes/app/debitItems.tsx";
+import * as $27 from "./routes/app/feedback.tsx";
+import * as $28 from "./routes/app/inactiveAccounts.tsx";
+import * as $29 from "./routes/app/item.tsx";
+import * as $30 from "./routes/app/manage_api/rest.tsx";
+import * as $31 from "./routes/app/manage_api/webhooks.tsx";
+import * as $32 from "./routes/app/newConnectedWallet.tsx";
+import * as $33 from "./routes/app/pagination/accessTokens.tsx";
+import * as $34 from "./routes/app/pagination/accountPaymentIntents.tsx";
+import * as $35 from "./routes/app/pagination/debitItems.tsx";
+import * as $36 from "./routes/app/pagination/debitItemsPaymentIntents.tsx";
+import * as $37 from "./routes/app/pagination/itemPaymentIntents.tsx";
+import * as $38 from "./routes/app/pagination/relayerTopupHistory.tsx";
+import * as $39 from "./routes/app/pagination/relayerTxHistory.tsx";
+import * as $40 from "./routes/app/pagination/relayerTxHistoryWithPaymentIntentId.tsx";
+import * as $41 from "./routes/app/pagination/subscriptions.tsx";
+import * as $42 from "./routes/app/payeePaymentIntents.tsx";
+import * as $43 from "./routes/app/paymentIntents.tsx";
+import * as $44 from "./routes/app/post/addEmailNotifications.tsx";
+import * as $45 from "./routes/app/post/cancelDynamicPayment.tsx";
+import * as $46 from "./routes/app/post/checkoutprofiledata.tsx";
+import * as $47 from "./routes/app/post/refreshbalance.tsx";
+import * as $48 from "./routes/app/post/saveAccountAPI.ts";
+import * as $49 from "./routes/app/post/savePaymentIntent.ts";
+import * as $50 from "./routes/app/post/updateItemUrl.tsx";
+import * as $51 from "./routes/app/profile.tsx";
+import * as $52 from "./routes/app/relayer.tsx";
+import * as $53 from "./routes/app/subscriptions.tsx";
+import * as $54 from "./routes/app/webauthn/2fa.tsx";
+import * as $55 from "./routes/app/webauthn/accountRegister.ts";
+import * as $56 from "./routes/app/webauthn/accounts.tsx";
+import * as $57 from "./routes/app/webauthn/register.ts";
+import * as $58 from "./routes/app/webauthn/revoke.ts";
+import * as $59 from "./routes/app/webauthn/verify.ts";
+import * as $60 from "./routes/buyitnow.tsx";
+import * as $61 from "./routes/buyitnowlogout.tsx";
+import * as $62 from "./routes/index.tsx";
+import * as $63 from "./routes/login.tsx";
+import * as $64 from "./routes/logout.tsx";
+import * as $65 from "./routes/passwordreset.tsx";
+import * as $66 from "./routes/privacyPolicy.tsx";
+import * as $67 from "./routes/signup.tsx";
+import * as $68 from "./routes/termsAndConditions.tsx";
+import * as $69 from "./routes/verifyEmail.tsx";
 import * as $$0 from "./islands/AccountTopupOrClose.tsx";
 import * as $$1 from "./islands/AddNew2FAPasskeyButton.tsx";
 import * as $$2 from "./islands/AddNewAccountPasskeyButton.tsx";
@@ -113,69 +117,73 @@ const manifest = {
     "./routes/_500.tsx": $0,
     "./routes/_app.tsx": $1,
     "./routes/_middleware.ts": $2,
-    "./routes/api/v1/_middleware.ts": $3,
-    "./routes/api/v1/accounts/[slug].ts": $4,
-    "./routes/api/v1/accounts/index.ts": $5,
-    "./routes/api/v1/index.ts": $6,
-    "./routes/api/v1/items/[slug].ts": $7,
-    "./routes/api/v1/items/index.ts": $8,
-    "./routes/api/v1/payment_intents/[slug].ts": $9,
-    "./routes/api/v1/payment_intents/index.ts": $10,
-    "./routes/api/v1/relayer/[slug].ts": $11,
-    "./routes/api/v1/relayer/index.ts": $12,
-    "./routes/api/v1/transactions/index.ts": $13,
-    "./routes/api/v1/zapier/index.ts": $14,
-    "./routes/app/_middleware.ts": $15,
-    "./routes/app/account.tsx": $16,
-    "./routes/app/accounts.tsx": $17,
-    "./routes/app/addNewAccount.tsx": $18,
-    "./routes/app/addNewDebitItem.tsx": $19,
-    "./routes/app/approvepayment.tsx": $20,
-    "./routes/app/createdPaymentIntents.tsx": $21,
-    "./routes/app/debitItems.tsx": $22,
-    "./routes/app/feedback.tsx": $23,
-    "./routes/app/inactiveAccounts.tsx": $24,
-    "./routes/app/item.tsx": $25,
-    "./routes/app/manage_api/rest.tsx": $26,
-    "./routes/app/manage_api/webhooks.tsx": $27,
-    "./routes/app/newConnectedWallet.tsx": $28,
-    "./routes/app/pagination/accessTokens.tsx": $29,
-    "./routes/app/pagination/accountPaymentIntents.tsx": $30,
-    "./routes/app/pagination/debitItems.tsx": $31,
-    "./routes/app/pagination/debitItemsPaymentIntents.tsx": $32,
-    "./routes/app/pagination/itemPaymentIntents.tsx": $33,
-    "./routes/app/pagination/relayerTopupHistory.tsx": $34,
-    "./routes/app/pagination/relayerTxHistory.tsx": $35,
-    "./routes/app/pagination/relayerTxHistoryWithPaymentIntentId.tsx": $36,
-    "./routes/app/pagination/subscriptions.tsx": $37,
-    "./routes/app/payeePaymentIntents.tsx": $38,
-    "./routes/app/paymentIntents.tsx": $39,
-    "./routes/app/post/addEmailNotifications.tsx": $40,
-    "./routes/app/post/cancelDynamicPayment.tsx": $41,
-    "./routes/app/post/checkoutprofiledata.tsx": $42,
-    "./routes/app/post/refreshbalance.tsx": $43,
-    "./routes/app/post/saveAccountAPI.ts": $44,
-    "./routes/app/post/savePaymentIntent.ts": $45,
-    "./routes/app/post/updateItemUrl.tsx": $46,
-    "./routes/app/profile.tsx": $47,
-    "./routes/app/relayer.tsx": $48,
-    "./routes/app/subscriptions.tsx": $49,
-    "./routes/app/webauthn/2fa.tsx": $50,
-    "./routes/app/webauthn/accountRegister.ts": $51,
-    "./routes/app/webauthn/accounts.tsx": $52,
-    "./routes/app/webauthn/register.ts": $53,
-    "./routes/app/webauthn/revoke.ts": $54,
-    "./routes/app/webauthn/verify.ts": $55,
-    "./routes/buyitnow.tsx": $56,
-    "./routes/buyitnowlogout.tsx": $57,
-    "./routes/index.tsx": $58,
-    "./routes/login.tsx": $59,
-    "./routes/logout.tsx": $60,
-    "./routes/passwordreset.tsx": $61,
-    "./routes/privacyPolicy.tsx": $62,
-    "./routes/signup.tsx": $63,
-    "./routes/termsAndConditions.tsx": $64,
-    "./routes/verifyEmail.tsx": $65,
+    "./routes/api/relayer/balance.ts": $3,
+    "./routes/api/relayer/fixedpayments.ts": $4,
+    "./routes/api/relayer/lock.ts": $5,
+    "./routes/api/relayer/relayingfailed.ts": $6,
+    "./routes/api/v1/_middleware.ts": $7,
+    "./routes/api/v1/accounts/[slug].ts": $8,
+    "./routes/api/v1/accounts/index.ts": $9,
+    "./routes/api/v1/index.ts": $10,
+    "./routes/api/v1/items/[slug].ts": $11,
+    "./routes/api/v1/items/index.ts": $12,
+    "./routes/api/v1/payment_intents/[slug].ts": $13,
+    "./routes/api/v1/payment_intents/index.ts": $14,
+    "./routes/api/v1/relayer/[slug].ts": $15,
+    "./routes/api/v1/relayer/index.ts": $16,
+    "./routes/api/v1/transactions/index.ts": $17,
+    "./routes/api/v1/zapier/index.ts": $18,
+    "./routes/app/_middleware.ts": $19,
+    "./routes/app/account.tsx": $20,
+    "./routes/app/accounts.tsx": $21,
+    "./routes/app/addNewAccount.tsx": $22,
+    "./routes/app/addNewDebitItem.tsx": $23,
+    "./routes/app/approvepayment.tsx": $24,
+    "./routes/app/createdPaymentIntents.tsx": $25,
+    "./routes/app/debitItems.tsx": $26,
+    "./routes/app/feedback.tsx": $27,
+    "./routes/app/inactiveAccounts.tsx": $28,
+    "./routes/app/item.tsx": $29,
+    "./routes/app/manage_api/rest.tsx": $30,
+    "./routes/app/manage_api/webhooks.tsx": $31,
+    "./routes/app/newConnectedWallet.tsx": $32,
+    "./routes/app/pagination/accessTokens.tsx": $33,
+    "./routes/app/pagination/accountPaymentIntents.tsx": $34,
+    "./routes/app/pagination/debitItems.tsx": $35,
+    "./routes/app/pagination/debitItemsPaymentIntents.tsx": $36,
+    "./routes/app/pagination/itemPaymentIntents.tsx": $37,
+    "./routes/app/pagination/relayerTopupHistory.tsx": $38,
+    "./routes/app/pagination/relayerTxHistory.tsx": $39,
+    "./routes/app/pagination/relayerTxHistoryWithPaymentIntentId.tsx": $40,
+    "./routes/app/pagination/subscriptions.tsx": $41,
+    "./routes/app/payeePaymentIntents.tsx": $42,
+    "./routes/app/paymentIntents.tsx": $43,
+    "./routes/app/post/addEmailNotifications.tsx": $44,
+    "./routes/app/post/cancelDynamicPayment.tsx": $45,
+    "./routes/app/post/checkoutprofiledata.tsx": $46,
+    "./routes/app/post/refreshbalance.tsx": $47,
+    "./routes/app/post/saveAccountAPI.ts": $48,
+    "./routes/app/post/savePaymentIntent.ts": $49,
+    "./routes/app/post/updateItemUrl.tsx": $50,
+    "./routes/app/profile.tsx": $51,
+    "./routes/app/relayer.tsx": $52,
+    "./routes/app/subscriptions.tsx": $53,
+    "./routes/app/webauthn/2fa.tsx": $54,
+    "./routes/app/webauthn/accountRegister.ts": $55,
+    "./routes/app/webauthn/accounts.tsx": $56,
+    "./routes/app/webauthn/register.ts": $57,
+    "./routes/app/webauthn/revoke.ts": $58,
+    "./routes/app/webauthn/verify.ts": $59,
+    "./routes/buyitnow.tsx": $60,
+    "./routes/buyitnowlogout.tsx": $61,
+    "./routes/index.tsx": $62,
+    "./routes/login.tsx": $63,
+    "./routes/logout.tsx": $64,
+    "./routes/passwordreset.tsx": $65,
+    "./routes/privacyPolicy.tsx": $66,
+    "./routes/signup.tsx": $67,
+    "./routes/termsAndConditions.tsx": $68,
+    "./routes/verifyEmail.tsx": $69,
   },
   islands: {
     "./islands/AccountTopupOrClose.tsx": $$0,
