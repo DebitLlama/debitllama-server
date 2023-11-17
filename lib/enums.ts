@@ -1,3 +1,4 @@
+
 export enum AccountTypes {
   VIRTUALACCOUNT = "VIRTUALACCOUNT",
   CONNECTEDWALLET = "CONNECTEDWALLET",
@@ -271,3 +272,15 @@ export enum AccountAccess {
   metamask = "metamask",
   passkey = "passkey",
 }
+
+
+export type DynamicPaymentRequestJobRow = {
+  id: number;
+  created_at: string;
+  paymentIntent_id: PaymentIntentRow;
+  requestedAmount: string;
+  status: string;
+  request_creator_id: string;
+  allocatedGas: string;
+  relayerBalance_id: number;
+};
