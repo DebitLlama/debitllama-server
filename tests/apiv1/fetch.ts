@@ -47,3 +47,29 @@ export async function AuthenticatedDELETE(args: AuthenticatedPOSTArgs) {
     body: args.body,
   }).then((response) => response);
 }
+
+export async function RelayerAuthenticatedGET(
+  args: AuthenticatedGETArgs & { xrelayer: string },
+) {
+  return await fetch(args.url, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${args.accesstoken}`,
+      "X-Relayer": args.xrelayer,
+    },
+  }).then((response) => response);
+}
+
+export async function RelayerAuthenticatedPOST(
+  args: AuthenticatedPOSTArgs & { xrelayer: string },
+) {
+  return await fetch(args.url, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${args.accesstoken}`,
+      "Content-Type": "application/json",
+      "X-Relayer": args.xrelayer,
+    },
+    body: args.body,
+  }).then((response) => response);
+}
