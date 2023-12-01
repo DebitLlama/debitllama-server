@@ -59,3 +59,27 @@ export async function updatDynamicPaymentRequestJobStatusTo(
     name: "updatDynamicPaymentRequestJobStatusTo",
   });
 }
+
+export async function selectDynamicPaymentRequestJobByPaymentIntentId(
+  ctx: any,
+  args: {
+    paymentIntentId: number;
+    status: DynamicPaymentRequestJobsStatus;
+  },
+) {
+  //This fetches the completed dynamic payment request job for the email/webhooks
+  return await query<
+    { paymentIntentId: number; status: DynamicPaymentRequestJobsStatus }
+  >({
+    ctx,
+    args,
+    impl: async (p) => {
+      return await p.client.from("DynamicPaymentRequestJobs")
+        .select("*").eq("paymentIntent_id", p.args.paymentIntentId).eq(
+          "status",
+          p.args.status,
+        );
+    },
+    name: "selectDynamicPaymentRequestJobByPaymentIntentId",
+  });
+}

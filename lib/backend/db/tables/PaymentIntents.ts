@@ -227,6 +227,22 @@ export async function selectFixedPricingWhereStatusIsRecurring(ctx: any) {
   });
 }
 
+export async function selectPaymentIntentRowByPaymentIntent(
+  ctx: any,
+  args: { paymentIntent: string },
+) {
+  return await query<{ paymentIntent: string }>({
+    ctx,
+    args,
+    impl: async (p) => {
+      return await p.client.from("PaymentIntents")
+        .select("*,account_id(*),debit_item_id(*)")
+        .eq("paymentIntent", p.args.paymentIntent);
+    },
+    name: "selectPaymentIntentRowByPaymentIntent",
+  });
+}
+
 export async function updateToAccountBalanceTooLow(
   ctx: any,
   args: { paymentIntentId: string },

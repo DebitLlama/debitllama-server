@@ -25,3 +25,14 @@ export async function deleteWebhookData(ctx: any) {
     args: { userid },
   });
 }
+
+export async function selectWebhooksForWorker(ctx: any, userId: string) {
+  const { client } = unwrapContext(ctx);
+  const res = await client.from("Webhooks")
+    .select("*")
+    .eq("creator_id", userId);
+  return responseHandler(res, {
+    rpc: "selectWebhooksForWorker",
+    args: { userId },
+  });
+}
