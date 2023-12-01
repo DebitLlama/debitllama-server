@@ -5,6 +5,8 @@ import {
   updateToAccountBalanceTooLow,
 } from "../../../lib/backend/db/tables/PaymentIntents.ts";
 import { updateMissingRelayerBalanceByChainId } from "../../../lib/backend/db/tables/RelayerBalance.ts";
+import { EventType } from "../../../lib/backend/email/types.ts";
+import { enqueueWebhookWork } from "../../../lib/backend/queue/kv.ts";
 import { PaymentIntentStatus } from "../../../lib/enums.ts";
 import { checkRelayerAuth } from "../../../lib/relayer/utils.ts";
 
@@ -31,7 +33,13 @@ export const handler = {
 
       if (reason === PaymentIntentStatus.ACCOUNTBALANCETOOLOW) {
         const paymentIntentId = json.paymentIntentId;
+        const paymentIntent = json.paymentIntent;
         await updateToAccountBalanceTooLow(ctx, { paymentIntentId });
+        enqueueWebhookWork({
+          eventType: EventType.PaymentFailure,
+          paymentIntent,
+        });
+
         return new Response(null, { status: 200 });
       } else if (reason === PaymentIntentStatus.BALANCETOOLOWTORELAY) {
         const {
@@ -39,6 +47,7 @@ export const handler = {
           paymentIntentId,
           newMissingBalance,
           relayerBalanceId,
+          paymentIntent,
         } = json;
 
         await updatePaymentIntentToRelayerBalanceTooLowById(ctx, {
@@ -48,7 +57,11 @@ export const handler = {
             newMissingBalance,
             relayerBalanceId,
           });
-        }); 
+          enqueueWebhookWork({
+            eventType: EventType.PaymentFailure,
+            paymentIntent,
+          });
+        });
         return new Response(null, { status: 200 });
       } else {
         return new Response(null, { status: 400 });

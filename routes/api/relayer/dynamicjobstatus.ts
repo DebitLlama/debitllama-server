@@ -1,6 +1,8 @@
 import { HandlerContext } from "$fresh/server.ts";
 import { v1Error } from "../../../lib/api_v1/responseBuilders.ts";
 import { updatDynamicPaymentRequestJobStatusTo } from "../../../lib/backend/db/tables/DynamicPaymentRequestJobs.ts";
+import { EventType } from "../../../lib/backend/email/types.ts";
+import { enqueueWebhookWork } from "../../../lib/backend/queue/kv.ts";
 import { DynamicPaymentRequestJobsStatus } from "../../../lib/enums.ts";
 import { checkRelayerAuth } from "../../../lib/relayer/utils.ts";
 
@@ -31,6 +33,14 @@ export const handler = {
         id,
         status,
       });
+
+      if (status === DynamicPaymentRequestJobsStatus.REJECETED) {
+        enqueueWebhookWork({
+          eventType: EventType.DynamicPaymentRequestRejected,
+          paymentIntent: json.paymentIntent,
+        });
+      }
+
       return new Response(JSON.stringify(res), { status: 200 });
     } else {
       return v1Error(
