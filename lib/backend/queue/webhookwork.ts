@@ -34,10 +34,13 @@ export async function processWebhookwork(args: NewWebhookWorkerArgs) {
     Deno.env.get("SUPABASE_KEY") || "",
     { auth: { persistSession: false } },
   );
-  const ctx: any = {};
+  const ctx: any = {
+    state: {
+      supabaseClient: undefined,
+    },
+  };
   ctx.state.supabaseClient = client;
   const { eventType, paymentIntent } = args;
-
   // Fetch the payment intent's data!
   const { data: piRowData } = await selectPaymentIntentRowByPaymentIntent(ctx, {
     paymentIntent,
@@ -49,9 +52,7 @@ export async function processWebhookwork(args: NewWebhookWorkerArgs) {
   }
   const piRow = piRowData[0] as PaymentIntentRow;
   // Check if should send email!
-
   const shouldSendEmail = piRow.debit_item_id.email_notifications;
-
   let customerEmail = "";
   let merchantEmail = "";
 
@@ -78,7 +79,6 @@ export async function processWebhookwork(args: NewWebhookWorkerArgs) {
   if (webhookdata.length !== 0) {
     shouldTriggerWebhook = true;
   }
-
   const webhooksRow: WebhooksRow = webhookdata[0];
 
   const { data: zapierWebhookData } = await selectZapierWebhooksByPayeeId(ctx, {
@@ -120,12 +120,8 @@ export async function processWebhookwork(args: NewWebhookWorkerArgs) {
           payment_intent_data: payment_intent_to_zapier_format(piRow),
         });
       }
-
-      //TODO: Check if there is zapier webhook endpoint configured for subscription_created_url
       break;
     case EventType.SubscriptionCancelled:
-      //TODO: check if webhookdata has on_subscription_cancelled true
-      //TODO: Check if there is zapier webhook endpoint configured for subscription_cancelled_url
       if (shouldSendEmail) {
         // both parties get an email
         await sendEmailToBothParties(
@@ -154,8 +150,6 @@ export async function processWebhookwork(args: NewWebhookWorkerArgs) {
       }
       break;
     case EventType.SubscriptionEnded:
-      //TODO: Check if webhookdata has  on_payment_success
-      //TODO: Check if there is zapier webhook endpoint configured for payment_url
       //THIS IS A PAYMENT EVENT
       if (shouldSendEmail) {
         //Both parties get an email
