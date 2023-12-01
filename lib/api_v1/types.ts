@@ -707,6 +707,6 @@ export interface PaymentIntent_ZapierFormat {
   native_currency: string;
   currency_address: string;
   network: string;
-  transactions_left: number; // calulated like: debit_interval - used_for
+  transactions_left: number; // calulated like: debit_times - used_for
   failed_dynamic_payment_amount: string;
 }
