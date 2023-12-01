@@ -6,7 +6,6 @@ export const kv = await Deno.openKv();
 
 kv.listenQueue(async (msg: unknown) => {
   if (isWebhookEvent(msg)) {
-    console.log("SENDING WEBHOOK EVENT");
     await processWebhookwork(msg).catch(console.error);
   } else {
     // If the message is of an unknown type, it might be an error
