@@ -1,4 +1,3 @@
-
 export enum AccountTypes {
   VIRTUALACCOUNT = "VIRTUALACCOUNT",
   CONNECTEDWALLET = "CONNECTEDWALLET",
@@ -49,7 +48,7 @@ export enum DocsLinks {
 export type PaymentIntentRow = {
   id: number;
   created_at: string;
-  creator_user_id: number;
+  creator_user_id: string;
   payee_user_id: string;
   account_id: Account;
   payee_address: string;
@@ -102,6 +101,7 @@ export type DebitItem = {
   name: string;
   deleted: boolean;
   payment_intents_count: number;
+  email_notifications: boolean;
 };
 
 export type RelayerBalance = {
@@ -273,7 +273,6 @@ export enum AccountAccess {
   passkey = "passkey",
 }
 
-
 export type DynamicPaymentRequestJobRow = {
   id: number;
   created_at: string;
@@ -283,4 +282,28 @@ export type DynamicPaymentRequestJobRow = {
   request_creator_id: string;
   allocatedGas: string;
   relayerBalance_id: number;
+};
+
+export type WebhooksRow = {
+  id: number;
+  created_at: string;
+  creator_id: string;
+  webhook_url: string;
+  on_subscription_created: boolean;
+  on_payment_success: boolean;
+  on_payment_failure: boolean;
+  on_dynamic_payment_request_rejected: boolean;
+  on_subscription_cancelled: boolean;
+  _authorization_: string;
+};
+
+export type ZapierWebhooksRow = {
+  id: number;
+  created_at: string;
+  user_id: string;
+  subscription_created_url: string;
+  subscription_cancelled_url: string;
+  payment_url: string;
+  payment_failure_url: string;
+  dynamic_payment_request_rejected_url: string;
 };
