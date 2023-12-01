@@ -4,6 +4,9 @@ import { updateAccountBalanceByCommitment } from "../../../lib/backend/db/tables
 import { updatePaymentIntentStatusAfterSuccess } from "../../../lib/backend/db/tables/PaymentIntents.ts";
 import { updateNewRelayerBalanceByChainId } from "../../../lib/backend/db/tables/RelayerBalance.ts";
 import { insertNewTx } from "../../../lib/backend/db/tables/RelayerHistory.ts";
+import { EventType } from "../../../lib/backend/email/types.ts";
+import { enqueueWebhookWork } from "../../../lib/backend/queue/kv.ts";
+import { PaymentIntentStatus } from "../../../lib/enums.ts";
 import { checkRelayerAuth } from "../../../lib/relayer/utils.ts";
 import { ChainIds } from "../../../lib/shared/web3.ts";
 
@@ -23,6 +26,7 @@ export interface RelayingSuccessArgs {
   lastPaymentDate: string;
   nextPaymentDate: string;
   used_for: number;
+  paymentIntent: string;
 }
 
 export const handler = {
@@ -54,6 +58,7 @@ export const handler = {
         lastPaymentDate,
         nextPaymentDate,
         used_for,
+        paymentIntent,
       } = json as RelayingSuccessArgs;
 
       await updateNewRelayerBalanceByChainId(ctx, chainId, {
@@ -83,6 +88,13 @@ export const handler = {
         nextPaymentDate,
         used_for,
         paymentIntentRowId: paymentIntentId,
+      });
+
+      enqueueWebhookWork({
+        eventType: statusText === PaymentIntentStatus.PAID
+          ? EventType.SubscriptionEnded
+          : EventType.Payment,
+        paymentIntent,
       });
     } else {
       return v1Error(
