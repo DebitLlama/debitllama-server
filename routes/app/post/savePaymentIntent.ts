@@ -1,7 +1,13 @@
 import { Handlers } from "$fresh/server.ts";
 import QueryBuilder from "../../../lib/backend/db/queryBuilder.ts";
+import { EventType } from "../../../lib/backend/email/types.ts";
+import { enqueueWebhookWork } from "../../../lib/backend/queue/kv.ts";
 import { estimateRelayerGas } from "../../../lib/backend/web3.ts";
-import { AccountTypes, PaymentIntentStatus, Pricing } from "../../../lib/enums.ts";
+import {
+  AccountTypes,
+  PaymentIntentStatus,
+  Pricing,
+} from "../../../lib/enums.ts";
 import { State } from "../../_middleware.ts";
 
 export const handler: Handlers<any, State> = {
@@ -85,6 +91,11 @@ export const handler: Handlers<any, State> = {
       return new Response(null, { status: 500 });
     }
 
+    // Gonna  send  email/ webhook etc
+    enqueueWebhookWork({
+      eventType: EventType.SubscriptionCreated,
+      paymentIntent,
+    });
     return new Response(null, { status: 200 });
   },
 };
