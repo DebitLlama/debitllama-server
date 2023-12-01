@@ -12,3 +12,10 @@ export type TriggerZapierWebhookArgs = {
   zapierUrl: string;
   payment_intent_data: PaymentIntent_ZapierFormat;
 };
+
+export type TriggerSlackWebhook = {
+  url: string;
+  subject: string;
+  message: string;
+  email: string;
+};
