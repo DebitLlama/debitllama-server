@@ -2,6 +2,7 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import Layout from "../../components/Layout.tsx";
 import { SlackInviteBox } from "../../components/SlackInviteForm.tsx";
 import { insertFeedback } from "../../lib/backend/db/rpc.ts";
+import { enqueueSlackNotification } from "../../lib/backend/queue/kv.ts";
 import { State } from "../_middleware.ts";
 export const handler: Handlers<any, State> = {
     async POST(req, ctx) {
@@ -16,7 +17,12 @@ export const handler: Handlers<any, State> = {
         }
 
         const { data: email, error } = await insertFeedback(ctx, { subject, message });
-
+        enqueueSlackNotification({
+            isSlackWebhook: true,
+            subject,
+            message,
+            email
+        })
         if (error) {
             headers.set("location", `/app/feedback?error=${"Unable to save feedback"}`)
         } else {
