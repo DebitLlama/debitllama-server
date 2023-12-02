@@ -36,9 +36,7 @@ export async function updateMissingRelayerBalanceByChainId(
           args,
           impl: async (p) => {
             return await p.client.from("RelayerBalance").update({
-              Missing_BTT_Donau_Testnet_Balance: formatEther(
-                p.args.newMissingBalance,
-              ),
+              Missing_BTT_Donau_Testnet_Balance: p.args.newMissingBalance,
             }).eq("id", p.args.relayerBalanceId);
           },
           name:
@@ -56,9 +54,7 @@ export async function updateMissingRelayerBalanceByChainId(
           args,
           impl: async (p) => {
             return await p.client.from("RelayerBalance").update({
-              Missing_BTT_Mainnet_Balance: formatEther(
-                p.args.newMissingBalance,
-              ),
+              Missing_BTT_Mainnet_Balance: p.args.newMissingBalance,
             }).eq("id", p.args.relayerBalanceId);
           },
           name:
