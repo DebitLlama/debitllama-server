@@ -9,6 +9,8 @@ import { ChainIds, networkNameFromId, rpcUrl } from "../../lib/shared/web3.ts";
 import { getPaymentIntentHistory } from "../../lib/backend/web3.ts";
 import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import { selectRelayerHistoryByPaymentIntentIdPaginated } from "../../lib/backend/db/tables/RelayerHistory.ts";
+import { enqueueWebhookWork } from "../../lib/backend/queue/kv.ts";
+import { EventType } from "../../lib/backend/email/types.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(req: any, ctx: any) {
@@ -51,7 +53,12 @@ export const handler: Handlers<any, State> = {
                 const update = queryBuilder.update();
                 // Update the database if it's nullified
                 // set the payment intent to closed!
-                await update.PaymentIntents.statusByPaymentIntent(PaymentIntentStatus.CANCELLED, paymentIntent);
+                await update.PaymentIntents.statusByPaymentIntent(PaymentIntentStatus.CANCELLED, paymentIntent).then(async () => {
+                    enqueueWebhookWork({
+                        eventType: EventType.SubscriptionCancelled,
+                        paymentIntent: paymentIntent,
+                    })
+                });
                 return new Response(null, { status: 200 })
             } else {
                 return new Response(null, { status: 500 })
