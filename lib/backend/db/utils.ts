@@ -15,11 +15,6 @@ export type PaginationArgs = {
 
 export type PaginationArgsWithSearch = PaginationArgs & { searchTerm: string };
 
-
-
-
-
-
 export type QueryCtx = {
   state: { supabaseClient: any; userid: string | null };
 };
@@ -52,17 +47,11 @@ export async function query<T>(
   });
 }
 
-
-
 export function unwrapContext(
   ctx: QueryCtx,
 ) {
   return { client: ctx.state.supabaseClient, userid: ctx.state.userid };
 }
-
-
-
-
 
 export function responseHandler(
   res: SupabaseQueryResult,
@@ -79,4 +68,8 @@ export function responseHandler(
     console.error("Args: ", JSON.stringify(params.args));
   }
   return { ...res };
+}
+
+export function AddMinutesToDate(date: Date, minutes: number) {
+  return new Date(date.getTime() + minutes * 60000);
 }
