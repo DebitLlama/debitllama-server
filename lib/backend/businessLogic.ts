@@ -125,13 +125,14 @@ export async function updateRelayerBalanceAndHistorySwitchNetwork(
         chainId,
       );
 
-      const feeData = await getGasPrice(ChainIds.BTT_TESTNET_ID);
+      const feeData = await getGasPrice(ChainIds.BTT_MAINNET_ID);
 
       const resetablePaymentIntents = await findPaymentIntentsThatCanBeReset(
         addedBalance,
         paymentIntentsWithLowBalance,
         feeData,
       );
+
       // Set these resetable payment intents to created or recurring
       await setResettablePaymentIntents(update, resetablePaymentIntents);
 
