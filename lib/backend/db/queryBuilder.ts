@@ -7,6 +7,7 @@ import {
 } from "../../enums.ts";
 import { ChainIds } from "../../shared/web3.ts";
 import { formatEther } from "../web3.ts";
+import { AddMinutesToDate } from "./utils.ts";
 
 export type SupabaseQueryResult = {
   error: any;
@@ -336,7 +337,7 @@ export default class QueryBuilder {
             last_modified: new Date().toUTCString(),
             accountType,
             creator_address,
-            account_access: accountAccess
+            account_access: accountAccess,
           });
 
           return this.responseHandler(res);
@@ -436,6 +437,7 @@ export default class QueryBuilder {
           publicSignals: string,
           relayerBalance_id: number,
         ) => {
+          const in30Min = AddMinutesToDate(new Date(), 30);
           const res = await this.client.from(
             "PaymentIntents",
           ).insert({
@@ -452,7 +454,7 @@ export default class QueryBuilder {
             estimatedGas,
             statusText,
             lastPaymentDate: null,
-            nextPaymentDate: new Date().toUTCString(),
+            nextPaymentDate: in30Min.toUTCString(),
             pricing,
             currency,
             network,
