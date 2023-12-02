@@ -5,7 +5,7 @@ import { selectRelayerBalanceByUserId } from "../../../lib/backend/db/tables/Rel
 import { checkRelayerAuth } from "../../../lib/relayer/utils.ts";
 
 export const handler = {
-  async GET(_req: Request, ctx: HandlerContext) {
+   async GET(_req: Request, ctx: HandlerContext) {
     const relayer_auth = _req.headers.get("X-Relayer");
     if (relayer_auth === null) {
       return v1Error(
@@ -15,12 +15,13 @@ export const handler = {
     }
 
     if (checkRelayerAuth(relayer_auth)) {
-      const json = await _req.json();
-      const payee_id = json.payee_id;
+      const url = new URL(_req.url);
+      const payee_id = url.searchParams.get("payee_id")
+      
       if (!payee_id) {
         return v1Error("Invalid Userid", 401);
       }
-      const res = selectRelayerBalanceByUserId(ctx, { payee_id });
+      const res = await selectRelayerBalanceByUserId(ctx, { payee_id });
       return new Response(JSON.stringify(res), { status: 200 });
     } else {
       return v1Error(
