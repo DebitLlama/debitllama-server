@@ -152,7 +152,7 @@ export default function CreatedPaymentIntents(props: PageProps) {
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Next Payment Date:</UnderlinedTd>
                                 <UnderlinedTd extraStyles="">
-                                    {pi.debitTimes - pi.used_for === 0 ? <p>Payments complete</p> :
+                                    {pi.debitTimes - pi.used_for === 0 ? <p>Payments completed</p> :
                                         <p>{pi.nextPaymentDate === null ? "" : new Date(pi.nextPaymentDate).toLocaleString()}</p>
                                     }
                                 </UnderlinedTd>
