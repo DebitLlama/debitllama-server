@@ -96,6 +96,7 @@ export const handler = {
           : EventType.Payment,
         paymentIntent,
       });
+      return new Response(null, { status: 200 });
     } else {
       return v1Error(
         "Invalid Relayer Authentication header",
