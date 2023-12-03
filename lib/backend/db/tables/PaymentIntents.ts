@@ -1,3 +1,5 @@
+import { PaymentIntentStatus, Pricing } from "../../../enums.ts";
+import { getTimeToProcessCreatedPaymentIntents } from "../../../relayer/utils.ts";
 import { PaginationArgs, PaginationArgsWithSearch } from "../utils.ts";
 import { query } from "../utils.ts";
 
@@ -24,7 +26,6 @@ export async function selectPaymentIntentsByAccountIdPaginated(
 export type SelectPaymentIntentsByAccountIdPaginated = PaginationArgs & {
   accountId: number;
 };
-
 
 export type SelectPaymentIntentsByAccountIdPaginatedWithSearch =
   & PaginationArgsWithSearch
@@ -53,8 +54,6 @@ export async function selectPaymentIntentsByAccountIdPaginatedWithSearch(
   );
 }
 
-
-
 export async function selectPaymentIntentsByPayeeUserIdPaginated(
   ctx: any,
   args: PaginationArgs,
@@ -74,7 +73,6 @@ export async function selectPaymentIntentsByPayeeUserIdPaginated(
     },
   );
 }
-
 
 export async function selectPaymentIntentsByPayeeUserIdPaginatedWithSearch(
   ctx: any,
@@ -96,7 +94,6 @@ export async function selectPaymentIntentsByPayeeUserIdPaginatedWithSearch(
     },
   );
 }
-
 
 export type SelectPaymentIntentsByDebitItemIdPaginated = PaginationArgs & {
   debit_item_id: number;
@@ -149,7 +146,6 @@ export async function selectPaymentIntentsByDebitItemIdPaginatedWithSearch(
   );
 }
 
-
 export async function selectPaymentIntentsAllByUserIdForCreatorPaginated(
   ctx: any,
   args: PaginationArgs,
@@ -175,8 +171,6 @@ export async function selectPaymentIntentsAllByUserIdForCreatorPaginated(
   );
 }
 
-
-
 export async function selectPaymentIntentsAllByUserIdForCreatorPaginatedWithSearch(
   ctx: any,
   args: PaginationArgsWithSearch,
@@ -201,4 +195,126 @@ export async function selectPaymentIntentsAllByUserIdForCreatorPaginatedWithSear
       name: "selectPaymentIntentsAllByUserIdForCreatorPaginatedWithSearch",
     },
   );
+}
+
+export async function selectFixedPricingWhereStatusIsCreated(ctx: any) {
+  return await query<{}>({
+    ctx,
+    args: {},
+    impl: async (p) => {
+      return await p.client.from("PaymentIntents")
+        .select("*,account_id(*),relayerBalance_id(*)")
+        .eq("statusText", PaymentIntentStatus.CREATED)
+        .eq("pricing", Pricing.Fixed)
+        .lt("nextPaymentDate", getTimeToProcessCreatedPaymentIntents());
+    },
+    name: "selectFixedPricingWhereStatusIsCreated",
+  });
+}
+
+export async function selectFixedPricingWhereStatusIsRecurring(ctx: any) {
+  return await query<{}>({
+    ctx,
+    args: {},
+    impl: async (p) => {
+      return await p.client.from("PaymentIntents")
+        .select("*,account_id(*),debit_item_id(*)")
+        .eq("pricing", Pricing.Fixed)
+        .lt("nextPaymentDate", new Date().toUTCString())
+        .eq("statusText", PaymentIntentStatus.RECURRING);
+    },
+    name: "selectFixedPricingWhereStatusIsRecurring",
+  });
+}
+
+export async function selectPaymentIntentRowByPaymentIntent(
+  ctx: any,
+  args: { paymentIntent: string },
+) {
+  return await query<{ paymentIntent: string }>({
+    ctx,
+    args,
+    impl: async (p) => {
+      return await p.client.from("PaymentIntents")
+        .select("*,account_id(*),debit_item_id(*)")
+        .eq("paymentIntent", p.args.paymentIntent);
+    },
+    name: "selectPaymentIntentRowByPaymentIntent",
+  });
+}
+
+export async function updateToAccountBalanceTooLow(
+  ctx: any,
+  args: { paymentIntentId: string },
+) {
+  return await query<{ paymentIntentId: string }>({
+    ctx,
+    args,
+    impl: async (p) => {
+      return await p.client.from("PaymentIntents").update({
+        statusText: PaymentIntentStatus.ACCOUNTBALANCETOOLOW,
+      }).eq("id", p.args.paymentIntentId);
+    },
+    name: "updateToAccountBalanceTooLow",
+  });
+}
+
+export async function updateToAccountBalanceTooLowFailedDynamic(
+  ctx: any,
+  args: { paymentIntentId: number; missingAmount: string },
+) {
+  return await query<{ paymentIntentId: number; missingAmount: string }>({
+    ctx,
+    args,
+    impl: async (p) => {
+      return await p.client.from("PaymentIntents").update({
+        statusText: PaymentIntentStatus.ACCOUNTBALANCETOOLOW,
+        failedDynamicPaymentAmount: p.args.missingAmount,
+      }).eq("id", p.args.paymentIntentId);
+    },
+    name: "updateToAccountBalanceTooLowFailedDynamic",
+  });
+}
+
+export async function updatePaymentIntentToRelayerBalanceTooLowById(
+  ctx: any,
+  args: { paymentIntentId: string },
+) {
+  return await query<{ paymentIntentId: string }>({
+    ctx,
+    args,
+    impl: async (p) => {
+      return await p.client.from("PaymentIntents").update({
+        statusText: PaymentIntentStatus.BALANCETOOLOWTORELAY,
+      }).eq("id", p.args.paymentIntentId);
+    },
+    name: "updateToRelayerBalanceTooLowById",
+  });
+}
+
+export interface UpdateStatusAfterSuccessArgs {
+  statusText: string;
+  lastPaymentDate: string;
+  nextPaymentDate: string;
+  used_for: number;
+  paymentIntentRowId: number;
+}
+
+export async function updatePaymentIntentStatusAfterSuccess(
+  ctx: any,
+  args: UpdateStatusAfterSuccessArgs,
+) {
+  return await query<UpdateStatusAfterSuccessArgs>({
+    ctx,
+    args,
+    impl: async (p) => {
+      return await p.client.from("PaymentIntents").update({
+        statusText: p.args.statusText,
+        lastPaymentDate: p.args.lastPaymentDate,
+        nextPaymentDate: p.args.nextPaymentDate,
+        used_for: p.args.used_for,
+      }).eq("id", p.args.paymentIntentRowId);
+    },
+    name: "updatePaymentIntentStatusAfterSuccess",
+  });
 }

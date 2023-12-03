@@ -42,7 +42,7 @@ export async function requestBalanceRefresh(
 ) {
   // If I call refresh balance from the app route then I don't need to have app in the url!
   const getUrl = calledFrom === "app"
-    ? "refreshbalance"
+    ? "post/refreshbalance"
     : "app/post/refreshbalance";
   return await fetch(getUrl, {
     credentials: "same-origin",
