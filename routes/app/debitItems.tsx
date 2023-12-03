@@ -1,17 +1,22 @@
 import Layout from "../../components/Layout.tsx";
 import { State } from "../_middleware.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
-import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import { DEBITITEMSTABLEPAGESIZE } from "../../lib/enums.ts";
 import { getTotalPages } from "../../lib/backend/businessLogic.ts";
 import DebitItemsTable from "../../islands/pagination/DebitItemsTable.tsx";
+import { selectItemsbyUserIdForPayeePaginated } from "../../lib/backend/db/tables/Items.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(_req, ctx) {
         const queryBuilder = new QueryBuilder(ctx);
-        const select = queryBuilder.select();
-        const { data: debitItemsData, count } = await select.Items.byUserIdForPayeePaginated(
-            "created_at", false, 0, 9);
+        // const select = queryBuilder.select();
+        const { data: debitItemsData, count } = await selectItemsbyUserIdForPayeePaginated(ctx, {
+            order: "created_at",
+            ascending: false,
+            rangeFrom: 0,
+            rangeTo: 9
+        });
         const totalPages = getTotalPages(count, DEBITITEMSTABLEPAGESIZE);
         return ctx.render({ ...ctx.state, debitItemsData, totalPages })
     }

@@ -202,3 +202,18 @@ export const getCurrenciesForNetworkName: {
   [NetworkNames.BTT_TESTNET]: bittorrentCurrencies,
   [NetworkNames.BTT_MAINNET]: bttMainnetCurrencies,
 };
+
+
+export const RelayerBalanceColumnNameByNetId:{
+  [key in ChainIds] : string
+} = {
+  [ChainIds.BTT_TESTNET_ID]: 'BTT_Donau_Testnet_Balance',
+  [ChainIds.BTT_MAINNET_ID] : 'BTT_Mainnet_Balance'
+}
+
+export const MISSING_RelayerBalanceColumnNameByNetId:{
+  [key in ChainIds] : string
+} = {
+  [ChainIds.BTT_TESTNET_ID]: 'Missing_BTT_Donau_Testnet_Balance',
+  [ChainIds.BTT_MAINNET_ID] : 'Missing_BTT_Mainnet_Balance'
+}

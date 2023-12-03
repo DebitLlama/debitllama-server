@@ -1,7 +1,7 @@
 // Api endpoints for the pagination API
 import { Handlers } from "$fresh/server.ts";
 import { getPagination, getTotalPages } from "../../../lib/backend/businessLogic.ts";
-import QueryBuilder from "../../../lib/backend/queryBuilder.ts";
+import { selectPaymentIntentsByDebitItemIdPaginated, selectPaymentIntentsByDebitItemIdPaginatedWithSearch } from "../../../lib/backend/db/tables/PaymentIntents.ts";
 import { errorResponseBuilder } from "../../../lib/backend/responseBuilders.ts";
 import { MapPaymentIntentsTableColNamesToDbColNames, PAYMENTINTENTSPAGESIZE, PaymentIntentsTableColNames } from "../../../lib/enums.ts";
 import { State } from "../../_middleware.ts";
@@ -29,32 +29,31 @@ export const handler: Handlers<any, State> = {
             if (!order) {
                 return errorResponseBuilder("Invalid column name!")
             }
-
-            const queryBuilder = new QueryBuilder(ctx);
-            const select = queryBuilder.select();
             const { from, to } = getPagination(currentPage, PAYMENTINTENTSPAGESIZE)
 
             let paymentIntentsRows = [];
             let rowCount = 0;
 
             if (searchTerm === "") {
-                const { data: piRows, count } = await select.PaymentIntents.byDebitItemIdPaginated(
+                const { data: piRows, count } = await selectPaymentIntentsByDebitItemIdPaginated(ctx, {
                     debit_item_id,
                     order,
-                    sortDirection === "ASC",
-                    from,
-                    to
+                    ascending: sortDirection === "ASC",
+                    rangeFrom: from,
+                    rangeTo: to
+                }
                 );
                 paymentIntentsRows = piRows;
                 rowCount = count;
             } else {
-                const { data: piRows, count } = await select.PaymentIntents.byDebitItemIdPaginatedWithSearch(
+                const { data: piRows, count } = await selectPaymentIntentsByDebitItemIdPaginatedWithSearch(ctx, {
                     debit_item_id,
                     order,
-                    sortDirection === "ASC",
-                    from,
-                    to,
+                    ascending: sortDirection === "ASC",
+                    rangeFrom: from,
+                    rangeTo: to,
                     searchTerm
+                }
                 );
                 paymentIntentsRows = piRows;
                 rowCount = count;

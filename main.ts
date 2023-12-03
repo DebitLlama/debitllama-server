@@ -3,6 +3,7 @@
 /// <reference lib="dom.iterable" />
 /// <reference lib="dom.asynciterable" />
 /// <reference lib="deno.ns" />
+/// <reference lib="deno.unstable" />
 
 import "$std/dotenv/load.ts";
 
@@ -18,8 +19,11 @@ supabaseEnvVarTests();
 // Remove the buggy warnings from the console. Hope Fresh fixes it soon
 const origConsoleError = console.error;
 console.error = (msg) => {
-  if (typeof msg === "string" && msg.includes("Improper nesting of table")) return;
+  if (typeof msg === "string" && msg.includes("Improper nesting of table")) {
+    return;
+  }
   origConsoleError(msg);
 };
+
 
 await start(manifest, config);

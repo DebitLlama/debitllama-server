@@ -2,11 +2,11 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { deleteCookie, getCookies } from "$std/http/cookie.ts";
 import { Head } from "$fresh/runtime.ts";
-import { signInWithPassword } from "../lib/backend/auth.ts";
+import { signInWithPassword } from "../lib/backend/db/auth.ts";
 import { State } from "./_middleware.ts";
 import { CookieNames } from "../lib/enums.ts";
 import { setRenderSidebarOpen, setSupaloginCookie } from "../lib/backend/cookies.ts";
-import CookieBanner from "../islands/CookieBanner.tsx";
+import CookieBanner from "../islands/utils/CookieBanner.tsx";
 
 export const handler: Handlers<any, State> = {
 
@@ -31,19 +31,10 @@ export const handler: Handlers<any, State> = {
         if (error) {
             redirect = `/login?error=${`Unable to Log in!`}`
         }
-        // else {
-        // EMAIL VERIFICATION IS DISABLED AND WILL BE DONE BY SUPABASE INSTEAD
-        //     const select = new QueryBuilder(ctx).select();
-
-        //     const { data: verifiedEmail, error: verifiedEmailErr } = await select.VerifiedEmails.byUserId(data.user.id);
-
-        //     if (verifiedEmail.length === 0 || verifiedEmailErr !== null || !verifiedEmail[0].verified) {
-        //         redirect = `/login?error=You need to verify your email address! Check your emails for the verification link!`
-        //     }
-        // }
-
 
         headers.set("location", redirect);
+
+
         return new Response(null, {
             status: 303,
             headers,

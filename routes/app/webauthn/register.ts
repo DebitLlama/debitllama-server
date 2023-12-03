@@ -1,6 +1,5 @@
 // Api endpoints for the pagination API
 import { Handlers } from "$fresh/server.ts";
-import QueryBuilder from "../../../lib/backend/queryBuilder.ts";
 import { State } from "../../_middleware.ts";
 import { registerAuthenticatorGET } from "../../../lib/backend/businessLogic.ts";
 import {
@@ -8,14 +7,13 @@ import {
   encodeUint8ArrayToBase64,
   verifyRegistration,
 } from "../../../lib/webauthn/backend.ts";
+import { insertNewAuthenticator } from "../../../lib/backend/db/tables/Authenticators.ts";
+import { selectCurrentUserChallenge } from "../../../lib/backend/db/tables/UserChallenges.ts";
 
 export const handler: Handlers<any, State> = {
   async POST(_req, ctx) {
     const json = await _req.json();
-    const queryBuilder = new QueryBuilder(ctx);
-    const select = queryBuilder.select();
-    const { data: userChallenge } = await select.UserChallenges
-      .currentChallenge();
+    const { data: userChallenge } = await selectCurrentUserChallenge(ctx,{})
 
     const verified = await verifyRegistration(json, userChallenge[0]);
 
@@ -37,16 +35,15 @@ export const handler: Handlers<any, State> = {
       transports: json.response.transports,
     };
 
-    await queryBuilder.insert().Authenticators.insertNew(newAuthenticator);
+    await insertNewAuthenticator(ctx, { authenticator: newAuthenticator });
 
     return new Response(JSON.stringify({ success: verified[1].verified }), {
       status: 200,
     });
   },
   async GET(_req, ctx) {
-    const queryBuilder = new QueryBuilder(ctx);
     const options = await registerAuthenticatorGET(
-      queryBuilder,
+      ctx,
       ctx.state.userid as string,
     );
 

@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { Head } from "$fresh/runtime.ts";
-import { signUp } from "../lib/backend/auth.ts";
+import { signUp } from "../lib/backend/db/auth.ts";
 import { State } from "./_middleware.ts";
 
 export const handler: Handlers<any, State> = {

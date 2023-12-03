@@ -1,6 +1,6 @@
 import BuyPageLayout from "../../components/BuyPageLayout.tsx"
 import { useEffect, useState } from 'preact/hooks';
-import { AccountTypes } from "../../lib/enums.ts";
+import { AccountAccess, AccountTypes } from "../../lib/enums.ts";
 import { LoggedOutUi } from "../../components/Checkout/LoggedOutUi.tsx";
 import { BuyButtonPageProps } from "../../lib/types/checkoutTypes.ts";
 import { LoggedInUi } from "../../components/Checkout/LoggedInUi.tsx";
@@ -43,6 +43,9 @@ export default function BuyButtonPage(props: BuyButtonPageProps) {
     })
 
     const [accountTypeSwitchValue, setAccountTypeSwitchValue] = useState<AccountTypes>(AccountTypes.VIRTUALACCOUNT);
+    const [accountAccessSelected, setAccountAccessSelected] = useState<AccountAccess>(AccountAccess.metamask);
+
+
 
     useEffect(() => {
         setSelectedAccount(props.accounts.length !== 0 ? 2 : 1);
@@ -109,7 +112,9 @@ export default function BuyButtonPage(props: BuyButtonPageProps) {
                     passwordAgain: newAccountPasswordAgain,
                     setPasswordAgain: setNewAccountPasswordAgain,
                     passwordStrengthNotification: newAccountPasswordStrengthNotification,
-                    passwordMatchError: newAccountPasswordMatchError
+                    passwordMatchError: newAccountPasswordMatchError,
+                    accountAccessSelected: accountAccessSelected,
+                    setAccountAccessSelected: setAccountAccessSelected
                 }
             }
             setNewAccountPasswordStrengthNotification={setNewAccountPasswordStrengthNotification}

@@ -9,9 +9,10 @@ import TriggerDirectDebitButton from "../../islands/TriggerDirectDebitButton.tsx
 import { errorResponseBuilder, successResponseBuilder } from "../../lib/backend/responseBuilders.ts";
 import CancelDynamicPaymentRequestButton from "../../islands/CancelDynamicPaymentRequestButton.tsx";
 import { addDynamicPaymentRequest } from "../../lib/backend/businessLogic.ts";
-import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import RelayedTxHistory from "../../islands/pagination/RelayedTxHistoryWithPagination.tsx";
 import { getTotalPaymentValue } from "../../components/PaymentIntentsTable.tsx";
+import { selectRelayerHistoryByPaymentIntentIdPaginated } from "../../lib/backend/db/tables/RelayerHistory.ts";
 
 
 
@@ -21,7 +22,7 @@ export const handler: Handlers<any, State> = {
         const query = url.searchParams.get("q") || "";
         const queryBuilder = new QueryBuilder(ctx);
         const select = queryBuilder.select();
-
+        //TODO: THESE CAN BE 1 RPC call, 1 instead of 3 calls!
         const { data: paymentIntentData } = await select.PaymentIntents
             .byPaymentIntentAndUserIdForPayee(query);
 
@@ -29,11 +30,12 @@ export const handler: Handlers<any, State> = {
             return ctx.render({ ...ctx.state, notfound: true });
         }
 
-        const { data: paymentIntentHistory, count: paymentIntentHistoryTotalpages } = await select.RelayerHistory
-            .byPaymentIntentIdPaginated(
-                paymentIntentData[0].id,
-                "created_at", false, 0, RELAYERTRANSACTIONHISTORYPAGESIZE - 1
-            );
+        const { data: paymentIntentHistory, count: paymentIntentHistoryTotalpages } = await selectRelayerHistoryByPaymentIntentIdPaginated(ctx, {
+            paymentIntentid: paymentIntentData[0].id,
+            order: "created_at",
+            ascending: false, rangeFrom: 0, rangeTo: RELAYERTRANSACTIONHISTORYPAGESIZE - 1
+        }
+        );
 
 
         if (paymentIntentData[0].pricing === Pricing.Dynamic) {

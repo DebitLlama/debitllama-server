@@ -6,7 +6,7 @@ import { State } from "../_middleware.ts";
 import { ChainIds, getConnectedWalletsContractAddress, getVirtualAccountsContractAddress, networkNameFromId } from "../../lib/shared/web3.ts";
 import AccountTopupOrClose from "../../islands/AccountTopupOrClose.tsx";
 import { AccountCardElement } from "../../components/AccountCardElement.tsx";
-import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import { refreshDBBalance } from "../../lib/backend/businessLogic.ts";
 import { AccountTypes, Pricing } from "../../lib/enums.ts";
 import WalletApproveOrDisconnect from "../../islands/WalletApproveOrDisconnect.tsx";

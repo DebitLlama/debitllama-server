@@ -2,17 +2,16 @@
 import Layout from "../../components/Layout.tsx";
 import { State } from "../_middleware.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
-import QueryBuilder from "../../lib/backend/queryBuilder.ts";
 import PaymentIntentsPaginationForAll from "../../islands/pagination/PaymentIntentsPaginationForAll.tsx";
-
+import { selectPaymentIntentsAllByUserIdForCreatorPaginated } from "../../lib/backend/db/tables/PaymentIntents.ts";
 export const handler: Handlers<any, State> = {
     async GET(_req, ctx) {
-        const queryBuilder = new QueryBuilder(ctx);
-        const select = queryBuilder.select();
-
-        const { data: subscriptions } = await select.PaymentIntents.allByUserIdForCreatorPaginated("created_at", false, 0, 9);
-
-        // Add pagination for both!
+        const { data: subscriptions } = await selectPaymentIntentsAllByUserIdForCreatorPaginated(ctx, {
+            order: "created_at",
+            ascending: false,
+            rangeFrom: 0,
+            rangeTo: 9
+        });
         return ctx.render({ ...ctx.state, subscriptions })
     }
 }

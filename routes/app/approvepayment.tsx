@@ -5,10 +5,12 @@ import { getItemProps } from "../buyitnow.tsx";
 import { formatEther, getAccount, getEncryptedNote, parseEther } from "../../lib/backend/web3.ts";
 import { decryptData } from "../../lib/backend/decryption.ts";
 import ApprovePaymentIsland from "../../islands/approvePaymentIsland.tsx";
-import QueryBuilder from "../../lib/backend/queryBuilder.ts";
-import { AccountTypes } from "../../lib/enums.ts";
+import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
+import { AccountAccess, AccountTypes } from "../../lib/enums.ts";
 import { verifyAuthentication } from "../../lib/webauthn/backend.ts";
 import { Head } from "$fresh/runtime.ts";
+import { selectAllAuthenticatorsByUserId } from "../../lib/backend/db/tables/Authenticators.ts";
+import { selectCurrentUserChallenge } from "../../lib/backend/db/tables/UserChallenges.ts";
 
 const ethEncryptPrivateKey = Deno.env.get("ETHENCRYPTPRIVATEKEY") || "";
 
@@ -24,13 +26,12 @@ export const handler: Handlers<any, State> = {
 
     // Check if the 2fa is activated and it it is, then require the challenge data in the request!
 
-    const { data: authenticators } = await select.Authenticators.allByUserId();
+    const { data: authenticators } = await selectAllAuthenticatorsByUserId(ctx, {});
 
     if (authenticators.length !== 0) {
       // 2Fa is required, the requiest must have sent the signed challenge!
       const verificationOptions = form.get("verificationOptions") as string;
-      const { data: userChallenge } = await select.UserChallenges
-        .currentChallenge();
+      const { data: userChallenge } = await selectCurrentUserChallenge(ctx,{})
 
       const [success, verification] = await verifyAuthentication(
         JSON.parse(verificationOptions),
@@ -98,19 +99,23 @@ export const handler: Handlers<any, State> = {
 
     const encryptedNote = await getEncryptedNote(accountcommitment, accountNetwork, accountdata[0].accountType);
 
-    //Decrypt the encrypted note
-    const symmetricEncryptedNote = await decryptData(ethEncryptPrivateKey, encryptedNote);
+    //Decrypt the encrypted note only if the account_access is password
+    const cipherNote = accountdata[0].account_access === AccountAccess.password ? await decryptData(ethEncryptPrivateKey, encryptedNote) : encryptedNote;
+
+
     const resp = await ctx.render(
       {
         ...ctx.state,
+        chainId: itemNetwork,
         notfound: false,
         itemData: itemData,
-        symmetricEncryptedNote,
+        cipherNote,
         accountcommitment,
         accountName: accountdata[0].name,
         accountBalance: formatEther(onChainAccount.account.balance),
         accountCurrency: accountdata[0].currency,
         accountType: accountdata[0].accountType,
+        account_access: accountdata[0].account_access,
         closed: accountdata[0].closed,
       });
 
@@ -141,13 +146,15 @@ export default function Approvepayments(props: PageProps) {
           item={getItemProps(item)}
         >
           <ApprovePaymentIsland
-            symmetricEncryptedNote={props.data.symmetricEncryptedNote}
+            chainId={props.data.chainId}
+            cipherNote={props.data.cipherNote}
             itemData={getItemProps(item)}
             accountcommitment={props.data.accountcommitment}
             accountName={props.data.accountName}
             accountBalance={props.data.accountBalance}
             accountCurrency={props.data.accountCurrency}
             accountType={props.data.accountType}
+            account_access={props.data.account_access}
             closed={props.data.closed}
           ></ApprovePaymentIsland>
         </BuyPageLayout> : <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">

@@ -7,7 +7,7 @@ import {
   AccessTokensQuery,
   getAuthTokenFromHeader,
   tokenExpired,
-} from "../../../lib/backend/auth.ts";
+} from "../../../lib/backend/db/auth.ts";
 
 export async function handler(
   _req: Request,
@@ -28,44 +28,40 @@ export async function handler(
 
   let resp;
   // If the request is not GET, then I Authenticate the endpoint!
-  if (_req.method !== "GET") {
-    const authorization = _req.headers.get("Authorization");
-    if (authorization === null) {
+  const authorization = _req.headers.get("Authorization");
+  if (authorization === null) {
+    resp = v1Error(
+      V1ErrorResponseBuilder({
+        message: "Missing Authorization Header",
+        status: 401,
+        timestamp: new Date().toUTCString(),
+      }),
+      401,
+    );
+  } else {
+    try {
+      const accesstoken = getAuthTokenFromHeader(authorization);
+
+      const tokenres = await AccessTokensQuery(
+        ctx.state.supabaseClient,
+        accesstoken,
+      );
+      // Throw an error if the token expired
+      tokenExpired(tokenres.data[0]);
+      ctx.state.userid = tokenres.data[0].creator_id;
+      // Check if the token is still valid and if yes then stash the creator_id in state as user_id!
+      resp = await ctx.next();
+    } catch (err: any) {
+      // If the access token can't be parsed, I return errorz
       resp = v1Error(
         V1ErrorResponseBuilder({
-          message: "Missing Authorization Header",
+          message: err.message,
           status: 401,
           timestamp: new Date().toUTCString(),
         }),
         401,
       );
-    } else {
-      try {
-        const accesstoken = getAuthTokenFromHeader(authorization);
-
-        const tokenres = await AccessTokensQuery(
-          ctx.state.supabaseClient,
-          accesstoken,
-        );
-        // Throw an error if the token expired
-        tokenExpired(tokenres.data[0]);
-        ctx.state.userid = tokenres.data[0].creator_id;
-        // Check if the token is still valid and if yes then stash the creator_id in state as user_id!
-        resp = await ctx.next();
-      } catch (err: any) {
-        // If the access token can't be parsed, I return errorz
-        resp = v1Error(
-          V1ErrorResponseBuilder({
-            message: err.message,
-            status: 401,
-            timestamp: new Date().toUTCString(),
-          }),
-          401,
-        );
-      }
     }
-  } else {
-    resp = await ctx.next();
   }
 
   //TODO: I need to write a rate limiter that stores

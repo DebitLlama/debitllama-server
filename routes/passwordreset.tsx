@@ -1,7 +1,6 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
-import { rand } from "../lib/backend/auth.ts";
-import QueryBuilder from "../lib/backend/queryBuilder.ts";
-import { doSendPasswordResetEmailMessage } from "../lib/email/doSend.ts";
+import { rand } from "../lib/backend/db/auth.ts";
+import QueryBuilder from "../lib/backend/db/queryBuilder.ts";
 import { State } from "./_middleware.ts";
 
 // I need a page also with args for the password reset link and then passwords that can be entered twice and such :) 
@@ -52,9 +51,10 @@ export const handler: Handlers<any, State> = {
                 const q = rand() + rand();
                 const nonce = rand() + rand();
                 await queryBuilder.insert().PasswordResetUrls.createNew(q, id, nonce).then(async () => {
+                    //TODO: DO THIS WITH A TRIGGER OR JUST RELY ON SUPABASE!
                     //Send email!
-                    const res = await doSendPasswordResetEmailMessage(email, q);
-                    console.log("email sent:", res);
+                    // const res = await doSendPasswordResetEmailMessage(email, q);
+                    // console.log("email sent:", res);
                 });
             }
 

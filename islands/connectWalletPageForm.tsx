@@ -1,13 +1,13 @@
 import { useState } from 'preact/hooks';
 import Overlay from "../components/Overlay.tsx";
-import { ChainIds, NetworkNames, SelectableCurrency, availableNetworks, bittorrentCurrencies, chainIdFromNetworkName, getConnectedWalletsContractAddress, getCurrenciesForNetworkName } from "../lib/shared/web3.ts";
+import { ChainIds, NetworkNames, SelectableCurrency, availableNetworks, chainIdFromNetworkName, getConnectedWalletsContractAddress, getCurrenciesForNetworkName } from "../lib/shared/web3.ts";
 import CurrencySelectDropdown from "./CurrencySelectDropdown.tsx";
 import AccountPasswordInput from "./accountPasswordInput.tsx";
-import { connectWallet, connectedWalletAlready, getContract, handleNetworkSelect, requestAccounts } from '../lib/frontend/web3.ts';
-import { setUpAccount } from '../lib/frontend/directdebitlib.ts';
+import { connectWallet, connectedWalletAlready, getContract, handleNetworkSelect, requestAccounts, switch_setupAccount } from '../lib/frontend/web3.ts';
 import { redirectToAccountPage, saveAccount } from '../lib/frontend/fetch.ts';
-import { AccountTypes } from "../lib/enums.ts";
-import TestnetTokens from "./TestnetTokens.tsx";
+import { AccountAccess, AccountTypes } from "../lib/enums.ts";
+import TestnetTokens from "./utils/TestnetTokens.tsx";
+import { getGoodToKnowMessage } from "../components/components.tsx";
 
 export const strength = [
     "Worst ☹",
@@ -43,6 +43,9 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
     const [selectedCurrency, setSelectedCurrency] = useState<SelectableCurrency>(selectableCurrencyArray[0]);
 
     const [walletTokenUsedError, setShowwalletTokenUsedError] = useState(false);
+
+    const [accountAccessSelected, setAccountAccessSelected] = useState<AccountAccess>(AccountAccess.metamask);
+
     function setPasswordAndCheck(to: string) {
         if (to === "") {
             setPasswordStrengthNotification("");
@@ -73,6 +76,10 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
     }
 
     function isButtonDisabled(): boolean {
+        if (accountAccessSelected === AccountAccess.metamask || accountAccessSelected === AccountAccess.passkey) {
+            return false;
+        }
+
         if (passwordScore < 3) {
             return true;
         }
@@ -111,7 +118,17 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
         const walletAddr = await requestAccounts();
 
         // It's a virtual account variable but will be used with connected wallet!
-        const virtualaccount = await setUpAccount(password, props.ethEncryptPublicKey);
+        const [virtualaccount, error, errorMessage] = await switch_setupAccount(
+            props.ethEncryptPublicKey,
+            password,
+            walletAddr,
+            accountAccessSelected);
+
+        if (error) {
+            handleError(errorMessage);
+            return;
+        }
+
 
         const contractAddress = getConnectedWalletsContractAddress[chainId as ChainIds];
 
@@ -144,7 +161,8 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
                         networkId: chainId,
                         commitment: virtualaccount.commitment,
                         currency: JSON.stringify(selectedCurrency),
-                        accountType: AccountTypes.CONNECTEDWALLET
+                        accountType: AccountTypes.CONNECTEDWALLET,
+                        accountAccess: accountAccessSelected,
                     })
                     if (res.status === 200) {
                         redirectToAccountPage(virtualaccount.commitment);
@@ -191,9 +209,11 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
             setPasswordAgain={sentAndcheckPasswordMatch}
             passwordMatchError={passwordMatchError}
             passwordStrengthNotification={passwordStrengthNotification}
+            accountAccessSelected={accountAccessSelected}
+            setAccountAccessSelected={setAccountAccessSelected}
         ></AccountPasswordInput>
         <div class="mb-4">
-            <p class="text-sm ...">The password is used for encrypting your account and it's needed for spending. Do not reuse your login password. The accounts are non-custodial and if you loose your password we can't recover it for you. You can always disconnect your wallet if you don't want to continue using it!</p>
+            <p class="text-sm ...">{getGoodToKnowMessage(accountAccessSelected)}</p>
         </div>
         {walletTokenUsedError ? <p class="text-sm text-red-500">Your wallet is already connected to that token on the current network!</p> : ""}
         <button
@@ -203,3 +223,4 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
             type="submit">{connectWalletButtonText}</button>
     </form>
 }
+

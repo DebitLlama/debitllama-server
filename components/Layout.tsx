@@ -2,7 +2,7 @@
 import { Head } from "$fresh/runtime.ts";
 import type { ComponentChildren } from "preact";
 import Nav from "./Nav.tsx";
-import SideBar from "../islands/Sidebar.tsx";
+import SideBar from "../islands/routes/Sidebar.tsx";
 
 interface LayoutProps {
   isLoggedIn: boolean;
@@ -13,7 +13,7 @@ interface LayoutProps {
 
 export default function Layout(props: LayoutProps) {
   const pathname = new URL(props.url).pathname;
-  const injectDeps = pathname === "/app/newConnectedWallet" || pathname === "/app/addNewAccount"
+  const injectDeps = pathname === "/app/newConnectedWallet" || pathname === "/app/addNewAccount" || pathname === "/app/createdPaymentIntents" || pathname === "/app/payeePaymentIntents"
 
   return (
     <>

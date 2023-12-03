@@ -2,7 +2,7 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import Layout from "../../components/Layout.tsx";
 import { State } from "../_middleware.ts";
-import QueryBuilder from "../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import { deleteCookie, getCookies } from "$std/http/cookie.ts";
 import { CookieNames } from "../../lib/enums.ts";
 

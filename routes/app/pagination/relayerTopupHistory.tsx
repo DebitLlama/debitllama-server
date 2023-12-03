@@ -1,7 +1,7 @@
 // Api endpoints for the pagination API
 import { Handlers } from "$fresh/server.ts";
 import { getPagination, getTotalPages } from "../../../lib/backend/businessLogic.ts";
-import QueryBuilder from "../../../lib/backend/queryBuilder.ts";
+import { selectRelayerTopUpHistoryByUserIdPaginated, selectRelayerTopUpHistoryByUserIdPaginatedWithTxSearch } from "../../../lib/backend/db/tables/RelayerTopUpHistory.ts";
 import { errorResponseBuilder } from "../../../lib/backend/responseBuilders.ts";
 import { RelayerTopupHistoryColNames, MapRelayerTopupHistoryColnamesToDbColNames, RELAYERTOPUPHISTORYPAGESIZE } from "../../../lib/enums.ts";
 import { State } from "../../_middleware.ts";
@@ -29,28 +29,28 @@ export const handler: Handlers<any, State> = {
         if (!order) {
             return errorResponseBuilder("Invalid column name!")
         }
-        const queryBuilder = new QueryBuilder(ctx);
-        const select = queryBuilder.select();
         const { from, to } = getPagination(currentPage, RELAYERTOPUPHISTORYPAGESIZE)
 
         let data = [];
         let rowCount = 0;
         if (searchTerm === "") {
-            const { data: rows, count } = await select.RelayerTopUpHistory.byUserIdPaginated(
+            const { data: rows, count } = await selectRelayerTopUpHistoryByUserIdPaginated(ctx, {
                 order,
-                sortDirection === "ASC",
-                from,
-                to
+                ascending: sortDirection === "ASC",
+                rangeFrom: from,
+                rangeTo: to
+            }
             )
             data = rows;
             rowCount = count;
         } else {
-            const { data: rows, count } = await select.RelayerTopUpHistory.byUserIdPaginatedWithTxSearch(
+            const { data: rows, count } = await selectRelayerTopUpHistoryByUserIdPaginatedWithTxSearch(ctx, {
                 order,
-                sortDirection === "ASC",
-                from,
-                to,
+                ascending: sortDirection === "ASC",
+                rangeFrom: from,
+                rangeTo: to,
                 searchTerm
+            }
             );
             data = rows;
             rowCount = count;

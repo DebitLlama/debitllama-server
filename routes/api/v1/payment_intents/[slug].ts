@@ -5,12 +5,17 @@ import {
   v1Error,
   v1Success,
 } from "../../../../lib/api_v1/responseBuilders.ts";
-import { DynamicPaymentRequestResponseMessage } from "../../../../lib/api_v1/types.ts";
+import {
+  checkRole,
+  DynamicPaymentRequestResponseMessage,
+  Role,
+} from "../../../../lib/api_v1/types.ts";
 import {
   addDynamicPaymentRequest,
   cancelDynamicPaymentRequestLogic,
 } from "../../../../lib/backend/businessLogic.ts";
-import QueryBuilder from "../../../../lib/backend/queryBuilder.ts";
+import QueryBuilder from "../../../../lib/backend/db/queryBuilder.ts";
+import { selectPaymentIntentByPaymentIntentAPIV1 } from "../../../../lib/backend/db/v1.ts";
 import { State } from "../../../_middleware.ts";
 
 export const handler = {
@@ -20,11 +25,20 @@ export const handler = {
       if (slug.length === 0) {
         throw new Error("Missing paymentIntent parameter");
       }
+
+      const url = new URL(_req.url);
+      const role = url.searchParams.get("role") || "";
+
+      if (!checkRole[role as Role]) {
+        throw new Error("Missing role");
+      }
+
       const queryBuilder = new QueryBuilder(ctx);
       const select = queryBuilder.select();
-      const paymentIntent = await select.PaymentIntents.byPaymentIntentApiV1(
-        slug,
-      );
+      const paymentIntent = await selectPaymentIntentByPaymentIntentAPIV1(ctx, {
+        paymentIntent: slug,
+        role: role as Role,
+      });
 
       if (paymentIntent.data.length === 0) {
         throw new Error("Payment Intent not found");

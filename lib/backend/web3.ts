@@ -1,5 +1,5 @@
 import { ethers, ZeroAddress } from "$ethers";
-import VirtualAccountsArtifact from "../../static/VirtualAccounts.json" assert {
+import DirectDebitArtifact from "../../static/DirectDebit.json" assert {
   type: "json",
 };
 import RelayerGasTracker from "../../static/RelayerGasTracker.json" assert {
@@ -40,7 +40,7 @@ export function getContract(
 
   return new ethers.Contract(
     address,
-    VirtualAccountsArtifact.abi,
+    DirectDebitArtifact.abi,
     provider,
   );
 }
@@ -73,7 +73,7 @@ export async function getEncryptedNote(
   return encryptedNote;
 }
 
-interface DirectDebitArgs {
+export interface DirectDebitArgs {
   proof: any;
   publicSignals: any;
   payeeAddress: string;

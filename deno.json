@@ -1,7 +1,7 @@
 {
   "lock": false,
   "tasks": {
-    "start": "ENV=development deno run -A --watch=static/,routes/ dev.ts",
+    "start": "ENV=development deno run -A --unstable --watch=static/,routes/ dev.ts",
     "update": "deno run -A -r https://fresh.deno.dev/update .",
     "test_enc": "deno test tests/encryption.ts",
     "test_queryFilter": "deno run -A tests/queryFilter.ts --allow-net",
@@ -13,14 +13,15 @@
     "test_paymentIntents": "deno test -A tests/apiv1/payment_intents.ts",
     "test_paymentIntentslug": "deno test -A tests/apiv1/payment_intentslug.ts",
     "test_items": "deno test -A tests/apiv1/items.ts",
+    "test_zapier_webhooks": "deno test -A tests/apiv1/zapier_webhooks.ts",
     "main": "deno run -A main.ts",
     "build": "USER_FEEDBACKS_WEBHOOK=asd SMTP_HOSTNAME=asd SMTP_USERNAME=asd SMTP_PASSWORD=asd TESTACCESSTOKEN=asd SUPABASE_URL=asf SUPABASE_KEY=asd ETHENCRYPTPUBLICKEY=asf ETHENCRYPTPRIVATEKEY=sad deno run -A dev.ts build",
     "preview": "deno run -A main.ts"
   },
   "imports": {
-    "$fresh/": "https://deno.land/x/fresh@1.5.2/",
-    "preact": "https://esm.sh/preact@10.18.1",
-    "preact/": "https://esm.sh/preact@10.18.1/",
+    "$fresh/": "https://deno.land/x/fresh@1.6.0/",
+    "preact": "https://esm.sh/preact@10.19.2",
+    "preact/": "https://esm.sh/preact@10.19.2/",
     "preact-render-to-string": "https://esm.sh/*preact-render-to-string@6.2.2",
     "@preact/signals": "https://esm.sh/*@preact/signals@1.2.1",
     "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.5.0",

@@ -1,4 +1,6 @@
+import { startAuthentication } from "@simplewebauthn/browser";
 import { ethers, ZeroAddress } from "../../ethers.min.js";
+import { AccountAccess } from "../enums.ts";
 import {
   ChainIds,
   explorerUrl,
@@ -7,7 +9,17 @@ import {
   RPCURLS,
   walletCurrency,
 } from "../shared/web3.ts";
-import { SolidityProof } from "./directdebitlib.ts";
+import {
+  decryptData,
+  getPublicKeyFromPrivateKey,
+  setUpAccount,
+  setUpAccountWithoutPassword,
+  SolidityProof,
+  unpackEncryptedMessage,
+} from "./directdebitlib.ts";
+import { aesDecryptData } from "./encryption.ts";
+import { getAuthenticationOptionsForLargeBlobRead } from "./fetch.ts";
+import { Buffer } from "https://deno.land/x/node_buffer@1.1.0/mod.ts";
 
 export function isEthereumUndefined() {
   //@ts-ignore This runs in the browser only. Checking if the browser has window.ethereum
@@ -174,9 +186,13 @@ export async function getContract(
   return new ethers.Contract(at, artifact.abi, signer);
 }
 
-export async function getRpcContract(provider: any, at: string, abiPath: string): Promise<any> {
-    const artifact = await fetchAbi(abiPath);
-    return new ethers.Contract(at, artifact.abi, provider);
+export async function getRpcContract(
+  provider: any,
+  at: string,
+  abiPath: string,
+): Promise<any> {
+  const artifact = await fetchAbi(abiPath);
+  return new ethers.Contract(at, artifact.abi, provider);
 }
 
 // Smart contract functions start here
@@ -357,24 +373,188 @@ export async function mintToken(contract: any, address: "string") {
 }
 
 export async function watchAsset(erc20Params: any, onError: any) {
-    //@ts-ignore window.ethereum should exist, I run this after onboarding!
-    await window.ethereum
-        .request({
-            method: "wallet_watchAsset",
-            params: {
-                type: "ERC20",
-                options: {
-                    address: erc20Params.address,
-                    symbol: erc20Params.symbol,
-                    decimals: erc20Params.decimals,
-                },
-            },
-        })
-        .then((success: any) => {
-            if (success) {
-            } else {
-                onError();
-            }
-        })
-        .catch(console.error);
+  //@ts-ignore window.ethereum should exist, I run this after onboarding!
+  await window.ethereum
+    .request({
+      method: "wallet_watchAsset",
+      params: {
+        type: "ERC20",
+        options: {
+          address: erc20Params.address,
+          symbol: erc20Params.symbol,
+          decimals: erc20Params.decimals,
+        },
+      },
+    })
+    .then((success: any) => {
+      if (!success) {
+        onError();
+      }
+    })
+    .catch(console.error);
+}
+
+export async function get_EncryptionPublicKey(address: string) {
+  //@ts-ignore window.ethereum should exist, I run this after checking for wallet!
+  return await window.ethereum.request({
+    "method": "eth_getEncryptionPublicKey",
+    "params": [
+      address,
+    ],
+  });
+}
+
+export async function eth_decrypt(encryptedMessage: any, address: string) {
+  //@ts-ignore window.ethereum should exists!
+  return await window.ethereum.request({
+    "method": "eth_decrypt",
+    "params": [
+      encryptedMessage,
+      address,
+    ],
+  });
+}
+
+/**
+ *  This function generates an ethereum private key used only for encryption, the private key is stored inside an authenticator device largeBlob extension!
+ * @returns an ethereum private key
+ */
+export function getRandomEncryptionPrivateKeyBlob() {
+  const privateKey = ethers.Wallet.createRandom().privateKey;
+  const textEncoder = new TextEncoder();
+  return textEncoder.encode(privateKey);
+}
+
+export async function switch_setupAccount(
+  ethEncryptDebitllamaPublicKey: string,
+  password: string,
+  address: string,
+  accountAccessSelected: AccountAccess,
+): Promise<
+  [{ commitment: string; encryptedNote: string }, boolean, string]
+> {
+  switch (accountAccessSelected) {
+    case AccountAccess.metamask: {
+      try {
+        const pubkey = await get_EncryptionPublicKey(address);
+        const acc = await setUpAccountWithoutPassword(pubkey);
+        return [acc, false, ""];
+      } catch (_err) {
+        return [
+          { commitment: "", encryptedNote: "" },
+          true,
+          "Unable to create an account!",
+        ];
+      }
+    }
+    case AccountAccess.password:
+      return [
+        await setUpAccount(password, ethEncryptDebitllamaPublicKey),
+        false,
+        "",
+      ];
+    case AccountAccess.passkey: {
+      const resp = await getAuthenticationOptionsForLargeBlobRead();
+      const authenticationJson = await resp.json();
+      if (resp.status !== 200) {
+        return [
+          { commitment: "", encryptedNote: "" },
+          true,
+          authenticationJson.error,
+        ];
+      }
+
+      if (!authenticationJson.extensions.largeBlob.read) {
+        return [
+          { commitment: "", encryptedNote: "" },
+          true,
+          "Unable to read from passkey",
+        ];
+      }
+
+      const credentials = await startAuthentication(authenticationJson);
+      try {
+        //@ts-ignore largeBlob should exist!
+        if (Object.keys(credentials.clientExtensionResults.largeBlob).length) {
+          const decoder = new TextDecoder();
+          const privkey =
+            //@ts-ignore should exist!
+            decoder.decode(credentials.clientExtensionResults.largeBlob.blob);
+          const pubKey = getPublicKeyFromPrivateKey(privkey.substring(2));
+
+          const acc = await setUpAccountWithoutPassword(pubKey);
+          return [acc, false, ""];
+        } else {
+          throw new Error();
+        }
+      } catch (_err) {
+        return [
+          { commitment: "", encryptedNote: "" },
+          true,
+          "Unable to read passkey data!",
+        ];
+      }
+    }
+    default:
+      throw new Error("Invalid account access selected!");
+  }
+}
+
+export async function switch_recoverAccount(
+  account_access: AccountAccess,
+  cipherNote: string,
+  password: string,
+  chainId: ChainIds,
+  handleError: any,
+) {
+  switch (account_access) {
+    case AccountAccess.metamask: {
+      const provider = await handleNetworkSelect(chainId, handleError);
+
+      if (!provider) {
+        return "";
+      }
+      const address = await requestAccounts();
+      const unpacked = unpackEncryptedMessage(cipherNote);
+      const buff = Buffer.from(JSON.stringify(unpacked), "utf-8");
+      return await eth_decrypt("0x" + buff.toString("hex"), address).catch(
+        (_err) => {
+          return "";
+        },
+      );
+    }
+    case AccountAccess.password: {
+      return await aesDecryptData(cipherNote, password);
+    }
+    case AccountAccess.passkey: {
+      const resp = await getAuthenticationOptionsForLargeBlobRead();
+      const authenticationJson = await resp.json();
+      if (resp.status !== 200) {
+        return "";
+      }
+      if (!authenticationJson.extensions.largeBlob.read) {
+        return "";
+      }
+      const credentials = await startAuthentication(authenticationJson);
+      try {
+        //@ts-ignore largeBlob should exist!
+        if (Object.keys(credentials.clientExtensionResults.largeBlob).length) {
+          const decoder = new TextDecoder();
+          const privkey =
+            //@ts-ignore should exist!
+            decoder.decode(credentials.clientExtensionResults.largeBlob.blob);
+
+          const unpacked = unpackEncryptedMessage(cipherNote);
+
+          return decryptData(privkey, unpacked);
+        } else {
+          throw new Error();
+        }
+      } catch (_err) {
+        return "";
+      }
+    }
+    default:
+      return "";
+  }
 }

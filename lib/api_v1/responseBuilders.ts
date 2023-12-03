@@ -6,6 +6,7 @@ import {
 } from "../enums.ts";
 import {
   bittorrentCurrencies,
+  bttMainnetCurrencies,
   ChainIds,
   ConnectedWalletsContractAddress,
   getCurrenciesForNetworkName,
@@ -35,6 +36,7 @@ import {
   Network_ApiV1,
   PaginationResponse_ApiV1,
   PaymentIntent_ApiV1,
+  PaymentIntent_ZapierFormat,
   PaymentIntents_filterKeys,
   PaymentIntentStatus_ApiV1,
   Pricing_ApiV1,
@@ -106,6 +108,21 @@ export function V1ResponseBuilder() {
         connected_wallets_contract: ConnectedWalletsContractAddress.BTT_TESTNET,
         currency: "BTT",
         available_currencies: bittorrentCurrencies.map((curr) => {
+          return {
+            name: curr.name,
+            native: curr.native,
+            contractAddress: curr.contractAddress,
+          };
+        }),
+      },
+      {
+        name: NetworkNames.BTT_MAINNET,
+        rpc: rpcUrl[ChainIds.BTT_MAINNET_ID],
+        chain_id: ChainIds.BTT_MAINNET_ID,
+        virtual_accounts_contract: VirtualAccountsContractAddress.BTT_MAINNET,
+        connected_wallets_contract: ConnectedWalletsContractAddress.BTT_MAINNET,
+        currency: "BTT",
+        available_currencies: bttMainnetCurrencies.map((curr) => {
           return {
             name: curr.name,
             native: curr.native,
@@ -653,7 +670,7 @@ function mapDynamicPaymentRequestRowToApiV1(
   };
 }
 
-function mapPaymentIntentsRowToPaymentIntentsApiV1(
+export function mapPaymentIntentsRowToPaymentIntentsApiV1(
   row: PaymentIntentRow,
 ): PaymentIntent_ApiV1 {
   const currency = JSON.parse(row.currency);
@@ -694,7 +711,7 @@ function mapPaymentIntentsRowToPaymentIntentsApiV1(
     commitment: row.commitment,
     estimated_gas: row.estimatedGas,
     status_text: row.statusText as PaymentIntentStatus_ApiV1,
-    last_payment_date: row.lastPaymentDate,
+    last_payment_date: row.lastPaymentDate === null ? "" : row.lastPaymentDate,
     next_payment_date: row.nextPaymentDate,
     pricing: row.pricing as Pricing_ApiV1,
     currency,
@@ -805,4 +822,32 @@ export function parseFilter(filter: any) {
   } catch (err) {
     throw new Error("Malformed Filter Parameter. Must be valid json");
   }
+}
+
+export function mapPaymentIntentsRowToZapierFriendlyResponse(
+  row: PaymentIntentRow,
+): PaymentIntent_ZapierFormat {
+  const currency = JSON.parse(row.currency);
+  const networkId = row.network as ChainIds;
+  const networkName = networkNameFromId[networkId];
+
+  return {
+    name: row.debit_item_id.name,
+    created_at: row.created_at,
+    payment_intent: row.paymentIntent,
+    status_text: row.statusText as PaymentIntentStatus_ApiV1,
+    payee_address: row.payee_address,
+    max_debit_amount: row.maxDebitAmount,
+    debit_times: row.debitTimes,
+    debit_interval: row.debitInterval,
+    last_payment_date: row.lastPaymentDate === null ? "" : row.lastPaymentDate,
+    next_payment_date: row.nextPaymentDate === null ? "" : row.nextPaymentDate,
+    pricing: row.pricing as Pricing_ApiV1,
+    currency_name: currency.name,
+    native_currency: currency.native,
+    currency_address: currency.contractAddress,
+    network: networkName,
+    transactions_left: row.debitTimes - row.used_for,
+    failed_dynamic_payment_amount: row.failedDynamicPaymentAmount,
+  };
 }

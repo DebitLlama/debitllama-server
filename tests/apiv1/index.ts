@@ -1,7 +1,7 @@
 //This file is used to run live integration tests on the apiv1 endpoint during development!
 import { assertEquals } from "https://deno.land/std@0.202.0/assert/mod.ts";
 import "$std/dotenv/load.ts";
-import { UnAuthenticatedGET } from "./fetch.ts";
+import { AuthenticatedGET } from "./fetch.ts";
 
 Deno.test("api/v1 test should authenticate", async () => {
   const accesstoken = Deno.env.get("TESTACCESSTOKEN") || "";
@@ -10,7 +10,11 @@ Deno.test("api/v1 test should authenticate", async () => {
     throw Error("Tests require a valid access token");
   }
 
-  const res = await UnAuthenticatedGET("http://localhost:3000/api/v1");
+  const res = await AuthenticatedGET({
+    url: "http://localhost:3000/api/v1",
+    accesstoken,
+  });
+
   // This request succeeded
   assertEquals(res.status, 200);
 

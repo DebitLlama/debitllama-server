@@ -9,10 +9,24 @@ import {
 import { ChainIds } from "../shared/web3.ts";
 import {
   getAuthenticationOptions,
+  getAuthenticationOptionsWithLargeBlobRead,
+  getAuthenticationOptionsWithLargeBlobWrite,
   getRegistrationOptions,
+  getRegistrationOptionsWithLargeBlob,
   PasskeyUserModel,
 } from "../webauthn/backend.ts";
-import QueryBuilder from "./queryBuilder.ts";
+import QueryBuilder from "./db/queryBuilder.ts";
+import { getEmailByUserId } from "./db/rpc.ts";
+import {
+  selectAccountAuthenticatorByCredentialId,
+  selectAllAccountAuthenticatorsByUserId,
+} from "./db/tables/AccountAuthenticators.ts";
+import { selectAllAuthenticatorsByUserId } from "./db/tables/Authenticators.ts";
+import {
+  insertNewChallenge,
+  selectCurrentUserChallenge,
+  updateUserChallengeByUserId,
+} from "./db/tables/UserChallenges.ts";
 import {
   estimateRelayerGas,
   formatEther,
@@ -47,7 +61,7 @@ export async function updateRelayerBalanceAndHistorySwitchNetwork(
         parseEther(addedBalance),
       );
       const id = relayerBalance[0].id;
-
+      //TODO: Refactor to 1 RPC call!
       await update.RelayerBalance.Missing_BTT_Donau_Testnet_BalanceById(
         newBalance,
         newMissingBalance,
@@ -111,13 +125,14 @@ export async function updateRelayerBalanceAndHistorySwitchNetwork(
         chainId,
       );
 
-      const feeData = await getGasPrice(ChainIds.BTT_TESTNET_ID);
+      const feeData = await getGasPrice(ChainIds.BTT_MAINNET_ID);
 
       const resetablePaymentIntents = await findPaymentIntentsThatCanBeReset(
         addedBalance,
         paymentIntentsWithLowBalance,
         feeData,
       );
+
       // Set these resetable payment intents to created or recurring
       await setResettablePaymentIntents(update, resetablePaymentIntents);
 
@@ -426,10 +441,12 @@ export async function refreshDBBalance(
   );
 
   // If account on chain is active but the balance is not the same as the balance I saved
+  // /?TODO; REFACTOR THESE TO 1 RPC CALL
   if (
     onChainAccount.account[0] &&
     parseEther(data[0].balance) !== onChainAccount.account[3]
   ) {
+    //TODO: RPC CALL INSTEAD OF THESE!!
     //Check if there were payment intents with account balance too low and
     // calculate how much balance was added and set them to recurring or created where possible
     await updatePaymentIntentsWhereAccountBalanceWasAdded(
@@ -638,6 +655,7 @@ export async function cancelDynamicPaymentRequestLogic(
 ) {
   const select = queryBuilder.select();
   const deleteQ = queryBuilder.delete();
+  //TODO: REFACTOR to 1 RPC call
   const { data: selectedDynamicPaymentRequest } = await select
     .DynamicPaymentRequestJobs.byJobId(requestId);
   // this will delete the row by id if it was created by the user and the row is not locked!
@@ -665,19 +683,16 @@ export async function cancelDynamicPaymentRequestLogic(
 }
 
 export async function registerAuthenticatorGET(
-  queryBuilder: QueryBuilder,
+  ctx: any,
   userid: string,
 ) {
-  const select = queryBuilder.select();
-  const insert = queryBuilder.insert();
-
-  const { data: userChallenge } = await select
-    .UserChallenges.currentChallenge();
+  //TODO: Refactor to 1 RPC call
+  const { data: userChallenge } = await selectCurrentUserChallenge(ctx, {});
 
   if (userChallenge.length === 0) {
-    const { data: emailData } = await select.RPC.emailByUserId(
+    const { data: emailData } = await getEmailByUserId(ctx, {
       userid,
-    );
+    });
     const email = emailData[0].email;
 
     // No challenge was saved yet, I will do insert
@@ -688,51 +703,160 @@ export async function registerAuthenticatorGET(
     };
     // There are no authenticators saved if there was no challenge yet!
     const options = await getRegistrationOptions(userModel, []);
-    await insert.UserChallenges.newChallenge(options.challenge, email);
+    await insertNewChallenge(ctx, { challenge: options.challenge, email });
 
     return options;
   } else {
     // I need to update the existing challenge
-    const { data: userChallengeModel } = await select.UserChallenges
-      .currentChallenge();
+    const { data: userChallengeModel } = await selectCurrentUserChallenge(
+      ctx,
+      {},
+    );
     const userModel: PasskeyUserModel = {
       id: userid as string,
       username: userChallengeModel[0].email,
       currentChallenge: userChallengeModel[0].currentChallenge,
     };
-    const { data: authenticators } = await select.Authenticators
-      .allByUserId();
+    const { data: authenticators } = await selectAllAuthenticatorsByUserId(
+      ctx,
+      {},
+    );
 
     const options = await getRegistrationOptions(userModel, authenticators);
-    const update = queryBuilder.update();
 
-    await update.UserChallenges.challengeByUserId(options.challenge);
+    await updateUserChallengeByUserId(ctx, { challenge: options.challenge });
 
     return options;
   }
 }
 
 export async function authenticationVerifyGET(
-  queryBuilder: QueryBuilder,
+  ctx: any,
 ) {
-  const select = queryBuilder.select();
-  const update = queryBuilder.update();
-
-  const { data: userChallenge } = await select
-    .UserChallenges.currentChallenge();
+  //TODO: refactor these 2 to 1 RPC call
+  const { data: userChallenge } = await selectCurrentUserChallenge(ctx, {});
 
   if (userChallenge.length === 0) {
     return [false, null];
   }
 
-  const { data: authenticators } = await select.Authenticators
-    .allByUserId();
+  const { data: authenticators } = await selectAllAuthenticatorsByUserId(
+    ctx,
+    {},
+  );
 
   if (authenticators.length === 0) {
     return [false, null];
   }
   const options = await getAuthenticationOptions(authenticators);
+  await updateUserChallengeByUserId(ctx, { challenge: options.challenge });
 
-  await update.UserChallenges.challengeByUserId(options.challenge);
+  return [true, options];
+}
+
+export async function registerAuthenticatorGETForAccount(
+  ctx: any,
+  userid: string,
+) {
+  //TODO: Refactor to 1 RPC call
+  const { data: userChallenge } = await selectCurrentUserChallenge(ctx, {});
+
+  if (userChallenge.length === 0) {
+    const { data: emailData } = await getEmailByUserId(ctx, {
+      userid,
+    });
+    const email = emailData[0].email;
+
+    // No challenge was saved yet, I will do insert
+    const userModel: PasskeyUserModel = {
+      id: userid,
+      username: email,
+      currentChallenge: "",
+    };
+    // There are no authenticators saved if there was no challenge yet!
+    const options = await getRegistrationOptionsWithLargeBlob(userModel, []);
+    await insertNewChallenge(ctx, { challenge: options.challenge, email });
+
+    return options;
+  } else {
+    // I need to update the existing challenge
+    const { data: userChallengeModel } = await selectCurrentUserChallenge(
+      ctx,
+      {},
+    );
+    const userModel: PasskeyUserModel = {
+      id: userid as string,
+      username: userChallengeModel[0].email,
+      currentChallenge: userChallengeModel[0].currentChallenge,
+    };
+
+    const { data: authenticators } =
+      await selectAllAccountAuthenticatorsByUserId(
+        ctx,
+        {},
+      );
+
+    const options = await getRegistrationOptionsWithLargeBlob(
+      userModel,
+      authenticators,
+    );
+    await updateUserChallengeByUserId(ctx, { challenge: options.challenge });
+
+    return options;
+  }
+}
+
+export async function account_AuthenticationLargeBlobWrite(
+  ctx: any,
+  credentialID: string,
+) {
+  //TODO: refactor these 2 to 1 RPC call
+  const { data: userChallenge } = await selectCurrentUserChallenge(ctx, {});
+
+  if (userChallenge.length === 0) {
+    return [false, null];
+  }
+
+  const { data: authenticators } =
+    await selectAccountAuthenticatorByCredentialId(ctx, {
+      credentialID,
+    });
+
+  if (authenticators.length === 0) {
+    return [false, null];
+  }
+
+  const options = await getAuthenticationOptionsWithLargeBlobWrite(
+    authenticators,
+  );
+  await updateUserChallengeByUserId(ctx, { challenge: options.challenge });
+
+  return [true, options];
+}
+
+export async function account_AuthenticationLargeBlobRead(
+  ctx: any,
+) {
+  //TODO: refactor these 2 to 1 RPC call
+  const { data: userChallenge } = await selectCurrentUserChallenge(ctx, {});
+
+  if (userChallenge.length === 0) {
+    return [false, null];
+  }
+
+  const { data: authenticators } = await selectAllAccountAuthenticatorsByUserId(
+    ctx,
+    {},
+  );
+
+  if (authenticators.length === 0) {
+    return [false, null];
+  }
+
+  const options = await getAuthenticationOptionsWithLargeBlobRead(
+    authenticators,
+  );
+  await updateUserChallengeByUserId(ctx, { challenge: options.challenge });
+
   return [true, options];
 }

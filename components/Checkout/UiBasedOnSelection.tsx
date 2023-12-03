@@ -1,5 +1,5 @@
 import { strength } from "../../islands/accountCreatePageForm.tsx";
-import { AccountTypes, Pricing } from "../../lib/enums.ts";
+import { AccountAccess, AccountTypes, Pricing } from "../../lib/enums.ts";
 import { ButtonsBasedOnSelectionProps } from "../../lib/types/checkoutTypes.ts";
 import { CreateNewAccountUI } from "./CreateNewAccountUI.tsx";
 import { NextBttnUi } from "../../islands/checkout/NextBttnUi.tsx";
@@ -41,6 +41,13 @@ export function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
         }
     }
     function isButtonDisabled(): boolean {
+        if (
+            props.newAccountPasswordProps.accountAccessSelected === AccountAccess.metamask
+            ||
+            props.newAccountPasswordProps.accountAccessSelected === AccountAccess.passkey) {
+            return false;
+        }
+
         if (props.newAccountPasswordScore < 3) {
             return true;
         }
@@ -65,6 +72,8 @@ export function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
             setPasswordAndCheck={setPasswordAndCheck}
             accountTypeSwitchValue={props.accountTypeSwitchValue}
             setAccountTypeSwitchValue={props.setAccountTypeSwitchValue}
+            accountAccessSelected={props.newAccountPasswordProps.accountAccessSelected}
+            setAccountAccessSelected={props.newAccountPasswordProps.setAccountAccessSelected}
         ></CreateNewAccountUI>
     }
 
