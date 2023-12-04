@@ -15,7 +15,7 @@ export const handler: Handlers<any, State> = {
 
         const headers = new Headers();
 
-        let redirect = "/login"
+        let redirect = "/SignupSuccess"
         if (error) {
             redirect = `/signup?error=${error.message}`
         }
