@@ -60,6 +60,7 @@ import * as $app_post_updateItemUrl from "./routes/app/post/updateItemUrl.tsx";
 import * as $app_profile from "./routes/app/profile.tsx";
 import * as $app_relayer from "./routes/app/relayer.tsx";
 import * as $app_subscriptions from "./routes/app/subscriptions.tsx";
+import * as $app_updatepassword from "./routes/app/updatepassword.tsx";
 import * as $app_webauthn_2fa from "./routes/app/webauthn/2fa.tsx";
 import * as $app_webauthn_accountRegister from "./routes/app/webauthn/accountRegister.ts";
 import * as $app_webauthn_accounts from "./routes/app/webauthn/accounts.tsx";
@@ -72,8 +73,9 @@ import * as $emailVerified from "./routes/emailVerified.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $login from "./routes/login.tsx";
 import * as $logout from "./routes/logout.tsx";
-import * as $passwordreset from "./routes/passwordreset.tsx";
 import * as $privacyPolicy from "./routes/privacyPolicy.tsx";
+import * as $requestpasswordreset from "./routes/requestpasswordreset.tsx";
+import * as $resendConfirmation from "./routes/resendConfirmation.tsx";
 import * as $signup from "./routes/signup.tsx";
 import * as $termsAndConditions from "./routes/termsAndConditions.tsx";
 import * as $AccountTopupOrClose from "./islands/AccountTopupOrClose.tsx";
@@ -185,6 +187,7 @@ const manifest = {
     "./routes/app/profile.tsx": $app_profile,
     "./routes/app/relayer.tsx": $app_relayer,
     "./routes/app/subscriptions.tsx": $app_subscriptions,
+    "./routes/app/updatepassword.tsx": $app_updatepassword,
     "./routes/app/webauthn/2fa.tsx": $app_webauthn_2fa,
     "./routes/app/webauthn/accountRegister.ts": $app_webauthn_accountRegister,
     "./routes/app/webauthn/accounts.tsx": $app_webauthn_accounts,
@@ -197,8 +200,9 @@ const manifest = {
     "./routes/index.tsx": $index,
     "./routes/login.tsx": $login,
     "./routes/logout.tsx": $logout,
-    "./routes/passwordreset.tsx": $passwordreset,
     "./routes/privacyPolicy.tsx": $privacyPolicy,
+    "./routes/requestpasswordreset.tsx": $requestpasswordreset,
+    "./routes/resendConfirmation.tsx": $resendConfirmation,
     "./routes/signup.tsx": $signup,
     "./routes/termsAndConditions.tsx": $termsAndConditions,
   },
