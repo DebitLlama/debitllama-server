@@ -42,6 +42,7 @@ export async function enqueueWebhookWork(args: NewWebhookWorkerArgs) {
 
 export interface SlackNotificationArgs {
   isSlackWebhook: boolean;
+  slackWebhookUrl: string;
   subject: string;
   message: string;
   email: string;
