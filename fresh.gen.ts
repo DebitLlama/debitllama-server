@@ -2,6 +2,7 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
+import * as $SignupSuccess from "./routes/SignupSuccess.tsx";
 import * as $_500 from "./routes/_500.tsx";
 import * as $_app from "./routes/_app.tsx";
 import * as $_middleware from "./routes/_middleware.ts";
@@ -67,6 +68,7 @@ import * as $app_webauthn_revoke from "./routes/app/webauthn/revoke.ts";
 import * as $app_webauthn_verify from "./routes/app/webauthn/verify.ts";
 import * as $buyitnow from "./routes/buyitnow.tsx";
 import * as $buyitnowlogout from "./routes/buyitnowlogout.tsx";
+import * as $emailVerified from "./routes/emailVerified.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $login from "./routes/login.tsx";
 import * as $logout from "./routes/logout.tsx";
@@ -74,7 +76,6 @@ import * as $passwordreset from "./routes/passwordreset.tsx";
 import * as $privacyPolicy from "./routes/privacyPolicy.tsx";
 import * as $signup from "./routes/signup.tsx";
 import * as $termsAndConditions from "./routes/termsAndConditions.tsx";
-import * as $verifyEmail from "./routes/verifyEmail.tsx";
 import * as $AccountTopupOrClose from "./islands/AccountTopupOrClose.tsx";
 import * as $AddNew2FAPasskeyButton from "./islands/AddNew2FAPasskeyButton.tsx";
 import * as $AddNewAccountPasskeyButton from "./islands/AddNewAccountPasskeyButton.tsx";
@@ -118,6 +119,7 @@ import { type Manifest } from "$fresh/server.ts";
 
 const manifest = {
   routes: {
+    "./routes/SignupSuccess.tsx": $SignupSuccess,
     "./routes/_500.tsx": $_500,
     "./routes/_app.tsx": $_app,
     "./routes/_middleware.ts": $_middleware,
@@ -191,6 +193,7 @@ const manifest = {
     "./routes/app/webauthn/verify.ts": $app_webauthn_verify,
     "./routes/buyitnow.tsx": $buyitnow,
     "./routes/buyitnowlogout.tsx": $buyitnowlogout,
+    "./routes/emailVerified.tsx": $emailVerified,
     "./routes/index.tsx": $index,
     "./routes/login.tsx": $login,
     "./routes/logout.tsx": $logout,
@@ -198,7 +201,6 @@ const manifest = {
     "./routes/privacyPolicy.tsx": $privacyPolicy,
     "./routes/signup.tsx": $signup,
     "./routes/termsAndConditions.tsx": $termsAndConditions,
-    "./routes/verifyEmail.tsx": $verifyEmail,
   },
   islands: {
     "./islands/AccountTopupOrClose.tsx": $AccountTopupOrClose,
