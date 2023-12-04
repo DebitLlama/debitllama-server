@@ -2,7 +2,7 @@ import { triggerSlackWebhook } from "../webhooks/fetch.ts";
 import { SlackNotificationArgs } from "./kv.ts";
 
 export async function processSlackWebhook(args: SlackNotificationArgs) {
-  const slackWebhookUrl = Deno.env.get("SLACKFEEDBACKSURL") || "";
+  const slackWebhookUrl = Deno.env.get(args.slackWebhookUrl) || "";
   if (slackWebhookUrl === undefined) {
     return;
   }
