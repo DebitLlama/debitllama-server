@@ -73,11 +73,11 @@ export default function Login(props: PageProps) {
 
                                     <div>
                                         <label for="email" class="block mb-2 text-sm font-medium">Your email</label>
-                                        <input type="email" name="email" id="email" class="border border-gray-300 sm:text-sm rounded-lg focus:ring-indigo-600 focus:border-indigo-600 block w-full p-2.5 dark:focus:ring-indigo-500 dark:focus:border-indigo-500" placeholder="name@company.com" />
+                                        <input required type="email" name="email" id="email" class="border border-gray-300 sm:text-sm rounded-lg focus:ring-indigo-600 focus:border-indigo-600 block w-full p-2.5 dark:focus:ring-indigo-500 dark:focus:border-indigo-500" placeholder="name@company.com" />
                                     </div>
                                     <div>
                                         <label for="password" class="block mb-2 text-sm font-medium">Password</label>
-                                        <input type="password" name="password" id="password" placeholder="••••••••" class="border border-gray-300 sm:text-sm rounded-lg focus:ring-indigo-600 focus:border-indigo-600 block w-full p-2.5 dark:focus:ring-indigo-500 dark:focus:border-indigo-500" />
+                                        <input required type="password" name="password" id="password" placeholder="••••••••" class="border border-gray-300 sm:text-sm rounded-lg focus:ring-indigo-600 focus:border-indigo-600 block w-full p-2.5 dark:focus:ring-indigo-500 dark:focus:border-indigo-500" />
                                     </div>
 
                                     <button type="submit" class="w-full text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-2xl px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">Log in</button>
@@ -87,8 +87,8 @@ export default function Login(props: PageProps) {
                                     </p>
                                     <hr />
                                     {/* <p class="text-sm font-light text-gray-500 dark:text-gray-400">
-                                    Forgot your password?  <a href="/passwordreset" class="font-medium text-indigo-600 hover:underline dark:text-indigo-500">Password Reset</a>
-                                </p> */}
+                                        Forgot your password?  <a href="/requestpasswordreset" class="font-medium text-indigo-600 hover:underline dark:text-indigo-500">Password Reset</a>
+                                    </p> */}
                                 </form>
                             </div>
                         </div>
