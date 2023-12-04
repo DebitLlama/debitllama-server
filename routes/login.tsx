@@ -27,9 +27,8 @@ export const handler: Handlers<any, State> = {
         let redirect = redirectTo === undefined || redirectTo === "" ? "/app/accounts" : redirectTo;
 
         deleteCookie(headers, CookieNames.loginRedirect);
-
         if (error) {
-            redirect = `/login?error=${`Unable to Log in!`}`
+            redirect = `/login?error=${error.message}`
         }
 
         headers.set("location", redirect);
