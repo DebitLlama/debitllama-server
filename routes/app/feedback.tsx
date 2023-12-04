@@ -21,7 +21,8 @@ export const handler: Handlers<any, State> = {
             isSlackWebhook: true,
             subject,
             message,
-            email
+            email,
+            slackWebhookUrl: "SLACKFEEDBACKSURL"
         })
         if (error) {
             headers.set("location", `/app/feedback?error=${"Unable to save feedback"}`)

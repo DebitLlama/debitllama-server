@@ -3,6 +3,7 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import { Head } from "$fresh/runtime.ts";
 import { signUp } from "../lib/backend/db/auth.ts";
 import { State } from "./_middleware.ts";
+import { enqueueSlackNotification } from "../lib/backend/queue/kv.ts";
 
 export const handler: Handlers<any, State> = {
 
@@ -18,6 +19,16 @@ export const handler: Handlers<any, State> = {
         let redirect = "/SignupSuccess"
         if (error) {
             redirect = `/signup?error=${error.message}`
+        }
+
+        if (!error) {
+            enqueueSlackNotification({
+                isSlackWebhook: true,
+                subject: "New Signup",
+                message: "Hello world. I signed up.",
+                email,
+                slackWebhookUrl: "SLACKUSERSIGNUPS"
+            })
         }
 
         headers.set("location", redirect);
