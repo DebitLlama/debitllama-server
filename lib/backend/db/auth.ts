@@ -6,7 +6,13 @@ export async function signUp(
   email: string,
   password: string,
 ) {
-  return await supabaseClient.auth.signUp({ email, password });
+  return await supabaseClient.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: "https://debitllama.com/emailVerified",
+    },
+  });
 }
 
 export async function signInWithPassword(
@@ -15,6 +21,33 @@ export async function signInWithPassword(
   password: string,
 ) {
   return await supabaseClient.auth.signInWithPassword({ email, password });
+}
+
+export async function resendEmailConfirmation(
+  supabaseClient: any,
+  email: string,
+) {
+  return await supabaseClient.auth.resend({
+    type: "signup",
+    email,
+    options: { emailRedirectTo: "https://debitllama.com/emailVerified" },
+  });
+}
+
+export async function sendPasswordResetEmail(
+  supabaseClient: any,
+  email: string,
+) {
+  return await supabaseClient.auth.resetPasswordForEmail(email, {
+    redirectTo: "https://debitllama.com/app/updatepassword",
+  });
+}
+
+export async function updateUserPassword(
+  supabaseClient: any,
+  newpassword: string,
+) {
+  return await supabaseClient.auth.updateUser({ password: newpassword });
 }
 
 export async function getUser(

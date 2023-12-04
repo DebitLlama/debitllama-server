@@ -1,16 +1,28 @@
+import { Head } from "$fresh/runtime.ts";
+
 export default function SignupSuccess() {
-    return <div class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
-        <div class="flex flex-row flex-wrap gap-2 justify-between p-2 ">
-            <div class="flex flex-col justify-center">
-                <div class="text-2xl  ml-1 font-bold flex flex-row">
-                    <img alt="debitllama logo" src="/logo.svg" width="45" height="45" class={"mr-3"} />{" "}
-                    <h1 class="text-2xl font-bold mt-1 text-center">Sign Up Successful</h1>
+    return <><html lang="en">
+        <Head>
+            <title>DebitLlama</title>
+            <link rel="stylesheet" href="/styles.css" />
+        </Head>
+        <section class="bg-gray-200 h-screen">
+            <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+                <div class="mx-auto mb-5">
+                    <img alt="debitllama logo" src="/logo.svg" width="100" height="100" />
+                </div>
+                <div class="mx-auto">
+                    <h2 class="text-2xl font-bold mb-5 text-center">Signup successful</h2>
+                </div>
+                <div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0 bg-gradient-gray-to-white-variant2">
+                    <h2 class="text-xl font-bold mb-6 text-center">Check your email to confirm your email address!</h2>
+                    <div class="flex flex-row justify-center">
+                        <a class="mx-auto text-xl text-indigo-800" href="/login">Go to Login</a>
+                    </div>
                 </div>
             </div>
-        </div>
-        <h2 class="text-xl font-bold mb-6 text-center">Check your email to confirm your email address!</h2>
-        <div class="flex flex-row justify-center">
-            <a class="mx-auto text-xl text-indigo-800" href="/login">Go to Login</a>
-        </div>
-    </div>
+        </section>
+    </html>
+    </>
 }
+
