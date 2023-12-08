@@ -19,6 +19,11 @@ export enum ChainIds {
   BTT_MAINNET_ID = "0xc7",
 }
 
+export const availableChainIds = [
+  ChainIds.BTT_TESTNET_ID.toString(),
+  ChainIds.BTT_MAINNET_ID.toString(),
+];
+
 export enum VirtualAccountsContractAddress {
   BTT_TESTNET = "0xF75515Df5AC843a8B261E232bB890dc2F75A4066",
   BTT_MAINNET = "0xc4Cf42D5a6F4F061cf5F98d0338FC5913b6fF581",
@@ -203,17 +208,16 @@ export const getCurrenciesForNetworkName: {
   [NetworkNames.BTT_MAINNET]: bttMainnetCurrencies,
 };
 
-
-export const RelayerBalanceColumnNameByNetId:{
-  [key in ChainIds] : string
+export const RelayerBalanceColumnNameByNetId: {
+  [key in ChainIds]: string;
 } = {
-  [ChainIds.BTT_TESTNET_ID]: 'BTT_Donau_Testnet_Balance',
-  [ChainIds.BTT_MAINNET_ID] : 'BTT_Mainnet_Balance'
-}
+  [ChainIds.BTT_TESTNET_ID]: "BTT_Donau_Testnet_Balance",
+  [ChainIds.BTT_MAINNET_ID]: "BTT_Mainnet_Balance",
+};
 
-export const MISSING_RelayerBalanceColumnNameByNetId:{
-  [key in ChainIds] : string
+export const MISSING_RelayerBalanceColumnNameByNetId: {
+  [key in ChainIds]: string;
 } = {
-  [ChainIds.BTT_TESTNET_ID]: 'Missing_BTT_Donau_Testnet_Balance',
-  [ChainIds.BTT_MAINNET_ID] : 'Missing_BTT_Mainnet_Balance'
-}
+  [ChainIds.BTT_TESTNET_ID]: "Missing_BTT_Donau_Testnet_Balance",
+  [ChainIds.BTT_MAINNET_ID]: "Missing_BTT_Mainnet_Balance",
+};

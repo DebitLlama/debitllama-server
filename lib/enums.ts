@@ -307,3 +307,13 @@ export type ZapierWebhooksRow = {
   payment_failure_url: string;
   dynamic_payment_request_rejected_url: string;
 };
+
+export type Relayer_balances_by_networkRow = {
+  id?: number;
+  created_at: string;
+  user_id: string;
+  network: string;
+  balance: string;
+  missing_balance: string;
+  last_topup: string;
+};

@@ -10,6 +10,7 @@ import * as $api_relayer_balance from "./routes/api/relayer/balance.ts";
 import * as $api_relayer_dynamicjobstatus from "./routes/api/relayer/dynamicjobstatus.ts";
 import * as $api_relayer_dynamicpayments from "./routes/api/relayer/dynamicpayments.ts";
 import * as $api_relayer_fixedpayments from "./routes/api/relayer/fixedpayments.ts";
+import * as $api_relayer_gas from "./routes/api/relayer/gas.ts";
 import * as $api_relayer_lock from "./routes/api/relayer/lock.ts";
 import * as $api_relayer_relayingfailed from "./routes/api/relayer/relayingfailed.ts";
 import * as $api_relayer_relayingsuccess from "./routes/api/relayer/relayingsuccess.ts";
@@ -69,6 +70,7 @@ import * as $app_webauthn_revoke from "./routes/app/webauthn/revoke.ts";
 import * as $app_webauthn_verify from "./routes/app/webauthn/verify.ts";
 import * as $buyitnow from "./routes/buyitnow.tsx";
 import * as $buyitnowlogout from "./routes/buyitnowlogout.tsx";
+import * as $dappwidget from "./routes/dappwidget.tsx";
 import * as $emailVerified from "./routes/emailVerified.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $login from "./routes/login.tsx";
@@ -84,6 +86,7 @@ import * as $AddNewAccountPasskeyButton from "./islands/AddNewAccountPasskeyButt
 import * as $CancelDynamicPaymentRequestButton from "./islands/CancelDynamicPaymentRequestButton.tsx";
 import * as $CancelPaymentIntentButton from "./islands/CancelPaymentIntentButton.tsx";
 import * as $CurrencySelectDropdown from "./islands/CurrencySelectDropdown.tsx";
+import * as $DappPageWidget from "./islands/DappPageWidget.tsx";
 import * as $DebitItemTableRow from "./islands/DebitItemTableRow.tsx";
 import * as $RelayerDetailsCard from "./islands/RelayerDetailsCard.tsx";
 import * as $TriggerDirectDebitButton from "./islands/TriggerDirectDebitButton.tsx";
@@ -129,6 +132,7 @@ const manifest = {
     "./routes/api/relayer/dynamicjobstatus.ts": $api_relayer_dynamicjobstatus,
     "./routes/api/relayer/dynamicpayments.ts": $api_relayer_dynamicpayments,
     "./routes/api/relayer/fixedpayments.ts": $api_relayer_fixedpayments,
+    "./routes/api/relayer/gas.ts": $api_relayer_gas,
     "./routes/api/relayer/lock.ts": $api_relayer_lock,
     "./routes/api/relayer/relayingfailed.ts": $api_relayer_relayingfailed,
     "./routes/api/relayer/relayingsuccess.ts": $api_relayer_relayingsuccess,
@@ -196,6 +200,7 @@ const manifest = {
     "./routes/app/webauthn/verify.ts": $app_webauthn_verify,
     "./routes/buyitnow.tsx": $buyitnow,
     "./routes/buyitnowlogout.tsx": $buyitnowlogout,
+    "./routes/dappwidget.tsx": $dappwidget,
     "./routes/emailVerified.tsx": $emailVerified,
     "./routes/index.tsx": $index,
     "./routes/login.tsx": $login,
@@ -214,6 +219,7 @@ const manifest = {
       $CancelDynamicPaymentRequestButton,
     "./islands/CancelPaymentIntentButton.tsx": $CancelPaymentIntentButton,
     "./islands/CurrencySelectDropdown.tsx": $CurrencySelectDropdown,
+    "./islands/DappPageWidget.tsx": $DappPageWidget,
     "./islands/DebitItemTableRow.tsx": $DebitItemTableRow,
     "./islands/RelayerDetailsCard.tsx": $RelayerDetailsCard,
     "./islands/TriggerDirectDebitButton.tsx": $TriggerDirectDebitButton,

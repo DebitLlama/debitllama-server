@@ -21,6 +21,17 @@ export async function selectRelayerBalanceByUserId(
   );
 }
 
+export async function selectAllRelayerBalances(ctx: any, args: {}) {
+  return await query<{}>({
+    ctx,
+    args,
+    impl: async (p) => {
+      return await p.client.from("RelayerBalance").select("*");
+    },
+    name: "selectAllRelayerBalance",
+  });
+}
+
 export async function updateMissingRelayerBalanceByChainId(
   ctx: any,
   chainId: ChainIds,

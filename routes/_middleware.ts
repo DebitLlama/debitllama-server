@@ -4,6 +4,7 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { getCookies } from "$std/http/cookie.ts";
 import { getUser } from "../lib/backend/db/auth.ts";
 import { AuthWhitelist } from "../lib/enums.ts";
+import { enqueueRelayerBalancesInit } from "../lib/backend/queue/kv.ts";
 
 export interface State {
   token: string | null;
@@ -43,6 +44,8 @@ export async function handler(
       ctx.state.userid = user.id;
       ctx.state.renderSidebarOpen = renderSidebarOpen;
     }
+    await enqueueRelayerBalancesInit({ user_id: user.id });
+
     return await ctx.next();
   }
   // Should not cache api
