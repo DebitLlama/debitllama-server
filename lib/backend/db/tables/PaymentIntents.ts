@@ -206,7 +206,7 @@ export async function selectFixedPricingWhereStatusIsCreated(ctx: any) {
         .select("*,account_id(*),relayerBalance_id(*)")
         .eq("statusText", PaymentIntentStatus.CREATED)
         .eq("pricing", Pricing.Fixed)
-        .lt("nextPaymentDate", getTimeToProcessCreatedPaymentIntents());
+        .lt("nextPaymentDate", new Date().toUTCString());
     },
     name: "selectFixedPricingWhereStatusIsCreated",
   });
