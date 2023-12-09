@@ -270,6 +270,10 @@ export async function getGasPrice(chainId: ChainIds) {
   };
 }
 
+export function getAverageGasLimit() {
+  return 400000n;
+}
+
 /**
  * Calculate the gas estimation for a dynamic payment request using the chainid and fee data and an increased gas limit
  * @param chainId
