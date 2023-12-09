@@ -70,7 +70,6 @@ import * as $app_webauthn_revoke from "./routes/app/webauthn/revoke.ts";
 import * as $app_webauthn_verify from "./routes/app/webauthn/verify.ts";
 import * as $buyitnow from "./routes/buyitnow.tsx";
 import * as $buyitnowlogout from "./routes/buyitnowlogout.tsx";
-import * as $dappwidget from "./routes/dappwidget.tsx";
 import * as $emailVerified from "./routes/emailVerified.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $login from "./routes/login.tsx";
@@ -86,7 +85,6 @@ import * as $AddNewAccountPasskeyButton from "./islands/AddNewAccountPasskeyButt
 import * as $CancelDynamicPaymentRequestButton from "./islands/CancelDynamicPaymentRequestButton.tsx";
 import * as $CancelPaymentIntentButton from "./islands/CancelPaymentIntentButton.tsx";
 import * as $CurrencySelectDropdown from "./islands/CurrencySelectDropdown.tsx";
-import * as $DappPageWidget from "./islands/DappPageWidget.tsx";
 import * as $DebitItemTableRow from "./islands/DebitItemTableRow.tsx";
 import * as $RelayerDetailsCard from "./islands/RelayerDetailsCard.tsx";
 import * as $TriggerDirectDebitButton from "./islands/TriggerDirectDebitButton.tsx";
@@ -116,6 +114,7 @@ import * as $utils_AccountDisplayElement from "./islands/utils/AccountDisplayEle
 import * as $utils_AccountsSelectButtons from "./islands/utils/AccountsSelectButtons.tsx";
 import * as $utils_CookieBanner from "./islands/utils/CookieBanner.tsx";
 import * as $utils_ShowAndContent from "./islands/utils/ShowAndContent.tsx";
+import * as $utils_ShowFeePrice from "./islands/utils/ShowFeePrice.tsx";
 import * as $utils_SidebarToggleButton from "./islands/utils/SidebarToggleButton.tsx";
 import * as $utils_TestnetTokens from "./islands/utils/TestnetTokens.tsx";
 import * as $utils_WalletAddressSelector from "./islands/utils/WalletAddressSelector.tsx";
@@ -200,7 +199,6 @@ const manifest = {
     "./routes/app/webauthn/verify.ts": $app_webauthn_verify,
     "./routes/buyitnow.tsx": $buyitnow,
     "./routes/buyitnowlogout.tsx": $buyitnowlogout,
-    "./routes/dappwidget.tsx": $dappwidget,
     "./routes/emailVerified.tsx": $emailVerified,
     "./routes/index.tsx": $index,
     "./routes/login.tsx": $login,
@@ -219,7 +217,6 @@ const manifest = {
       $CancelDynamicPaymentRequestButton,
     "./islands/CancelPaymentIntentButton.tsx": $CancelPaymentIntentButton,
     "./islands/CurrencySelectDropdown.tsx": $CurrencySelectDropdown,
-    "./islands/DappPageWidget.tsx": $DappPageWidget,
     "./islands/DebitItemTableRow.tsx": $DebitItemTableRow,
     "./islands/RelayerDetailsCard.tsx": $RelayerDetailsCard,
     "./islands/TriggerDirectDebitButton.tsx": $TriggerDirectDebitButton,
@@ -255,6 +252,7 @@ const manifest = {
     "./islands/utils/AccountsSelectButtons.tsx": $utils_AccountsSelectButtons,
     "./islands/utils/CookieBanner.tsx": $utils_CookieBanner,
     "./islands/utils/ShowAndContent.tsx": $utils_ShowAndContent,
+    "./islands/utils/ShowFeePrice.tsx": $utils_ShowFeePrice,
     "./islands/utils/SidebarToggleButton.tsx": $utils_SidebarToggleButton,
     "./islands/utils/TestnetTokens.tsx": $utils_TestnetTokens,
     "./islands/utils/WalletAddressSelector.tsx": $utils_WalletAddressSelector,
