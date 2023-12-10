@@ -17,9 +17,3 @@ export function getTimeToLockDynamicPaymentRequest() {
     return new Date(anHourAgo).toUTCString();
   }
 }
-
-export function getTimeToProcessCreatedPaymentIntents() {
-  const halfHOUR = 1000 * 60 * 30;
-  const thirtyMinAgo = Date.now() - halfHOUR;
-  return new Date(thirtyMinAgo).toUTCString();
-}

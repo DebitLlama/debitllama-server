@@ -1,5 +1,4 @@
 import { PaymentIntentStatus, Pricing } from "../../../enums.ts";
-import { getTimeToProcessCreatedPaymentIntents } from "../../../relayer/utils.ts";
 import { PaginationArgs, PaginationArgsWithSearch } from "../utils.ts";
 import { query } from "../utils.ts";
 
