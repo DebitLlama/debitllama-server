@@ -1,5 +1,4 @@
 import { PaymentIntentStatus, Pricing } from "../../../enums.ts";
-import { getTimeToProcessCreatedPaymentIntents } from "../../../relayer/utils.ts";
 import { PaginationArgs, PaginationArgsWithSearch } from "../utils.ts";
 import { query } from "../utils.ts";
 
@@ -206,7 +205,7 @@ export async function selectFixedPricingWhereStatusIsCreated(ctx: any) {
         .select("*,account_id(*),relayerBalance_id(*)")
         .eq("statusText", PaymentIntentStatus.CREATED)
         .eq("pricing", Pricing.Fixed)
-        .lt("nextPaymentDate", getTimeToProcessCreatedPaymentIntents());
+        .lt("nextPaymentDate", new Date().toUTCString());
     },
     name: "selectFixedPricingWhereStatusIsCreated",
   });
