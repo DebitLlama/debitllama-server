@@ -1,5 +1,14 @@
 import { AccountTypes, RelayerBalance } from "../enums.ts";
 
+export const FeeDividerPerNetwork = {
+  BTT_TESTNET: [20, "5%"], //value and the percentage
+  BTT_MAINNET: [20, "5%"],
+};
+
+export function getAverageGasLimit() {
+  return 400000n;
+}
+
 export enum NetworkNames {
   BTT_TESTNET = "BTT Donau Testnet",
   BTT_MAINNET = "BitTorrent Chain",
@@ -78,6 +87,20 @@ export const walletCurrency: { [key in ChainIds]: NetworkTickers } = {
   [ChainIds.BTT_MAINNET_ID]: NetworkTickers.BTT_MAINNET,
 };
 
+export const mapNetworkNameToFeeDivider: { [key in NetworkNames]: string } = {
+  [NetworkNames.BTT_MAINNET]: FeeDividerPerNetwork.BTT_MAINNET[1] as string,
+  [NetworkNames.BTT_TESTNET]: FeeDividerPerNetwork.BTT_TESTNET[1] as string,
+};
+
+export const mapChainIdToFeePercentage: { [key in ChainIds]: string } = {
+  [ChainIds.BTT_MAINNET_ID]: FeeDividerPerNetwork.BTT_MAINNET[1] as string,
+  [ChainIds.BTT_TESTNET_ID]: FeeDividerPerNetwork.BTT_TESTNET[1] as string,
+};
+export const mapChainIdToFeeDivider: { [key in ChainIds]: number } = {
+  [ChainIds.BTT_MAINNET_ID]: FeeDividerPerNetwork.BTT_MAINNET[0] as number,
+  [ChainIds.BTT_TESTNET_ID]: FeeDividerPerNetwork.BTT_TESTNET[0] as number,
+};
+
 export const getVirtualAccountsContractAddress: {
   [keys in ChainIds]: VirtualAccountsContractAddress;
 } = {
@@ -116,7 +139,8 @@ export const chainIdFromNetworkName: { [key in NetworkNames]: ChainIds } = {
   [NetworkNames.BTT_MAINNET]: ChainIds.BTT_MAINNET_ID,
 };
 
-//This is used with the RelayerBalance DB Table!
+//This is u sed with the RelayerBalance DB Table!
+//TODO: Deprecate:
 export function mapNetworkNameToDBColumn(
   selectedNetwork: NetworkNames,
   relayerData: RelayerBalance,
@@ -131,6 +155,7 @@ export function mapNetworkNameToDBColumn(
   }
 }
 
+//TODO: Deprecate:
 export function mapNetworkNameToMissingBalanceColumn(
   selectedNetwork: NetworkNames,
   relayerData: RelayerBalance,
@@ -146,6 +171,7 @@ export function mapNetworkNameToMissingBalanceColumn(
 }
 
 //This is used with the RelayerBalance DB Table!
+//TODO: DEPRECATE
 export function mapNetworkNameToDBColumnNameString(
   selectedNetwork: NetworkNames,
 ) {
@@ -174,31 +200,41 @@ export type SelectableCurrency = {
   name: string;
   native: boolean;
   contractAddress: string;
+  minimumAmount: string;
 };
 
-export const ethereumCurrencies = [
-  { name: "ETH", native: true, contractAddress: "" },
-  { name: "USDC", native: false, contractAddress: "" },
+export const ethereumCurrencies: SelectableCurrency[] = [
+  { name: "ETH", native: true, contractAddress: "", minimumAmount: "0.01" },
+  { name: "USDC", native: false, contractAddress: "", minimumAmount: "1" },
 ];
 
-export const bittorrentCurrencies = [{
+export const bittorrentCurrencies: SelectableCurrency[] = [{
   name: "BTT",
   native: true,
   contractAddress: "",
-}, { name: "USDTM", native: false, contractAddress: DonauTestnetTokens.USDTM }];
+  minimumAmount: "5000",
+}, {
+  name: "USDTM",
+  native: false,
+  contractAddress: DonauTestnetTokens.USDTM,
+  minimumAmount: "1",
+}];
 
-export const bttMainnetCurrencies = [{
+export const bttMainnetCurrencies: SelectableCurrency[] = [{
   name: "BTT",
   native: true,
   contractAddress: "",
+  minimumAmount: "5000",
 }, {
   name: "USDD_t",
   native: false,
   contractAddress: "0x17F235FD5974318E4E2a5e37919a209f7c37A6d1",
+  minimumAmount: "0.1",
 }, {
   name: "USDT_e",
   native: false,
   contractAddress: "0xE887512ab8BC60BcC9224e1c3b5Be68E26048B8B",
+  minimumAmount: "0.1",
 }];
 
 export const getCurrenciesForNetworkName: {
@@ -206,6 +242,22 @@ export const getCurrenciesForNetworkName: {
 } = {
   [NetworkNames.BTT_TESTNET]: bittorrentCurrencies,
   [NetworkNames.BTT_MAINNET]: bttMainnetCurrencies,
+};
+
+//TODO: Add more currency tickers here
+export const mapCurrencyNameToRedstoneSymbol = (ticker: string) => {
+  switch (ticker) {
+    case "BTT":
+      return "BTT";
+    case "USDTM":
+      return "USDT";
+    case "USDD_t":
+      return "USDD";
+    case "USDT_e":
+      return "USDT";
+    default:
+      return "";
+  }
 };
 
 export const RelayerBalanceColumnNameByNetId: {
