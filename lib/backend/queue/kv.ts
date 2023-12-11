@@ -1,5 +1,4 @@
 import { EventType } from "../email/types.ts";
-import { initRelayerBalances } from "./relayerBalanceInit.ts";
 import { processSlackWebhook } from "./slack.ts";
 import { processWebhookwork } from "./webhookwork.ts";
 
@@ -14,7 +13,6 @@ export type KvMessage = {
 export enum KvMessageType {
   webhookEvent = "webhookEvent",
   slackWebhook = "slackWebhook",
-  relayerBalanceInit = "relayerBalanceInit",
 }
 
 kv.listenQueue(async (msg: any) => {
@@ -24,9 +22,6 @@ kv.listenQueue(async (msg: any) => {
       break;
     case KvMessageType.slackWebhook:
       await processSlackWebhook(msg.content);
-      break;
-    case KvMessageType.relayerBalanceInit:
-      await initRelayerBalances(msg.content);
       break;
     default:
       console.error("Unknown message received:", msg);
@@ -53,15 +48,4 @@ export interface SlackNotificationArgs {
 
 export async function enqueueSlackNotification(args: SlackNotificationArgs) {
   await kv.enqueue({ type: KvMessageType.slackWebhook, content: args });
-}
-
-export interface RelayerBalanceInitArgs {
-  user_id: string;
-}
-
-//TODO: RUN THIS FUNCTION WHEN? LOGIN?
-//TODO: Maybe I refactor to fee sandwich only, if the tx value is too low, I offer a manual pull payment via UI with default fees
-//TODO: THen maybe the new relayer balances wil be removed also
-export async function enqueueRelayerBalancesInit(args: RelayerBalanceInitArgs) {
-  await kv.enqueue({ type: KvMessageType.relayerBalanceInit, content: args });
 }

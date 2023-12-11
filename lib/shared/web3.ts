@@ -1,4 +1,4 @@
-import { AccountTypes, RelayerBalance } from "../enums.ts";
+import { AccountTypes } from "../enums.ts";
 
 export const FeeDividerPerNetwork = {
   BTT_TESTNET: [20, "5%"], //value and the percentage
@@ -139,52 +139,6 @@ export const chainIdFromNetworkName: { [key in NetworkNames]: ChainIds } = {
   [NetworkNames.BTT_MAINNET]: ChainIds.BTT_MAINNET_ID,
 };
 
-//This is u sed with the RelayerBalance DB Table!
-//TODO: Deprecate:
-export function mapNetworkNameToDBColumn(
-  selectedNetwork: NetworkNames,
-  relayerData: RelayerBalance,
-) {
-  switch (selectedNetwork) {
-    case NetworkNames.BTT_TESTNET:
-      return relayerData.BTT_Donau_Testnet_Balance;
-    case NetworkNames.BTT_MAINNET:
-      return relayerData.BTT_Mainnet_Balance;
-    default:
-      return "Invalid Network";
-  }
-}
-
-//TODO: Deprecate:
-export function mapNetworkNameToMissingBalanceColumn(
-  selectedNetwork: NetworkNames,
-  relayerData: RelayerBalance,
-) {
-  switch (selectedNetwork) {
-    case NetworkNames.BTT_TESTNET:
-      return relayerData.Missing_BTT_Donau_Testnet_Balance;
-    case NetworkNames.BTT_MAINNET:
-      return relayerData.Missing_BTT_Mainnet_Balance;
-    default:
-      return "";
-  }
-}
-
-//This is used with the RelayerBalance DB Table!
-//TODO: DEPRECATE
-export function mapNetworkNameToDBColumnNameString(
-  selectedNetwork: NetworkNames,
-) {
-  switch (selectedNetwork) {
-    case NetworkNames.BTT_TESTNET:
-      return "BTT_Donau_Testnet_Balance";
-    case NetworkNames.BTT_MAINNET:
-      return "BTT_Mainnet_Balance";
-    default:
-      return "";
-  }
-}
-
 export function getChainExplorerForChainId(chainId: ChainIds, tx: string) {
   switch (chainId) {
     case ChainIds.BTT_TESTNET_ID:
@@ -258,18 +212,4 @@ export const mapCurrencyNameToRedstoneSymbol = (ticker: string) => {
     default:
       return "";
   }
-};
-
-export const RelayerBalanceColumnNameByNetId: {
-  [key in ChainIds]: string;
-} = {
-  [ChainIds.BTT_TESTNET_ID]: "BTT_Donau_Testnet_Balance",
-  [ChainIds.BTT_MAINNET_ID]: "BTT_Mainnet_Balance",
-};
-
-export const MISSING_RelayerBalanceColumnNameByNetId: {
-  [key in ChainIds]: string;
-} = {
-  [ChainIds.BTT_TESTNET_ID]: "Missing_BTT_Donau_Testnet_Balance",
-  [ChainIds.BTT_MAINNET_ID]: "Missing_BTT_Mainnet_Balance",
 };

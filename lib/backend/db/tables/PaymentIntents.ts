@@ -203,7 +203,7 @@ export async function selectFixedPricingWhereStatusIsCreated(ctx: any) {
     args: {},
     impl: async (p) => {
       return await p.client.from("PaymentIntents")
-        .select("*,account_id(*),relayerBalance_id(*)")
+        .select("*,account_id(*)")
         .eq("statusText", PaymentIntentStatus.CREATED)
         .eq("pricing", Pricing.Fixed)
         .lt("nextPaymentDate", getTimeToProcessCreatedPaymentIntents());
@@ -273,22 +273,6 @@ export async function updateToAccountBalanceTooLowFailedDynamic(
       }).eq("id", p.args.paymentIntentId);
     },
     name: "updateToAccountBalanceTooLowFailedDynamic",
-  });
-}
-
-export async function updatePaymentIntentToRelayerBalanceTooLowById(
-  ctx: any,
-  args: { paymentIntentId: string },
-) {
-  return await query<{ paymentIntentId: string }>({
-    ctx,
-    args,
-    impl: async (p) => {
-      return await p.client.from("PaymentIntents").update({
-        statusText: PaymentIntentStatus.BALANCETOOLOWTORELAY,
-      }).eq("id", p.args.paymentIntentId);
-    },
-    name: "updateToRelayerBalanceTooLowById",
   });
 }
 

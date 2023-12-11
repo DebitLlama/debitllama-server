@@ -43,20 +43,6 @@ export const handler: Handlers<any, State> = {
             return new Response(null, { status: 303, headers })
         }
 
-        let relayerBalanceId = null;
-
-        const { data: relayerBalanceData } = await select.RelayerBalance.byUserId();
-        // I'm gonna add the id of the relayerBalance to the debit item so I can join tables later more easily
-        if (relayerBalanceData === null || relayerBalanceData.length === 0) {
-            //TODO: Refactor these to 1 RPC call
-            await insert.RelayerBalance.newRelayerBalance()
-            const { data: relayerBalanceData2, error: relayerBalanceDataError2 } = await select.RelayerBalance.byUserId();
-            relayerBalanceId = relayerBalanceData2[0].id;
-        } else {
-            relayerBalanceId = relayerBalanceData[0].id
-        }
-
-
         const name = form.get("name") as string;
         const network = form.get("network") as string;
         const walletaddress = form.get("walletaddress") as string;
@@ -146,7 +132,6 @@ export const handler: Handlers<any, State> = {
             pricing,
             chainIdFromNetworkName[network as NetworkNames],
             name,
-            relayerBalanceId
         )
 
         headers.set("location", `/app/item?q=${item[0].button_id}`);

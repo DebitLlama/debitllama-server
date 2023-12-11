@@ -11,7 +11,6 @@ export enum EventTypes_ApiV1 {
   customerSubscriptionFinished = "customer.subscription.finished",
   customerSubscriptionBalanceLow = "customer.subscription.balancelow",
   customerSubscriptionBalanceUpdated = "customer.subscription.balanceupdated",
-  merchantRelayerBalanceLow = "merchant.relayer.balancelow",
   dynamicPaymentRequestCreated = "merchant.request.created",
   dynamicPaymentRequestLocked = "merchant.request.locked",
   dynamicPaymentRequestRejected = "merchant.request.rejected",
@@ -31,7 +30,6 @@ export enum PaymentIntentStatus_ApiV1 {
   CANCELLED = "CANCELLED",
   RECURRING = "RECURRING",
   PAID = "PAID",
-  BALANCETOOLOWTORELAY = "BALANCETOOLOWTORELAY",
   ACCOUNTBALANCETOOLOW = "ACCOUNTBALANCETOOLOW",
 }
 
@@ -93,7 +91,6 @@ export const validatePaymentIntentStatus_ApiV1: {
   [PaymentIntentStatus_ApiV1.CANCELLED]: true,
   [PaymentIntentStatus_ApiV1.RECURRING]: true,
   [PaymentIntentStatus_ApiV1.PAID]: true,
-  [PaymentIntentStatus_ApiV1.BALANCETOOLOWTORELAY]: true,
   [PaymentIntentStatus_ApiV1.ACCOUNTBALANCETOOLOW]: true,
 };
 
@@ -199,7 +196,6 @@ export interface DynamicPaymentRequest_ApiV1 {
   amount: string; // This is formatted ether in the DB, maybe I should serve it as WEI always!
   currency: Currency_ApiV1;
   chain_id: string;
-  allocated_gas: string; // This is also formatted ether!
 }
 
 export interface EventData_ApiV1 {
@@ -223,15 +219,12 @@ export enum APIV1Endpoints_ApiV1 {
   payment_intents = APIV1 + "payment_intents/", // payment_intent,
   accounts = APIV1 + "accounts/", // commitment
   items = APIV1 + "items/", //id
-  relayer_balance = APIV1 + "relayer/", // chain id, top up history pagination
-  transaction_history = APIV1 + "transactions", // chainId
 }
 
 export enum APIV1_AllowedMethods_ApiV1 {
   payment_intents = "GET,POST", // get all payment intents, get 1 payment intents when using path, post dynamicPayment request on path
   accounts = "GET", // get 1 account
   items = "GET,PUT,POST", // get item, put new item, post update redirect_url
-  relayer_balance = "GET", // get relayer balance and history paginated
   transaction_history = "GET", // get transaction history paginated
 }
 
@@ -250,10 +243,6 @@ export enum EndpointNames_ApiV1 {
   itemsSlug = "/api/v1/items/[slug]",
   paymentIntents = "/api/v1/payment_intents",
   paymentIntentsSlug = "/api/v1/payment_intents/[slug]",
-  relayer = "/api/v1/relayer",
-  relayerSlug = "/api/v1/relayer/[slug]",
-  transactions = "/api/v1/transactions",
-  transactionsSlug = "/api/v1/transactions[slug]",
 }
 
 export const endpoints_ApiV1: { [key in EndpointNames_ApiV1]: Array<Methods> } =
@@ -265,10 +254,6 @@ export const endpoints_ApiV1: { [key in EndpointNames_ApiV1]: Array<Methods> } =
     [EndpointNames_ApiV1.itemsSlug]: [Methods.GET, Methods.POST],
     [EndpointNames_ApiV1.paymentIntents]: [Methods.GET],
     [EndpointNames_ApiV1.paymentIntentsSlug]: [Methods.GET, Methods.POST],
-    [EndpointNames_ApiV1.relayer]: [Methods.GET],
-    [EndpointNames_ApiV1.relayerSlug]: [Methods.GET],
-    [EndpointNames_ApiV1.transactions]: [Methods.GET],
-    [EndpointNames_ApiV1.transactionsSlug]: [Methods.GET],
   };
 
 export const endpointDefinitions: { [key in EndpointNames_ApiV1]: string } = {
@@ -285,12 +270,6 @@ export const endpointDefinitions: { [key in EndpointNames_ApiV1]: string } = {
     "GET:All payment intents of access token owner paginated",
   [EndpointNames_ApiV1.paymentIntentsSlug]:
     "GET: payment intent by identifier, POST: Create a DynamicPaymentRequest",
-  [EndpointNames_ApiV1.relayer]: "GET: Relayer balance",
-  [EndpointNames_ApiV1.relayerSlug]:
-    "GET: Relayer Topup history of access token owner by chain_id paginated",
-  [EndpointNames_ApiV1.transactions]:
-    "GET: Relayed transactions of access token owner pagianted",
-  [EndpointNames_ApiV1.transactionsSlug]: "GET: Relayed transaction by hash",
 };
 
 export interface Link {
@@ -684,18 +663,13 @@ export const getSortableColumns: {
   [EndpointNames_ApiV1.paymentIntents]: Object.entries(PaymentIntents_sortyBy)
     .map((ent) => ent[0]),
   [EndpointNames_ApiV1.paymentIntentsSlug]: [],
-  [EndpointNames_ApiV1.relayer]: [],
-  [EndpointNames_ApiV1.relayerSlug]: [],
-  [EndpointNames_ApiV1.transactions]: [],
-  [EndpointNames_ApiV1.transactionsSlug]: [],
 };
-
 
 export interface PaymentIntent_ZapierFormat {
   name: string;
   created_at: string;
   payment_intent: string;
-  status_text: PaymentIntentStatus_ApiV1,
+  status_text: PaymentIntentStatus_ApiV1;
   payee_address: string;
   max_debit_amount: string;
   debit_times: number;

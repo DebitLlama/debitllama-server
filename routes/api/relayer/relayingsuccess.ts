@@ -2,7 +2,6 @@ import { HandlerContext } from "$fresh/server.ts";
 import { v1Error } from "../../../lib/api_v1/responseBuilders.ts";
 import { updateAccountBalanceByCommitment } from "../../../lib/backend/db/tables/Accounts.ts";
 import { updatePaymentIntentStatusAfterSuccess } from "../../../lib/backend/db/tables/PaymentIntents.ts";
-import { updateNewRelayerBalanceByChainId } from "../../../lib/backend/db/tables/RelayerBalance.ts";
 import { insertNewTx } from "../../../lib/backend/db/tables/RelayerHistory.ts";
 import { EventType } from "../../../lib/backend/email/types.ts";
 import { enqueueWebhookWork } from "../../../lib/backend/queue/kv.ts";
@@ -12,10 +11,8 @@ import { ChainIds } from "../../../lib/shared/web3.ts";
 
 export interface RelayingSuccessArgs {
   chainId: ChainIds;
-  newRelayerBalance: string;
   payee_user_id: string;
   paymentIntentId: number;
-  relayerBalanceId: number;
   submittedTransaction: string;
   allGasUsed: string;
   paymentAmount: string;
@@ -44,10 +41,8 @@ export const handler = {
 
       const {
         chainId,
-        newRelayerBalance,
         payee_user_id,
         paymentIntentId,
-        relayerBalanceId,
         submittedTransaction,
         allGasUsed,
         paymentAmount,
@@ -61,15 +56,9 @@ export const handler = {
         paymentIntent,
       } = json as RelayingSuccessArgs;
 
-      await updateNewRelayerBalanceByChainId(ctx, chainId, {
-        newBalance: newRelayerBalance,
-        payee_user_id,
-      });
-
       await insertNewTx(ctx, {
         payee_user_id,
         paymentIntentId,
-        relayerBalanceId,
         submittedTransaction,
         allGasUsed,
         paymentAmount,

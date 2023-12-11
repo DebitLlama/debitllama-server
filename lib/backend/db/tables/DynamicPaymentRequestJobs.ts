@@ -29,7 +29,7 @@ export async function selectDynamicPaymentRequestJobWhereStatusIsLocked(
     impl: async (p) => {
       return await p.client.from("DynamicPaymentRequestJobs")
         .select(
-          "*,paymentIntent_id(*,account_id(*),debit_item_id(*),relayerBalance_id(*))",
+          "*,paymentIntent_id(*,account_id(*),debit_item_id(*)",
         ).eq("status", DynamicPaymentRequestJobsStatus.LOCKED);
     },
     name: "selectDynamicPaymentRequestJobWhereStatusIsLocked",

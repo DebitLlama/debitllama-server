@@ -35,7 +35,7 @@ export default class QueryBuilder {
         //selectItemByButtonId
         byButtonId: async (buttonId: string) => {
           const res = await this.client.from("Items").select(
-            "*,relayerBalance_id(*)",
+            "*",
           ).eq(
             "button_id",
             buttonId,
@@ -44,7 +44,7 @@ export default class QueryBuilder {
         },
         byButtonIdForPayeeOnly: async (buttonId: string) => {
           const res = await this.client.from("Items").select(
-            "*,relayerBalance_id(*)",
+            "*",
           ).eq(
             "button_id",
             buttonId,
@@ -160,14 +160,7 @@ export default class QueryBuilder {
             .eq("statusText", PaymentIntentStatus.ACCOUNTBALANCETOOLOW);
           return this.responseHandler(res);
         },
-        //selectPaymentIntentsByRelayerBalanceTooLow
-        byRelayerBalanceTooLowAndUserIdForPayee: async (network: ChainIds) => {
-          const res = await this.client.from("PaymentIntents").select("*")
-            .eq("payee_user_id", this.userid)
-            .eq("network", network)
-            .eq("statusText", PaymentIntentStatus.BALANCETOOLOWTORELAY);
-          return this.responseHandler(res);
-        },
+
         //selectPaymentIntentByPaymentIntentAndCreatorUserId
         byPaymentIntentAndUserIdForCreator: async (paymentIntent: string) => {
           const res = await this.client.from("PaymentIntents")
@@ -216,37 +209,9 @@ export default class QueryBuilder {
           return this.responseHandler(res);
         },
       },
-      RelayerBalance: {
-        //selectRelayerBalanceByUserId
-        byUserId: async () => {
-          const res = await this.client.from("RelayerBalance").select().eq(
-            "user_id",
-            this.userid,
-          );
-          return this.responseHandler(res);
-        },
-      },
-      RelayerTopUpHistory: {
-        //selectRelayerTopUpHistoryDataByTransactionHash
-        byTransactionHash: async (hash: string) => {
-          const res = await this.client.from("RelayerTopUpHistory")
-            .select()
-            .eq("transactionHash", hash);
-          return this.responseHandler(res);
-        },
-        //selectRelayerTopUpHistoryDataByUserId
-        byUserIdDesc: async () => {
-          const res = await this.client.from("RelayerTopUpHistory").select()
-            .eq(
-              "user_id",
-              this.userid,
-            ).order("created_at", { ascending: false });
-          return this.responseHandler(res);
-        },
-      },
       DynamicPaymentRequestJobs: {
         //selectDynamicPaymentRequestJobByPaymentIntentIdAndUserId
-        byPaymentIntentIdAndUserId: async (paymentIntent_id: string) => {
+        byPaymentIntentIdAndUserId: async (paymentIntent_id: number) => {
           const res = await this.client.from("DynamicPaymentRequestJobs")
             .select("*,paymentIntent_id(*)")
             .eq("paymentIntent_id", paymentIntent_id)
@@ -256,7 +221,7 @@ export default class QueryBuilder {
         //selectDynamicPaymentRequestJobById
         byJobId: async (jobId: number) => {
           const res = await this.client.from("DynamicPaymentRequestJobs")
-            .select("*,relayerBalance_id(*),paymentIntent_id(*)").eq(
+            .select("*,paymentIntent_id(*)").eq(
               "id",
               jobId,
             );
@@ -264,42 +229,13 @@ export default class QueryBuilder {
         },
         byPaymentIntentId: async (paymentIntent_id: string) => {
           const res = await this.client.from("DynamicPaymentRequestJobs")
-            .select("*,relayerBalance_id(*),paymentIntent_id(*)")
+            .select("*,paymentIntent_id(*)")
             .eq("paymentIntent_id", paymentIntent_id);
 
           return this.responseHandler(res);
         },
       },
 
-      PasswordResetUrls: {
-        byQ: async (q: string) => {
-          const res = await this.client.from("PasswordResetUrls")
-            .select()
-            .eq("q", q);
-          return this.responseHandler(res);
-        },
-        byNonce: async (nonce: string) => {
-          const res = await this.client.from("PasswordResetUrls")
-            .select()
-            .eq("nonce", nonce);
-          return this.responseHandler(res);
-        },
-      },
-      VerifiedEmails: {
-        byUserId: async (user_id: string) => {
-          const res = await this.client.from("VerifiedEmail")
-            .select()
-            .eq("user_id", user_id);
-
-          return this.responseHandler(res);
-        },
-        byUrl: async (url: string) => {
-          const res = await this.client.from("VerifiedEmail")
-            .select()
-            .eq("url", url);
-          return this.responseHandler(res);
-        },
-      },
       RPC: {
         emailByUserId: async (user_id: string) => {
           const res = await this.client.rpc("get_email_by_user_uuid2", {
@@ -355,7 +291,6 @@ export default class QueryBuilder {
           pricing: string,
           network: string,
           name: string,
-          relayerBalance_id: string,
         ) => {
           const res = await this.client.from("Items").insert({
             created_at: new Date().toUTCString(),
@@ -369,7 +304,6 @@ export default class QueryBuilder {
             pricing,
             network,
             name,
-            relayerBalance_id,
           }).select();
           return this.responseHandler(res);
         },
@@ -435,7 +369,6 @@ export default class QueryBuilder {
           debit_item_id: string,
           proof: string,
           publicSignals: string,
-          relayerBalance_id: number,
         ) => {
           const in30Min = AddMinutesToDate(new Date(), 30);
           const res = await this.client.from(
@@ -461,38 +394,8 @@ export default class QueryBuilder {
             debit_item_id,
             proof,
             publicSignals,
-            relayerBalance_id,
           });
 
-          return this.responseHandler(res);
-        },
-      },
-      RelayerBalance: {
-        //insertNewRelayerBalance
-        newRelayerBalance: async () => {
-          const res = await this.client.from("RelayerBalance").insert({
-            created_at: new Date().toUTCString(),
-            user_id: this.userid,
-          });
-
-          return this.responseHandler(res);
-        },
-      },
-      RelayerTopUpHistory: {
-        //insertNewRelayerTopUpHistory
-        newRow: async (
-          transactionHash: string,
-          chainId: ChainIds,
-          addedBalance: string,
-        ) => {
-          const res = await this.client.from("RelayerTopUpHistory")
-            .insert({
-              created_at: new Date().toUTCString(),
-              transactionHash,
-              user_id: this.userid,
-              network: chainId,
-              Amount: addedBalance,
-            });
           return this.responseHandler(res);
         },
       },
@@ -501,8 +404,6 @@ export default class QueryBuilder {
         newJob: async (
           paymentIntent_id: number,
           requestedAmount: string,
-          allocatedGas: string,
-          relayerBalance_id: number,
         ) => {
           const res = await this.client.from("DynamicPaymentRequestJobs")
             .insert({
@@ -511,14 +412,11 @@ export default class QueryBuilder {
               requestedAmount,
               status: DynamicPaymentRequestJobsStatus.CREATED,
               request_creator_id: this.userid,
-              allocatedGas,
-              relayerBalance_id,
             }).select();
           return this.responseHandler(res);
         },
       },
       Webhooks: {
-        //TODO: THIS GOES TO RPC
         newUrl: async (
           webhook_url: string,
         ) => {
@@ -527,30 +425,6 @@ export default class QueryBuilder {
             webhook_url,
             creator_id: this.userid,
           });
-          return this.responseHandler(res);
-        },
-      },
-      PasswordResetUrls: {
-        createNew: async (q: string, user_id: string, nonce: string) => {
-          const res = await this.client.from("PasswordResetUrls")
-            .insert({
-              created_at: new Date().toUTCString(),
-              q,
-              user_id,
-              nonce,
-            });
-          return this.responseHandler(res);
-        },
-      },
-      VerifiedEmails: {
-        createNew: async (user_id: string, url: string) => {
-          const res = await this.client.from("VerifiedEmail")
-            .insert({
-              created_at: new Date().toUTCString(),
-              user_id,
-              verified: false,
-              url,
-            });
           return this.responseHandler(res);
         },
       },
@@ -644,58 +518,6 @@ export default class QueryBuilder {
           return this.responseHandler(res);
         },
       },
-      RelayerBalance: {
-        //updateBTT_Donau_Testnet_Balance
-        BTT_Donau_Testnet_BalanceById: async (
-          newRelayerBalance: bigint,
-          relayerBalance_id: number,
-        ) => {
-          const res = await this.client.from("RelayerBalance").update({
-            BTT_Donau_Testnet_Balance: formatEther(newRelayerBalance),
-          }).eq("id", relayerBalance_id);
-
-          return this.responseHandler(res);
-        },
-        BTT_Mainnet_BalanceById: async (
-          newRelayerBalance: bigint,
-          relayerBalance_id: number,
-        ) => {
-          const res = await this.client.from("RelayerBalance").update({
-            BTT_Mainnet_Balance: formatEther(newRelayerBalance),
-          }).eq(
-            "id",
-            relayerBalance_id,
-          );
-          return this.responseHandler(res);
-        },
-        //updateMissing_BTT_Donau_Testnet_Balance
-        Missing_BTT_Donau_Testnet_BalanceById: async (
-          newBalance: bigint,
-          newMissingBalance: bigint,
-          id: number,
-        ) => {
-          const res = await this.client.from("RelayerBalance").update({
-            BTT_Donau_Testnet_Balance: formatEther(newBalance),
-            last_topup: new Date().toUTCString(),
-            Missing_BTT_Donau_Testnet_Balance: formatEther(newMissingBalance),
-          }).eq("id", id);
-
-          return this.responseHandler(res);
-        },
-        Missing_BTT_Mainnet_BalanceById: async (
-          newBalance: bigint,
-          newMissingBalance: bigint,
-          id: number,
-        ) => {
-          const res = await this.client.from("RelayerBalance").update({
-            BTT_Mainnet_Balance: formatEther(newBalance),
-            last_topup: new Date().toUTCString(),
-            Missing_BTT_Mainnet_Balance: formatEther(newMissingBalance),
-          }).eq("id", id);
-
-          return this.responseHandler(res);
-        },
-      },
       Webhooks: {
         byUserId: async (webhook_url: string) => {
           const res = await this.client.from("Webhooks")
@@ -709,27 +531,15 @@ export default class QueryBuilder {
         ByPaymentIntentIdAndRequestCreator: async (
           paymentIntent_id: number,
           requestedAmount: string,
-          allocatedGas: string,
         ) => {
           const res = await this.client.from("DynamicPaymentRequestJobs")
             .update({
               created_at: new Date().toUTCString(),
               requestedAmount,
               status: DynamicPaymentRequestJobsStatus.CREATED,
-              allocatedGas,
               last_modified: new Date().toUTCString(),
             }).eq("paymentIntent_id", paymentIntent_id)
             .eq("request_creator_id", this.userid).select();
-
-          return this.responseHandler(res);
-        },
-      },
-      VerifiedEmails: {
-        updateToVerified: async (user_id: string) => {
-          const res = await this.client.from("VerifiedEmail")
-            .update({
-              verified: true,
-            }).eq("user_id", user_id);
 
           return this.responseHandler(res);
         },
@@ -792,14 +602,6 @@ export default class QueryBuilder {
             .delete()
             .eq("access_token", accessToken)
             .eq("creator_id", this.userid);
-          return this.responseHandler(res);
-        },
-      },
-      PasswordResetUrls: {
-        byQAndType: async (q: string) => {
-          const res = await this.client.from("PasswordResetUrls")
-            .delete()
-            .eq("q", q);
           return this.responseHandler(res);
         },
       },
