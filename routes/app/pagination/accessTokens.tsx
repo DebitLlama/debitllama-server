@@ -1,9 +1,8 @@
 // Api endpoints for the pagination API
 import { Handlers } from "$fresh/server.ts";
 import { getPagination, getTotalPages } from "../../../lib/backend/businessLogic.ts";
-import QueryBuilder from "../../../lib/backend/db/queryBuilder.ts";
+import { selectApiAuthTokensByUseridPaginated } from "../../../lib/backend/db/tables/ApiAuthTokens.ts";
 import { errorResponseBuilder } from "../../../lib/backend/responseBuilders.ts";
-import { RELAYERTOPUPHISTORYPAGESIZE } from "../../../lib/enums.ts";
 import { State } from "../../_middleware.ts";
 
 export const handler: Handlers<any, State> = {
@@ -14,18 +13,17 @@ export const handler: Handlers<any, State> = {
             return errorResponseBuilder("Missing Current Page");
         }
 
-        const queryBuilder = new QueryBuilder(ctx);
-        const select = queryBuilder.select();
         const { from, to } = getPagination(currentPage, 10)
 
-        const { data, count } = await select.ApiAuthTokens.byUseridPaginated(
-            "created_at",
-            false,
-            from,
-            to
+        const { data, count } = await selectApiAuthTokensByUseridPaginated(ctx, {
+            order: "created_at",
+            ascending: false,
+            rangeFrom: from,
+            rangeTo: to
+        }
         )
 
-        const totalPages = getTotalPages(count, RELAYERTOPUPHISTORYPAGESIZE);
+        const totalPages = getTotalPages(count, 10);
         return new Response(JSON.stringify({
             currentPage,
             data,
