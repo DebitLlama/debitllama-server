@@ -10,7 +10,6 @@ import * as $api_relayer_balance from "./routes/api/relayer/balance.ts";
 import * as $api_relayer_dynamicjobstatus from "./routes/api/relayer/dynamicjobstatus.ts";
 import * as $api_relayer_dynamicpayments from "./routes/api/relayer/dynamicpayments.ts";
 import * as $api_relayer_fixedpayments from "./routes/api/relayer/fixedpayments.ts";
-import * as $api_relayer_gas from "./routes/api/relayer/gas.ts";
 import * as $api_relayer_lock from "./routes/api/relayer/lock.ts";
 import * as $api_relayer_relayingfailed from "./routes/api/relayer/relayingfailed.ts";
 import * as $api_relayer_relayingsuccess from "./routes/api/relayer/relayingsuccess.ts";
@@ -22,9 +21,6 @@ import * as $api_v1_items_slug_ from "./routes/api/v1/items/[slug].ts";
 import * as $api_v1_items_index from "./routes/api/v1/items/index.ts";
 import * as $api_v1_payment_intents_slug_ from "./routes/api/v1/payment_intents/[slug].ts";
 import * as $api_v1_payment_intents_index from "./routes/api/v1/payment_intents/index.ts";
-import * as $api_v1_relayer_slug_ from "./routes/api/v1/relayer/[slug].ts";
-import * as $api_v1_relayer_index from "./routes/api/v1/relayer/index.ts";
-import * as $api_v1_transactions_index from "./routes/api/v1/transactions/index.ts";
 import * as $api_v1_zapier_index from "./routes/api/v1/zapier/index.ts";
 import * as $app_middleware from "./routes/app/_middleware.ts";
 import * as $app_account from "./routes/app/account.tsx";
@@ -45,7 +41,6 @@ import * as $app_pagination_accountPaymentIntents from "./routes/app/pagination/
 import * as $app_pagination_debitItems from "./routes/app/pagination/debitItems.tsx";
 import * as $app_pagination_debitItemsPaymentIntents from "./routes/app/pagination/debitItemsPaymentIntents.tsx";
 import * as $app_pagination_itemPaymentIntents from "./routes/app/pagination/itemPaymentIntents.tsx";
-import * as $app_pagination_relayerTopupHistory from "./routes/app/pagination/relayerTopupHistory.tsx";
 import * as $app_pagination_relayerTxHistory from "./routes/app/pagination/relayerTxHistory.tsx";
 import * as $app_pagination_relayerTxHistoryWithPaymentIntentId from "./routes/app/pagination/relayerTxHistoryWithPaymentIntentId.tsx";
 import * as $app_pagination_subscriptions from "./routes/app/pagination/subscriptions.tsx";
@@ -59,7 +54,6 @@ import * as $app_post_saveAccountAPI from "./routes/app/post/saveAccountAPI.ts";
 import * as $app_post_savePaymentIntent from "./routes/app/post/savePaymentIntent.ts";
 import * as $app_post_updateItemUrl from "./routes/app/post/updateItemUrl.tsx";
 import * as $app_profile from "./routes/app/profile.tsx";
-import * as $app_relayer from "./routes/app/relayer.tsx";
 import * as $app_subscriptions from "./routes/app/subscriptions.tsx";
 import * as $app_updatepassword from "./routes/app/updatepassword.tsx";
 import * as $app_webauthn_2fa from "./routes/app/webauthn/2fa.tsx";
@@ -86,7 +80,6 @@ import * as $CancelDynamicPaymentRequestButton from "./islands/CancelDynamicPaym
 import * as $CancelPaymentIntentButton from "./islands/CancelPaymentIntentButton.tsx";
 import * as $CurrencySelectDropdown from "./islands/CurrencySelectDropdown.tsx";
 import * as $DebitItemTableRow from "./islands/DebitItemTableRow.tsx";
-import * as $RelayerDetailsCard from "./islands/RelayerDetailsCard.tsx";
 import * as $TriggerDirectDebitButton from "./islands/TriggerDirectDebitButton.tsx";
 import * as $WalletApproveOrDisconnect from "./islands/WalletApproveOrDisconnect.tsx";
 import * as $WalletDetailsFetcher from "./islands/WalletDetailsFetcher.tsx";
@@ -106,15 +99,12 @@ import * as $pagination_PaymentIntentsPaginationForAll from "./islands/paginatio
 import * as $pagination_PaymentIntentsPaginationForDebitItemsPage from "./islands/pagination/PaymentIntentsPaginationForDebitItemsPage.tsx";
 import * as $pagination_PaymentIntentsPaginationForItemPage from "./islands/pagination/PaymentIntentsPaginationForItemPage.tsx";
 import * as $pagination_RelayedTxHistoryWithPagination from "./islands/pagination/RelayedTxHistoryWithPagination.tsx";
-import * as $pagination_RelayerTopupHistory from "./islands/pagination/RelayerTopupHistory.tsx";
-import * as $routes_RelayerUISwitcher from "./islands/routes/RelayerUISwitcher.tsx";
 import * as $routes_Sidebar from "./islands/routes/Sidebar.tsx";
 import * as $utils_AccountAccessToggle from "./islands/utils/AccountAccessToggle.tsx";
 import * as $utils_AccountDisplayElement from "./islands/utils/AccountDisplayElement.tsx";
 import * as $utils_AccountsSelectButtons from "./islands/utils/AccountsSelectButtons.tsx";
 import * as $utils_CookieBanner from "./islands/utils/CookieBanner.tsx";
 import * as $utils_ShowAndContent from "./islands/utils/ShowAndContent.tsx";
-import * as $utils_ShowFeePrice from "./islands/utils/ShowFeePrice.tsx";
 import * as $utils_SidebarToggleButton from "./islands/utils/SidebarToggleButton.tsx";
 import * as $utils_TestnetTokens from "./islands/utils/TestnetTokens.tsx";
 import * as $utils_WalletAddressSelector from "./islands/utils/WalletAddressSelector.tsx";
@@ -131,7 +121,6 @@ const manifest = {
     "./routes/api/relayer/dynamicjobstatus.ts": $api_relayer_dynamicjobstatus,
     "./routes/api/relayer/dynamicpayments.ts": $api_relayer_dynamicpayments,
     "./routes/api/relayer/fixedpayments.ts": $api_relayer_fixedpayments,
-    "./routes/api/relayer/gas.ts": $api_relayer_gas,
     "./routes/api/relayer/lock.ts": $api_relayer_lock,
     "./routes/api/relayer/relayingfailed.ts": $api_relayer_relayingfailed,
     "./routes/api/relayer/relayingsuccess.ts": $api_relayer_relayingsuccess,
@@ -143,9 +132,6 @@ const manifest = {
     "./routes/api/v1/items/index.ts": $api_v1_items_index,
     "./routes/api/v1/payment_intents/[slug].ts": $api_v1_payment_intents_slug_,
     "./routes/api/v1/payment_intents/index.ts": $api_v1_payment_intents_index,
-    "./routes/api/v1/relayer/[slug].ts": $api_v1_relayer_slug_,
-    "./routes/api/v1/relayer/index.ts": $api_v1_relayer_index,
-    "./routes/api/v1/transactions/index.ts": $api_v1_transactions_index,
     "./routes/api/v1/zapier/index.ts": $api_v1_zapier_index,
     "./routes/app/_middleware.ts": $app_middleware,
     "./routes/app/account.tsx": $app_account,
@@ -169,8 +155,6 @@ const manifest = {
       $app_pagination_debitItemsPaymentIntents,
     "./routes/app/pagination/itemPaymentIntents.tsx":
       $app_pagination_itemPaymentIntents,
-    "./routes/app/pagination/relayerTopupHistory.tsx":
-      $app_pagination_relayerTopupHistory,
     "./routes/app/pagination/relayerTxHistory.tsx":
       $app_pagination_relayerTxHistory,
     "./routes/app/pagination/relayerTxHistoryWithPaymentIntentId.tsx":
@@ -188,7 +172,6 @@ const manifest = {
     "./routes/app/post/savePaymentIntent.ts": $app_post_savePaymentIntent,
     "./routes/app/post/updateItemUrl.tsx": $app_post_updateItemUrl,
     "./routes/app/profile.tsx": $app_profile,
-    "./routes/app/relayer.tsx": $app_relayer,
     "./routes/app/subscriptions.tsx": $app_subscriptions,
     "./routes/app/updatepassword.tsx": $app_updatepassword,
     "./routes/app/webauthn/2fa.tsx": $app_webauthn_2fa,
@@ -218,7 +201,6 @@ const manifest = {
     "./islands/CancelPaymentIntentButton.tsx": $CancelPaymentIntentButton,
     "./islands/CurrencySelectDropdown.tsx": $CurrencySelectDropdown,
     "./islands/DebitItemTableRow.tsx": $DebitItemTableRow,
-    "./islands/RelayerDetailsCard.tsx": $RelayerDetailsCard,
     "./islands/TriggerDirectDebitButton.tsx": $TriggerDirectDebitButton,
     "./islands/WalletApproveOrDisconnect.tsx": $WalletApproveOrDisconnect,
     "./islands/WalletDetailsFetcher.tsx": $WalletDetailsFetcher,
@@ -243,16 +225,12 @@ const manifest = {
       $pagination_PaymentIntentsPaginationForItemPage,
     "./islands/pagination/RelayedTxHistoryWithPagination.tsx":
       $pagination_RelayedTxHistoryWithPagination,
-    "./islands/pagination/RelayerTopupHistory.tsx":
-      $pagination_RelayerTopupHistory,
-    "./islands/routes/RelayerUISwitcher.tsx": $routes_RelayerUISwitcher,
     "./islands/routes/Sidebar.tsx": $routes_Sidebar,
     "./islands/utils/AccountAccessToggle.tsx": $utils_AccountAccessToggle,
     "./islands/utils/AccountDisplayElement.tsx": $utils_AccountDisplayElement,
     "./islands/utils/AccountsSelectButtons.tsx": $utils_AccountsSelectButtons,
     "./islands/utils/CookieBanner.tsx": $utils_CookieBanner,
     "./islands/utils/ShowAndContent.tsx": $utils_ShowAndContent,
-    "./islands/utils/ShowFeePrice.tsx": $utils_ShowFeePrice,
     "./islands/utils/SidebarToggleButton.tsx": $utils_SidebarToggleButton,
     "./islands/utils/TestnetTokens.tsx": $utils_TestnetTokens,
     "./islands/utils/WalletAddressSelector.tsx": $utils_WalletAddressSelector,
