@@ -96,7 +96,6 @@ export async function selectRelayerHistorybyPaymentIntentIdPaginatedWithTxSearch
 export interface InsertNewTxArgs {
   payee_user_id: string;
   paymentIntentId: number;
-  relayerBalanceId: number;
   submittedTransaction: string;
   allGasUsed: string;
   network: string;
@@ -116,7 +115,6 @@ export async function insertNewTx(
         created_at: new Date().toUTCString(),
         payee_user_id: p.args.payee_user_id,
         paymentIntent_id: p.args.paymentIntentId,
-        relayerBalance_id: p.args.relayerBalanceId,
         submittedTransaction: p.args.submittedTransaction,
         allGasUsed: p.args.allGasUsed,
         network: p.args.network,

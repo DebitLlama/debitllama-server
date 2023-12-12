@@ -2,7 +2,7 @@ import Layout from "../../components/Layout.tsx";
 import { State } from "../_middleware.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import AddNewDebitItemPageForm from "../../islands/addNewDebitItemPageForm.tsx";
-import { NetworkNames, chainIdFromNetworkName, getCurrenciesForNetworkName } from "../../lib/shared/web3.ts";
+import { NetworkNames, SelectableCurrency, chainIdFromNetworkName, getCurrenciesForNetworkName } from "../../lib/shared/web3.ts";
 import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import { Pricing } from "../../lib/enums.ts";
 import { errorResponseBuilder } from "../../lib/backend/responseBuilders.ts";
@@ -42,20 +42,6 @@ export const handler: Handlers<any, State> = {
             setProfileRedirectCookie(headers, "/app/addNewDebitItem");
             return new Response(null, { status: 303, headers })
         }
-
-        let relayerBalanceId = null;
-
-        const { data: relayerBalanceData } = await select.RelayerBalance.byUserId();
-        // I'm gonna add the id of the relayerBalance to the debit item so I can join tables later more easily
-        if (relayerBalanceData === null || relayerBalanceData.length === 0) {
-            //TODO: Refactor these to 1 RPC call
-            await insert.RelayerBalance.newRelayerBalance()
-            const { data: relayerBalanceData2, error: relayerBalanceDataError2 } = await select.RelayerBalance.byUserId();
-            relayerBalanceId = relayerBalanceData2[0].id;
-        } else {
-            relayerBalanceId = relayerBalanceData[0].id
-        }
-
 
         const name = form.get("name") as string;
         const network = form.get("network") as string;
@@ -103,17 +89,29 @@ export const handler: Handlers<any, State> = {
         }
 
         try {
-            const parsedCurrency = JSON.parse(currency);
+            const parsedCurrency = JSON.parse(currency) as SelectableCurrency;
 
             const name = parsedCurrency.name;
             const native = parsedCurrency.native;
             const contractAddress = parsedCurrency.contractAddress;
-
+            const minimumAmount = parsedCurrency.minimumAmount;
             const chainCurrencies = getCurrenciesForNetworkName[network as NetworkNames];
-
-            const findSubmittedCurrency = chainCurrencies.filter((curr) => curr.name === name && curr.native === native && curr.contractAddress === contractAddress);
+            //Verify the passed in currency object is valid
+            const findSubmittedCurrency = chainCurrencies.filter(
+                (curr) =>
+                    curr.name === name
+                    && curr.native === native
+                    && curr.contractAddress === contractAddress
+                    && curr.minimumAmount === minimumAmount
+            );
             if (findSubmittedCurrency.length !== 1) {
                 throw new Error();
+            }
+
+
+            if (parseFloat(minimumAmount) > parseFloat(maxAmount)) {
+                // Invalid amount, maxAmount should be bigger or equal the minimum!
+                return errorResponseBuilder("maxAmount under minimum")
             }
 
         } catch (err) {
@@ -134,7 +132,6 @@ export const handler: Handlers<any, State> = {
             pricing,
             chainIdFromNetworkName[network as NetworkNames],
             name,
-            relayerBalanceId
         )
 
         headers.set("location", `/app/item?q=${item[0].button_id}`);

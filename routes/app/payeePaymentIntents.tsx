@@ -3,7 +3,7 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import { State } from "../_middleware.ts";
 import { NotFound, Tooltip, UnderlinedTd, getDebitIntervalText, getPaymentIntentStatusLogo, getPaymentIntentStatusTooltip, getPaymentRequestJobStatusTooltipMessage, getPaymentRequestStatusLogo, getSubscriptionTooltipMessage } from "../../components/components.tsx";
 import CancelPaymentIntentButton from "../../islands/CancelPaymentIntentButton.tsx";
-import { ChainIds, networkNameFromId } from "../../lib/shared/web3.ts";
+import { ChainIds, SelectableCurrency, networkNameFromId } from "../../lib/shared/web3.ts";
 import { DynamicPaymentRequestJobsStatus, PaymentIntentRow, Pricing, RELAYERTRANSACTIONHISTORYPAGESIZE } from "../../lib/enums.ts";
 import TriggerDirectDebitButton from "../../islands/TriggerDirectDebitButton.tsx";
 import { errorResponseBuilder, successResponseBuilder } from "../../lib/backend/responseBuilders.ts";
@@ -77,7 +77,7 @@ export default function CreatedPaymentIntents(props: PageProps) {
     }
     const pi = props.data.paymentIntentData[0] as PaymentIntentRow;
     const dynamicPaymentRequestJobArr = props.data.dynamicPaymentRequestJobArr;
-
+    const currency :SelectableCurrency = JSON.parse(pi.currency);
     function IfDynamicAddDebitTrigger(props: { pricing: Pricing, maxDebitAmount: string, dynamicPaymentRequestJob: any }) {
         if (props.pricing === Pricing.Dynamic) {
             return <tr>
@@ -85,7 +85,7 @@ export default function CreatedPaymentIntents(props: PageProps) {
                 <UnderlinedTd extraStyles="">
                     {props.dynamicPaymentRequestJob !== undefined && props.dynamicPaymentRequestJob.status === DynamicPaymentRequestJobsStatus.LOCKED
                         ? <p>Your last payment request is locked for processing! Come back in a few minutes!</p>
-                        : <TriggerDirectDebitButton chainId={pi.network as ChainIds} paymentIntent={pi} transactionsLeft={pi.debit_item_id.debit_times - pi.used_for}></TriggerDirectDebitButton>}
+                        : <TriggerDirectDebitButton currency={currency.name} minAmount={currency.minimumAmount} chainId={pi.network as ChainIds} paymentIntent={pi} transactionsLeft={pi.debit_item_id.debit_times - pi.used_for}></TriggerDirectDebitButton>}
                 </UnderlinedTd>
                 <UnderlinedTd extraStyles=""><Tooltip message="For dynamic payments you need to specify how much to debit!"></Tooltip></UnderlinedTd>
             </tr>

@@ -23,8 +23,6 @@ export default function TableSearch(props: TableSearchProps) {
                 return "Search Identifier"
             case FilterFor.DebitItems:
                 return "Search Name";
-            case FilterFor.RelayerTopupHistory:
-                return "Find Transaction Hash"
             case FilterFor.TransactionHistory:
                 return "Find Transaction Hash"
             default:

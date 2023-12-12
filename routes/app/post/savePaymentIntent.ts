@@ -84,7 +84,6 @@ export const handler: Handlers<any, State> = {
         itemData[0].id,
         proof,
         publicSignals,
-        itemData[0].relayerBalance_id.id,
       );
 
     if (insertError !== null) {

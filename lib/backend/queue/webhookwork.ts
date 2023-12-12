@@ -27,19 +27,10 @@ import {
   PaymentIntentStatus_ApiV1,
   Pricing_ApiV1,
 } from "../../api_v1/types.ts";
+import { getContext } from "./utils.ts";
 
 export async function processWebhookwork(args: NewWebhookWorkerArgs) {
-  const client = createClient(
-    Deno.env.get("SUPABASE_URL") || "",
-    Deno.env.get("SUPABASE_KEY") || "",
-    { auth: { persistSession: false } },
-  );
-  const ctx: any = {
-    state: {
-      supabaseClient: undefined,
-    },
-  };
-  ctx.state.supabaseClient = client;
+  const ctx = getContext();
   const { eventType, paymentIntent } = args;
   // Fetch the payment intent's data!
   const { data: piRowData } = await selectPaymentIntentRowByPaymentIntent(ctx, {

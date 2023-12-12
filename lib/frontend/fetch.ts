@@ -2,7 +2,6 @@ import {
   AccountTypes,
   DebitItemTableColNames,
   PaymentIntentsTableColNames,
-  RelayerTopupHistoryColNames,
   RelayerTxHistoryColNames,
 } from "../enums.ts";
 import { ChainIds } from "../shared/web3.ts";
@@ -88,25 +87,6 @@ export interface UploadPaymentIntentArgs {
 
 export async function uploadPaymentIntent(args: UploadPaymentIntentArgs) {
   return await fetch("/app/post/savePaymentIntent", {
-    credentials: "same-origin",
-    method: "POST",
-    body: JSON.stringify(args),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  }).then((response) => response.status);
-}
-
-export interface PostRelayerTopup {
-  chainId: string;
-  blockNumber: string;
-  transactionHash: string;
-  from: string;
-  amount: string;
-}
-
-export async function postRelayerTopup(args: PostRelayerTopup) {
-  return await fetch("/app/relayer", {
     credentials: "same-origin",
     method: "POST",
     body: JSON.stringify(args),
@@ -240,22 +220,6 @@ export async function fetchPaginatedDebitItems(args: {
   sortDirection: "ASC" | "DESC";
 }) {
   return await fetch("/app/pagination/debitItems", {
-    credentials: "same-origin",
-    method: "POST",
-    body: JSON.stringify(args),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  }).then((response) => response);
-}
-
-export async function fetchPaginatedRelayerTopupHistory(args: {
-  currentPage: number;
-  searchTerm: string;
-  sortBy: RelayerTopupHistoryColNames;
-  sortDirection: "ASC" | "DESC";
-}) {
-  return await fetch("/app/pagination/relayerTopupHistory", {
     credentials: "same-origin",
     method: "POST",
     body: JSON.stringify(args),
@@ -458,4 +422,15 @@ export async function deleteAccountAuthenticator(credentialID: string) {
     credentials: "same-origin",
     body: JSON.stringify({ credentialID }),
   }).then((response) => response);
+}
+
+export async function redstonePrice(symbol: string) {
+  return await fetch(
+    `https://api.redstone.finance/prices/?symbol=${symbol}&provider=redstone&limit=1`,
+    {
+      method: "GET",
+    },
+  ).then(async (response) => await response.json()).then((json) =>
+    json[0].value
+  );
 }

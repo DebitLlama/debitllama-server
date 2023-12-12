@@ -24,7 +24,7 @@ export const handler: Handlers<any, State> = {
         }
         const redirectTo = getCookies(req.headers)[CookieNames.loginRedirect];
 
-        let redirect = redirectTo === undefined || redirectTo === "" ? "/app/accounts" : redirectTo;
+        let redirect = redirectTo === undefined || redirectTo === "" ? "/app/webauthn/2fa" : redirectTo;
 
         deleteCookie(headers, CookieNames.loginRedirect);
         if (error) {
