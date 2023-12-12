@@ -8,6 +8,8 @@ export interface TriggerDirectDebitButtonProps {
     chainId: ChainIds;
     paymentIntent: PaymentIntentRow;
     transactionsLeft: number;
+    minAmount: string;
+    currency: string;
 }
 
 export default function TriggerDirectDebitButton(props: TriggerDirectDebitButtonProps) {
@@ -76,6 +78,7 @@ export default function TriggerDirectDebitButton(props: TriggerDirectDebitButton
             <div class={"flex flex-col justify-center"}>
                 <input required class="max-w-xs px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
                     value={requestedAmount} onChange={(event: any) => setRequestedAmount(event.target.value)} type="number" id="requestedAmount" name="requestedAmount" placeholder="Debit" step="any" />
+                <span class="text-sm">Minimum amount: {props.minAmount} {props.currency}</span>
                 <button
                     aria-label="Request dynamic payment"
                     disabled={props.paymentIntent.statusText === PaymentIntentStatus.CANCELLED}
