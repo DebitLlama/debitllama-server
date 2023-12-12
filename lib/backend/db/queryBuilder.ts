@@ -370,7 +370,6 @@ export default class QueryBuilder {
           proof: string,
           publicSignals: string,
         ) => {
-          const in30Min = AddMinutesToDate(new Date(), 30);
           const res = await this.client.from(
             "PaymentIntents",
           ).insert({
@@ -387,7 +386,7 @@ export default class QueryBuilder {
             estimatedGas,
             statusText,
             lastPaymentDate: null,
-            nextPaymentDate: in30Min.toUTCString(),
+            nextPaymentDate: new Date().toUTCString(),
             pricing,
             currency,
             network,
