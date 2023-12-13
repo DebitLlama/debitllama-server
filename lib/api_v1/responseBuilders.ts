@@ -86,14 +86,6 @@ export function V1ResponseBuilder() {
         href: "/api/v1/payment_intents",
         methods: endpoints_ApiV1[EndpointNames_ApiV1.paymentIntents],
       },
-      {
-        href: "/api/v1/relayer",
-        methods: endpoints_ApiV1[EndpointNames_ApiV1.relayer],
-      },
-      {
-        href: "/api/v1/transactions",
-        methods: endpoints_ApiV1[EndpointNames_ApiV1.transactions],
-      },
     ],
     artifacts: [
       { name: "ConnectedWallets", href: "/ConnectedWallets.json" },
@@ -155,14 +147,6 @@ export function V1ErrorResponseBuilder(error: V1Error) {
       {
         href: "/api/v1/payment_intents",
         methods: endpoints_ApiV1[EndpointNames_ApiV1.paymentIntents],
-      },
-      {
-        href: "/api/v1/relayer",
-        methods: endpoints_ApiV1[EndpointNames_ApiV1.relayer],
-      },
-      {
-        href: "/api/v1/transactions",
-        methods: endpoints_ApiV1[EndpointNames_ApiV1.transactions],
       },
     ],
     error,
@@ -660,7 +644,6 @@ function mapDynamicPaymentRequestRowToApiV1(
     created_at: row.created_at,
     amount: row.requested_amount,
     status: row.status,
-    allocated_gas: row.allocatedGas,
     chain_id: row.paymentIntent_id.network,
     currency: {
       name: curr.name,

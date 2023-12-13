@@ -43,6 +43,7 @@ export async function handler(
       ctx.state.userid = user.id;
       ctx.state.renderSidebarOpen = renderSidebarOpen;
     }
+
     return await ctx.next();
   }
   // Should not cache api

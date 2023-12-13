@@ -2,9 +2,6 @@ import { ethers, ZeroAddress } from "$ethers";
 import DirectDebitArtifact from "../../static/DirectDebit.json" assert {
   type: "json",
 };
-import RelayerGasTracker from "../../static/RelayerGasTracker.json" assert {
-  type: "json",
-};
 import ERC20Artifact from "../../static/ERC20.json" assert {
   type: "json",
 };
@@ -12,7 +9,6 @@ import ERC20Artifact from "../../static/ERC20.json" assert {
 import {
   ChainIds,
   getConnectedWalletsContractAddress,
-  getRelayerGasTrackerContractAddress,
   getVirtualAccountsContractAddress,
   rpcUrl,
 } from "../shared/web3.ts";
@@ -43,12 +39,6 @@ export function getContract(
     DirectDebitArtifact.abi,
     provider,
   );
-}
-
-export function getRelayerTopUpContract(networkId: string) {
-  const provider = getProvider(networkId);
-  const addr = getRelayerGasTrackerContractAddress[networkId as ChainIds];
-  return new ethers.Contract(addr, RelayerGasTracker.abi, provider);
 }
 
 export async function getAccount(
