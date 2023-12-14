@@ -62,10 +62,6 @@ export default function AccountCardCarousel(props: AccountCardCarouselProps) {
         </div>
         <div class="flex flex-row justify-center ">
             <div class={"flex flex-col justify-center"}>
-                {props.page === "active" ?
-                    <TooltipWithTitle extraStyle='right: 50px;' message='In this current release we only update the displayed balance when you are interacting with it using DebitLlama. If you changed your connected wallet balance by transfering to it, it might not be displayed until a refresh is triggered. Clicking on the card and opening the account page will do that!' title='Click on the card to refresh the balance!'></TooltipWithTitle>
-                    : null
-                }
                 <AccountDisplayElement
                     amount={data.balance}
                     currency={data.currency}
@@ -82,12 +78,6 @@ export default function AccountCardCarousel(props: AccountCardCarouselProps) {
                     class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
             </div>
         </div>
-        <MissedPaymentsNotification
-            accountType={data.accountType}
-            chainId={data.network_id}
-            missedPayments={getPaymentIntentsForCurrentAccount(data.commitment, props.missedPayments)}
-            currency={data.currency}
-        ></MissedPaymentsNotification>
         <hr
             class="my-1 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
         <section class="px-4 mx-auto">
