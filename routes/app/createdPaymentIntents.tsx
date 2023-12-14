@@ -11,6 +11,7 @@ import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import { selectRelayerHistoryByPaymentIntentIdPaginated } from "../../lib/backend/db/tables/RelayerHistory.ts";
 import { enqueueWebhookWork } from "../../lib/backend/queue/kv.ts";
 import { EventType } from "../../lib/backend/email/types.ts";
+import WalletBalanceDisplay from "../../islands/WalletBalanceDisplay.tsx";
 
 export const handler: Handlers<any, State> = {
     async GET(req: any, ctx: any) {
@@ -114,7 +115,14 @@ export default function CreatedPaymentIntents(props: PageProps) {
                             </tr>
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">My Account Balance:</UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><p>{pi.account_id.balance}  {JSON.parse(pi.debit_item_id.currency).name}</p>
+                                <UnderlinedTd extraStyles=""><WalletBalanceDisplay
+                                    commitment={pi.commitment}
+                                    network={pi.network as ChainIds}
+                                    accountType={pi.account_id.accountType}
+                                    currency={pi.currency}
+                                    oldBalance={pi.account_id.balance}
+                                    calledFrom={"app"}
+                                ></WalletBalanceDisplay>
                                     <a class="text-indigo-500 hover:text-indigo-800" href={`/app/account?q=${pi.account_id.commitment}`}>Top Up</a></UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><Tooltip message="The current balance of the account that will be charged."></Tooltip></UnderlinedTd>
                             </tr>

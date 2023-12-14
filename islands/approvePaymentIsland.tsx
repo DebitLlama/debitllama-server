@@ -115,10 +115,13 @@ export default function ApprovePaymentIsland(props: ApprovePaymentIslandProps) {
 
                 <div class="flex flex-row justify-center margin_0_auto">
                     <AccountCardElement
+                        calledFrom={"app"}
+                        commitment={props.accountcommitment}
                         name={props.accountName}
                         balance={props.accountBalance}
                         currency={props.accountCurrency}
-                        network={""}
+                        network={props.chainId}
+                        networkName={""}
                         accountType={props.accountType}
                         closed={props.closed}
                     ></AccountCardElement>

@@ -424,13 +424,3 @@ export async function deleteAccountAuthenticator(credentialID: string) {
   }).then((response) => response);
 }
 
-export async function redstonePrice(symbol: string) {
-  return await fetch(
-    `https://api.redstone.finance/prices/?symbol=${symbol}&provider=redstone&limit=1`,
-    {
-      method: "GET",
-    },
-  ).then(async (response) => await response.json()).then((json) =>
-    json[0].value
-  );
-}

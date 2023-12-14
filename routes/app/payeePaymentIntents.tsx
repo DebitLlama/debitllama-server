@@ -13,6 +13,7 @@ import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import RelayedTxHistory from "../../islands/pagination/RelayedTxHistoryWithPagination.tsx";
 import { getTotalPaymentValue } from "../../components/PaymentIntentsTable.tsx";
 import { selectRelayerHistoryByPaymentIntentIdPaginated } from "../../lib/backend/db/tables/RelayerHistory.ts";
+import WalletBalanceDisplay from "../../islands/WalletBalanceDisplay.tsx";
 
 
 
@@ -77,7 +78,7 @@ export default function CreatedPaymentIntents(props: PageProps) {
     }
     const pi = props.data.paymentIntentData[0] as PaymentIntentRow;
     const dynamicPaymentRequestJobArr = props.data.dynamicPaymentRequestJobArr;
-    const currency :SelectableCurrency = JSON.parse(pi.currency);
+    const currency: SelectableCurrency = JSON.parse(pi.currency);
     function IfDynamicAddDebitTrigger(props: { pricing: Pricing, maxDebitAmount: string, dynamicPaymentRequestJob: any }) {
         if (props.pricing === Pricing.Dynamic) {
             return <tr>
@@ -194,7 +195,14 @@ export default function CreatedPaymentIntents(props: PageProps) {
                             </tr>
                             <tr>
                                 <UnderlinedTd extraStyles="bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200 text-sm">Customer Account Balance:</UnderlinedTd>
-                                <UnderlinedTd extraStyles=""><p>{pi.account_id.balance}  {currName}</p></UnderlinedTd>
+                                <UnderlinedTd extraStyles=""><WalletBalanceDisplay
+                                    commitment={pi.commitment}
+                                    network={pi.network as ChainIds}
+                                    accountType={pi.account_id.accountType}
+                                    currency={pi.currency}
+                                    oldBalance={pi.account_id.balance}
+                                    calledFrom={"app"}
+                                ></WalletBalanceDisplay></UnderlinedTd>
                                 <UnderlinedTd extraStyles=""><Tooltip message="The current balance of the account that will be charged."></Tooltip></UnderlinedTd>
                             </tr>
                             <tr>
