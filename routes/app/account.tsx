@@ -11,18 +11,18 @@ import { refreshDBBalance } from "../../lib/backend/businessLogic.ts";
 import { AccountTypes, Pricing } from "../../lib/enums.ts";
 import WalletApproveOrDisconnect from "../../islands/WalletApproveOrDisconnect.tsx";
 import WalletDetailsFetcher from "../../islands/WalletDetailsFetcher.tsx";
-import { formatEther } from "../../lib/backend/web3.ts";
-import { parseEther } from "../../lib/frontend/web3.ts";
+import { formatEther, getAccount } from "../../lib/backend/web3.ts";
 import { ZeroAddress } from "$ethers";
+import { parseEther } from "../../lib/frontend/web3.ts";
 
 export const handler: Handlers<any, State> = {
     async GET(req: any, ctx: any) {
         const url = new URL(req.url);
-        const query = url.searchParams.get("q") || "";
+        const commitment = url.searchParams.get("q") || "";
         const queryBuilder = new QueryBuilder(ctx);
         const select = queryBuilder.select();
         try {
-            const { data } = await select.Accounts.byCommitment(query);
+            const { data } = await select.Accounts.byCommitment(commitment);
             if (data.length === 0) {
                 return ctx.render({ ...ctx.state, notfound: true })
             }
@@ -38,8 +38,13 @@ export const handler: Handlers<any, State> = {
             }
 
             const networkId = data[0].network_id;
-
-            const onChainAccount = await refreshDBBalance(data, query, queryBuilder)
+            //This don't need to refresh balance, as the UI will fetch it again each time
+            //But I do wanna keep the redirect, so I just query blockchain without callingrefreshDBBalance
+            const onChainAccount = await getAccount(
+                commitment,
+                networkId,
+                data[0].accountType,
+            );
 
             if (!onChainAccount.account[0]) {
                 // If it's closed I redirect to accounts page!
@@ -59,7 +64,7 @@ export const handler: Handlers<any, State> = {
                     ...ctx.state,
                     currency: data[0].currency,
                     name: data[0].name,
-                    commitment: query,
+                    commitment,
                     closed: data[0].closed,
                     networkId: networkId,
                     accountData: onChainAccount,
@@ -109,9 +114,12 @@ export default function Account(props: PageProps) {
                 <div class="bg-white shadow-2xl p-6 rounded-2xl border-2 border-gray-50">
                     <div class="flex flex-col justify-center">
                         <AccountCardElement
+                            calledFrom={"app"}
+                            commitment={props.data.commitment}
                             name={props.data.name}
                             balance={formatEther(balance)}
-                            network={networkNameFromId[props.data.networkId as ChainIds]}
+                            network={props.data.networkId}
+                            networkName={networkNameFromId[props.data.networkId as ChainIds]}
                             currency={props.data.currency}
                             accountType={accountType}
                             closed={props.data.closed}
