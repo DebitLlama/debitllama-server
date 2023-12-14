@@ -82,6 +82,7 @@ import * as $CurrencySelectDropdown from "./islands/CurrencySelectDropdown.tsx";
 import * as $DebitItemTableRow from "./islands/DebitItemTableRow.tsx";
 import * as $TriggerDirectDebitButton from "./islands/TriggerDirectDebitButton.tsx";
 import * as $WalletApproveOrDisconnect from "./islands/WalletApproveOrDisconnect.tsx";
+import * as $WalletBalanceDisplay from "./islands/WalletBalanceDisplay.tsx";
 import * as $WalletDetailsFetcher from "./islands/WalletDetailsFetcher.tsx";
 import * as $WebhooksUI from "./islands/WebhooksUI.tsx";
 import * as $accountCardCarousel from "./islands/accountCardCarousel.tsx";
@@ -203,6 +204,7 @@ const manifest = {
     "./islands/DebitItemTableRow.tsx": $DebitItemTableRow,
     "./islands/TriggerDirectDebitButton.tsx": $TriggerDirectDebitButton,
     "./islands/WalletApproveOrDisconnect.tsx": $WalletApproveOrDisconnect,
+    "./islands/WalletBalanceDisplay.tsx": $WalletBalanceDisplay,
     "./islands/WalletDetailsFetcher.tsx": $WalletDetailsFetcher,
     "./islands/WebhooksUI.tsx": $WebhooksUI,
     "./islands/accountCardCarousel.tsx": $accountCardCarousel,
