@@ -1,3 +1,4 @@
+import { ChainIds, networkNameFromId } from "../../lib/shared/web3.ts";
 import { LoggedInUiProps } from "../../lib/types/checkoutTypes.ts";
 import { AccountCardElement } from "../AccountCardElement.tsx";
 import { CardOutline } from "../Cards.tsx";
@@ -31,7 +32,10 @@ export function LoggedInUi(props: LoggedInUiProps) {
                     selected={props.selectedAccount}
                 >
                     <AccountCardElement
-                        network={""}
+                        commitment={data.commitment}
+                        calledFrom={"buyPage"}
+                        network={data.network_id}
+                        networkName={networkNameFromId[data.network_id as ChainIds]}
                         balance={data.balance}
                         currency={data.currency}
                         name={data.name}
