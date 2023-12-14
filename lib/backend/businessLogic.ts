@@ -263,12 +263,10 @@ export async function refreshDBBalance(
   );
 
   // If account on chain is active but the balance is not the same as the balance I saved
-  // /?TODO; REFACTOR THESE TO 1 RPC CALL
   if (
     onChainAccount.account[0] &&
     parseEther(data[0].balance) !== onChainAccount.account[3]
   ) {
-    //TODO: RPC CALL INSTEAD OF THESE!!
     //Check if there were payment intents with account balance too low and
     // calculate how much balance was added and set them to recurring or created where possible
     await updatePaymentIntentsWhereAccountBalanceWasAdded(
