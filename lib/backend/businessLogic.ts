@@ -5,7 +5,12 @@ import {
   PaymentIntentStatus,
   Pricing,
 } from "../enums.ts";
-import { ChainIds, SelectableCurrency } from "../shared/web3.ts";
+import {
+  ChainIds,
+  getCurrenciesForNetworkName,
+  NetworkNames,
+  SelectableCurrency,
+} from "../shared/web3.ts";
 import {
   getAuthenticationOptions,
   getAuthenticationOptionsWithLargeBlobRead,
@@ -26,13 +31,7 @@ import {
   selectCurrentUserChallenge,
   updateUserChallengeByUserId,
 } from "./db/tables/UserChallenges.ts";
-import {
-  estimateRelayerGas,
-  formatEther,
-  getAccount,
-  getProvider,
-  parseEther,
-} from "./web3.ts";
+import { getAccount, getProvider, parseEther } from "./web3.ts";
 
 async function setResettablePaymentIntents(
   update: any,
@@ -54,32 +53,6 @@ async function setResettablePaymentIntents(
       );
     }
   }
-}
-
-export function findPaymentIntentsThatCanBeReset(
-  addedBalance: string,
-  paymentIntentsRows: Array<PaymentIntentRow>,
-  feeData: any,
-) {
-  const parsedAddedBalance = parseEther(addedBalance);
-  const resumablePaymentIntents = new Array<PaymentIntentRow>();
-
-  let addedBalanceLeft = parsedAddedBalance;
-  for (let i = 0; i < paymentIntentsRows.length; i++) {
-    const pi = paymentIntentsRows[i];
-    const totalFee = calculateGasEstimationPerChain(
-      pi.network as ChainIds,
-      feeData,
-      increaseGasLimit(BigInt(pi.estimatedGas)),
-    );
-    if (totalFee) {
-      if (addedBalanceLeft - totalFee >= 0) {
-        resumablePaymentIntents.push(pi);
-        addedBalanceLeft -= totalFee;
-      }
-    }
-  }
-  return resumablePaymentIntents;
 }
 
 /**
@@ -112,33 +85,6 @@ export async function getGasPrice(chainId: ChainIds) {
       ? BigInt(0)
       : feeData.maxPriorityFeePerGas,
   };
-}
-
-/**
- * Calculate the gas estimation for a dynamic payment request using the chainid and fee data and an increased gas limit
- * @param chainId
- */
-
-export function calculateGasEstimationPerChain(
-  chainId: ChainIds,
-  feeData: {
-    gasPrice: bigint | null;
-    maxFeePerGas: bigint;
-    maxPriorityFeePerGas: bigint;
-  },
-  increasedEstimatedGas: bigint,
-) {
-  if (feeData.gasPrice === null) {
-    return null;
-  }
-  switch (chainId) {
-    case ChainIds.BTT_TESTNET_ID:
-      return feeData.gasPrice * increasedEstimatedGas;
-    case ChainIds.BTT_MAINNET_ID:
-      return feeData.gasPrice * increasedEstimatedGas;
-    default:
-      return null;
-  }
 }
 
 function findPaymentIntentsWithAccountBalanceLowThatCanBeReset(
@@ -595,4 +541,73 @@ export async function account_AuthenticationLargeBlobRead(
   await updateUserChallengeByUserId(ctx, { challenge: options.challenge });
 
   return [true, options];
+}
+
+export function parseCurrencyForValidation(
+  currency: string,
+  network: NetworkNames,
+  maxAmount: string,
+) {
+  const parsedCurrency = JSON.parse(currency) as SelectableCurrency;
+
+  const name = parsedCurrency.name;
+  const native = parsedCurrency.native;
+  const contractAddress = parsedCurrency.contractAddress;
+  const minimumAmount = parsedCurrency.minimumAmount;
+  const chainCurrencies = getCurrenciesForNetworkName[network];
+  //Verify the passed in currency object is valid
+  const findSubmittedCurrency = chainCurrencies.filter(
+    (curr) =>
+      curr.name === name &&
+      curr.native === native &&
+      curr.contractAddress === contractAddress &&
+      curr.minimumAmount === minimumAmount,
+  );
+
+  console.log(findSubmittedCurrency);
+
+  if (findSubmittedCurrency.length !== 1) {
+    throw new Error("Invalid currency object params");
+  }
+  if (parseFloat(minimumAmount) > parseFloat(maxAmount)) {
+    // Invalid amount, maxAmount should be bigger or equal the minimum!
+    throw new Error("maxAmount under minimum");
+  }
+}
+
+export function parseCurrencyForValidation_APIV1(
+  currency: string,
+  network: NetworkNames,
+  maxAmount: string,
+) {
+  const parsedCurrency = JSON.parse(currency) as SelectableCurrency;
+
+  const name = parsedCurrency.name;
+  const native = parsedCurrency.native;
+  const contractAddress = parsedCurrency.contractAddress;
+
+  const chainCurrencies = getCurrenciesForNetworkName[network];
+
+  //Verify the passed in currency object is valid
+  const findSubmittedCurrency = chainCurrencies.filter(
+    (curr) =>
+      curr.name === name &&
+      curr.native === native &&
+      curr.contractAddress === contractAddress,
+  );
+
+  if (findSubmittedCurrency.length !== 1) {
+    throw new Error("Invalid currency object params");
+  }
+
+  if (
+    parseFloat(findSubmittedCurrency[0].minimumAmount) > parseFloat(maxAmount)
+  ) {
+    // Invalid amount, maxAmount should be bigger or equal the minimum!
+    throw new Error(
+      `maxAmount < ${
+        findSubmittedCurrency[0].minimumAmount
+      } ${name}`,
+    );
+  }
 }
