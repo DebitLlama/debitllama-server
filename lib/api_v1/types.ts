@@ -243,6 +243,7 @@ export enum EndpointNames_ApiV1 {
   itemsSlug = "/api/v1/items/[slug]",
   paymentIntents = "/api/v1/payment_intents",
   paymentIntentsSlug = "/api/v1/payment_intents/[slug]",
+  buyitnow = "/buyitnow?q=[slug]",
 }
 
 export const endpoints_ApiV1: { [key in EndpointNames_ApiV1]: Array<Methods> } =
@@ -254,6 +255,7 @@ export const endpoints_ApiV1: { [key in EndpointNames_ApiV1]: Array<Methods> } =
     [EndpointNames_ApiV1.itemsSlug]: [Methods.GET, Methods.POST],
     [EndpointNames_ApiV1.paymentIntents]: [Methods.GET],
     [EndpointNames_ApiV1.paymentIntentsSlug]: [Methods.GET, Methods.POST],
+    [EndpointNames_ApiV1.buyitnow]: [Methods.GET],
   };
 
 export const endpointDefinitions: { [key in EndpointNames_ApiV1]: string } = {
@@ -263,13 +265,14 @@ export const endpointDefinitions: { [key in EndpointNames_ApiV1]: string } = {
   [EndpointNames_ApiV1.accountsSlug]:
     "GET: an account by commitment and refresh owned account balance if authenticated!",
   [EndpointNames_ApiV1.items]:
-    "GET all items of access token owner paginated,PUT: new item",
+    "GET all items of access token owner paginated,POST: new item",
   [EndpointNames_ApiV1.itemsSlug]:
     "GET: Fetch an item by item_id. POST: Update redirect_url and deactivate item",
   [EndpointNames_ApiV1.paymentIntents]:
     "GET:All payment intents of access token owner paginated",
   [EndpointNames_ApiV1.paymentIntentsSlug]:
     "GET: payment intent by identifier, POST: Create a DynamicPaymentRequest",
+  [EndpointNames_ApiV1.buyitnow]: "GET: The checkout page to redirect to",
 };
 
 export interface Link {
@@ -346,6 +349,17 @@ export interface V1_ItemsResponse extends Base_ApiV1 {
   pagination: PaginationResponse_ApiV1;
   filter: Array<Filter>;
   availableFilters: Array<string>;
+}
+
+export interface V1_NewItemCreated extends Base_ApiV1 {
+  checkout: string;
+  item_id: string;
+}
+
+export interface V1_ItemResponse extends Base_ApiV1 {
+  item: DebitItem_ApiV1;
+  checkout: string;
+  item_id: string;
 }
 
 export interface PaginationResponse_ApiV1 {
@@ -663,6 +677,7 @@ export const getSortableColumns: {
   [EndpointNames_ApiV1.paymentIntents]: Object.entries(PaymentIntents_sortyBy)
     .map((ent) => ent[0]),
   [EndpointNames_ApiV1.paymentIntentsSlug]: [],
+  [EndpointNames_ApiV1.buyitnow]: [],
 };
 
 export interface PaymentIntent_ZapierFormat {
