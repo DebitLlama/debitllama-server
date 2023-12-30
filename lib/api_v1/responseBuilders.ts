@@ -549,7 +549,7 @@ export interface SingleItemResponseBuilderArgs {
 
 export function SingleItemResponseBuilder(args: SingleItemResponseBuilderArgs) {
   const _self = {
-    href: `/api/v1/items/${args?.item?.button_id} `,
+    href: `/api/v1/items/${args?.item?.button_id}`,
     methods: endpoints_ApiV1[EndpointNames_ApiV1.itemsSlug],
   };
   const checkoutLink =
