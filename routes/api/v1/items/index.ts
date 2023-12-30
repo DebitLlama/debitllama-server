@@ -1,6 +1,7 @@
-import { HandlerContext } from "$fresh/server.ts";
+import { FreshContext } from "$fresh/server.ts";
 import {
   ItemsResponseBuilder,
+  newItemCreatedResponseBuilder,
   parseFilter,
   v1Error,
   v1Success,
@@ -14,12 +15,23 @@ import {
 import {
   getPagination,
   getTotalPages,
+  parseCurrencyForValidation_APIV1,
 } from "../../../../lib/backend/businessLogic.ts";
-import { selectAllItemsForAPIV1 } from "../../../../lib/backend/db/v1.ts";
+import {
+  insertNewItemForAPIV1,
+  selectAllItemsForAPIV1,
+} from "../../../../lib/backend/db/v1.ts";
+import { validateAddress } from "../../../../lib/backend/web3.ts";
+import { Pricing } from "../../../../lib/enums.ts";
+import {
+  ChainIds,
+  networkNameFromId,
+  rpcUrl,
+} from "../../../../lib/shared/web3.ts";
 import { State } from "../../../_middleware.ts";
 
 export const handler = {
-  async GET(_req: Request, ctx: HandlerContext<any, State>) {
+  async GET(_req: Request, ctx: FreshContext<any, State>) {
     const url = new URL(_req.url);
     const current_pageQ = url.searchParams.get("current_page") || "0";
     const page_sizeQ = url.searchParams.get("page_size") || "10";
@@ -114,8 +126,107 @@ export const handler = {
       );
     }
   },
-  PUT(_req: Request, ctx: HandlerContext<any, State>) {
-    //TODO: Create a brand new item
-    return new Response(null, { status: 200 });
+  async POST(_req: Request, _ctx: FreshContext<any, State>) {
+    try {
+      const json = await _req.json();
+
+      const {
+        name,
+        chainId,
+        walletaddress,
+        currency,
+        pricing,
+        maxAmount,
+        debitTimes,
+        debitInterval,
+        redirectto,
+      } = json;
+
+      //URL validation, this throws if its invalid url
+      new URL(redirectto);
+
+      //Verify if the network is valid
+
+      if (rpcUrl[chainId as ChainIds] === undefined) {
+        throw new Error("Invalid network");
+      }
+
+      const validAddress = validateAddress(walletaddress);
+
+      if (!validAddress) {
+        throw new Error("Invalid wallet address");
+      }
+
+      if (isNaN(parseInt(debitTimes))) {
+        throw new Error("Invalid Debit Time");
+      }
+
+      if (pricing !== Pricing.Fixed && pricing !== Pricing.Dynamic) {
+        throw new Error("Invalid Pricing! Fixed or Dynamic only!");
+      }
+
+      if (pricing === Pricing.Fixed && Number(debitInterval) < 1) {
+        throw new Error(
+          "Invalid Debit Interval! Fixed priced payments can't have unspecified/zero interval!",
+        );
+      }
+
+      if (isNaN(parseFloat(maxAmount))) {
+        throw new Error("Invalid Max Amount");
+      }
+      if (isNaN(parseInt(debitInterval))) {
+        throw new Error("Invalid Max Amount");
+      }
+      if (pricing !== Pricing.Fixed && pricing !== Pricing.Dynamic) {
+        throw new Error("Invalid pricing");
+      }
+
+      parseCurrencyForValidation_APIV1(
+        currency,
+        networkNameFromId[chainId as ChainIds],
+        maxAmount,
+      );
+
+      const { data, error } = await insertNewItemForAPIV1(_ctx, {
+        payee_id: _ctx.state.userid,
+        payee_address: walletaddress,
+        currency,
+        max_price: maxAmount,
+        debit_times: debitTimes,
+        debit_interval: debitInterval,
+        redirect_url: redirectto,
+        pricing,
+        network: chainId,
+        name,
+      });
+      if (error) {
+        console.error(error);
+      }
+
+      const button_id = data[0].button_id;
+
+      return v1Success(newItemCreatedResponseBuilder({
+        button_id,
+        returnError: false,
+        error: {
+          message: "",
+          status: 0,
+          timestamp: new Date().toUTCString(),
+        },
+      }));
+    } catch (err) {
+      return v1Error(
+        newItemCreatedResponseBuilder({
+          returnError: true,
+          error: {
+            message: err.message,
+            status: 400,
+            timestamp: new Date().toUTCString(),
+          },
+          button_id: "",
+        }),
+        400,
+      );
+    }
   },
 };
