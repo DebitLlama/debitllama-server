@@ -78,6 +78,7 @@ export default function ApiAccess(props: PageProps) {
                                 <option value={TokenExpiry.ONEMONTH} >One Month</option>
                                 <option value={TokenExpiry.SIXMONTHS} >Six Months</option>
                                 <option value={TokenExpiry.ONEYEAR} >One Year</option>
+                                <option value={TokenExpiry.NEVER}>Never</option>
                             </select>
                         </div>
                         <button aria-label="get new access token" type="submit" class=" w-64 mt-2 w-full text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800"

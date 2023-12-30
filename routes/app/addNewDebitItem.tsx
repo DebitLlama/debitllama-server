@@ -2,12 +2,13 @@ import Layout from "../../components/Layout.tsx";
 import { State } from "../_middleware.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import AddNewDebitItemPageForm from "../../islands/addNewDebitItemPageForm.tsx";
-import { NetworkNames, SelectableCurrency, chainIdFromNetworkName, getCurrenciesForNetworkName } from "../../lib/shared/web3.ts";
+import { NetworkNames, chainIdFromNetworkName, getCurrenciesForNetworkName } from "../../lib/shared/web3.ts";
 import QueryBuilder from "../../lib/backend/db/queryBuilder.ts";
 import { Pricing } from "../../lib/enums.ts";
 import { errorResponseBuilder } from "../../lib/backend/responseBuilders.ts";
 import { validateAddress } from "../../lib/backend/web3.ts";
 import { setProfileRedirectCookie } from "../../lib/backend/cookies.ts";
+import { parseCurrencyForValidation } from "../../lib/backend/businessLogic.ts";
 
 
 
@@ -89,30 +90,7 @@ export const handler: Handlers<any, State> = {
         }
 
         try {
-            const parsedCurrency = JSON.parse(currency) as SelectableCurrency;
-
-            const name = parsedCurrency.name;
-            const native = parsedCurrency.native;
-            const contractAddress = parsedCurrency.contractAddress;
-            const minimumAmount = parsedCurrency.minimumAmount;
-            const chainCurrencies = getCurrenciesForNetworkName[network as NetworkNames];
-            //Verify the passed in currency object is valid
-            const findSubmittedCurrency = chainCurrencies.filter(
-                (curr) =>
-                    curr.name === name
-                    && curr.native === native
-                    && curr.contractAddress === contractAddress
-                    && curr.minimumAmount === minimumAmount
-            );
-            if (findSubmittedCurrency.length !== 1) {
-                throw new Error();
-            }
-
-
-            if (parseFloat(minimumAmount) > parseFloat(maxAmount)) {
-                // Invalid amount, maxAmount should be bigger or equal the minimum!
-                return errorResponseBuilder("maxAmount under minimum")
-            }
+            parseCurrencyForValidation(currency, network as NetworkNames, maxAmount);
 
         } catch (err) {
             return errorResponseBuilder("Unable to parse currency!");
