@@ -5,16 +5,13 @@ import {
   PaymentIntentRow,
 } from "../enums.ts";
 import {
-  bittorrentCurrencies,
-  bttMainnetCurrencies,
   ChainIds,
-  ConnectedWalletsContractAddress,
+  getConnectedWalletsContractAddress,
   getCurrenciesForNetworkName,
   getVirtualAccountsContractAddress,
   networkNameFromId,
-  NetworkNames,
+  responseBuildersSupportedNetworks,
   rpcUrl,
-  VirtualAccountsContractAddress,
   walletCurrency,
 } from "../shared/web3.ts";
 import {
@@ -44,7 +41,9 @@ import {
   v1_AccountsResponse,
   v1_DynamicPaymentRequesResponse,
   v1_Index_Response,
+  V1_ItemResponse,
   V1_ItemsResponse,
+  V1_NewItemCreated,
   v1_Payment_intentsResponse,
   v1_SinglePaymentIntentResponse,
   V1Error,
@@ -91,38 +90,7 @@ export function V1ResponseBuilder() {
       { name: "ConnectedWallets", href: "/ConnectedWallets.json" },
       { name: "VirtualAccounts", href: "/VirtualAccounts.json" },
     ],
-    supported_networks: [
-      {
-        name: NetworkNames.BTT_TESTNET,
-        rpc: rpcUrl[ChainIds.BTT_TESTNET_ID],
-        chain_id: ChainIds.BTT_TESTNET_ID,
-        virtual_accounts_contract: VirtualAccountsContractAddress.BTT_TESTNET,
-        connected_wallets_contract: ConnectedWalletsContractAddress.BTT_TESTNET,
-        currency: "BTT",
-        available_currencies: bittorrentCurrencies.map((curr) => {
-          return {
-            name: curr.name,
-            native: curr.native,
-            contractAddress: curr.contractAddress,
-          };
-        }),
-      },
-      {
-        name: NetworkNames.BTT_MAINNET,
-        rpc: rpcUrl[ChainIds.BTT_MAINNET_ID],
-        chain_id: ChainIds.BTT_MAINNET_ID,
-        virtual_accounts_contract: VirtualAccountsContractAddress.BTT_MAINNET,
-        connected_wallets_contract: ConnectedWalletsContractAddress.BTT_MAINNET,
-        currency: "BTT",
-        available_currencies: bttMainnetCurrencies.map((curr) => {
-          return {
-            name: curr.name,
-            native: curr.native,
-            contractAddress: curr.contractAddress,
-          };
-        }),
-      },
-    ],
+    supported_networks: responseBuildersSupportedNetworks,
   };
   return body;
 }
@@ -528,6 +496,112 @@ export function DynamicPaymentRequestResponseBuilder(
   return body;
 }
 
+export interface ItemCreatedResponseBuilderArgs {
+  button_id: string;
+  returnError: boolean;
+  error: V1Error;
+}
+
+export function newItemCreatedResponseBuilder(
+  args: ItemCreatedResponseBuilderArgs,
+) {
+  const _self = {
+    href: `/api/v1/items`,
+    methods: endpoints_ApiV1[EndpointNames_ApiV1.items],
+  };
+  const _version = "v1";
+  const _description = endpointDefinitions[EndpointNames_ApiV1.items];
+
+  const checkoutLink = `https://debitllama.com/buyitnow?q=${args.button_id}`;
+
+  const _links = [{
+    href: checkoutLink,
+    methods: endpoints_ApiV1[EndpointNames_ApiV1.buyitnow],
+  }];
+
+  if (args.returnError) {
+    const errorRes: ErrorResponse = {
+      _self,
+      _description,
+      _version,
+      _links,
+      error: args.error,
+    };
+    return errorRes;
+  }
+
+  const body: V1_NewItemCreated = {
+    _self,
+    _description,
+    _version,
+    _links,
+    checkout: checkoutLink,
+    item_id: args.button_id,
+  };
+  return body;
+}
+
+export interface SingleItemResponseBuilderArgs {
+  error: V1Error;
+  returnedError: boolean;
+  item: DebitItem | undefined;
+}
+
+export function SingleItemResponseBuilder(args: SingleItemResponseBuilderArgs) {
+  const _self = {
+    href: `/api/v1/items/${args?.item?.button_id} `,
+    methods: endpoints_ApiV1[EndpointNames_ApiV1.itemsSlug],
+  };
+  const checkoutLink =
+    `https://debitllama.com/buyitnow?q=${args.item?.button_id}`;
+
+  const _version = "v1";
+  const _description = endpointDefinitions[EndpointNames_ApiV1.itemsSlug];
+  const _links = [_self, {
+    href: checkoutLink,
+    methods: endpoints_ApiV1[EndpointNames_ApiV1.itemsSlug],
+  }];
+
+  if (args.returnedError) {
+    const errorRes: ErrorResponse = {
+      _self,
+      _description,
+      _version,
+      _links,
+      error: args.error,
+    };
+    return errorRes;
+  }
+
+  const item = args.item as DebitItem;
+
+  const body: V1_ItemResponse = {
+    _self,
+    _version,
+    _description,
+    _links,
+    item: {
+      id: item.id,
+      created_at: item.created_at,
+      payee_address: item.payee_address,
+      currency: JSON.parse(item.currency),
+      max_price: item.max_price,
+      debit_times: item.debit_times,
+      debit_interval: item.debit_interval,
+      button_id: item.button_id,
+      redirect_url: item.redirect_url,
+      pricing: item.pricing as Pricing_ApiV1,
+      network: getNetworkDetailsFromDebitItem(item),
+      name: item.name,
+      deleted: item.deleted,
+      payment_intents_count: item.payment_intents_count,
+    },
+    checkout: checkoutLink,
+    item_id: item.button_id,
+  };
+  return body;
+}
+
 export interface ItemsResponseBuilderArgs {
   returnError: boolean;
   error: V1Error;
@@ -576,26 +650,8 @@ export function ItemsResponseBuilder(args: ItemsResponseBuilderArgs) {
     _links,
     items: args.items.map((i) => {
       const curr = JSON.parse(i.currency);
-      const networkId = i.network as ChainIds;
-      const networkName = networkNameFromId[networkId];
-      const network = {
-        name: networkName,
-        rpc: rpcUrl[networkId],
-        chain_id: networkId,
-        virtual_accounts_contract: getVirtualAccountsContractAddress[networkId],
-        connected_wallets_contract:
-          getVirtualAccountsContractAddress[networkId],
-        currency: walletCurrency[networkId],
-        available_currencies: getCurrenciesForNetworkName[networkName].map(
-          (curr) => {
-            return {
-              name: curr.name,
-              native: curr.native,
-              contractAddress: curr.contractAddress,
-            };
-          },
-        ),
-      };
+      const network = getNetworkDetailsFromDebitItem(i);
+
       return {
         id: i.id,
         created_at: i.created_at,
@@ -623,6 +679,29 @@ export function ItemsResponseBuilder(args: ItemsResponseBuilderArgs) {
   };
 
   return body;
+}
+
+export function getNetworkDetailsFromDebitItem(i: DebitItem) {
+  const networkId = i.network as ChainIds;
+  const networkName = networkNameFromId[networkId];
+  const network = {
+    name: networkName,
+    rpc: rpcUrl[networkId],
+    chain_id: networkId,
+    virtual_accounts_contract: getVirtualAccountsContractAddress[networkId],
+    connected_wallets_contract: getConnectedWalletsContractAddress[networkId],
+    currency: walletCurrency[networkId],
+    available_currencies: getCurrenciesForNetworkName[networkName].map(
+      (curr) => {
+        return {
+          name: curr.name,
+          native: curr.native,
+          contractAddress: curr.contractAddress,
+        };
+      },
+    ),
+  };
+  return network;
 }
 
 function getLinksFromPaymentIntents(
