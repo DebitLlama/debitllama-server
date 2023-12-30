@@ -69,6 +69,7 @@ import * as $index from "./routes/index.tsx";
 import * as $login from "./routes/login.tsx";
 import * as $logout from "./routes/logout.tsx";
 import * as $privacyPolicy from "./routes/privacyPolicy.tsx";
+import * as $ramp from "./routes/ramp.tsx";
 import * as $requestpasswordreset from "./routes/requestpasswordreset.tsx";
 import * as $resendConfirmation from "./routes/resendConfirmation.tsx";
 import * as $signup from "./routes/signup.tsx";
@@ -188,6 +189,7 @@ const manifest = {
     "./routes/login.tsx": $login,
     "./routes/logout.tsx": $logout,
     "./routes/privacyPolicy.tsx": $privacyPolicy,
+    "./routes/ramp.tsx": $ramp,
     "./routes/requestpasswordreset.tsx": $requestpasswordreset,
     "./routes/resendConfirmation.tsx": $resendConfirmation,
     "./routes/signup.tsx": $signup,

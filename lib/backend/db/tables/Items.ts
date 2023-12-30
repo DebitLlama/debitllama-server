@@ -1,8 +1,4 @@
-import {
-  PaginationArgs,
-  PaginationArgsWithSearch,
-  SupabaseQueryResult,
-} from "../utils.ts";
+import { PaginationArgs, PaginationArgsWithSearch } from "../utils.ts";
 import { query, responseHandler, unwrapContext } from "../utils.ts";
 
 export async function updateItemEmailNotifications(

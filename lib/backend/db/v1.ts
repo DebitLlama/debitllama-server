@@ -37,6 +37,110 @@ export async function selectAllItemsForAPIV1(
   });
 }
 
+export interface NewItemArgs {
+  payee_id: string;
+  payee_address: string;
+  currency: string;
+  max_price: string;
+  debit_times: string;
+  debit_interval: string;
+  redirect_url: string;
+  pricing: string;
+  network: string;
+  name: string;
+}
+
+export async function insertNewItemForAPIV1(ctx: any, args: NewItemArgs) {
+  return await query<NewItemArgs>({
+    ctx,
+    args,
+    name: "insertNewItemForAPIV1",
+    impl: async (p) => {
+      const {
+        payee_id,
+        payee_address,
+        currency,
+        max_price,
+        debit_times,
+        debit_interval,
+        redirect_url,
+        pricing,
+        network,
+        name,
+      } = args;
+      return await p.client.from("Items").insert({
+        created_at: new Date().toUTCString(),
+        payee_id,
+        payee_address,
+        currency,
+        max_price,
+        debit_times,
+        debit_interval,
+        redirect_url,
+        pricing,
+        network,
+        name,
+      }).select();
+    },
+  });
+}
+
+export async function selectSingleItemForAPIV1(
+  ctx: any,
+  args: { button_id: string },
+) {
+  return await query<{ button_id: string }>({
+    ctx,
+    args,
+    name: "selectSingleItemForAPIV1",
+    impl: async (p) => {
+      return await p.client.from("Items").select("*")
+        .eq("button_id", p.args.button_id)
+        .eq("payee_id", p.userid);
+    },
+  });
+}
+
+export interface UpdateItemParamsArgs {
+  button_id: string;
+  value: any,
+  type: "disable" | "redirect";
+}
+
+export async function updateItemParamsAPIV1(
+  ctx: any,
+  args: UpdateItemParamsArgs,
+) {
+  return await query<UpdateItemParamsArgs>({
+    ctx,
+    args,
+    name: "updateItemParamsAPIV1",
+    impl: async (p) => {
+      switch (args.type) {
+        case "disable": {
+          return await p.client.from("Items").update({
+            deleted: args.value,
+          })
+            .eq("button_id", p.args.button_id)
+            .eq("payee_id", p.userid)
+            .select("*");
+        }
+        case "redirect": {
+          return await p.client.from("Items").update({
+            redirect_url: args.value,
+          })
+            .eq("button_id", p.args.button_id)
+            .eq("payee_id", p.userid)
+            .select("*");
+        }
+        default:
+          //Do nothing as it's an unrecognized type
+          break;
+      }
+    },
+  });
+}
+
 export type SelectAccountsByCommitmentAPiV1 = {
   commitment: string;
 };
@@ -314,7 +418,8 @@ export async function getLatestSubscriptionWhereAccountBalanceLowAndFailedDynami
         .eq("payee_user_id", p.userid)
         .eq("pricing", Pricing_ApiV1.Dynamic);
     },
-    name: "getLatestSubscriptionWhereAccountBalanceLowAndFailedDynamicPaymentAmount",
+    name:
+      "getLatestSubscriptionWhereAccountBalanceLowAndFailedDynamicPaymentAmount",
   });
 }
 
