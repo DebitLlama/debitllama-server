@@ -83,7 +83,7 @@ export const handler = {
     //TODO: refactor to type and value
     const { type, value } = json;
 
-    if (type !== "disable" && type !== "redirect") {
+    if (type !== "delete" && type !== "redirect") {
       return v1Error(
         SingleItemResponseBuilder({
           error: {
@@ -98,7 +98,8 @@ export const handler = {
       );
     }
 
-    if (type === "disable" && typeof value !== "boolean") {
+
+    if (type === "delete" && typeof value !== "boolean") {
       return v1Error(
         SingleItemResponseBuilder({
           error: {

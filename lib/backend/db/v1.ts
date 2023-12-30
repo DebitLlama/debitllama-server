@@ -104,7 +104,7 @@ export async function selectSingleItemForAPIV1(
 export interface UpdateItemParamsArgs {
   button_id: string;
   value: any,
-  type: "disable" | "redirect";
+  type: "delete" | "redirect";
 }
 
 export async function updateItemParamsAPIV1(
@@ -117,7 +117,7 @@ export async function updateItemParamsAPIV1(
     name: "updateItemParamsAPIV1",
     impl: async (p) => {
       switch (args.type) {
-        case "disable": {
+        case "delete": {
           return await p.client.from("Items").update({
             deleted: args.value,
           })

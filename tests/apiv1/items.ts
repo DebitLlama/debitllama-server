@@ -79,7 +79,7 @@ Deno.test("api/v1/items POST", async () => {
   const disablePOSTRes = await AuthenticatedPOST({
     accesstoken,
     url: `http://localhost:3000/api/v1/items/${item_id}`,
-    body: JSON.stringify({ type: "disable", value: true }),
+    body: JSON.stringify({ type: "deleted", value: true }),
   });
 
   console.log(await disablePOSTRes.json());
