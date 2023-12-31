@@ -166,6 +166,7 @@ export default function Home() {
                             <div class="flex flex-col flex-wrap justify-around flex-wrap  p-8 rounded max-w-7xl">
                                 <h2 class="text-5xl font-bold mt-2 text-gray-800 text-center">Non-Interactive Payments</h2>
                                 <p class="whitespace-break-spaces text-center text-2xl">Set up your account once and approve subscription payments using any browser!</p>
+                                <p class="whitespace-break-spaces text-center text-lg text-gray-400">We charge a 🚘 5% fee on direct debit to cover the ⛽ Gas Fees!!</p>
                             </div>
                         </div>
                     </div>
@@ -326,7 +327,7 @@ export default function Home() {
                         </div>
                         <div class="flex flex-row justify-center">
                             <div class="flex flex-col flex-wrap justify-around flex-wrap  p-8 rounded max-w-7xl">
-                                <h2 class="text-5xl font-bold mt-2 text-gray-800 text-center">Open API to Automate Payments</h2>
+                                <h2 class="text-5xl font-bold mt-2 text-gray-800 text-center">Open API to Automate Custom Payments</h2>
                                 <p class="whitespace-break-spaces text-center text-2xl">Fixed priced subscriptions are processed automatically but Dynamic payments need to be triggered using the API!</p>
                                 <div class="p-4 shadow-lg rounded-xl">
                                     <h3 class="text-center font-bold text-3xl">Implement Pay as You Go for your SaaS, IaaS etc...</h3>
