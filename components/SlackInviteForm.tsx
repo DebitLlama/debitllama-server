@@ -1,5 +1,5 @@
 export default function SlacKInviteForm() {
-    return <div class="flex flex-row justify-around gap-5 pt-10 pb-10 max-w-7xl mx-auto bg-gray-100">
+    return <div class="flex flex-row justify-around gap-5 pt-10 pb-10  mx-auto bg-gray-100">
         <div class="flex flex-row justify-around max-w-7xl flex-wrap gap-4">
 
             <div class="flex flex-col justify-center">

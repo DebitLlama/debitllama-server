@@ -338,7 +338,7 @@ export default function Home() {
 
 
                 <section class="bg-gradient-gray-to-white">
-                    <div class="flex flex-row justify-around gap-5 pt-10 pb-10 max-w-7xl mx-auto bg-white">
+                    <div class="flex flex-row justify-around gap-5 pt-10 pb-10 mx-auto bg-white">
                         <div class="flex flex-row justify-around max-w-7xl flex-wrap gap-4">
                             <div class="flex flex-col justify-center">
                                 <h1 class="text-center mx-auto text-4xl font-bold mt-2 text-gray-800 ">Learn more about how it works</h1>
