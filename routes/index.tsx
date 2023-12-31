@@ -64,8 +64,6 @@ export default function Home() {
                     </div>
                 </section>
 
-
-
                 <section>
                     <div class="flex flex-col justify-center pt-10  rounded mx-auto">
                         <div class="flex flex-row justify-center rounded-lg  mx-auto">
@@ -76,6 +74,7 @@ export default function Home() {
                             <div class="flex flex-col flex-wrap justify-around flex-wrap  p-8 rounded max-w-7xl">
                                 <h2 class="text-5xl font-bold mt-2 text-gray-800 text-center">Scalable Intent Solvers</h2>
                                 <p class="whitespace-break-spaces text-center text-2xl">Let us worry about transactions. You just set it and forget it!</p>
+                                <h3 class="text-center font-bold">Operating at 1010 TPS and Ready to Scale</h3>
                             </div>
                         </div>
                     </div>
@@ -211,8 +210,8 @@ export default function Home() {
                                 <img src="./getOffMyPorch.webp" alt="Placeholder Image" class="w-full h-48 rounded-md object-cover" />
                                 <div class="px-1 py-4">
                                     <div class="font-bold text-xl">Non-custodial</div>
-                                    <p class="text-gray-700 text-base">
-                                        Your funds are always stored securely in your EOA or a Smart Contract!
+                                    <p class="text-gray-700 text-base tracking-wide	leading-loose">
+                                        Your funds are always stored securely in your External Wallet or deposited into a Smart Contract!
                                         <br />
                                         You can withdraw your deposit or disconnect your wallet any time. Doing so will cancel all your pending subscriptions too!
                                         <br />
@@ -223,7 +222,7 @@ export default function Home() {
                                 <img src="./fishingPerson.webp" alt="Placeholder Image" class="w-full h-48 rounded-md object-cover" />
                                 <div class="px-1 py-4">
                                     <div class="font-bold text-xl mb-2">Phishing Resistant!</div>
-                                    <p class="text-gray-700 text-base">
+                                    <p class="text-gray-700 text-base tracking-wide	leading-loose">
                                         Add a Passkey to protect yourself from Phishing and Account takeovers!
                                         <br />
                                         W3C standard 2FA, available in all browsers and mobile devices!
@@ -236,8 +235,8 @@ export default function Home() {
                                 <img src="./animecoins.webp" alt="Placeholder Image" class="w-full h-48 rounded-md object-cover" />
                                 <div class="px-1 py-4">
                                     <div class="font-bold text-xl">Spending Limit</div>
-                                    <p class="text-gray-700 text-base">
-                                        Spending can be controlled with both the Accounts and Subscriptions!
+                                    <p class="text-gray-700 text-base tracking-wide	leading-loose">
+                                        Spending can be controlled in both the Accounts and Subscriptions!
                                         Account balance is controlled via manual deposit or ERC-20 Approvals!
                                         Subscription debit limit is limited on the cryptography level! Never get charged suprise fees!
                                     </p>
@@ -247,9 +246,12 @@ export default function Home() {
                                 <img src="llama5_crop.webp" alt="Placeholder Image" class="w-full h-48 rounded-md object-cover" />
                                 <div class="px-1 py-4">
                                     <div class="font-bold text-xl">Payments secured by ZKP</div>
-                                    <p class="text-gray-700 text-base">
-                                        Your subscription parameters are immutable, once it's created it can't be altered!
+                                    <p class="text-gray-700 text-base tracking-wide	leading-loose">
+                                        Your subscription parameters are immutable, once they are created they can't be altered only cancelled.
                                         <br />
+                                        Payment Intent proofs are trustlessly processed by approved relayers!
+                                        <br />
+                                        Powered by a Groth-16 Snark Proving System!
                                     </p>
                                 </div>
                             </div>
@@ -260,16 +262,24 @@ export default function Home() {
                 </section>
 
                 <section class="bg-gradient-white-to-gray">
+                    <div class="flex flex-col flex-wrap justify-around flex-wrap  p-8 rounded max-w-7xl">
+                        <h2 class="text-5xl font-bold mt-2 text-gray-800 text-center">Simple Checkout Flow</h2>
+                        <p class="whitespace-break-spaces text-center text-2xl">Link to the checkout page or embedd the button</p>
+                    </div>
                     <div class="flex flex-row justify-around gap-5 mt-10  max-w-7xl mx-auto bg-gray-200 pt-10 pb-10">
                         <div class="flex flex-row justify-around max-w-7xl flex-wrap gap-4">
                             <div class="flex flex-col justify-center text-center">
+                                <div class="flex flex-row justify-center rounded-lg  mx-auto">
+                                    <img alt="another cyberpunk llama image" width="inherit" height="inherit" class="bigScreen indigobg" src="./llama7.webp" />
+                                    <img alt="another cyberpunk llama image mobile" width="inherit" height="inherit" class="smallScreen indigobg " src="./llama7.webp" />
+                                </div>
                                 <h2 class="text-4xl font-bold text-gray-800 text-gradient-gray-to-white">Easy merchant integration!</h2>
                                 <div class="flex flex-row justify-center mt-2">
                                     <img alt="Buy It Now with DebitLlama" src="/buyitnow.png" width="150px" height="inherit" />
                                 </div>
                             </div>
 
-                            <div class="overflow-auto bg-gray-800 shadow-2xl rounded-lg codeDisplayWidth">
+                            <div class="overflow-auto bg-gray-800 shadow-2xl rounded-lg codeDisplayWidth h-60">
                                 <div id="header-buttons" class="py-3 px-4 flex">
                                     <div class="rounded-full w-3 h-3 bg-red-500 mr-2"></div>
                                     <div class="rounded-full w-3 h-3 bg-yellow-500 mr-2"></div>
@@ -304,8 +314,26 @@ export default function Home() {
                     </div>
                 </section>
 
-                <section class="bg-gradient-white-to-gray pb-10 ">
+                <section class="pb-10 ">
                     <SlacKInviteForm></SlacKInviteForm>
+                </section>
+
+                <section>
+                    <div class="flex flex-col justify-center pt-10  rounded mx-auto">
+                        <div class="flex flex-row justify-center rounded-lg  mx-auto">
+                            <img alt="another cyberpunk llama image" width="inherit" height="inherit" class="bigScreen indigobg" src="./llama8.webp" />
+                            <img alt="another cyberpunk llama image mobile" width="inherit" height="inherit" class="smallScreen indigobg " src="./llama8.webp" />
+                        </div>
+                        <div class="flex flex-row justify-center">
+                            <div class="flex flex-col flex-wrap justify-around flex-wrap  p-8 rounded max-w-7xl">
+                                <h2 class="text-5xl font-bold mt-2 text-gray-800 text-center">Open API to Automate Payments</h2>
+                                <p class="whitespace-break-spaces text-center text-2xl">Fixed priced subscriptions are processed automatically but Dynamic payments need to be triggered using the API!</p>
+                                <div class="p-4 shadow-lg rounded-xl">
+                                    <h3 class="text-center font-bold text-3xl">Implement Pay as You Go for your SaaS, IaaS etc...</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </section>
 
 
