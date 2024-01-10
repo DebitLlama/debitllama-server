@@ -15,7 +15,7 @@
     "test_items": "deno test -A tests/apiv1/items.ts",
     "test_zapier_webhooks": "deno test -A tests/apiv1/zapier_webhooks.ts",
     "main": "deno run -A main.ts",
-    "build": "USER_FEEDBACKS_WEBHOOK=asd SMTP_HOSTNAME=asd SMTP_USERNAME=asd SMTP_PASSWORD=asd TESTACCESSTOKEN=asd SUPABASE_URL=asf SUPABASE_KEY=asd ETHENCRYPTPUBLICKEY=asf ETHENCRYPTPRIVATEKEY=sad deno run -A dev.ts build",
+    "build": "USER_FEEDBACKS_WEBHOOK=asd SMTP_HOSTNAME=asd SMTP_USERNAME=asd SMTP_PASSWORD=asd TESTACCESSTOKEN=asd SUPABASE_URL=asf SUPABASE_KEY=asd ETHENCRYPTPUBLICKEY=asf ETHENCRYPTPRIVATEKEY=sad deno run -A --unstable dev.ts build",
     "preview": "deno run -A main.ts"
   },
   "imports": {
