@@ -7,3 +7,4 @@
 todo.md
 # Ignore fresh build directory
 _fresh/
+cipherenv.txt

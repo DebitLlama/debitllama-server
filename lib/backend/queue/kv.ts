@@ -15,19 +15,21 @@ export enum KvMessageType {
   slackWebhook = "slackWebhook",
 }
 
-kv.listenQueue(async (msg: any) => {
-  switch (msg.type as KvMessageType) {
-    case KvMessageType.webhookEvent:
-      await processWebhookwork(msg.content).catch(console.error);
-      break;
-    case KvMessageType.slackWebhook:
-      await processSlackWebhook(msg.content);
-      break;
-    default:
-      console.error("Unknown message received:", msg);
-      break;
-  }
-});
+if (!Deno.args.includes("build")) {
+  kv.listenQueue(async (msg: any) => {
+    switch (msg.type as KvMessageType) {
+      case KvMessageType.webhookEvent:
+        await processWebhookwork(msg.content).catch(console.error);
+        break;
+      case KvMessageType.slackWebhook:
+        await processSlackWebhook(msg.content);
+        break;
+      default:
+        console.error("Unknown message received:", msg);
+        break;
+    }
+  });
+}
 
 export interface NewWebhookWorkerArgs {
   eventType: EventType;

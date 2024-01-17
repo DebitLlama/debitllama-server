@@ -15,11 +15,11 @@
     "test_items": "deno test -A tests/apiv1/items.ts",
     "test_zapier_webhooks": "deno test -A tests/apiv1/zapier_webhooks.ts",
     "main": "deno run -A main.ts",
-    "build": "USER_FEEDBACKS_WEBHOOK=asd SMTP_HOSTNAME=asd SMTP_USERNAME=asd SMTP_PASSWORD=asd TESTACCESSTOKEN=asd SUPABASE_URL=asf SUPABASE_KEY=asd ETHENCRYPTPUBLICKEY=asf ETHENCRYPTPRIVATEKEY=sad deno run -A dev.ts build",
+    "build": "RELAYERAUTHTOKEN=asd SLACKFEEDBACKSURL=asd SLACKUSERSIGNUPS=asd USER_FEEDBACKS_WEBHOOK=asd SMTP_HOSTNAME=asd SMTP_USERNAME=asd SMTP_PASSWORD=asd TESTACCESSTOKEN=asd SUPABASE_URL=asf SUPABASE_KEY=asd ETHENCRYPTPUBLICKEY=asf ETHENCRYPTPRIVATEKEY=sad deno run -A --unstable dev.ts build",
     "preview": "deno run -A main.ts"
   },
   "imports": {
-    "$fresh/": "https://deno.land/x/fresh@1.6.1/",
+    "$fresh/": "https://deno.land/x/fresh@1.6.3/",
     "preact": "https://esm.sh/preact@10.19.2",
     "preact/": "https://esm.sh/preact@10.19.2/",
     "preact-render-to-string": "https://esm.sh/*preact-render-to-string@6.2.2",
