@@ -1,12 +1,9 @@
 import * as base64 from "https://deno.land/std@0.207.0/encoding/base64.ts";
 
-// I need to decrypt it using TPM, then I need to parse the json and set the env variables
+const dockerSecret = "/run/secrets/server_env.txt";
 
-// The cipher env should be injected into the environment by docker or kubernetes etc..
-// It needs to be encrypted for the TPM of the device that is running the cluster
-
-export async function configureCipherEnv() {
-  const base64CipherEnv = Deno.env.get("CIPHERENV") ?? "";
+export async function configureEnv() {
+  const base64CipherEnv = await Deno.readTextFile(dockerSecret);
   const uintCipherEnv = base64.decodeBase64(base64CipherEnv);
   const textDecoder = new TextDecoder();
   const plainBase64Env = await runCommand(
@@ -81,3 +78,5 @@ enum EnvFields {
   SLACKFEEDBACKSURL = "SLACKFEEDBACKSURL",
   SLACKUSERSIGNUPS = "SLACKUSERSIGNUPS",
 }
+
+await configureEnv()
