@@ -556,6 +556,11 @@
 	animation: blinker 2s linear infinite;
 }
 
+.blinkStepStart{
+	animation: blinker 1s step-start infinite;
+	
+}
+
 @keyframes blinker {
 	0% {
 		opacity: 0;
