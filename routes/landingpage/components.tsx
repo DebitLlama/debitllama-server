@@ -1,4 +1,5 @@
 import { ChangingTitlePart } from "../../islands/landingpage/changingTitle.tsx";
+import { ContactUsForm } from "../../islands/landingpage/contactUsForm.tsx";
 
 export function HeaderRow() {
     return <div class="flex flex-row flex-wrap gap-2 justify-between p-2 border-b shadow">
@@ -387,13 +388,13 @@ export function SimpleLandingPage() {
                 </div>
             </nav>
         </header>
-        <div class="relative isolate px-6 pt-14 lg:px-8">
+        <div class="relative isolate pt-14 ">
             <div class="flex flex-row flex-wrap">
 
                 <div class="mx-auto max-w-2xl pt-32 sm:pt-48 lg:pt-56 pb-10" >
                     <div class="text-center">
-                        <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl whitespace-pre">    Crypto subscription    </h1>
-                        <h2 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl"><ChangingTitlePart ></ChangingTitlePart><span class="blinkStepStart">|</span></h2>
+                        <h1 class="text-3xl font-bold tracking-tight text-gray-900  whitespace-pre">    Crypto subscription    </h1>
+                        <h2 class="text-3xl font-bold tracking-tight text-gray-900 "><ChangingTitlePart ></ChangingTitlePart><span class="blinkStepStart">|</span></h2>
 
                         <p class="mt-6 text-lg leading-8 text-gray-600">Smart Contract Accounts, Wallet Abstraction, Checkout Flow</p>
                         <div class="mt-10 flex items-center justify-center gap-x-6">
@@ -408,14 +409,7 @@ export function SimpleLandingPage() {
         <InfoSection></InfoSection>
         <FeesInfoSection></FeesInfoSection>
         <SimpleCheckoutFlow></SimpleCheckoutFlow>
-        {/* <div class="flex flex-col justify-center">
-            <div class="flex flex-row justify-center text-center pb-5">
-                <h2 class="text-4xl font-bold text-gray-800 ">Do you have any questions? </h2>
-            </div>
-            <a href="https://debitllama.gitbook.io/debitllama/how-we-compare-to-others" class="mx-auto font-bold w-72 text-white bg-black hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-lg px-5 py-2.5 text-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800">See how we compare to others!</a>
-        </div> */}
-
-        <footer></footer>
+        <FooterMarquee></FooterMarquee>
     </div>
 }
 
@@ -492,11 +486,22 @@ export function FeesInfoSection() {
                 </div>
             </div>
         </div>
+    </section>
+}
+
+export function FooterMarquee() {
+    return <footer>
         <div class="flex flex-col justify-center rounded mx-auto">
             <div class="flex flex-row justify-center">
                 <div class="marquee-horizontal">
                     <div class="track-horizontal" aria-hidden="true">
                         <span class="marquee-text text-xl font-bold mt-2 text-indigo-800 text-center">{"    "}</span>
+                        <span class="marquee-text text-xl font-bold mt-2 text-indigo-800 text-center">DebitLlama 2023 - ${new Date().getFullYear()}</span>
+
+                        <span class="marquee-text text-xl font-bold mt-2 text-indigo-800 text-center">Wallet Abstractions</span>
+                        <span class="marquee-text text-xl font-bold mt-2 text-indigo-800 text-center">Distributed Intent Solvers</span>
+                        <span class="marquee-text text-xl font-bold mt-2 text-indigo-800 text-center">Zero-Knowledge Proofs</span>
+                        <span class="marquee-text text-xl font-bold mt-2 text-indigo-800 indgobg text-center">Meta-Transactions</span>
                         <span class="marquee-text text-xl font-bold mt-2 text-indigo-800 text-center">Deposit Accounts</span>
                         <span class="marquee-text text-xl font-bold mt-2 text-indigo-800 text-center">Connect External Wallet</span>
                         <span class="marquee-text text-xl font-bold mt-2 text-indigo-800 text-center">Pay with Metamask</span>
@@ -508,17 +513,16 @@ export function FeesInfoSection() {
                 </div>
             </div>
         </div>
-    </section>
+    </footer>
 }
 
 export function SimpleCheckoutFlow() {
     return <section>
-        <div class="flex flex-row justify-around gap-5 mt-10  max-w-7xl mx-auto bg-gray-200 pt-10 pb-10">
-            <div class="flex flex-row justify-around max-w-7xl flex-wrap gap-4">
+        <div class="flex flex-row flex-wrap justify-around gap-5 mt-10 mx-auto bg-gray-200 pt-10 pb-10">
+            <div class="flex flex-row justify-around max-w-2xl flex-wrap gap-4 rounded shadow-md pb-2">
                 <div class="flex flex-col justify-center text-center">
                     <div class="flex flex-col flex-wrap justify-around flex-wrap  p-8 rounded max-w-7xl">
-                        <h2 class="text-4xl font-bold mt-2 text-gray-800 text-center">Simple Checkout Forms</h2>
-                        <p class="whitespace-break-spaces text-center text-2xl">Link to the checkout page or embedd the button</p>
+                        <h2 class="text-xl font-bold mt-2 text-gray-800 text-center">Simple Checkout Integration</h2>
                     </div>
                     <div class="flex flex-row justify-center mt-2">
                         <img alt="Buy It Now with DebitLlama" src="/buyitnow.png" width="150px" height="inherit" />
@@ -557,6 +561,8 @@ export function SimpleCheckoutFlow() {
                     </div>
                 </div>
             </div>
+            <ContactUsForm></ContactUsForm>
         </div>
     </section>
 }
+
