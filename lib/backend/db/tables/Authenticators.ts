@@ -1,8 +1,8 @@
 import { Authenticator } from "../../../webauthn/backend.ts";
-import { responseHandler, unwrapContext } from "../utils.ts";
+import { QueryCtx, responseHandler, unwrapContext } from "../utils.ts";
 
 export async function selectAllAuthenticatorsByUserId(
-  ctx: any,
+  ctx: QueryCtx,
   args: {},
 ) {
   const { client, userid } = unwrapContext(ctx);
