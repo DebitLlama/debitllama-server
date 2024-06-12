@@ -66,6 +66,7 @@ import * as $buyitnow from "./routes/buyitnow.tsx";
 import * as $buyitnowlogout from "./routes/buyitnowlogout.tsx";
 import * as $emailVerified from "./routes/emailVerified.tsx";
 import * as $index from "./routes/index.tsx";
+import * as $landingpage_components from "./routes/landingpage/components.tsx";
 import * as $login from "./routes/login.tsx";
 import * as $logout from "./routes/logout.tsx";
 import * as $privacyPolicy from "./routes/privacyPolicy.tsx";
@@ -94,6 +95,8 @@ import * as $approvePaymentIsland from "./islands/approvePaymentIsland.tsx";
 import * as $checkout_NextBttnUi from "./islands/checkout/NextBttnUi.tsx";
 import * as $checkout_buyButtonPage from "./islands/checkout/buyButtonPage.tsx";
 import * as $connectWalletPageForm from "./islands/connectWalletPageForm.tsx";
+import * as $landingpage_changingTitle from "./islands/landingpage/changingTitle.tsx";
+import * as $landingpage_contactUsForm from "./islands/landingpage/contactUsForm.tsx";
 import * as $pagination_AccessTokensTable from "./islands/pagination/AccessTokensTable.tsx";
 import * as $pagination_DebitItemsTable from "./islands/pagination/DebitItemsTable.tsx";
 import * as $pagination_PaymentIntentsPaginationForAccounts from "./islands/pagination/PaymentIntentsPaginationForAccounts.tsx";
@@ -186,6 +189,7 @@ const manifest = {
     "./routes/buyitnowlogout.tsx": $buyitnowlogout,
     "./routes/emailVerified.tsx": $emailVerified,
     "./routes/index.tsx": $index,
+    "./routes/landingpage/components.tsx": $landingpage_components,
     "./routes/login.tsx": $login,
     "./routes/logout.tsx": $logout,
     "./routes/privacyPolicy.tsx": $privacyPolicy,
@@ -217,6 +221,8 @@ const manifest = {
     "./islands/checkout/NextBttnUi.tsx": $checkout_NextBttnUi,
     "./islands/checkout/buyButtonPage.tsx": $checkout_buyButtonPage,
     "./islands/connectWalletPageForm.tsx": $connectWalletPageForm,
+    "./islands/landingpage/changingTitle.tsx": $landingpage_changingTitle,
+    "./islands/landingpage/contactUsForm.tsx": $landingpage_contactUsForm,
     "./islands/pagination/AccessTokensTable.tsx": $pagination_AccessTokensTable,
     "./islands/pagination/DebitItemsTable.tsx": $pagination_DebitItemsTable,
     "./islands/pagination/PaymentIntentsPaginationForAccounts.tsx":
