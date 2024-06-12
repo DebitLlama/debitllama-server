@@ -1,13 +1,41 @@
 import { useState } from "preact/hooks"
 
+type ContactResult = { status: "none" | "sent" | "err", msg: string }
+
 export function ContactUsForm() {
-    const [message, setMessage] = useState("");
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("")
-    const [website, setWebsite] = useState("");
+
+    const [contactResult, setContactResult] = useState<ContactResult>({ status: "none", msg: "" });
+
+    async function onSubmit(event: any) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const message = formData.get("message") as string;
+        const name = formData.get("name") as string;
+        const email = formData.get("email") as string;
+        const website = formData.get("website") as string;
+
+        const res = await fetch("/", {
+            method: "POST",
+            body: JSON.stringify({ message, name, email, website }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+
+        if (res.status === 200) {
+            setContactResult({ status: "sent", msg: "Message Sent! We will email you as soon as possible." })
+        } else if (res.status === 429) {
+            setContactResult({ status: "err", msg: "Too many requests send from this IP address. Try again in 10 minutes." })
+        } else {
+            setContactResult({ status: "err", msg: "Unable to send the message" })
+        }
+
+        return false;
+    }
+
 
     return <div class="max-w-2xl dark:bg-gray-950 dark:text-white">
-        <form class=" w-full p-4 rounded shadow-md" action="/submit-comment" method="post">
+        <form class=" w-full p-4 rounded shadow-md" onSubmit={onSubmit} method="post">
             <h2 class="text-xl mb-4 tracking-wider font-lighter text-gray-900 dark:text-gray-200">Contact us</h2>
             <p class="text-gray-600 mb-4">If you are interested in adding Crypto Direct Debit payment to your application, let us know. We will fund and scale the relayers depending on your demand. Would you like to use a different network or support a new currency? Send a message and we will tailor the application to your needs with no upfront costs.</p>
 
@@ -19,7 +47,6 @@ export function ContactUsForm() {
                         class="w-full px-3 py-2 dark:bg-gray-900 rounded-sm border dark:border-none border-gray-300 focus:outline-none border-solid focus:border-dashed resize-none"
                         placeholder="Type Message...*"
                         rows={5}
-
                         required
                     ></textarea>
                 </div>
@@ -46,7 +73,7 @@ export function ContactUsForm() {
                 </div>
                 <div class="mb-4">
                     <input
-                        type="text"
+                        type="url"
                         id="website"
                         name="website"
                         class="w-full px-3 py-2 dark:bg-gray-900 rounded-sm border dark:border-none border-gray-300 focus:outline-none border-solid focus:border-dashed"
@@ -62,6 +89,18 @@ export function ContactUsForm() {
                     Send Message →
                 </button>
             </div>
+            <DisplayNotification contactResult={contactResult}></DisplayNotification>
         </form>
     </div>
+}
+
+function DisplayNotification(props: { contactResult: ContactResult }) {
+    switch (props.contactResult.status) {
+        case "none":
+            return <div></div>
+        case "err":
+            return <p class="text-red-400">{props.contactResult.msg}</p>
+        case "sent":
+            return <p class="text-indigo-400">{props.contactResult.msg}</p>
+    }
 }
