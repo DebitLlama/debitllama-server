@@ -106,7 +106,7 @@ export function FeesInfoSection() {
 
             <div class="flex flex-row justify-center mt-5">
                 <div class="flex flex-col flex-wrap justify-around flex-wrap  p-8 rounded max-w-7xl">
-                    <h2 class="text-2xl font-bold mt-2 text-gray-800 text-center">Non-Interactive Payments</h2>
+                    <h2 class="text-2xl font-bold mt-2 text-gray-800 text-center">Direct Debit Payments</h2>
                     <p class="whitespace-break-spaces text-center text-2xl">Set up your account once and approve payments from it on any device.</p>
                     <p class="whitespace-break-spaces text-center text-lg text-gray-400">We charge a 🚘 5% fee on direct debit to cover the ⛽ Gas Fees!!</p>
                 </div>
