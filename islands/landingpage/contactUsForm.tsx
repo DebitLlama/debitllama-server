@@ -37,7 +37,7 @@ export function ContactUsForm() {
     return <div class="max-w-2xl dark:bg-gray-950 dark:text-white">
         <form class=" w-full p-4 rounded shadow-md" onSubmit={onSubmit} method="post">
             <h2 class="text-xl mb-4 tracking-wider font-lighter text-gray-900 dark:text-gray-200">Contact us</h2>
-            <p class="text-gray-600 mb-4">If you are interested in adding Crypto Direct Debit payment to your application, let us know. We will fund and scale the relayers depending on your demand. Would you like to use a different network or support a new currency? Send a message and we will tailor the application to your needs with no upfront costs.</p>
+            <p class="text-gray-600 mb-4">If you are interested in adding Crypto Direct Debit payment to your application, let us know. Would you like to use a different network or support a new currency? Send a message and we will tailor the application to your needs with no upfront costs.</p>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div class="mb-4 col-span-1 md:col-span-3">
