@@ -64,11 +64,9 @@ export function InfoSection() {
                 </div>
                 <div class="bg-white rounded-lg border p-4">
                     <div class="px-1 py-4">
-                        <div class="font-bold text-xl mb-2">Phishing Resistant</div>
+                        <div class="font-bold text-xl mb-2">Secure Web Wallets</div>
                         <p class="text-gray-700 text-base tracking-wide	leading-loose">
-                            Add a Passkey to protect yourself from Phishing and protect your Accounts.
-                            <br />
-                            W3C standard 2FA, available in all browsers and mobile devices.
+                            W3C standard 2FA using passkeys is available in all browsers and mobile devices.
                             <br />
                             Hardware authenticator devices are also supported.
                         </p>
