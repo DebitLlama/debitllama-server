@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'preact/hooks';
 
 export function ChangingTitlePart() {
-    const titles = ["for online businesses", "direct debit payments", "gas free txs"];
+    const titles = ["for online businesses", "direct debit payments", "without surprises", "gas free txs"];
 
     const [currentTitleIndex, setCurrentTitleIndex] = useState(0);
     const [typingMode, setTypingMode] = useState<"writing" | "deleting" | "waiting">("writing");

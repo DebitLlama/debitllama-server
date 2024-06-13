@@ -22,7 +22,7 @@ export function SimpleLandingPage() {
                 <div class="mx-auto max-w-2xl pt-32 sm:pt-48 lg:pt-56 pb-10" >
                     <div class="text-center">
                         <h1 class="text-3xl font-bold tracking-tight text-gray-900  whitespace-pre">    Crypto subscription    </h1>
-                        <h2 class="text-3xl font-bold tracking-tight text-gray-900 "><ChangingTitlePart ></ChangingTitlePart><span class="blinkStepStart">|</span></h2>
+                        <h2 class="text-3xl font-bold tracking-tight text-gray-900 "><ChangingTitlePart></ChangingTitlePart><span class="blinkStepStart">|</span></h2>
 
                         <p class="mt-6 text-lg leading-8 text-gray-600">Smart Contract Accounts, Wallet Abstraction, Checkout Flow</p>
                         <div class="mt-10 flex items-center justify-center gap-x-6">
@@ -53,44 +53,56 @@ export function InfoSection() {
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4">
                 <div class="bg-white rounded-lg border p-4">
                     <div class="px-1 py-4">
+                        <div class="font-bold text-xl mb-2">What is DebitLlama?</div>
+                        <p class="text-gray-700 text-base tracking-wide	leading-loose">
+                            <strong>A service for creating and managing future transactions with immutable constraints.</strong>
+                            <br />
+                            The service uses blockchain contracts with zero-knowledge proof cryptography that allow transactions to become valid over time until the proof is invalidated.
+                            <br />
+                            You can manage accounts for recurring subscription payments or become a merchant and directly debit cold wallets and pay for your customer's transaction fees.
+                        </p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg border p-4">
+                    <div class="px-1 py-4">
                         <div class="font-bold text-xl">Non-custodial</div>
                         <p class="text-gray-700 text-base tracking-wide	leading-loose">
-                            Your funds are always stored securely in your External Wallet or deposited into a Smart Contract.
+                            <strong>There is no custody. Period. Funds are never locked or stored by third-parties.</strong>
+
+                            Your funds are always stored securely in your <strong>External Owned Wallet</strong> or in a <strong>Smart Contract based Virtual Account</strong>
                             <br />
-                            You can withdraw your deposit or disconnect your wallet any time. Doing so will cancel all your pending subscriptions too.
+                            You can cancel all your subscriptions and disconnect your wallet with a single blockchain transaction any time.
                             <br />
+
+                            DebitLlama has no access to funds and is unable to freeze or conficate deposits or alter subscriptions in any ways.
                         </p>
                     </div>
                 </div>
                 <div class="bg-white rounded-lg border p-4">
                     <div class="px-1 py-4">
-                        <div class="font-bold text-xl mb-2">Secure Web Wallets</div>
+                        <div class="font-bold text-xl">Always in control</div>
                         <p class="text-gray-700 text-base tracking-wide	leading-loose">
-                            W3C standard 2FA using passkeys is available in all browsers and mobile devices.
+                            <strong>You can't get charged more than what you approved.</strong>
                             <br />
-                            Hardware authenticator devices are also supported.
+                            No surprise fees even with pay-per-usage. The maximum you can pay never changes.
+                            <br />
+                            Your spending limit is set on both the account and subscription level, where cryptography guarantees your subscription never exceeds the maximum approved payment amount or frequency.
+                            <br />
+
                         </p>
                     </div>
                 </div>
                 <div class="bg-white rounded-lg border p-4">
                     <div class="px-1 py-4">
-                        <div class="font-bold text-xl">Fine tuned spending</div>
+                        <div class="font-bold text-xl">Bespoke Wallet Abstractions</div>
                         <p class="text-gray-700 text-base tracking-wide	leading-loose">
-                            Account balance is controlled via manual deposit or ERC-20 Approvals and offers the same security as virtual credit cards.
+                            <strong>Accounts with Direct Debit Pull Payments</strong>
                             <br />
-                            Subscription debit limit is controlled on the cryptography level. Never get charged suprise fees.
-                        </p>
-                    </div>
-                </div>
-                <div class="bg-white rounded-lg border p-4">
-                    <div class="px-1 py-4">
-                        <div class="font-bold text-xl">Payments secured by ZKP</div>
-                        <p class="text-gray-700 text-base tracking-wide	leading-loose">
-                            Your subscription parameters are immutable, once they are created they can't be altered only cancelled.
+                            Meta-Transactions are trustlessly relayed by Intent Solvers.
                             <br />
-                            Payment Intent proofs are trustlessly processed by approved relayers.
+                            Account creation always depends on an active wallet, but once they are created payments can be approved from them just by supplying an encryption password or passkey too, or just keep using trusty ol Metamask.
                             <br />
-                            Powered by a Groth-16 Snark Proving System!
+                            <strong>Spending approval and ownership is decoupled.</strong>
                         </p>
                     </div>
                 </div>
@@ -101,14 +113,15 @@ export function InfoSection() {
 
 
 export function FeesInfoSection() {
-    return <section class="mt-5">
-        <div class="flex flex-col justify-center pt-2  max-w-7xl rounded mx-auto">
+    return <section class="mt-5 ml-5 mr-5">
+        <div class="flex flex-col justify-start pt-2  max-w-7xl rounded border-8">
 
             <div class="flex flex-row justify-center mt-5">
-                <div class="flex flex-col flex-wrap justify-around flex-wrap  p-8 rounded max-w-7xl">
-                    <h2 class="text-2xl font-bold mt-2 text-gray-800 text-center">Direct Debit Payments</h2>
-                    <p class="whitespace-break-spaces text-center text-2xl">Set up your account once and approve payments from it on any device.</p>
-                    <p class="whitespace-break-spaces text-center text-lg text-gray-400">The relayer charges a 🚘 5% fee on direct debit to cover the ⛽ Gas Fees! It will be deducted from the approved amount.</p>
+                <div class="flex flex-col flex-wrap justify-around flex-wrap p-8 rounded max-w-7xl">
+                    <h2 class="text-2xl font-bold mt-2 text-gray-800 text-start">Direct Debit Payments</h2>
+                    <p class="whitespace-break-spaces text-start text-lg text-gray-400">The service charges a 🚘 5% fee on successful direct debit in the smart contract. Fees are subject to change. </p>
+                    <p class="whitespace-break-spaces text-start text-xl">Set up your account once and approve payments from it on any device. Keep using metamask, use a password based wallet abstraction or turn a cutting-edge passkey into a wallet.</p>
+                    <p>Debitllama is not a money transmitter. It does not custody funds or processes the blockchain transactions on behalf of users. It stores <strong>Intents</strong> and provides an interface to fulfill them and charges a fee for using this interface. The subscription service providers that register must process their own transactions and cover the ⛽ Gas Fees. If you want to register and sell a subscription service but don't know how to host a relayer and debit your customers, fill out the contact us form and we will get back to you shortly with hands on support.</p>
                 </div>
             </div>
         </div>
@@ -128,7 +141,7 @@ export function FooterMarquee() {
                         <span class="marquee-text text-xl font-bold mt-2 text-indigo-800 text-center">Distributed Intent Solvers</span>
                         <span class="marquee-text text-xl font-bold mt-2 text-indigo-800 text-center">Zero-Knowledge Proofs</span>
                         <span class="marquee-text text-xl font-bold mt-2 text-indigo-800 indgobg text-center">Meta-Transactions</span>
-                        <span class="marquee-text text-xl font-bold mt-2 text-indigo-800 text-center">Deposit Accounts</span>
+                        <span class="marquee-text text-xl font-bold mt-2 text-indigo-800 text-center">Single-Use Accounts</span>
                         <span class="marquee-text text-xl font-bold mt-2 text-indigo-800 text-center">Connect External Wallet</span>
                         <span class="marquee-text text-xl font-bold mt-2 text-indigo-800 text-center">Pay with Metamask</span>
                         <span class="marquee-text text-xl font-bold mt-2 text-indigo-800 indgobg text-center">Pay with a Password</span>
