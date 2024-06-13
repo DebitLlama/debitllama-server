@@ -46,16 +46,9 @@ export async function handler(
 
     return await ctx.next();
   }
-  // Should not cache api
-  if (url.pathname.startsWith("/api")) {
-    return ctx.next();
-  }
 
-  // All other pages I can cache!
-  const res = await ctx.next();
-  res.headers.append("Cache-Control", " max-age=31536000");
-
-  return res;
+  //I removed the cacheing because it was breaking the islands on first load
+  return ctx.next();
 }
 
 function shouldCheckAuth(pathname: string) {

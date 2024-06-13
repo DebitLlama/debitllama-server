@@ -1,7 +1,7 @@
 {
   "lock": false,
   "tasks": {
-    "start": "ENV=development deno run -A --unstable --watch=static/,routes/ dev.ts",
+    "start": "ENV=development deno run -A --unstable-kv --watch=static/,routes/ dev.ts",
     "update": "deno run -A -r https://fresh.deno.dev/update .",
     "test_enc": "deno test tests/encryption.ts",
     "test_queryFilter": "deno run -A tests/queryFilter.ts --allow-net",
@@ -14,17 +14,17 @@
     "test_paymentIntentslug": "deno test -A tests/apiv1/payment_intentslug.ts",
     "test_items": "deno test -A tests/apiv1/items.ts",
     "test_zapier_webhooks": "deno test -A tests/apiv1/zapier_webhooks.ts",
-    "main": "deno run -A main.ts",
-    "build": "RELAYERAUTHTOKEN=asd SLACKFEEDBACKSURL=asd SLACKUSERSIGNUPS=asd USER_FEEDBACKS_WEBHOOK=asd SMTP_HOSTNAME=asd SMTP_USERNAME=asd SMTP_PASSWORD=asd TESTACCESSTOKEN=asd SUPABASE_URL=asf SUPABASE_KEY=asd ETHENCRYPTPUBLICKEY=asf ETHENCRYPTPRIVATEKEY=sad deno run -A --unstable dev.ts build",
+    "main": "deno run -A --unstable-kv main.ts",
+    "build": "RELAYERAUTHTOKEN=asd SLACKFEEDBACKSURL=asd SLACKUSERSIGNUPS=asd USER_FEEDBACKS_WEBHOOK=asd SMTP_HOSTNAME=asd SMTP_USERNAME=asd SMTP_PASSWORD=asd TESTACCESSTOKEN=asd SUPABASE_URL=asf SUPABASE_KEY=asd ETHENCRYPTPUBLICKEY=asf ETHENCRYPTPRIVATEKEY=sad SALESTEAMEMAILADDRESS=asd deno run -A --unstable-kv dev.ts build",
     "preview": "deno run -A main.ts"
   },
   "imports": {
-    "$fresh/": "https://deno.land/x/fresh@1.6.3/",
-    "preact": "https://esm.sh/preact@10.19.2",
-    "preact/": "https://esm.sh/preact@10.19.2/",
+    "$fresh/": "https://deno.land/x/fresh@1.6.8/",
+    "preact": "https://esm.sh/preact@10.19.6",
+    "preact/": "https://esm.sh/preact@10.19.6/",
     "preact-render-to-string": "https://esm.sh/*preact-render-to-string@6.2.2",
-    "@preact/signals": "https://esm.sh/*@preact/signals@1.2.1",
-    "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.5.0",
+    "@preact/signals": "https://esm.sh/*@preact/signals@1.2.2",
+    "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.5.1",
     "twind": "https://esm.sh/twind@0.16.19",
     "twind/": "https://esm.sh/twind@0.16.19/",
     "$std/": "https://deno.land/std@0.193.0/",
@@ -35,7 +35,11 @@
     "screen-size-detector": "https://esm.sh/screen-size-detector@1.0.4",
     "jose": "https://deno.land/x/jose@v4.14.6/index.ts",
     "@simplewebauthn/browser": "https://esm.sh/@simplewebauthn/browser@8.3.1",
-    "@simplewebauthn/server": "https://esm.sh/@simplewebauthn/server@8.3.2"
+    "@simplewebauthn/server": "https://esm.sh/@simplewebauthn/server@8.3.2",
+    "@twind/core": "https://esm.sh/@twind/core@1.1.3",
+    "@twind/preset-tailwind": "https://esm.sh/@twind/preset-tailwind@1.1.4/",
+    "@twind/preset-autoprefix": "https://esm.sh/@twind/preset-autoprefix@1.0.7/",
+    "react-typed": "https://esm.sh/react-typed@2.0.12"
   },
   "compilerOptions": { "jsx": "react-jsx", "jsxImportSource": "preact" },
   "lint": { "rules": { "tags": ["fresh", "recommended"] } },

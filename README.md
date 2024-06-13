@@ -55,11 +55,21 @@ secure environment locally. `echo -n '<JSON_STRING>' | base64`
 Run `seal.sh` on the server as root to prepare the encrypted base64 string which will
 be saved to a file `cipherenv.txt`
 
+seal.sh:
+```
+#!/bin/bash
+echo "Enter the base64 encoded environment variables to seal:"
+read -s base64env
+
+echo -n ${base64env} | ./gotpm seal | base64  > cipherenv.txt
+```
+
 Then run your Docker container:
 
 `docker run -it -p 3000:3000 --device /dev/tpm0:/dev/tpm0 --device /dev/tpmrm0:/dev/tpmrm0 debitllama-server`
 
-# Instead of docker, PM2! Need to install Deno and Node for PM2
+# *Deprecated* | Deploy with PM2. 
+Need to install Deno and Node for PM2
 
 install node https://github.com/nodesource/distributions
 
@@ -112,7 +122,7 @@ Run with pm2
 
 `pm2 start main.ts --interpreter="deno" --interpreter-args="run -A --unstable"`
 
-## Run the server
+## *Deprecated* | Run the server
 
 This method was used for injecting dependencies and will be deprecated!!
 
@@ -120,7 +130,7 @@ This method was used for injecting dependencies and will be deprecated!!
 
 `./run.sh`
 
-## Redeployment:
+## *Deprecated* | Redeployment:
 
 After SSH to the server, pull the changes and run the rebuiild with the mock EVN
 vars, then pm2 restart the service

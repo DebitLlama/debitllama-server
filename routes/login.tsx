@@ -24,7 +24,7 @@ export const handler: Handlers<any, State> = {
         }
         const redirectTo = getCookies(req.headers)[CookieNames.loginRedirect];
 
-        let redirect = redirectTo === undefined || redirectTo === "" ? "/app/webauthn/2fa" : redirectTo;
+        let redirect = redirectTo === undefined || redirectTo === "" ? "/app/accounts" : redirectTo;
 
         deleteCookie(headers, CookieNames.loginRedirect);
         if (error) {
@@ -32,7 +32,6 @@ export const handler: Handlers<any, State> = {
         }
 
         headers.set("location", redirect);
-
 
         return new Response(null, {
             status: 303,
