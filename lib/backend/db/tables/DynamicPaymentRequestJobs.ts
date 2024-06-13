@@ -11,7 +11,8 @@ export async function lockDynamicPaymentRequestJobs(
       last_modified: new Date().toUTCString(),
     })
     .eq("status", DynamicPaymentRequestJobsStatus.CREATED)
-    .lt("created_at", new Date().toUTCString());
+    .lt("created_at", new Date().toUTCString())
+    .eq("request_creator_id", ctx.state.userid);
 
   return responseHandler(res, {
     rpc: "lockDynamicPaymentRequestJobs",
@@ -29,7 +30,8 @@ export async function selectDynamicPaymentRequestJobWhereStatusIsLocked(
       return await p.client.from("DynamicPaymentRequestJobs")
         .select(
           "*,paymentIntent_id(*,account_id(*),debit_item_id(*))",
-        ).eq("status", DynamicPaymentRequestJobsStatus.LOCKED);
+        ).eq("status", DynamicPaymentRequestJobsStatus.LOCKED)
+        .eq("request_creator_id", ctx.state.userid);
     },
     name: "selectDynamicPaymentRequestJobWhereStatusIsLocked",
   });
@@ -53,7 +55,8 @@ export async function updatDynamicPaymentRequestJobStatusTo(
             last_modified: new Date().toUTCString(),
           },
         ).eq("status", DynamicPaymentRequestJobsStatus.LOCKED)
-        .eq("id", p.args.id);
+        .eq("id", p.args.id)
+        .eq("request_creator_id", ctx.state.userid);
     },
     name: "updatDynamicPaymentRequestJobStatusTo",
   });
