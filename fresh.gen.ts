@@ -6,6 +6,7 @@ import * as $SignupSuccess from "./routes/SignupSuccess.tsx";
 import * as $_500 from "./routes/_500.tsx";
 import * as $_app from "./routes/_app.tsx";
 import * as $_middleware from "./routes/_middleware.ts";
+import * as $api_relayer_middleware from "./routes/api/relayer/_middleware.ts";
 import * as $api_relayer_balance from "./routes/api/relayer/balance.ts";
 import * as $api_relayer_dynamicjobstatus from "./routes/api/relayer/dynamicjobstatus.ts";
 import * as $api_relayer_dynamicpayments from "./routes/api/relayer/dynamicpayments.ts";
@@ -122,6 +123,7 @@ const manifest = {
     "./routes/_500.tsx": $_500,
     "./routes/_app.tsx": $_app,
     "./routes/_middleware.ts": $_middleware,
+    "./routes/api/relayer/_middleware.ts": $api_relayer_middleware,
     "./routes/api/relayer/balance.ts": $api_relayer_balance,
     "./routes/api/relayer/dynamicjobstatus.ts": $api_relayer_dynamicjobstatus,
     "./routes/api/relayer/dynamicpayments.ts": $api_relayer_dynamicpayments,

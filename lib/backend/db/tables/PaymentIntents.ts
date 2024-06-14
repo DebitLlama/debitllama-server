@@ -205,7 +205,8 @@ export async function selectFixedPricingWhereStatusIsCreated(ctx: any) {
         .select("*,account_id(*)")
         .eq("statusText", PaymentIntentStatus.CREATED)
         .eq("pricing", Pricing.Fixed)
-        .lt("nextPaymentDate", new Date().toUTCString());
+        .lt("nextPaymentDate", new Date().toUTCString())
+        .eq("payee_user_id", ctx.state.userid);
     },
     name: "selectFixedPricingWhereStatusIsCreated",
   });
@@ -220,7 +221,8 @@ export async function selectFixedPricingWhereStatusIsRecurring(ctx: any) {
         .select("*,account_id(*),debit_item_id(*)")
         .eq("pricing", Pricing.Fixed)
         .lt("nextPaymentDate", new Date().toUTCString())
-        .eq("statusText", PaymentIntentStatus.RECURRING);
+        .eq("statusText", PaymentIntentStatus.RECURRING)
+        .eq("payee_user_id", ctx.state.userid);
     },
     name: "selectFixedPricingWhereStatusIsRecurring",
   });
@@ -252,7 +254,8 @@ export async function updateToAccountBalanceTooLow(
     impl: async (p) => {
       return await p.client.from("PaymentIntents").update({
         statusText: PaymentIntentStatus.ACCOUNTBALANCETOOLOW,
-      }).eq("id", p.args.paymentIntentId);
+      }).eq("id", p.args.paymentIntentId)
+        .eq("payee_user_id", ctx.state.userid);
     },
     name: "updateToAccountBalanceTooLow",
   });
@@ -269,7 +272,10 @@ export async function updateToAccountBalanceTooLowFailedDynamic(
       return await p.client.from("PaymentIntents").update({
         statusText: PaymentIntentStatus.ACCOUNTBALANCETOOLOW,
         failedDynamicPaymentAmount: p.args.missingAmount,
-      }).eq("id", p.args.paymentIntentId);
+      }).eq("id", p.args.paymentIntentId).eq(
+        "payee_user_id",
+        ctx.state.userid,
+      );
     },
     name: "updateToAccountBalanceTooLowFailedDynamic",
   });
