@@ -1,5 +1,5 @@
 import { Head } from "$fresh/runtime.ts";
-import { SimpleLandingPage } from "./landingpage/components.tsx";
+import { SimpleLandingPage } from "../components/landingpage.tsx";
 import { Handlers } from "$fresh/server.ts";
 import { State } from "./_middleware.ts";
 import { single_is_rateLimited } from "../lib/backend/ratelimiter.ts";

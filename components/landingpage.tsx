@@ -1,5 +1,5 @@
-import { ChangingTitlePart } from "../../islands/landingpage/changingTitle.tsx";
-import { ContactUsForm } from "../../islands/landingpage/contactUsForm.tsx";
+import { ChangingTitlePart } from "../islands/landingpage/changingTitle.tsx";
+import { ContactUsForm } from "../islands/landingpage/contactUsForm.tsx";
 
 export function SimpleLandingPage() {
     return <div class="bg-white">

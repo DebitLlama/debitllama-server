@@ -67,7 +67,6 @@ import * as $buyitnow from "./routes/buyitnow.tsx";
 import * as $buyitnowlogout from "./routes/buyitnowlogout.tsx";
 import * as $emailVerified from "./routes/emailVerified.tsx";
 import * as $index from "./routes/index.tsx";
-import * as $landingpage_components from "./routes/landingpage/components.tsx";
 import * as $login from "./routes/login.tsx";
 import * as $logout from "./routes/logout.tsx";
 import * as $privacyPolicy from "./routes/privacyPolicy.tsx";
@@ -191,7 +190,6 @@ const manifest = {
     "./routes/buyitnowlogout.tsx": $buyitnowlogout,
     "./routes/emailVerified.tsx": $emailVerified,
     "./routes/index.tsx": $index,
-    "./routes/landingpage/components.tsx": $landingpage_components,
     "./routes/login.tsx": $login,
     "./routes/logout.tsx": $logout,
     "./routes/privacyPolicy.tsx": $privacyPolicy,
