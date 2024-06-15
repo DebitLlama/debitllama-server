@@ -195,6 +195,7 @@ export async function processWebhookwork(args: NewWebhookWorkerArgs) {
       if (shouldSendEmail) {
         // If the failure reason is BALANCETOOLOWTORELAY then only the merchant gets an email!
         // Else the customer gets an email too
+        //TODO: Balance too low to relay is deprecated!
         if (piRow.statusText === PaymentIntentStatus.BALANCETOOLOWTORELAY) {
           await sendEmailToMerchant(
             eventType,

@@ -4,36 +4,20 @@ import {
   selectFixedPricingWhereStatusIsCreated,
   selectFixedPricingWhereStatusIsRecurring,
 } from "../../../lib/backend/db/tables/PaymentIntents.ts";
-import { checkRelayerAuth } from "../../../lib/relayer/utils.ts";
 
 export const handler = {
   async POST(_req: Request, ctx: HandlerContext) {
-    const relayer_auth = _req.headers.get("X-Relayer");
-    if (relayer_auth === null) {
-      return v1Error(
-        "Missing Relayer Authentication header",
-        401,
-      );
-    }
+    const json = await _req.json();
+    const statusText: "CREATED" | "RECURRING" | undefined = json.statusText;
 
-    if (checkRelayerAuth(relayer_auth)) {
-      const json = await _req.json();
-      const statusText: "CREATED" | "RECURRING" | undefined = json.statusText;
-
-      if (statusText === "CREATED") {
-        const res = await selectFixedPricingWhereStatusIsCreated(ctx);
-        return new Response(JSON.stringify(res), { status: 200 });
-      } else if (statusText === "RECURRING") {
-        const res = await selectFixedPricingWhereStatusIsRecurring(ctx);
-        return new Response(JSON.stringify(res), { status: 200 });
-      } else {
-        return v1Error("Invalid status text", 400);
-      }
+    if (statusText === "CREATED") {
+      const res = await selectFixedPricingWhereStatusIsCreated(ctx);
+      return new Response(JSON.stringify(res), { status: 200 });
+    } else if (statusText === "RECURRING") {
+      const res = await selectFixedPricingWhereStatusIsRecurring(ctx);
+      return new Response(JSON.stringify(res), { status: 200 });
     } else {
-      return v1Error(
-        "Invalid Relayer Authentication header",
-        401,
-      );
+      return v1Error("Invalid status text", 400);
     }
   },
 };

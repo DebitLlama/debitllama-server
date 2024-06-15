@@ -23,6 +23,17 @@ export async function signInWithPassword(
   return await supabaseClient.auth.signInWithPassword({ email, password });
 }
 
+export type SignupProvider = "google";
+
+export async function signInWithOAuth(
+  supabaseClient: any,
+  provider: SignupProvider,
+) {
+  return await supabaseClient.auth.signInWithOAuth({
+    provider: provider,
+  });
+}
+
 export async function resendEmailConfirmation(
   supabaseClient: any,
   email: string,

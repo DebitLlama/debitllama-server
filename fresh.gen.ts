@@ -6,6 +6,7 @@ import * as $SignupSuccess from "./routes/SignupSuccess.tsx";
 import * as $_500 from "./routes/_500.tsx";
 import * as $_app from "./routes/_app.tsx";
 import * as $_middleware from "./routes/_middleware.ts";
+import * as $api_relayer_middleware from "./routes/api/relayer/_middleware.ts";
 import * as $api_relayer_balance from "./routes/api/relayer/balance.ts";
 import * as $api_relayer_dynamicjobstatus from "./routes/api/relayer/dynamicjobstatus.ts";
 import * as $api_relayer_dynamicpayments from "./routes/api/relayer/dynamicpayments.ts";
@@ -66,7 +67,6 @@ import * as $buyitnow from "./routes/buyitnow.tsx";
 import * as $buyitnowlogout from "./routes/buyitnowlogout.tsx";
 import * as $emailVerified from "./routes/emailVerified.tsx";
 import * as $index from "./routes/index.tsx";
-import * as $landingpage_components from "./routes/landingpage/components.tsx";
 import * as $login from "./routes/login.tsx";
 import * as $logout from "./routes/logout.tsx";
 import * as $privacyPolicy from "./routes/privacyPolicy.tsx";
@@ -122,6 +122,7 @@ const manifest = {
     "./routes/_500.tsx": $_500,
     "./routes/_app.tsx": $_app,
     "./routes/_middleware.ts": $_middleware,
+    "./routes/api/relayer/_middleware.ts": $api_relayer_middleware,
     "./routes/api/relayer/balance.ts": $api_relayer_balance,
     "./routes/api/relayer/dynamicjobstatus.ts": $api_relayer_dynamicjobstatus,
     "./routes/api/relayer/dynamicpayments.ts": $api_relayer_dynamicpayments,
@@ -189,7 +190,6 @@ const manifest = {
     "./routes/buyitnowlogout.tsx": $buyitnowlogout,
     "./routes/emailVerified.tsx": $emailVerified,
     "./routes/index.tsx": $index,
-    "./routes/landingpage/components.tsx": $landingpage_components,
     "./routes/login.tsx": $login,
     "./routes/logout.tsx": $logout,
     "./routes/privacyPolicy.tsx": $privacyPolicy,

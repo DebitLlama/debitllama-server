@@ -30,76 +30,20 @@ It was build using Deno Fresh framework.
 Copy the nginxconfig to /etc/nginx/sites-enabled/default to reverse proxy from
 port 3000 This is the entry point for the application
 
-# Docker
+# Deploy with Pup. 
+The deployment stack was refactored to use Deno only.
 
-run `deno task build` locally to prebuild the fresh project
-
-To build your Docker image inside of a Git repository:
-
-`docker build --build-arg GIT_REVISION=$(git rev-parse HEAD) -t debitllama-server .`
-
-Git revision is required for the DENO_DEPLOYMENT_ID, it needs to change for each
-redeployment, else the caching fails
-
-## Create the cipher env!
-
-The enironment variables are protected by TPM2.0 seal and must be prepared for
-each hardware device that is running the containers first. The ./gotpm
-executable in this repository is used for interacting with the TPM.
-
-### Seal the ENV
-
-Create a json string from the environment variables and then base encode it in a
-secure environment locally. `echo -n '<JSON_STRING>' | base64`
-
-Run `seal.sh` on the server as root to prepare the encrypted base64 string which will
-be saved to a file `cipherenv.txt`
-
-seal.sh:
-```
-#!/bin/bash
-echo "Enter the base64 encoded environment variables to seal:"
-read -s base64env
-
-echo -n ${base64env} | ./gotpm seal | base64  > cipherenv.txt
-```
-
-Then run your Docker container:
-
-`docker run -it -p 3000:3000 --device /dev/tpm0:/dev/tpm0 --device /dev/tpmrm0:/dev/tpmrm0 debitllama-server`
-
-# *Deprecated* | Deploy with PM2. 
-Need to install Deno and Node for PM2
-
-install node https://github.com/nodesource/distributions
-
-`sudo apt-get install -y ca-certificates curl gnupg`
-
-`sudo mkdir -p /etc/apt/keyrings`
-
-`curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg`
-
-`NODE_MAJOR=20`
-
-`echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list`
-
-`sudo apt-get update`
-
-`sudo apt-get install nodejs -y`
-
-install pm2
-
-`npm install -g pm2`
-
-configure systemd for pm2
-
-`pm2 startup systemd`
-
-install deno
+Install deno
 
 `sudo apt install unzip`
 
 `curl -fsSL https://deno.land/x/install/install.sh | sh`
+
+Install pup
+
+`deno run -Ar jsr:@pup/pup@1.0.0-rc.39 setup --channel prerelease`
+Check for the latest version at https://github.com/Hexagon/pup
+
 
 ## Clone the repository from github
 
@@ -118,19 +62,5 @@ else the build fails, add them to the environment before running the build:
 
 `deno task build`
 
-Run with pm2
-
-`pm2 start main.ts --interpreter="deno" --interpreter-args="run -A --unstable"`
-
-## *Deprecated* | Run the server
-
-This method was used for injecting dependencies and will be deprecated!!
-
-`chmod a+x run.sh`
-
-`./run.sh`
-
-## *Deprecated* | Redeployment:
-
-After SSH to the server, pull the changes and run the rebuiild with the mock EVN
-vars, then pm2 restart the service
+Enable service, it will run it in the background.
+`pup enable-service -n debitllama-service`

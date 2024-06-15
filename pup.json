@@ -1,0 +1,16 @@
+{
+  "processes": [
+    {
+      "id": "debitllama-cluster",
+      "cmd": "deno run -A --unstable-kv main.ts",
+      "autostart": true,
+      "restart": "always",
+      "cluster": {
+        "instances": 3,
+        "commonPort": 3000,
+        "startPort": 4000,
+        "strategy": "round-robin"
+      }
+    }
+  ]
+}
