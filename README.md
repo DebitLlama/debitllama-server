@@ -64,3 +64,22 @@ else the build fails, add them to the environment before running the build:
 
 Enable service, it will run it in the background.
 `pup enable-service -n debitllama-service`
+
+Optionally:
+
+`pup enable-service --system  -n debitllama-service`
+And complete the installation by using the manual steps printed
+Optionally:
+
+```
+To complete the installation, carry out these manual steps:
+1. The systemd configuration has been saved to a temporary file. Copy this file to the correct location using the following command:
+   Command: sudo cp /tmp/svcinstall-<id>/cfg /etc/systemd/system/pup.service
+2. Reload the systemd configuration:
+   Command: sudo systemctl daemon-reload
+3. Enable the service:
+   Command: sudo systemctl enable pup
+4. Start the service now:
+   Command: sudo systemctl start pup
+   
+```
