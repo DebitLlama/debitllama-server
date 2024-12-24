@@ -80,6 +80,7 @@ import * as $AddNew2FAPasskeyButton from "./islands/AddNew2FAPasskeyButton.tsx";
 import * as $AddNewAccountPasskeyButton from "./islands/AddNewAccountPasskeyButton.tsx";
 import * as $CancelDynamicPaymentRequestButton from "./islands/CancelDynamicPaymentRequestButton.tsx";
 import * as $CancelPaymentIntentButton from "./islands/CancelPaymentIntentButton.tsx";
+import * as $Captcha from "./islands/Captcha.tsx";
 import * as $CurrencySelectDropdown from "./islands/CurrencySelectDropdown.tsx";
 import * as $DebitItemTableRow from "./islands/DebitItemTableRow.tsx";
 import * as $TriggerDirectDebitButton from "./islands/TriggerDirectDebitButton.tsx";
@@ -206,6 +207,7 @@ const manifest = {
     "./islands/CancelDynamicPaymentRequestButton.tsx":
       $CancelDynamicPaymentRequestButton,
     "./islands/CancelPaymentIntentButton.tsx": $CancelPaymentIntentButton,
+    "./islands/Captcha.tsx": $Captcha,
     "./islands/CurrencySelectDropdown.tsx": $CurrencySelectDropdown,
     "./islands/DebitItemTableRow.tsx": $DebitItemTableRow,
     "./islands/TriggerDirectDebitButton.tsx": $TriggerDirectDebitButton,
