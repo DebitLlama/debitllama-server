@@ -1,8 +1,8 @@
 import { ethers, ZeroAddress } from "$ethers";
-import DirectDebitArtifact from "../../static/DirectDebit.json" assert {
+import DirectDebitArtifact from "../../static/DirectDebit.json" with {
   type: "json",
 };
-import ERC20Artifact from "../../static/ERC20.json" assert {
+import ERC20Artifact from "../../static/ERC20.json" with {
   type: "json",
 };
 
