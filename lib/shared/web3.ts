@@ -226,7 +226,6 @@ export const bttMainnetCurrencies: SelectableCurrency[] = [{
   minimumAmount: "0.1",
 }];
 
-// TODO: confirm final token addresses for Arbitrum Sepolia (testnet placeholders)
 export const arbitrumSepoliaCurrencies: SelectableCurrency[] = [
   {
     name: "ETH",
@@ -237,12 +236,11 @@ export const arbitrumSepoliaCurrencies: SelectableCurrency[] = [
   {
     name: "USDC",
     native: false,
-    contractAddress: "TODO:",
+    contractAddress: "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d",
     minimumAmount: "1",
   },
 ];
 
-// TODO: confirm final token addresses for Arbitrum One Mainnet
 export const arbitrumMainnetCurrencies: SelectableCurrency[] = [
   {
     name: "ETH",
@@ -253,8 +251,6 @@ export const arbitrumMainnetCurrencies: SelectableCurrency[] = [
   {
     name: "USDC",
     native: false,
-    //TODO: CONFIRM USDC!
-    //TODO:
     contractAddress: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
     minimumAmount: "1",
   },
