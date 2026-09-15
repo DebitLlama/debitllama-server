@@ -37,7 +37,7 @@ export default function AccountCardCarousel(props: AccountCardCarouselProps) {
         }, 400)
     }
 
-    const data = props.accountData[currentAccount];
+    const data = props?.accountData[currentAccount];
 
     if (data === undefined) {
         return <div class="flex flex-col justify-center">
