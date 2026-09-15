@@ -115,7 +115,7 @@ import * as $utils_SidebarToggleButton from "./islands/utils/SidebarToggleButton
 import * as $utils_TestnetTokens from "./islands/utils/TestnetTokens.tsx";
 import * as $utils_WalletAddressSelector from "./islands/utils/WalletAddressSelector.tsx";
 import * as $utils_copyButton from "./islands/utils/copyButton.tsx";
-import { type Manifest } from "$fresh/server.ts";
+import type { Manifest } from "$fresh/server.ts";
 
 const manifest = {
   routes: {
