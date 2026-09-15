@@ -146,14 +146,6 @@ export default function SideBar(props: SidebarProps) {
                         <span class="ml-2 text-sm tracking-wide truncate">Logout</span>
                     </a>
                 </li>
-                <li>
-                    <a href="/app/feedback" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50  hover:text-gray-800 border-l-4 border-transparent hover:border-indigo-500 pr-6">
-                        <span class="inline-flex justify-center items-center ml-4">
-                            <svg  style={"margin-left: -1px;"} xmlns="http://www.w3.org/2000/svg" fill="currentColor" stroke="currentColor" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-360q17 0 28.5-11.5T520-400q0-17-11.5-28.5T480-440q-17 0-28.5 11.5T440-400q0 17 11.5 28.5T480-360Zm-40-160h80v-240h-80v240ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z" /></svg>
-                        </span>
-                        <span class="ml-2 text-sm tracking-wide truncate">Feedback</span>
-                    </a>
-                </li>
             </ul>
         </div>
     </div>
