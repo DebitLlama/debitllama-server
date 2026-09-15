@@ -42,14 +42,7 @@ export default function TestnetTokens(props: TestnetTokensProps) {
 
     }
 
-    if (props.chainId !== ChainIds.BTT_TESTNET_ID) {
-        return <div></div>
-    }
 
-    return <div class="mb-4">
-        <button onClick={mintTokensClicked} type="button" class="w-full bg-yellow-500 text-white text-sm font-bold py-2 px-4 rounded-md  hover:bg-yellow-600 disabled:bg-yellow-100 transition duration-300">
-            Mint testnet tokens
-        </button>
-        <h4 class="text-sm text-gray-500">You are on testnet, connected wallets only work with ERC-20 tokens, so to try the app you need to mint some first! It's called USDT Mock. (USDTM)</h4>
-    </div>
+    return <div></div>
+
 }
