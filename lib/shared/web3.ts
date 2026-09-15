@@ -3,7 +3,8 @@ import { AccountTypes } from "../enums.ts";
 export const FeeDividerPerNetwork = {
   BTT_TESTNET: [20, "5%"], //value and the percentage
   BTT_MAINNET: [20, "5%"],
-  AVAX_MAINNET: [20, "5%"],
+  ARBITRUM_SEPOLIA: [20, "5%"],
+  ARBITRUM_MAINNET: [20, "5%"],
 };
 
 export function getAverageGasLimit() {
@@ -13,54 +14,64 @@ export function getAverageGasLimit() {
 export enum NetworkNames {
   BTT_TESTNET = "BTT Donau Testnet",
   BTT_MAINNET = "BitTorrent Chain",
-  AVAX_MAINNET = "Avalanche Mainnet C-Chain",
+  ARBITRUM_SEPOLIA = "Arbitrum Sepolia Testnet",
+  ARBITRUM_MAINNET = "Arbitrum Mainnet",
 }
 //TODO: add here new networks to select
 export const availableNetworks = [
-  NetworkNames.BTT_MAINNET.toString(),
-  NetworkNames.BTT_TESTNET.toString(),
+  // NetworkNames.BTT_MAINNET.toString(),
+  // NetworkNames.BTT_TESTNET.toString(),
+  NetworkNames.ARBITRUM_SEPOLIA.toString(),
+  NetworkNames.ARBITRUM_MAINNET.toString(),
 ];
 
 export enum NetworkTickers {
   BTT_TESTNET = "BTT",
   BTT_MAINNET = "BTT",
-  AVAX_MAINNET = "AVAX",
+  ARBITRUM_SEPOLIA = "ETH",
+  ARBITRUM_MAINNET = "ETH",
 }
 
 export enum ChainIds {
-  BTT_TESTNET_ID = "0x405",
-  BTT_MAINNET_ID = "0xc7",
-  AVAX_MAINNET = "0xA86A",
+  BTT_TESTNET_ID = "0x405", // 1029 - BitTorrent Chain (Donau testnet)
+  BTT_MAINNET_ID = "0xc7", // 199 - BitTorrent Chain Mainnet
+  ARBITRUM_SEPOLIA_ID = "0x66eee", // 421614 - Arbitrum Sepolia
+  ARBITRUM_MAINNET_ID = "0xa4b1", // 42161 - Arbitrum One Mainnet
 }
 
 export const availableChainIds = [
   ChainIds.BTT_TESTNET_ID.toString(),
   ChainIds.BTT_MAINNET_ID.toString(),
-  ChainIds.AVAX_MAINNET.toString(),
+  ChainIds.ARBITRUM_SEPOLIA_ID.toString(),
+  ChainIds.ARBITRUM_MAINNET_ID.toString(),
 ];
 
 export enum VirtualAccountsContractAddress {
   BTT_TESTNET = "0xF75515Df5AC843a8B261E232bB890dc2F75A4066",
   BTT_MAINNET = "0xc4Cf42D5a6F4F061cf5F98d0338FC5913b6fF581",
-  AVAX_MAINNET = "TODO:",
+  ARBITRUM_SEPOLIA = "0x5586938a2fC4489661E868c5800769Fb10847fC5",
+  ARBITRUM_MAINNET = "0x5586938a2fC4489661E868c5800769Fb10847fC5",
 }
 
 export enum ConnectedWalletsContractAddress {
   BTT_TESTNET = "0x9c85da9E45126Fd45BC62656026A2E7226bba239",
   BTT_MAINNET = "0xF9962f3C23De4e864E56ef29125D460c785905c6",
-  AVAX_MAINNET = "TODO:",
+  ARBITRUM_SEPOLIA = "0x3Cad43A3038F0E657753C0129ce7Ea4a5801EC90",
+  ARBITRUM_MAINNET = "0x3Cad43A3038F0E657753C0129ce7Ea4a5801EC90",
 }
 
 export enum RPCURLS {
   BTT_TESTNET = "https://pre-rpc.bt.io/",
   BTT_MAINNET = "https://rpc.bittorrentchain.io",
-  AVAX_MAINNET = "https://api.avax.network/ext/bc/C/rpc",
+  ARBITRUM_SEPOLIA = "https://sepolia-rollup.arbitrum.io/rpc",
+  ARBITRUM_MAINNET = "https://arb1.arbitrum.io/rpc",
 }
 
 export enum EXPORERURLS {
   BTT_TESTNET = "https://testscan.bt.io",
   BTT_MAINNET = "https://bttcscan.com",
-  AVAX_MAINNET = "https://avascan.info/",
+  ARBITRUM_SEPOLIA = "https://sepolia.arbiscan.io",
+  ARBITRUM_MAINNET = "https://arbiscan.io",
 }
 
 export enum DonauTestnetTokens {
@@ -75,42 +86,49 @@ export enum BTTMAinnetTokens {
 export const rpcUrl: { [key in ChainIds]: RPCURLS } = {
   [ChainIds.BTT_TESTNET_ID]: RPCURLS.BTT_TESTNET,
   [ChainIds.BTT_MAINNET_ID]: RPCURLS.BTT_MAINNET,
-  [ChainIds.AVAX_MAINNET]: RPCURLS.AVAX_MAINNET,
+  [ChainIds.ARBITRUM_SEPOLIA_ID]: RPCURLS.ARBITRUM_SEPOLIA,
+  [ChainIds.ARBITRUM_MAINNET_ID]: RPCURLS.ARBITRUM_MAINNET,
 };
 
 export const explorerUrl: { [key in ChainIds]: EXPORERURLS } = {
   [ChainIds.BTT_TESTNET_ID]: EXPORERURLS.BTT_TESTNET,
   [ChainIds.BTT_MAINNET_ID]: EXPORERURLS.BTT_MAINNET,
-  [ChainIds.AVAX_MAINNET]: EXPORERURLS.AVAX_MAINNET,
+  [ChainIds.ARBITRUM_SEPOLIA_ID]: EXPORERURLS.ARBITRUM_SEPOLIA,
+  [ChainIds.ARBITRUM_MAINNET_ID]: EXPORERURLS.ARBITRUM_MAINNET,
 };
 
 export const explorerUrlAddressPath: { [key in ChainIds]: string } = {
   [ChainIds.BTT_TESTNET_ID]: "/#/address/",
   [ChainIds.BTT_MAINNET_ID]: "/address/",
-  [ChainIds.AVAX_MAINNET]: "/blockchain/c/address/",
+  [ChainIds.ARBITRUM_SEPOLIA_ID]: "/address/",
+  [ChainIds.ARBITRUM_MAINNET_ID]: "/address/",
 };
 
 export const walletCurrency: { [key in ChainIds]: NetworkTickers } = {
   [ChainIds.BTT_TESTNET_ID]: NetworkTickers.BTT_TESTNET,
   [ChainIds.BTT_MAINNET_ID]: NetworkTickers.BTT_MAINNET,
-  [ChainIds.AVAX_MAINNET]: NetworkTickers.AVAX_MAINNET,
+  [ChainIds.ARBITRUM_SEPOLIA_ID]: NetworkTickers.ARBITRUM_SEPOLIA,
+  [ChainIds.ARBITRUM_MAINNET_ID]: NetworkTickers.ARBITRUM_MAINNET,
 };
 
 export const mapNetworkNameToFeeDivider: { [key in NetworkNames]: string } = {
   [NetworkNames.BTT_MAINNET]: FeeDividerPerNetwork.BTT_MAINNET[1] as string,
   [NetworkNames.BTT_TESTNET]: FeeDividerPerNetwork.BTT_TESTNET[1] as string,
-  [NetworkNames.AVAX_MAINNET]: FeeDividerPerNetwork.AVAX_MAINNET[1] as string,
+  [NetworkNames.ARBITRUM_SEPOLIA]: FeeDividerPerNetwork.ARBITRUM_SEPOLIA[1] as string,
+  [NetworkNames.ARBITRUM_MAINNET]: FeeDividerPerNetwork.ARBITRUM_MAINNET[1] as string,
 };
 
 export const mapChainIdToFeePercentage: { [key in ChainIds]: string } = {
   [ChainIds.BTT_MAINNET_ID]: FeeDividerPerNetwork.BTT_MAINNET[1] as string,
   [ChainIds.BTT_TESTNET_ID]: FeeDividerPerNetwork.BTT_TESTNET[1] as string,
-  [ChainIds.AVAX_MAINNET]: FeeDividerPerNetwork.AVAX_MAINNET[1] as string,
+  [ChainIds.ARBITRUM_SEPOLIA_ID]: FeeDividerPerNetwork.ARBITRUM_SEPOLIA[1] as string,
+  [ChainIds.ARBITRUM_MAINNET_ID]: FeeDividerPerNetwork.ARBITRUM_MAINNET[1] as string,
 };
 export const mapChainIdToFeeDivider: { [key in ChainIds]: number } = {
   [ChainIds.BTT_MAINNET_ID]: FeeDividerPerNetwork.BTT_MAINNET[0] as number,
   [ChainIds.BTT_TESTNET_ID]: FeeDividerPerNetwork.BTT_TESTNET[0] as number,
-  [ChainIds.AVAX_MAINNET]: FeeDividerPerNetwork.AVAX_MAINNET[0] as number,
+  [ChainIds.ARBITRUM_SEPOLIA_ID]: FeeDividerPerNetwork.ARBITRUM_SEPOLIA[0] as number,
+  [ChainIds.ARBITRUM_MAINNET_ID]: FeeDividerPerNetwork.ARBITRUM_MAINNET[0] as number,
 };
 
 export const getVirtualAccountsContractAddress: {
@@ -118,7 +136,8 @@ export const getVirtualAccountsContractAddress: {
 } = {
   [ChainIds.BTT_TESTNET_ID]: VirtualAccountsContractAddress.BTT_TESTNET,
   [ChainIds.BTT_MAINNET_ID]: VirtualAccountsContractAddress.BTT_MAINNET,
-  [ChainIds.AVAX_MAINNET]: VirtualAccountsContractAddress.AVAX_MAINNET,
+  [ChainIds.ARBITRUM_SEPOLIA_ID]: VirtualAccountsContractAddress.ARBITRUM_SEPOLIA,
+  [ChainIds.ARBITRUM_MAINNET_ID]: VirtualAccountsContractAddress.ARBITRUM_MAINNET,
 };
 
 export const getConnectedWalletsContractAddress: {
@@ -126,7 +145,8 @@ export const getConnectedWalletsContractAddress: {
 } = {
   [ChainIds.BTT_TESTNET_ID]: ConnectedWalletsContractAddress.BTT_TESTNET,
   [ChainIds.BTT_MAINNET_ID]: ConnectedWalletsContractAddress.BTT_MAINNET,
-  [ChainIds.AVAX_MAINNET]: ConnectedWalletsContractAddress.AVAX_MAINNET,
+  [ChainIds.ARBITRUM_SEPOLIA_ID]: ConnectedWalletsContractAddress.ARBITRUM_SEPOLIA,
+  [ChainIds.ARBITRUM_MAINNET_ID]: ConnectedWalletsContractAddress.ARBITRUM_MAINNET,
 };
 
 export const getAbiJsonByAccountType: {
@@ -139,13 +159,15 @@ export const getAbiJsonByAccountType: {
 export const networkNameFromId: { [key in ChainIds]: NetworkNames } = {
   [ChainIds.BTT_TESTNET_ID]: NetworkNames.BTT_TESTNET,
   [ChainIds.BTT_MAINNET_ID]: NetworkNames.BTT_MAINNET,
-  [ChainIds.AVAX_MAINNET]: NetworkNames.AVAX_MAINNET,
+  [ChainIds.ARBITRUM_SEPOLIA_ID]: NetworkNames.ARBITRUM_SEPOLIA,
+  [ChainIds.ARBITRUM_MAINNET_ID]: NetworkNames.ARBITRUM_MAINNET,
 };
 
 export const chainIdFromNetworkName: { [key in NetworkNames]: ChainIds } = {
   [NetworkNames.BTT_TESTNET]: ChainIds.BTT_TESTNET_ID,
   [NetworkNames.BTT_MAINNET]: ChainIds.BTT_MAINNET_ID,
-  [NetworkNames.AVAX_MAINNET]: ChainIds.AVAX_MAINNET,
+  [NetworkNames.ARBITRUM_SEPOLIA]: ChainIds.ARBITRUM_SEPOLIA_ID,
+  [NetworkNames.ARBITRUM_MAINNET]: ChainIds.ARBITRUM_MAINNET_ID,
 };
 
 export function getChainExplorerForChainId(chainId: ChainIds, tx: string) {
@@ -154,8 +176,10 @@ export function getChainExplorerForChainId(chainId: ChainIds, tx: string) {
       return `https://testnet.bttcscan.com/tx/${tx}`;
     case ChainIds.BTT_MAINNET_ID:
       return `https://bttcscan.com/tx/${tx}`;
-    case ChainIds.AVAX_MAINNET:
-      return `https://avascan.info/blockchain/c/tx/${tx}`;
+    case ChainIds.ARBITRUM_SEPOLIA_ID:
+      return `https://sepolia.arbiscan.io/tx/${tx}`;
+    case ChainIds.ARBITRUM_MAINNET_ID:
+      return `https://arbiscan.io/tx/${tx}`;
     default:
       return ``;
   }
@@ -202,24 +226,37 @@ export const bttMainnetCurrencies: SelectableCurrency[] = [{
   minimumAmount: "0.1",
 }];
 
-export const avaxCurrencies: SelectableCurrency[] = [
-  // {
-  //   name: "AVAX",
-  //   native: true,
-  //   contractAddress: "",
-  //   minimumAmount: "0.1",
-  // },
+// TODO: confirm final token addresses for Arbitrum Sepolia (testnet placeholders)
+export const arbitrumSepoliaCurrencies: SelectableCurrency[] = [
+  {
+    name: "ETH",
+    native: true,
+    contractAddress: "",
+    minimumAmount: "0.001",
+  },
   {
     name: "USDC",
     native: false,
-    contractAddress: "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
-    minimumAmount: "10",
+    contractAddress: "TODO:",
+    minimumAmount: "1",
+  },
+];
+
+// TODO: confirm final token addresses for Arbitrum One Mainnet
+export const arbitrumMainnetCurrencies: SelectableCurrency[] = [
+  {
+    name: "ETH",
+    native: true,
+    contractAddress: "",
+    minimumAmount: "0.001",
   },
   {
-    name: "EURC",
+    name: "USDC",
     native: false,
-    contractAddress: "0xc891eb4cbdeff6e073e859e987815ed1505c2acd",
-    minimumAmount: "10",
+    //TODO: CONFIRM USDC!
+    //TODO:
+    contractAddress: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+    minimumAmount: "1",
   },
 ];
 
@@ -228,7 +265,8 @@ export const getCurrenciesForNetworkName: {
 } = {
   [NetworkNames.BTT_TESTNET]: bittorrentCurrencies,
   [NetworkNames.BTT_MAINNET]: bttMainnetCurrencies,
-  [NetworkNames.AVAX_MAINNET]: avaxCurrencies,
+  [NetworkNames.ARBITRUM_SEPOLIA]: arbitrumSepoliaCurrencies,
+  [NetworkNames.ARBITRUM_MAINNET]: arbitrumMainnetCurrencies,
 };
 
 export const responseBuildersSupportedNetworks = [
@@ -263,13 +301,28 @@ export const responseBuildersSupportedNetworks = [
     }),
   },
   {
-    name: NetworkNames.AVAX_MAINNET,
-    rpc: rpcUrl[ChainIds.AVAX_MAINNET],
-    chain_id: ChainIds.AVAX_MAINNET,
-    virtual_accounts_contract: VirtualAccountsContractAddress.AVAX_MAINNET,
-    connected_wallets_contract: ConnectedWalletsContractAddress.AVAX_MAINNET,
-    currency: "AVAX",
-    available_currencies: avaxCurrencies.map((curr) => {
+    name: NetworkNames.ARBITRUM_SEPOLIA,
+    rpc: rpcUrl[ChainIds.ARBITRUM_SEPOLIA_ID],
+    chain_id: ChainIds.ARBITRUM_SEPOLIA_ID,
+    virtual_accounts_contract: VirtualAccountsContractAddress.ARBITRUM_SEPOLIA,
+    connected_wallets_contract: ConnectedWalletsContractAddress.ARBITRUM_SEPOLIA,
+    currency: "ETH",
+    available_currencies: arbitrumSepoliaCurrencies.map((curr) => {
+      return {
+        name: curr.name,
+        native: curr.native,
+        contractAddress: curr.contractAddress,
+      };
+    }),
+  },
+  {
+    name: NetworkNames.ARBITRUM_MAINNET,
+    rpc: rpcUrl[ChainIds.ARBITRUM_MAINNET_ID],
+    chain_id: ChainIds.ARBITRUM_MAINNET_ID,
+    virtual_accounts_contract: VirtualAccountsContractAddress.ARBITRUM_MAINNET,
+    connected_wallets_contract: ConnectedWalletsContractAddress.ARBITRUM_MAINNET,
+    currency: "ETH",
+    available_currencies: arbitrumMainnetCurrencies.map((curr) => {
       return {
         name: curr.name,
         native: curr.native,
