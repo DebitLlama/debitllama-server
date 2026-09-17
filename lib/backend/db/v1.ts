@@ -101,9 +101,40 @@ export async function selectSingleItemForAPIV1(
   });
 }
 
+//This function will select a checkout item no matter who owns it.
+export async function selectSingleCheckoutItemForAPIV1(
+  ctx: any,
+  args: {
+    button_id: string;
+  },
+) {
+  return await query<{ button_id: string }>({
+    ctx,
+    args,
+    name: "selectSingleCheckoutItemForAPIV1",
+    impl: async (p) => {
+      const { data, error } = await p.client
+        .from("Items")
+        .select("*")
+        .eq("button_id", p.args.button_id)
+        .limit(1);
+
+      if (error) {
+        throw error;
+      }
+
+      if (!data || data.length === 0) {
+        throw new Error(`No item found for button_id: ${p.args.button_id}`);
+      }
+
+      return data[0];
+    },
+  });
+}
+
 export interface UpdateItemParamsArgs {
   button_id: string;
-  value: any,
+  value: any;
   type: "delete" | "redirect";
 }
 
