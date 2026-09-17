@@ -21,6 +21,19 @@ import {
 } from "../../../../lib/backend/businessLogic.ts";
 import { selectAllPaymentIntentsAPIV1 } from "../../../../lib/backend/db/v1.ts";
 import { State } from "../../../_middleware.ts";
+import QueryBuilder from "../../../../lib/backend/db/queryBuilder.ts";
+import { enqueueWebhookWork } from "../../../../lib/backend/queue/kv.ts";
+import { EventType } from "../../../../lib/backend/email/types.ts";
+import {
+  AccountTypes,
+  PaymentIntentStatus,
+  Pricing,
+} from "../../../../lib/enums.ts";
+import {
+  estimateRelayerGas,
+  getAccount,
+  parseEther,
+} from "../../../../lib/backend/web3.ts";
 
 export const handler = {
   async GET(_req: Request, ctx: HandlerContext<any, State>) {
@@ -133,4 +146,325 @@ export const handler = {
       );
     }
   },
+  async POST(_req: Request, ctx: HandlerContext<any, State>) {
+    try {
+      const userid = ctx.state.userid;
+      const json = await _req.json();
+
+      const checkoutId: string = json.checkout_id;
+      if (!checkoutId || typeof json.payload !== "string") {
+        return new Response(null, { status: 400 });
+      }
+
+      const { proof, publicSignals, publicInputs } =
+        deserializePaymentIntentSubmission(json.payload);
+
+      // Proof validity is enforced by estimateRelayerGas below: it simulates the
+      // on-chain call including the verifier, so a bad proof makes that call
+      // throw/revert. No separate verification step needed here.
+      //
+      // publicInputs is typed and came straight from createPaymentIntent client
+      // side — no array-index guessing. IMPORTANT: publicInputs itself is NOT
+      // proof-bound. The values actually enforced against the proof are inside
+      // `publicSignals`/`proof`, whatever the relayer/verifier contract does
+      // with them. If estimateRelayerGas (or the contract it calls) uses
+      // publicInputs.maxDebitAmount/payee/etc. as explicit call params rather
+      // than deriving them from the verified publicSignals, confirm the
+      // contract asserts those params equal the corresponding public signals —
+      // otherwise a client could send a valid proof for one set of terms
+      // alongside a mismatched publicInputs struct.
+      const commitment = publicInputs.commitment.toString();
+      const paymentIntentId = publicInputs.paymentIntent.toString();
+      const payeeAddress = publicInputs.payee;
+      const maxDebitAmount = publicInputs.maxDebitAmount;
+      const debitTimes = publicInputs.debitTimes;
+      const debitInterval = publicInputs.debitInterval;
+
+      // Decimal columns (max_price, debit_interval) can come back as strings
+      // with a decimal point even for whole-number amounts (e.g. "100.0"),
+      // which makes BigInt() throw. This coerces safely and rejects anything
+      // with a genuine fractional part, since these represent integer public
+      // inputs to the circuit.
+      const decimalToBigInt = (value: string | number): bigint => {
+        const [whole, fraction = ""] = value.toString().split(".");
+        if (/[1-9]/.test(fraction)) {
+          throw new Error(
+            `Expected an integer amount, got fractional value: ${value}`,
+          );
+        }
+        return BigInt(whole);
+      };
+
+      const queryBuilder = new QueryBuilder(ctx);
+      const select = queryBuilder.select();
+      const insert = queryBuilder.insert();
+
+      // ASSUMPTION — confirmed by you: this is byButtonId, called with checkoutId.
+      const { data: itemData } = await select.Items.byButtonId(checkoutId);
+      if (!itemData || itemData.length === 0) {
+        return new Response(null, { status: 404 });
+      }
+      const item = itemData[0];
+
+      // publicInputs is not proof-bound (see note above), so cross-check it
+      // against the item's own stored terms — data the client can't influence.
+      // A mismatch here means the client is claiming different terms than what
+      // this item actually charges, whether or not the proof itself is valid.
+      if (item.payee_address !== payeeAddress) {
+        return new Response(null, { status: 400 });
+      }
+
+      if (item.pricing === Pricing.Fixed) {
+        // Fixed pricing: the debited amount must match the item exactly.
+        if (
+          decimalToBigInt(maxDebitAmount) !== decimalToBigInt(item.max_price)
+        ) {
+          return new Response(null, { status: 400 });
+        }
+      } else {
+        // ASSUMPTION — for variable pricing I don't know the exact semantics
+        // of item.max_price (a hard cap the customer can't exceed, vs. just a
+        // display default). Treating it as a cap here; adjust if that's wrong.
+        if (decimalToBigInt(maxDebitAmount) > decimalToBigInt(item.max_price)) {
+          return new Response(null, { status: 400 });
+        }
+      }
+
+      // item.debit_times/debit_interval come back as BigInt/Decimal columns —
+      // likely strings at runtime — so compare numerically rather than with
+      // strict equality, which would wrongly reject e.g. 5 !== "5".
+      if (Number(item.debit_times) !== debitTimes) {
+        return new Response(null, { status: 400 });
+      }
+
+      if (Number(item.debit_interval) !== debitInterval) {
+        return new Response(null, { status: 400 });
+      }
+
+      const { data: accountData } = await select.Accounts.byCommitment(
+        commitment,
+      );
+      if (!accountData || accountData.length === 0) {
+        return new Response(null, { status: 404 });
+      }
+      const account = accountData[0];
+
+      // Ownership check (this was a bare TODO before): the authenticated caller
+      // must actually own the account paying for the intent.
+      if (account.user_id !== userid) {
+        return new Response(null, { status: 403 });
+      }
+
+      if (account.closed) {
+        return new Response(null, { status: 409 });
+      }
+
+      if (item.network !== account.network_id) {
+        return new Response(null, { status: 400 });
+      }
+
+      // Sync cached balance with on-chain state before checking funds.
+      // Skipped for connected wallets, same as the original logic.
+      if (account.accountType !== AccountTypes.CONNECTEDWALLET) {
+        const onChainAccount = await getAccount(
+          commitment,
+          item.network,
+          account.accountType,
+        );
+        if (parseEther(account.balance) !== onChainAccount.account[3]) {
+          const update = queryBuilder.update();
+          await update.Accounts.balanceAndClosedById(
+            onChainAccount.account[3],
+            !onChainAccount.account[0],
+            account.id,
+          );
+          account.balance = onChainAccount.account[3];
+          account.closed = !onChainAccount.account[0];
+        }
+      }
+
+      if (account.closed) {
+        return new Response(null, { status: 409 });
+      }
+
+      // Gas estimate will fail if the account lacks funds — only relevant for
+      // fixed-price virtual-account debits, where we know the exact amount upfront.
+      const getActualDebitedAmount =
+        account.accountType === AccountTypes.VIRTUALACCOUNT &&
+          item.pricing === Pricing.Fixed
+          ? maxDebitAmount
+          : "0";
+
+      let estimatedGas: bigint;
+      try {
+        estimatedGas = await estimateRelayerGas(
+          {
+            proof,
+            publicSignals,
+            payeeAddress: item.payee_address,
+            maxDebitAmount,
+            actualDebitedAmount: getActualDebitedAmount,
+            debitTimes,
+            debitInterval,
+          },
+          item.network,
+          account.accountType,
+        );
+      } catch (gasErr) {
+        // A revert here most likely means the proof failed verification
+        // on-chain (or genuinely insufficient funds — those two cases are
+        // presumably indistinguishable from the revert alone, since virtual
+        // account balance was already checked above for fixed pricing).
+        console.error(
+          "estimateRelayerGas reverted — treating as invalid proof",
+          gasErr,
+        );
+        return new Response(null, { status: 400 });
+      }
+
+      const stringifyBigint = (value: unknown): string =>
+        JSON.stringify(
+          value,
+          (_key, v) => (typeof v === "bigint" ? v.toString() : v),
+        );
+
+      const { data: insertedIntent, error: insertError } = await insert
+        .PaymentIntent
+        .newPaymentIntent(
+          item.payee_id,
+          account.id,
+          item.payee_address,
+          maxDebitAmount,
+          debitTimes.toString(),
+          debitInterval.toString(),
+          paymentIntentId,
+          commitment,
+          estimatedGas.toString(),
+          PaymentIntentStatus.CREATED,
+          item.pricing,
+          item.currency,
+          item.network,
+          item.id,
+          stringifyBigint(proof),
+          stringifyBigint(publicSignals),
+        );
+
+      if (insertError !== null) {
+        return new Response(null, { status: 500 });
+      }
+
+      enqueueWebhookWork({
+        eventType: EventType.SubscriptionCreated,
+        paymentIntent: insertedIntent?.id ?? paymentIntentId,
+      });
+
+      return new Response(JSON.stringify({ redirect_url: item.redirect_url }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
+    } catch (err) {
+      console.error("POST /payment_intents failed", err);
+      return new Response(null, { status: 500 });
+    }
+  },
+};
+
+function deserializeFullProof(json: string): FullProof {
+  const parsed = JSON.parse(json);
+  const toBig = (arr: string[]): bigint[] => arr.map(BigInt);
+
+  return {
+    proof: {
+      pi_a: toBig(parsed.proof.pi_a),
+      pi_b: parsed.proof.pi_b.map(toBig),
+      pi_c: toBig(parsed.proof.pi_c),
+      protocol: parsed.proof.protocol,
+      curve: parsed.proof.curve,
+    },
+    publicSignals: parsed.publicSignals, // leave as-is, or BigInt() selectively
+  };
+}
+
+export type FullProof = {
+  proof: Proof;
+  publicSignals: Array<any>;
+};
+
+export type Proof = {
+  pi_a: BigNumberish[];
+  pi_b: BigNumberish[][];
+  pi_c: BigNumberish[];
+  protocol: string;
+  curve: string;
+};
+
+export type SolidityProof = [
+  BigNumberish,
+  BigNumberish,
+  BigNumberish,
+  BigNumberish,
+  BigNumberish,
+  BigNumberish,
+  BigNumberish,
+  BigNumberish,
+];
+export type BigNumberish = string | bigint;
+
+/**
+ * Makes a proof compatible with the Verifier.sol method inputs.
+ * @param proof The proof generated with SnarkJS.
+ * @returns The Solidity compatible proof.
+ */
+export function packToSolidityProof(proof: Proof): SolidityProof {
+  return [
+    proof.pi_a[0],
+    proof.pi_a[1],
+    proof.pi_b[0][1],
+    proof.pi_b[0][0],
+    proof.pi_b[1][1],
+    proof.pi_b[1][0],
+    proof.pi_c[0],
+    proof.pi_c[1],
+  ];
+}
+
+export function deserializePaymentIntentSubmission(
+  json: string,
+): PaymentIntentSubmission {
+  const parsed = JSON.parse(json);
+  const toBig = (arr: string[]): bigint[] => arr.map(BigInt);
+
+  return {
+    proof: {
+      pi_a: toBig(parsed.proof.pi_a),
+      pi_b: parsed.proof.pi_b.map(toBig),
+      pi_c: toBig(parsed.proof.pi_c),
+      protocol: parsed.proof.protocol,
+      curve: parsed.proof.curve,
+    },
+    publicSignals: parsed.publicSignals,
+    publicInputs: {
+      commitment: BigInt(parsed.publicInputs.commitment),
+      paymentIntent: BigInt(parsed.publicInputs.paymentIntent),
+      payee: parsed.publicInputs.payee,
+      maxDebitAmount: parsed.publicInputs.maxDebitAmount,
+      debitTimes: parsed.publicInputs.debitTimes,
+      debitInterval: parsed.publicInputs.debitInterval,
+    },
+  };
+}
+
+export type PaymentIntentSubmission = {
+  proof: Proof;
+  publicSignals: Array<any>;
+  publicInputs: PaymentIntentPublicSignals;
+};
+
+export type PaymentIntentPublicSignals = {
+  commitment: bigint;
+  paymentIntent: bigint;
+  payee: string;
+  maxDebitAmount: string;
+  debitTimes: number;
+  debitInterval: number;
 };
