@@ -126,6 +126,21 @@ export interface DebitItem_ApiV1 {
   payment_intents_count: number;
 }
 
+export interface CheckoutItem_ApiV1{
+  id: number;
+  created_at: string;
+  payee_address: string;
+  currency: Currency_ApiV1;
+  max_price: string;
+  debit_times: number;
+  debit_interval: number;
+  checkout_id: string; 
+  redirect_url: string;
+  pricing: Pricing_ApiV1;
+  network: Network_ApiV1;
+  name: string;
+}
+
 export interface PaymentIntent_ApiV1 {
   id: number;
   created_at: string;
@@ -240,6 +255,7 @@ export enum EndpointNames_ApiV1 {
   accounts = "/api/v1/accounts",
   accountsSlug = "/api/v1/accounts/[slug]",
   items = "/api/v1/items",
+  checkout = "/api/v1/items/checkout",
   itemsSlug = "/api/v1/items/[slug]",
   paymentIntents = "/api/v1/payment_intents",
   paymentIntentsSlug = "/api/v1/payment_intents/[slug]",
@@ -252,6 +268,7 @@ export const endpoints_ApiV1: { [key in EndpointNames_ApiV1]: Array<Methods> } =
     [EndpointNames_ApiV1.accounts]: [Methods.GET],
     [EndpointNames_ApiV1.accountsSlug]: [Methods.GET],
     [EndpointNames_ApiV1.items]: [Methods.GET, Methods.PUT],
+    [EndpointNames_ApiV1.checkout]: [Methods.GET],
     [EndpointNames_ApiV1.itemsSlug]: [Methods.GET, Methods.POST],
     [EndpointNames_ApiV1.paymentIntents]: [Methods.GET],
     [EndpointNames_ApiV1.paymentIntentsSlug]: [Methods.GET, Methods.POST],
@@ -266,6 +283,7 @@ export const endpointDefinitions: { [key in EndpointNames_ApiV1]: string } = {
     "GET: an account by commitment and refresh owned account balance if authenticated!",
   [EndpointNames_ApiV1.items]:
     "GET all items of access token owner paginated,POST: new item",
+  [EndpointNames_ApiV1.checkout]: "GET: Fetch a single item for the checkout",
   [EndpointNames_ApiV1.itemsSlug]:
     "GET: Fetch an item by item_id. POST: Update redirect_url and deactivate item",
   [EndpointNames_ApiV1.paymentIntents]:
@@ -349,6 +367,10 @@ export interface V1_ItemsResponse extends Base_ApiV1 {
   pagination: PaginationResponse_ApiV1;
   filter: Array<Filter>;
   availableFilters: Array<string>;
+}
+
+export interface V1_CheckoutItemResponse extends Base_ApiV1{
+  item: CheckoutItem_ApiV1
 }
 
 export interface V1_NewItemCreated extends Base_ApiV1 {
@@ -673,6 +695,7 @@ export const getSortableColumns: {
   [EndpointNames_ApiV1.items]: Object.entries(Items_sortBy).map((ent) =>
     ent[0]
   ),
+  [EndpointNames_ApiV1.checkout]: [],
   [EndpointNames_ApiV1.itemsSlug]: [],
   [EndpointNames_ApiV1.paymentIntents]: Object.entries(PaymentIntents_sortyBy)
     .map((ent) => ent[0]),
