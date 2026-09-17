@@ -8,7 +8,11 @@ import { ChangingTitlePart } from "../islands/landingpage/changingTitle.tsx";
 export function SimpleLandingPage() {
     return (
         <div class="bg-[#F6F5F1]">
-            <header class="fixed inset-x-0 top-0 z-50 border-b border-[#E4E1D8] bg-[#F6F5F1]">
+            <div class="fixed inset-x-0 top-0 z-50">
+                <div class="bg-[#4338CA] px-4 py-2 text-center text-xs font-medium leading-5 text-white">
+                    DebitLlama is going through an upgrade and migrating to the Arbitrum network — some functionality may not work.
+                </div>
+                <header class="border-b border-[#E4E1D8] bg-[#F6F5F1]">
                 <nav class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8" aria-label="Global">
                     <div class="flex items-center gap-2.5">
                         <img alt="DebitLlama logo" src="/logo.svg" width="32" height="32" />
@@ -31,7 +35,8 @@ export function SimpleLandingPage() {
                         </a>
                     </div>
                 </nav>
-            </header>
+                </header>
+            </div>
 
             <style>
                 {`
@@ -48,7 +53,7 @@ export function SimpleLandingPage() {
                 `}
             </style>
 
-            <div class="relative isolate pt-20">
+            <div class="relative isolate pt-32 sm:pt-28">
                 <div class="mx-auto max-w-7xl px-6 lg:px-8">
                     <div class="grid grid-cols-1 items-center gap-12 py-20 lg:grid-cols-2 lg:py-28">
                         <div class="dl-hero-fade">
@@ -86,6 +91,7 @@ export function SimpleLandingPage() {
             <InfoSection></InfoSection>
             <ForSpendersSection></ForSpendersSection>
             <ForMerchantsSection></ForMerchantsSection>
+            <McpAgentSection></McpAgentSection>
             <FAQSection></FAQSection>
             <SiteFooter></SiteFooter>
         </div>
@@ -407,6 +413,133 @@ export function SimpleCheckoutFlow() {
     );
 }
 
+// --- MCP server for agents / AgentPay -------------------------------------
+
+export function McpAgentSection() {
+    return (
+        <section class="bg-[#14171F] py-20">
+            <div class="mx-auto max-w-5xl px-6 lg:px-8">
+                <div class="flex items-baseline gap-3">
+                    <span class="h-6 w-1 rounded-full bg-[#8B8FE6]"></span>
+                    <h2 class="text-3xl font-bold tracking-tight text-white">MCP server for agents</h2>
+                </div>
+                <p class="mt-4 max-w-2xl text-[15px] leading-7 text-[#B8BAC2]">
+                    <span class="font-semibold text-white">debitllama-mcp</span> puts the REST API behind a Model Context
+                    Protocol server, so an agent doesn't need custom integration code to transact — it just calls the
+                    tools. List items for sale, discover what other agents are offering, create or accept a payment
+                    intent, and approve a subscription, all as native MCP calls.
+                </p>
+
+                <div class="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
+                    <div class="rounded-lg border border-white/10 bg-white/[0.03] p-6">
+                        <span class="font-mono text-xs text-[#8B8FE6]">agentpay</span>
+                        <h3 class="mt-1 text-base font-bold text-white">Hand an agent the keys, on purpose</h3>
+                        <p class="mt-3 text-sm leading-6 text-[#B8BAC2]">
+                            AgentPay connects debitllama-mcp directly to one of your accounts. Once linked, the agent
+                            authenticates as that account and can approve, adjust, or cancel its own subscriptions —
+                            no human click-through required, still bounded by the balance and limits you set when you
+                            created it.
+                        </p>
+                    </div>
+                    <div class="rounded-lg border border-white/10 bg-white/[0.03] p-6">
+                        <span class="font-mono text-xs text-[#8B8FE6]">listings</span>
+                        <h3 class="mt-1 text-base font-bold text-white">Agents can sell, too</h3>
+                        <p class="mt-3 text-sm leading-6 text-[#B8BAC2]">
+                            The same API surface an agent uses to pay also lets it publish: create a new item or
+                            subscription plan, price it, and put it up for other agents to find — no dashboard, no
+                            merchant onboarding call.
+                        </p>
+                    </div>
+                    <div class="rounded-lg border border-white/10 bg-white/[0.03] p-6">
+                        <span class="font-mono text-xs text-[#8B8FE6]">agent-to-agent</span>
+                        <h3 class="mt-1 text-base font-bold text-white">A marketplace with no humans in the loop</h3>
+                        <p class="mt-3 text-sm leading-6 text-[#B8BAC2]">
+                            Because both sides of the API are open to agents, one agent's listing can become another
+                            agent's subscription. Payment intents get created, accepted, and settled machine-to-machine,
+                            with the same on-chain limits protecting everyone involved.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-10 rounded-lg border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+                    <span class="font-mono text-xs text-[#8B8FE6]">how it connects</span>
+                    <h3 class="mt-1 text-base font-bold text-white">Agents subscribing to each other</h3>
+                    <p class="mt-3 max-w-2xl text-sm leading-6 text-[#B8BAC2]">
+                        Each agent runs its own local debitllama-mcp server, wired to an account it controls — there's no shared or remote MCP service in between. From there it
+                        can list a service, subscribe to another agent's listing, or both — the diagram below shows
+                        three agents doing all three at once.
+                    </p>
+                    <div class="mt-8">
+                        <AgentSubscriptionDiagram></AgentSubscriptionDiagram>
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+}
+
+function AgentSubscriptionDiagram() {
+    return (
+        <svg
+            viewBox="0 0 700 480"
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-full"
+            role="img"
+            aria-label="Diagram showing three agents, each running its own local debitllama-mcp server, subscribing to one another directly in a cycle"
+        >
+            <defs>
+                <marker id="dl-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                    <path d="M0,0 L10,5 L0,10 z" fill="#8B8FE6" />
+                </marker>
+                <marker id="dl-arrow-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                    <path d="M0,0 L10,5 L0,10 z" fill="#0F9D6E" />
+                </marker>
+            </defs>
+
+            {/* Agent A - top left, with its own local mcp server */}
+            <circle cx="150" cy="90" r="46" fill="#1E2230" stroke="#8B8FE6" stroke-width="2" />
+            <text x="150" y="86" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="white">Agent A</text>
+            <text x="150" y="101" text-anchor="middle" font-family="monospace" font-size="9" fill="#8B8F99">sells research</text>
+            <line x1="118" y1="60" x2="72" y2="32" stroke="#4B4F5C" stroke-width="1.5" stroke-dasharray="3 4" />
+            <rect x="14" y="14" width="96" height="30" rx="6" fill="#1E2230" stroke="#4B4F5C" stroke-width="1.5" />
+            <circle cx="28" cy="29" r="3" fill="#8B8FE6" />
+            <text x="66" y="33" text-anchor="middle" font-family="monospace" font-size="9" fill="#B8BAC2">local mcp</text>
+
+            {/* Agent B - top right, with its own local mcp server */}
+            <circle cx="550" cy="90" r="46" fill="#1E2230" stroke="#8B8FE6" stroke-width="2" />
+            <text x="550" y="86" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="white">Agent B</text>
+            <text x="550" y="101" text-anchor="middle" font-family="monospace" font-size="9" fill="#8B8F99">sells compute</text>
+            <line x1="582" y1="60" x2="628" y2="32" stroke="#4B4F5C" stroke-width="1.5" stroke-dasharray="3 4" />
+            <rect x="590" y="14" width="96" height="30" rx="6" fill="#1E2230" stroke="#4B4F5C" stroke-width="1.5" />
+            <circle cx="604" cy="29" r="3" fill="#8B8FE6" />
+            <text x="642" y="33" text-anchor="middle" font-family="monospace" font-size="9" fill="#B8BAC2">local mcp</text>
+
+            {/* Agent C - bottom center, with its own local mcp server */}
+            <circle cx="350" cy="370" r="46" fill="#1E2230" stroke="#8B8FE6" stroke-width="2" />
+            <text x="350" y="366" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="white">Agent C</text>
+            <text x="350" y="381" text-anchor="middle" font-family="monospace" font-size="9" fill="#8B8F99">sells data feeds</text>
+            <line x1="350" y1="416" x2="350" y2="434" stroke="#4B4F5C" stroke-width="1.5" stroke-dasharray="3 4" />
+            <rect x="302" y="434" width="96" height="26" rx="6" fill="#1E2230" stroke="#4B4F5C" stroke-width="1.5" />
+            <circle cx="316" cy="447" r="3" fill="#8B8FE6" />
+            <text x="356" y="451" text-anchor="middle" font-family="monospace" font-size="9" fill="#B8BAC2">local mcp</text>
+
+            {/* subscription arrows, curved, forming a cycle: A -> B -> C -> A */}
+            <path d="M 196 78 C 300 30, 400 30, 504 78" fill="none" stroke="#0F9D6E" stroke-width="2" marker-end="url(#dl-arrow-green)" />
+            <text x="350" y="40" text-anchor="middle" font-family="monospace" font-size="10" fill="#9CE6C2">subscribes</text>
+
+            <path d="M 538 130 C 520 230, 440 300, 385 345" fill="none" stroke="#0F9D6E" stroke-width="2" marker-end="url(#dl-arrow-green)" />
+            <text x="505" y="245" text-anchor="middle" font-family="monospace" font-size="10" fill="#9CE6C2" transform="rotate(63 505 245)">subscribes</text>
+
+            <path d="M 315 345 C 260 300, 180 230, 162 130" fill="none" stroke="#0F9D6E" stroke-width="2" marker-end="url(#dl-arrow-green)" />
+            <text x="195" y="245" text-anchor="middle" font-family="monospace" font-size="10" fill="#9CE6C2" transform="rotate(-63 195 245)">subscribes</text>
+
+            <text x="350" y="472" text-anchor="middle" font-family="monospace" font-size="9" fill="#6B6F79">
+                dashed = each agent's own local mcp server · green = subscription payment intents, agent to agent
+            </text>
+        </svg>
+    );
+}
+
 const FAQS = [
     {
         q: "Who holds my funds?",
@@ -427,6 +560,10 @@ const FAQS = [
     {
         q: "Who pays the gas fees?",
         a: "Subscription providers run their own relayer (or an intent solver) and cover gas for the transactions they process. DebitLlama takes a small fee on successful direct debits for providing the interface.",
+    },
+    {
+        q: "What can an agent do with AgentPay?",
+        a: "Once debitllama-mcp is connected to an account, an agent can approve, adjust, or cancel that account's subscriptions, and — through the same API — list its own items or plans for other agents to subscribe to. It's still bounded by whatever balance and limits you set on the account.",
     },
 ];
 
