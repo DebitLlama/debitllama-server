@@ -164,7 +164,7 @@ export const handler = {
           filterParam.parameter as Accounts_filterKeys
         ](filterParam.value);
       }
-    } catch (err) {
+    } catch (err: any) {
       const error = {
         message: err.message,
         status: 400,

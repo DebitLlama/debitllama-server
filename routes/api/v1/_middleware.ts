@@ -27,7 +27,7 @@ export async function handler(
   }
 
   let resp;
-  // If the request is not GET, then I Authenticate the endpoint!
+  
   const authorization = _req.headers.get("Authorization");
   if (authorization === null) {
     resp = v1Error(

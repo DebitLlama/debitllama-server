@@ -173,7 +173,7 @@ export const handler = {
         },
         filters: filterParameters as Array<Filter>,
       }));
-    } catch (err) {
+    } catch (err:any) {
       const error = {
         message: err.message,
         status: 400,

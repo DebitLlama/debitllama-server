@@ -214,7 +214,7 @@ export const handler = {
           timestamp: new Date().toUTCString(),
         },
       }));
-    } catch (err) {
+    } catch (err: any) {
       return v1Error(
         newItemCreatedResponseBuilder({
           returnError: true,
