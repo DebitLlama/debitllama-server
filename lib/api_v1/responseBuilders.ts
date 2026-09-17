@@ -39,6 +39,7 @@ import {
   Pricing_ApiV1,
   v1_AccountResponse,
   v1_AccountsResponse,
+  V1_CheckoutItemResponse,
   v1_DynamicPaymentRequesResponse,
   v1_Index_Response,
   V1_ItemResponse,
@@ -616,7 +617,7 @@ export function ItemsResponseBuilder(args: ItemsResponseBuilderArgs) {
     methods: endpoints_ApiV1[EndpointNames_ApiV1.items],
   };
   const _version = "v1";
-  const _description = endpointDefinitions[EndpointNames_ApiV1.accountsSlug];
+  const _description = endpointDefinitions[EndpointNames_ApiV1.items];
 
   const _links = [{
     href: "/api/v1/items",
@@ -676,6 +677,72 @@ export function ItemsResponseBuilder(args: ItemsResponseBuilderArgs) {
     pagination: args.pagination as PaginationResponse_ApiV1,
     filter: args.filters,
     availableFilters: Object.entries(Items_sortBy).map((ent) => ent[0]),
+  };
+
+  return body;
+}
+
+export interface CheckoutItemResponseBuilderArgs {
+  returnError: boolean;
+  error: V1Error;
+  item: DebitItem;
+}
+
+export function CheckoutItemResponseBuilder(
+  args: CheckoutItemResponseBuilderArgs,
+) {
+  const _self = {
+    href: `/api/v1/items/checkout`,
+    methods: endpoints_ApiV1[EndpointNames_ApiV1.checkout],
+  };
+  const _version = "v1";
+  const _description = endpointDefinitions[EndpointNames_ApiV1.checkout];
+
+  const _links = [{
+    href: "/api/v1/items",
+    methods: endpoints_ApiV1[EndpointNames_ApiV1.items],
+  }];
+
+  if (args.returnError) {
+    const errorRes: ErrorResponse = {
+      _self,
+      _description,
+      _version,
+      _links,
+      error: args.error,
+    };
+    return errorRes;
+  }
+
+
+  const curr = JSON.parse(args.item.currency);
+  const network = getNetworkDetailsFromDebitItem(args.item);
+
+  const i = args.item;
+
+  const body: V1_CheckoutItemResponse = {
+    _self,
+    _description,
+    _version,
+    _links,
+    item: {
+      id: i.id,
+      created_at: i.created_at,
+      payee_address: i.payee_address,
+      currency: {
+        name: curr.name,
+        contractAddress: curr.contractAddress,
+        native: curr.native,
+      },
+      max_price: i.max_price,
+      debit_times: i.debit_times,
+      debit_interval: i.debit_interval,
+      checkout_id: i.button_id,
+      redirect_url: i.redirect_url,
+      pricing: i.pricing as Pricing_ApiV1,
+      network,
+      name: i.name,
+    },
   };
 
   return body;
@@ -913,3 +980,11 @@ export function mapPaymentIntentsRowToZapierFriendlyResponse(
     failed_dynamic_payment_amount: row.failedDynamicPaymentAmount,
   };
 }
+
+// export interface SubscriptionFetchResponseBuilderArgs{
+//   error: V1Error;
+//   returnedError: boolean;
+//   subscription: Subscription | undefined
+// }
+
+// export function SubscriptionPageResponseBuilder(args: )
