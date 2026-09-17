@@ -19,6 +19,7 @@ import * as $api_v1_accounts_slug_ from "./routes/api/v1/accounts/[slug].ts";
 import * as $api_v1_accounts_index from "./routes/api/v1/accounts/index.ts";
 import * as $api_v1_index from "./routes/api/v1/index.ts";
 import * as $api_v1_items_slug_ from "./routes/api/v1/items/[slug].ts";
+import * as $api_v1_items_checkout from "./routes/api/v1/items/checkout.ts";
 import * as $api_v1_items_index from "./routes/api/v1/items/index.ts";
 import * as $api_v1_payment_intents_slug_ from "./routes/api/v1/payment_intents/[slug].ts";
 import * as $api_v1_payment_intents_index from "./routes/api/v1/payment_intents/index.ts";
@@ -136,6 +137,7 @@ const manifest = {
     "./routes/api/v1/accounts/index.ts": $api_v1_accounts_index,
     "./routes/api/v1/index.ts": $api_v1_index,
     "./routes/api/v1/items/[slug].ts": $api_v1_items_slug_,
+    "./routes/api/v1/items/checkout.ts": $api_v1_items_checkout,
     "./routes/api/v1/items/index.ts": $api_v1_items_index,
     "./routes/api/v1/payment_intents/[slug].ts": $api_v1_payment_intents_slug_,
     "./routes/api/v1/payment_intents/index.ts": $api_v1_payment_intents_index,
