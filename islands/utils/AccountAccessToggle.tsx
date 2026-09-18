@@ -1,4 +1,4 @@
-import { KeyLogo, PasswordLogo } from "../../components/components.tsx";
+import { AgentPayLogo, KeyLogo, PasswordLogo } from "../../components/components.tsx";
 import { AccountAccess } from "../../lib/enums.ts";
 
 export interface AccountAccessToggleProps {
@@ -20,13 +20,22 @@ export default function AccountAccessToggle(props: AccountAccessToggleProps) {
         <div class="flex flex-row justify-center mb-2">
             <small class="text-gray-800">Select how you want to access your account when approving subscription payments</small>
         </div>
-        <div class="flex flex-row justify-center mb-5">
+        <div class="flex flex-row justify-evenly mb-5">
+            <button onClick={() => props.setAccountAccessSelected(AccountAccess.agent)}
+                aria-label="Grant payment access to an agent" type="button"
+                class={`select-none flex flex-col justify-center border-t-2 border-b-2 border-l-2 border-r-2 border-l-dotted border-r-dotted pr-2 pl-2 hover:bg-gray-200 ${hightlight(AccountAccess.agent)}`}
+            >
+                <AgentPayLogo></AgentPayLogo>
+                <h2 class="text-gray-700">Agent</h2>
+            </button>
+
             <button onClick={() => props.setAccountAccessSelected(AccountAccess.metamask)} aria-label="Access account with metamask" type="button"
                 class={`select-none flex flex-col justify-center border-t-2 border-b-2 border-l-2 pr-2 pl-2 hover:bg-gray-200 ${hightlight(AccountAccess.metamask)}`}>
-                <img class="mx-auto" width="45px" height="45px" src="/MetaMask_Icon_Color.svg" />
-                <small class="text-gray-700">Metamask</small>
+                <img class="mx-auto" width="90px" height="90px" src="/MetaMask_Icon_Color.svg" />
+                <h2 class="text-gray-700">Metamask</h2>
             </button>
-            <button onClick={() => props.setAccountAccessSelected(AccountAccess.password)} aria-label="Access account with password" type="button"
+
+            {/* <button onClick={() => props.setAccountAccessSelected(AccountAccess.password)} aria-label="Access account with password" type="button"
                 class={`select-none flex flex-col justify-center border-t-2 border-b-2 border-l-2 border-r-2 border-l-dotted border-r-dotted pr-2 pl-2 hover:bg-gray-200 ${hightlight(AccountAccess.password)}`}>
                 <PasswordLogo></PasswordLogo>
                 <small class="text-gray-700">Password</small>
@@ -35,7 +44,7 @@ export default function AccountAccessToggle(props: AccountAccessToggleProps) {
                 class={`select-none flex flex-col justify-center border-t-2 border-b-2 border-r-2 pl-2 pr-2 hover:bg-gray-200 ${hightlight(AccountAccess.passkey)}`}>
                 <KeyLogo></KeyLogo>
                 <small class="text-gray-700">Passkey</small>
-            </button>
+            </button> */}
         </div>
     </div>
 }

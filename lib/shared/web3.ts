@@ -22,7 +22,7 @@ export const availableNetworks = [
   // NetworkNames.BTT_MAINNET.toString(),
   // NetworkNames.BTT_TESTNET.toString(),
   NetworkNames.ARBITRUM_SEPOLIA.toString(),
-  NetworkNames.ARBITRUM_MAINNET.toString(),
+  // NetworkNames.ARBITRUM_MAINNET.toString(),
 ];
 
 export enum NetworkTickers {
@@ -327,3 +327,26 @@ export const responseBuildersSupportedNetworks = [
     }),
   },
 ];
+
+
+// BN254 scalar field modulus (r)
+export const SNARK_FIELD_SIZE: bigint = BigInt(
+  "21888242871839275222246405745257275088548364400416034343698204186575808495617"
+);
+
+export type NoteHex = `0x${string}`;
+
+/**
+ * Checks that `value` is a 0x-prefixed hex string of exactly `length` bytes
+ * and that it encodes a valid BN254 field element (< r).
+ */
+export function isValidNoteHex(value: string, length = 32): value is NoteHex {
+  if (typeof value !== "string") return false;
+
+  // shape: "0x" + exactly length*2 hex chars
+  const re = new RegExp(`^0x[0-9a-fA-F]{${length * 2}}$`);
+  if (!re.test(value)) return false;
+
+  // range: must be a field element
+  return BigInt(value) < SNARK_FIELD_SIZE;
+}

@@ -45,7 +45,7 @@ export default function BuyButtonPage(props: BuyButtonPageProps) {
     const [accountTypeSwitchValue, setAccountTypeSwitchValue] = useState<AccountTypes>(AccountTypes.VIRTUALACCOUNT);
     const [accountAccessSelected, setAccountAccessSelected] = useState<AccountAccess>(AccountAccess.metamask);
 
-
+    const [commitment, setCommitment] = useState("")
 
     useEffect(() => {
         setSelectedAccount(props.accounts.length !== 0 ? 2 : 1);
@@ -114,7 +114,9 @@ export default function BuyButtonPage(props: BuyButtonPageProps) {
                     passwordStrengthNotification: newAccountPasswordStrengthNotification,
                     passwordMatchError: newAccountPasswordMatchError,
                     accountAccessSelected: accountAccessSelected,
-                    setAccountAccessSelected: setAccountAccessSelected
+                    setAccountAccessSelected: setAccountAccessSelected,
+                    commitment: commitment,
+                    setCommitment: (to: string) => setCommitment(to)
                 }
             }
             setNewAccountPasswordStrengthNotification={setNewAccountPasswordStrengthNotification}
@@ -155,6 +157,8 @@ export default function BuyButtonPage(props: BuyButtonPageProps) {
             setAccountTypeSwitchValue={setAccountTypeSwitchValue}
             requires2Fa={props.requires2Fa}
             url={props.url}
+            commitment={commitment}
+            setCommitment={setCommitment}
         ></LoggedInUi> : <LoggedOutUi buttonid={props.item.buttonId} url={props.url} ></LoggedOutUi>}
     </BuyPageLayout>
 

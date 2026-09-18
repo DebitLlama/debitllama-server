@@ -66,6 +66,8 @@ export interface ButtonsBasedOnSelectionProps {
   accountTypeSwitchValue: AccountTypes;
   setAccountTypeSwitchValue: (to: AccountTypes) => void;
   requires2Fa: boolean;
+  commitment: string;
+  setCommitment: (to: string) => void
 }
 
 export interface TopupBalanceArgs {
@@ -90,6 +92,7 @@ export interface onCreateAccountSubmitArgs {
   setShowOverlay: (to: boolean) => void;
   accountTypeSwitchValue: AccountTypes;
   accountAccessSelected: AccountAccess;
+  commitment: string;
 }
 
 export interface LoggedInUiProps {
@@ -133,4 +136,8 @@ export interface LoggedInUiProps {
 
   requires2Fa: boolean;
   url: string;
+
+  commitment: string;
+
+  setCommitment: (to: string) => void;
 }

@@ -426,10 +426,9 @@ export function getRandomEncryptionPrivateKeyBlob() {
 }
 
 export async function switch_setupAccount(
-  ethEncryptDebitllamaPublicKey: string,
-  password: string,
   address: string,
   accountAccessSelected: AccountAccess,
+  commitment: string,
 ): Promise<
   [{ commitment: string; encryptedNote: string }, boolean, string]
 > {
@@ -447,53 +446,13 @@ export async function switch_setupAccount(
         ];
       }
     }
-    case AccountAccess.password:
+    case AccountAccess.agent:{
       return [
-        await setUpAccount(password, ethEncryptDebitllamaPublicKey),
+        {commitment, encryptedNote: ""},
         false,
-        "",
-      ];
-    case AccountAccess.passkey: {
-      const resp = await getAuthenticationOptionsForLargeBlobRead();
-      const authenticationJson = await resp.json();
-      if (resp.status !== 200) {
-        return [
-          { commitment: "", encryptedNote: "" },
-          true,
-          authenticationJson.error,
-        ];
-      }
+        ""
+      ]
 
-      if (!authenticationJson.extensions.largeBlob.read) {
-        return [
-          { commitment: "", encryptedNote: "" },
-          true,
-          "Unable to read from passkey",
-        ];
-      }
-
-      const credentials = await startAuthentication(authenticationJson);
-      try {
-        //@ts-ignore largeBlob should exist!
-        if (Object.keys(credentials.clientExtensionResults.largeBlob).length) {
-          const decoder = new TextDecoder();
-          const privkey =
-            //@ts-ignore should exist!
-            decoder.decode(credentials.clientExtensionResults.largeBlob.blob);
-          const pubKey = getPublicKeyFromPrivateKey(privkey.substring(2));
-
-          const acc = await setUpAccountWithoutPassword(pubKey);
-          return [acc, false, ""];
-        } else {
-          throw new Error();
-        }
-      } catch (_err) {
-        return [
-          { commitment: "", encryptedNote: "" },
-          true,
-          "Unable to read passkey data!",
-        ];
-      }
     }
     default:
       throw new Error("Invalid account access selected!");
@@ -523,36 +482,8 @@ export async function switch_recoverAccount(
         },
       );
     }
-    case AccountAccess.password: {
-      return await aesDecryptData(cipherNote, password);
-    }
-    case AccountAccess.passkey: {
-      const resp = await getAuthenticationOptionsForLargeBlobRead();
-      const authenticationJson = await resp.json();
-      if (resp.status !== 200) {
-        return "";
-      }
-      if (!authenticationJson.extensions.largeBlob.read) {
-        return "";
-      }
-      const credentials = await startAuthentication(authenticationJson);
-      try {
-        //@ts-ignore largeBlob should exist!
-        if (Object.keys(credentials.clientExtensionResults.largeBlob).length) {
-          const decoder = new TextDecoder();
-          const privkey =
-            //@ts-ignore should exist!
-            decoder.decode(credentials.clientExtensionResults.largeBlob.blob);
-
-          const unpacked = unpackEncryptedMessage(cipherNote);
-
-          return decryptData(privkey, unpacked);
-        } else {
-          throw new Error();
-        }
-      } catch (_err) {
-        return "";
-      }
+    case AccountAccess.agent:{
+      //TODO: Can't recover accout here... The agent pay is not used on this page
     }
     default:
       return "";

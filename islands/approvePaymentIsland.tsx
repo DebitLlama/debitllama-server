@@ -31,13 +31,16 @@ export default function ApprovePaymentIsland(props: ApprovePaymentIslandProps) {
 
     async function payClicked() {
 
+        if (props.account_access === AccountAccess.agent) {
+            setErrorMessage("Must subscribe using the MCP server")
+        }
+
         const decryptedNote = await switch_recoverAccount(
             props.account_access,
             props.cipherNote,
             password,
             props.chainId as ChainIds,
             setErrorMessage
-
         );
 
         if (decryptedNote === "") {
@@ -127,43 +130,23 @@ export default function ApprovePaymentIsland(props: ApprovePaymentIslandProps) {
                     ></AccountCardElement>
 
                 </div>
-                <form class="flex flex-col margin_0_auto" onSubmit={disableOnSubmit}>
-                    {props.account_access === "password" ?
-                        <div class="mx-auto mt-4">
-                            <label for="password" class="block mb-2 text-sm font-medium">Decrypt your Account with the Password</label>
-                            <input
-                                value={password}
-                                onChange={(event: any) => setPassword(event.target.value)}
-                                type="password"
-                                name="password"
-                                id="password"
-                                placeholder="••••••••"
-                                class="width-320px border border-gray-300 sm:text-sm rounded-lg focus:ring-indigo-600 focus:border-indigo-600 block w-full p-2.5 dark:focus:ring-indigo-500 dark:focus:border-indigo-500"
-                            />
+                {props.account_access === AccountAccess.agent ? <h2>You must use the MCP server to create a subscription</h2> :
+                    <form class="flex flex-col margin_0_auto" onSubmit={disableOnSubmit}>
+                        <button
+                            aria-label="Accept this subsciption"
+                            disabled={payClickLocked}
+                            onClick={payClicked}
+                            class="w-full flex flex-row justify-center text-xl font-bold mb-4 mt-4 text-white bg-indigo-700 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800 indigobg"
+                        >Subscribe</button>
+                        <div class="w-60 mx-auto mt-4 text-center">
+                            <p class={"text-red-600	"}>{errorMessage}</p>
                         </div>
-                        :
-                        <div class="mx-auto mt-4">
-                            <label for="password" class="block mb-2 text-sm font-medium">{
-                                props.account_access === AccountAccess.metamask
-                                    ? "Decrypt you account using Metamask"
-                                    : "Access your account using Passkey"}</label>
-                        </div>
-                    }
-                    <button
-                        aria-label="Accept this subsciption"
-                        disabled={payClickLocked}
-                        onClick={payClicked}
-                        class="w-full flex flex-row justify-center text-xl font-bold mb-4 mt-4 text-white bg-indigo-700 hover:bg-indigo-600 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-lg px-5 py-2.5 text-center dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800 indigobg"
-                    >Subscribe</button>
-                    <div class="w-60 mx-auto mt-4 text-center">
-                        <p class={"text-red-600	"}>{errorMessage}</p>
-                    </div>
-                </form>
+                    </form>}
             </div>
         </>}
         <div class="bg-gray-100 border-t border-b border-gray-500 text-gray-700 px-4 py-3" role="alert">
             <p class="font-bold">Make sure you are on debitllama.com! By entering the password you accept our <a href="/termsAndConditions" target="_blank" class="text-sm text-indigo-500">Terms and conditions</a> and the parameters of this subscription and prove you are the owner of this account. This is a secure page, your password and decrypted account remains confidental and never leaves the browser.</p>
-            <p class="text-sm">DebitLlama does not collect or store your password or decrypted account. If you lost or forgot your account password, we can't recover it for you. You can always withdraw the account balance using the wallet that created it. By clicking Subscribe you accept to create a zero-knowledge proof that will be used to debit the payments during the subscription period. If you wish to cancel the subscription, you can cancel it any time using your wallet.</p>
+            <p class="text-sm">DebitLlama does not collect  your decrypted account. If you lost or forgot your account password, we can't recover it for you. You can always withdraw the account balance using the wallet that created it. By clicking Subscribe you accept to create a zero-knowledge proof that will be used to debit the payments during the subscription period. If you wish to cancel the subscription, you can cancel it any time using your wallet.</p>
             <p class="text-sm">DISCLAIMER! THE SUBSCRIPTION SERVICE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. DEBITLLAMA FURTHER DISCLAIMS ALL WARRANTIES, EXPRESS AND IMPLIED, INCLUDING WITHOUT LIMITATION, ANY IMPLIED WARRANTIES OF THE SERVICE OFFERED BY MERCHANTS IN EXCHANGE FOR PAYMENTS. DEBITLLAMA IS NOT RESPONSIBLE FOR ANY DAMAGES CAUSED OR DISPUTES THAT CAN OCCUR DUE TO THE PARTIES DISAGREEMENT CAUSED BY NON-FULFILLMENT OR CANCELLATION OF THE SUBSCRIPTION AND ITS TERMS. WE PROVIDE NO WARRANTIES AND BY SUBSCRIBING TO A SERVICE YOU AGREE TO IDEMNIFY DEBITLLAMA FROM CLAIMS DAMAGES OR LOSSES ARISING FROM ACCEPTING THIS SUBSCRIPTION.</p>
         </div>
     </div>

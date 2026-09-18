@@ -3,7 +3,7 @@ import { useState } from 'preact/hooks';
 import CurrencySelectDropdown from "./CurrencySelectDropdown.tsx";
 import AccountPasswordInput from "./accountPasswordInput.tsx";
 import { approveSpend, depositEth, depositToken, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts, switch_setupAccount } from "../lib/frontend/web3.ts";
-import { ChainIds, NetworkNames, SelectableCurrency, availableNetworks, arbitrumMainnetCurrencies, chainIdFromNetworkName, getVirtualAccountsContractAddress } from "../lib/shared/web3.ts";
+import { ChainIds, NetworkNames, SelectableCurrency, availableNetworks, arbitrumMainnetCurrencies, chainIdFromNetworkName, getVirtualAccountsContractAddress, isValidNoteHex } from "../lib/shared/web3.ts";
 import Overlay from '../components/Overlay.tsx';
 import { redirectToAccountsPage, saveAccount } from '../lib/frontend/fetch.ts';
 import { AccountAccess, AccountTypes } from '../lib/enums.ts';
@@ -40,6 +40,7 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
 
     const [depositAmount, setDepositAmount] = useState("");
 
+    const [commitment, setCommitment] = useState("")
 
     const [showOverlay, setShowOverlay] = useState(false);
     const [showOverlayError, setShowOverlayError] = useState({
@@ -80,23 +81,17 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
     }
 
     function isButtonDisabled(): boolean {
-        if (accountAccessSelected === AccountAccess.metamask || accountAccessSelected === AccountAccess.passkey) {
+
+        if (accountAccessSelected === AccountAccess.metamask) {
             return false;
         }
 
-        if (passwordScore < 3) {
-            return true;
-        }
-
-        if (passwordAgain == "") {
-            return true;
-        }
-
-        if (passwordMatchError !== "") {
-            return true;
+        if (!isValidNoteHex(commitment)) {
+            return true
         }
         return false;
     }
+
 
     function setSelectedCurrencyHook(to: SelectableCurrency) {
         setSelectedCurrency(to);
@@ -173,10 +168,9 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
         const address = await requestAccounts();
 
         const [virtualaccount, error, errorMessage] = await switch_setupAccount(
-            props.ethEncryptPublicKey,
-            password,
             address,
-            accountAccessSelected);
+            accountAccessSelected,
+            commitment);
 
         if (error) {
             handleError(errorMessage);
@@ -307,6 +301,8 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
             passwordStrengthNotification={passwordStrengthNotification}
             accountAccessSelected={accountAccessSelected}
             setAccountAccessSelected={setAccountAccessSelected}
+            commitment={commitment}
+            setCommitment={setCommitment}
         ></AccountPasswordInput>
         <div class="mb-4">
             <p class="text-sm ...">{getGoodToKnowMessage(accountAccessSelected)}</p>

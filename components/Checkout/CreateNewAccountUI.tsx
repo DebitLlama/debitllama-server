@@ -20,7 +20,9 @@ export function CreateNewAccountUI(props: {
     accountTypeSwitchValue: AccountTypes;
     setAccountTypeSwitchValue: (to: AccountTypes) => void;
     accountAccessSelected: AccountAccess,
-    setAccountAccessSelected: (to:AccountAccess) => void;
+    setAccountAccessSelected: (to: AccountAccess) => void;
+    commitment: string;
+    setCommitment: (to: string) => void;
 }) {
     const isERC20 = !props.item.currency.native;
 
@@ -36,7 +38,8 @@ export function CreateNewAccountUI(props: {
         accountCurrency: props.item.currency.name,
         setShowOverlay: props.setShowOverlay,
         accountTypeSwitchValue: props.accountTypeSwitchValue,
-        accountAccessSelected: props.accountAccessSelected
+        accountAccessSelected: props.accountAccessSelected,
+        commitment: props.commitment,
     })}>
         <BuyPageProfile
             profileExists={props.profileExists}
@@ -97,6 +100,8 @@ export function CreateNewAccountUI(props: {
                 passwordStrengthNotification={props.newAccountPasswordProps.passwordStrengthNotification}
                 accountAccessSelected={props.accountAccessSelected}
                 setAccountAccessSelected={props.setAccountAccessSelected}
+                commitment={props.commitment}
+                setCommitment={props.setCommitment}
             ></AccountPasswordInput>
             <div class="mb-4">
                 <p class="text-sm ...">{getGoodToKnowMessage(props.accountAccessSelected)}</p>

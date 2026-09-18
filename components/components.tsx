@@ -377,6 +377,49 @@ export function KeyLogo() {
     return <svg class="mx-auto" xmlns="http://www.w3.org/2000/svg" height="45" viewBox="0 -960 960 960" width="45"><path d="M280-400q-33 0-56.5-23.5T200-480q0-33 23.5-56.5T280-560q33 0 56.5 23.5T360-480q0 33-23.5 56.5T280-400Zm0 160q-100 0-170-70T40-480q0-100 70-170t170-70q67 0 121.5 33t86.5 87h352l120 120-180 180-80-60-80 60-85-60h-47q-32 54-86.5 87T280-240Zm0-80q56 0 98.5-34t56.5-86h125l58 41 82-61 71 55 75-75-40-40H435q-14-52-56.5-86T280-640q-66 0-113 47t-47 113q0 66 47 113t113 47Z" /></svg>
 }
 
+export function AgentPayLogo(){
+    return <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"  width="90px" height="90px">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#4338CA"/>
+    </linearGradient>
+    <linearGradient id="badge" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34D399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="2" y="2" width="116" height="116" rx="28" fill="url(#bg)"/>
+
+
+  <line x1="60" y1="28" x2="60" y2="20" stroke="#E0E7FF" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="60" cy="17" r="5" fill="#E0E7FF"/>
+
+
+  <rect x="32" y="30" width="56" height="46" rx="14" fill="#F5F7FF"/>
+
+
+  <circle cx="48" cy="53" r="6" fill="#4338CA"/>
+  <circle cx="72" cy="53" r="6" fill="#4338CA"/>
+
+
+  <rect x="46" y="65" width="28" height="4" rx="2" fill="#A5B4FC"/>
+
+
+  <rect x="24" y="46" width="8" height="14" rx="4" fill="#F5F7FF"/>
+  <rect x="88" y="46" width="8" height="14" rx="4" fill="#F5F7FF"/>
+
+  
+  <g transform="translate(70,68)">
+    <circle cx="20" cy="20" r="22" fill="url(#badge)" stroke="#F5F7FF" stroke-width="3"/>
+    <rect x="9" y="14" width="22" height="15" rx="3" fill="#F5F7FF"/>
+    <rect x="9" y="18" width="22" height="4" fill="#059669"/>
+    <rect x="12" y="25" width="8" height="2.4" rx="1.2" fill="#059669"/>
+  </g>
+</svg>
+}
+
 export function getGoodToKnowMessage(accountAccessSelected: AccountAccess) {
     switch (accountAccessSelected) {
         case AccountAccess.metamask:

@@ -64,6 +64,8 @@ export function LoggedInUi(props: LoggedInUiProps) {
                 accountTypeSwitchValue={props.accountTypeSwitchValue}
                 setAccountTypeSwitchValue={props.setAccountTypeSwitchValue}
                 requires2Fa={props.requires2Fa}
+                commitment={props.commitment}
+                setCommitment={props.setCommitment}
             ></UIBasedOnSelection>
             {err && (
                 <div class="bg-red-400 border-l-4 p-4" role="alert">

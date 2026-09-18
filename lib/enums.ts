@@ -241,9 +241,10 @@ export enum EMAILCONSTANTS {
 }
 
 export enum AccountAccess {
-  password = "password",
+  // password = "password",
   metamask = "metamask",
-  passkey = "passkey",
+  // passkey = "passkey",
+  agent = "agent",
 }
 
 export type DynamicPaymentRequestJobRow = {

@@ -5,6 +5,7 @@ import { CreateNewAccountUI } from "./CreateNewAccountUI.tsx";
 import { NextBttnUi } from "../../islands/checkout/NextBttnUi.tsx";
 import { RefreshBalanceUI } from "./RefreshBalanceUI.tsx";
 import { TopUpUI } from "./TopUpUI.tsx";
+import { isValidNoteHex } from "../../lib/shared/web3.ts";
 
 export function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
 
@@ -40,27 +41,21 @@ export function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
             props.setNewAccountPasswordMatchError("")
         }
     }
+
     function isButtonDisabled(): boolean {
-        if (
-            props.newAccountPasswordProps.accountAccessSelected === AccountAccess.metamask
-            ||
-            props.newAccountPasswordProps.accountAccessSelected === AccountAccess.passkey) {
+
+        if (props.newAccountPasswordProps.accountAccessSelected === AccountAccess.metamask) {
             return false;
         }
 
-        if (props.newAccountPasswordScore < 3) {
-            return true;
-        }
-
-        if (props.newAccountPasswordProps.passwordAgain == "") {
-            return true;
-        }
-
-        if (props.newAccountPasswordProps.passwordMatchError !== "") {
-            return true;
+        if (!isValidNoteHex(props.commitment)) {
+            return true
         }
         return false;
     }
+
+
+
     const accIndex = props.selected - 2;
 
     const selectedAccount = props.accounts[accIndex];
@@ -74,6 +69,8 @@ export function UIBasedOnSelection(props: ButtonsBasedOnSelectionProps) {
             setAccountTypeSwitchValue={props.setAccountTypeSwitchValue}
             accountAccessSelected={props.newAccountPasswordProps.accountAccessSelected}
             setAccountAccessSelected={props.newAccountPasswordProps.setAccountAccessSelected}
+            commitment={props.commitment}
+            setCommitment={props.setCommitment}
         ></CreateNewAccountUI>
     }
 

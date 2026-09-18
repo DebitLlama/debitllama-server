@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks';
 import Overlay from "../components/Overlay.tsx";
-import { ChainIds, NetworkNames, SelectableCurrency, availableNetworks, chainIdFromNetworkName, getConnectedWalletsContractAddress, getCurrenciesForNetworkName } from "../lib/shared/web3.ts";
+import { ChainIds, NetworkNames, SelectableCurrency, availableNetworks, chainIdFromNetworkName, getConnectedWalletsContractAddress, getCurrenciesForNetworkName, isValidNoteHex } from "../lib/shared/web3.ts";
 import CurrencySelectDropdown from "./CurrencySelectDropdown.tsx";
 import AccountPasswordInput from "./accountPasswordInput.tsx";
 import { connectWallet, connectedWalletAlready, getContract, handleNetworkSelect, requestAccounts, switch_setupAccount } from '../lib/frontend/web3.ts';
@@ -46,6 +46,8 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
 
     const [accountAccessSelected, setAccountAccessSelected] = useState<AccountAccess>(AccountAccess.metamask);
 
+    const [commitment, setCommitment] = useState("")
+
     function setPasswordAndCheck(to: string) {
         if (to === "") {
             setPasswordStrengthNotification("");
@@ -76,20 +78,13 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
     }
 
     function isButtonDisabled(): boolean {
-        if (accountAccessSelected === AccountAccess.metamask || accountAccessSelected === AccountAccess.passkey) {
+
+        if (accountAccessSelected === AccountAccess.metamask) {
             return false;
         }
 
-        if (passwordScore < 3) {
-            return true;
-        }
-
-        if (passwordAgain == "") {
-            return true;
-        }
-
-        if (passwordMatchError !== "") {
-            return true;
+        if (!isValidNoteHex(commitment)) {
+            return true
         }
         return false;
     }
@@ -119,10 +114,10 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
 
         // It's a virtual account variable but will be used with connected wallet!
         const [virtualaccount, error, errorMessage] = await switch_setupAccount(
-            props.ethEncryptPublicKey,
-            password,
             walletAddr,
-            accountAccessSelected);
+            accountAccessSelected,
+            commitment,
+        );
 
         if (error) {
             handleError(errorMessage);
@@ -211,6 +206,8 @@ export default function ConnectWalletPageForm(props: ConnectWalletPageFormProps)
             passwordStrengthNotification={passwordStrengthNotification}
             accountAccessSelected={accountAccessSelected}
             setAccountAccessSelected={setAccountAccessSelected}
+            commitment={commitment}
+            setCommitment={setCommitment}
         ></AccountPasswordInput>
         <div class="mb-4">
             <p class="text-sm ...">{getGoodToKnowMessage(accountAccessSelected)}</p>
