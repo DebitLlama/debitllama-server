@@ -156,6 +156,7 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
     async function onSubmitForm(event: any) {
         event.preventDefault();
 
+
         // I check if I can find a wallet
         const chainId = chainIdFromNetworkName[selectedNetwork as NetworkNames];
 
@@ -229,12 +230,14 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
             setShowOverlay(true);
             setShowOverlayError({ ...showOverlayError, showError: false, message: "" })
 
+
             const tx = await depositEth(
                 contract,
                 virtualaccount.commitment,
                 depositAmount,
                 virtualaccount.encryptedNote
             ).catch(err => {
+                console.error(err)
                 setShowOverlayError({ ...showOverlayError, showError: true, message: "Unable to deposit!" })
             });
 
@@ -288,8 +291,29 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
         <TestnetTokens chainId={chainIdFromNetworkName[selectedNetwork as NetworkNames]}></TestnetTokens>
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="amount">Deposit Amount</label>
-            <input value={depositAmount} onChange={(event: any) => setDepositAmount(event.target.value)} required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
-                type="number" id="amount" name="amount" placeholder="0" step={"any"} />
+            <input
+                value={depositAmount}
+                onInput={(event: any) => {
+                    const input = event.target as HTMLInputElement;
+                    const value = input.valueAsNumber;
+                    setDepositAmount(input.value);
+
+                    // Empty string clears the error so `required` handles it
+                    if (input.value !== "" && !(value > 0)) {
+                        input.setCustomValidity("Deposit amount must be greater than 0.");
+                    } else {
+                        input.setCustomValidity("");
+                    }
+                }}
+                required
+                min="0"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500 invalid:border-red-500"
+                type="number"
+                id="amount"
+                name="amount"
+                placeholder="0"
+                step="any"
+            />
         </div>
         <AccountPasswordInput
             title='Virtual Account Password'
