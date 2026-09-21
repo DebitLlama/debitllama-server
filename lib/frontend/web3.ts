@@ -49,6 +49,21 @@ export async function requestAccounts() {
   }
 }
 
+const decimalsCache = new Map<string, number>();
+
+export async function getTokenDecimals(network: ChainIds, tokenAddress: string): Promise<number> {
+    if (isZero(tokenAddress)) return 18; // native ETH
+    const key = `${network}:${tokenAddress.toLowerCase()}`;
+    const cached = decimalsCache.get(key);
+    if (cached !== undefined) return cached;
+
+    const provider = getJSONRPCProvider(network);
+    const token: any = await getRpcContract(provider, tokenAddress, "/ERC20.json");
+    const decimals = Number(await token.decimals());
+    decimalsCache.set(key, decimals);
+    return decimals;
+}
+
 export function getJSONRPCProvider(networkId: string) {
   const url = rpcUrl[networkId as ChainIds];
   return new ethers.JsonRpcProvider(url);
@@ -250,12 +265,30 @@ export async function topUpTokens(
   return await contract.topUpTokens(commitment, parseEther(balance));
 }
 
+
+// Makes a typed amount safe for parseUnits: no exponent form, no excess precision
+function normalizeAmount(amount: string, decimals: number): string {
+    let s = amount.trim();
+    if (/e/i.test(s)) {
+        // String(1e-7) === "1e-7", which parseUnits rejects
+        s = Number(s).toFixed(decimals);
+    }
+    const [whole, frac = ""] = s.split(".");
+    const w = whole || "0";
+    const f = frac.slice(0, decimals); // parseUnits throws on excess precision, so truncate
+    return f ? `${w}.${f}` : w;
+}
+
 export async function approveSpend(
-  erc20Contract: any,
-  spender: string,
-  amount: string,
+    erc20Contract: any,
+    spender: string,
+    amount: string,
 ) {
-  return await erc20Contract.approve(spender, parseEther(amount));
+    const decimals = Number(await erc20Contract.decimals());
+    return await erc20Contract.approve(
+        spender,
+        parseUnits(normalizeAmount(amount, decimals), decimals),
+    );
 }
 
 export async function getAllowance(
@@ -333,6 +366,14 @@ export function parseEther(input: string) {
 
 export function formatEther(input: any) {
   return ethers.formatEther(input);
+}
+
+export function formatUnits(input: any, decimals: any){
+  return ethers.formatUnits(input,decimals)
+}
+
+export function parseUnits(value: string, decimals: number){
+  return ethers.parseUnits(value, decimals)
 }
 
 export async function topupRelayer(contract: any, amount: string) {

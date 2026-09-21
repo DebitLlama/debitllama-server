@@ -15,6 +15,7 @@ import {
   getContract,
   handleNetworkSelect,
   parseEther,
+  parseUnits,
   requestAccounts,
   switch_setupAccount,
   topUpETH,
@@ -190,7 +191,6 @@ export function approveBalance(args: TopupBalanceArgs) {
     getConnectedWalletsContractAddress[args.chainId as ChainIds];
 
   return async () => {
-    // I need to connect the wallet do the onboarding and then do the transaction if all the conditions are met!
     const provider = await handleNetworkSelect(args.chainId, args.handleError);
     if (!provider) {
       return;
@@ -201,8 +201,13 @@ export function approveBalance(args: TopupBalanceArgs) {
       "/ERC20.json",
     );
 
+    const raw = Number(args.topupAmount);
+    if (!Number.isFinite(raw) || raw <= 0) {
+      args.handleError("Please enter a valid amount");
+      return;
+    }
+
     args.setShowOverlay(true);
-    // Add allowance and then deposit
     const approveTx = await approveSpend(
       erc20Contract,
       debitContractAddress,
@@ -220,7 +225,7 @@ export function approveBalance(args: TopupBalanceArgs) {
             "buyPage",
           );
           if (res !== 200) {
-            handleError("An error occured saving the balance!");
+            args.handleError("An error occured saving the balance!");
             args.setShowOverlay(false);
           } else {
             location.reload();
@@ -259,8 +264,8 @@ export async function handleTokenTX(
   selectedCurrency: Currency,
   setShowOverlay: (to: boolean) => void,
   selectedAccountType: AccountTypes,
-  accountAccessSelected: AccountAccess
-  ) { // The TX is either a deposit or a connected wallet!
+  accountAccessSelected: AccountAccess,
+) { // The TX is either a deposit or a connected wallet!
   const tx = selectedAccountType === AccountTypes.VIRTUALACCOUNT
     ? await depositToken(
       debitcontract,
@@ -334,13 +339,11 @@ export function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
         return;
       }
     }
-    const [virtualaccount, error, errorMessage] =
-      await switch_setupAccount(
-        args.ethEncryptPublicKey,
-        args.passwordProps.password,
-        address,
-        args.accountAccessSelected,
-      );
+    const [virtualaccount, error, errorMessage] = await switch_setupAccount(
+      args.ethEncryptPublicKey,
+      address,
+      args.accountAccessSelected,
+    );
 
     if (error) {
       handleError(errorMessage);
