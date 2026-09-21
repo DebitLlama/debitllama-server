@@ -2,7 +2,7 @@ import { AccountTypes } from "../lib/enums.ts";
 import { useEffect, useState } from 'preact/hooks';
 import { ChainIds, getConnectedWalletsContractAddress } from "../lib/shared/web3.ts";
 
-import { balanceOf, formatEther, getAllowance, getContract, getJSONRPCProvider, isZero, isAddress, getRpcContract } from "../lib/frontend/web3.ts";
+import { balanceOf, getAllowance, getJSONRPCProvider, isZero, isAddress, getRpcContract, formatUnits } from "../lib/frontend/web3.ts";
 import { ExplorerLinkForAddress } from "../components/components.tsx";
 
 
@@ -20,17 +20,28 @@ export default function WalletDetailsFetcher(props: ConnectedWalletDetailsFetche
     const [spendableBalance, setSpendableBalance] = useState("⏳");
 
     async function fetchAndSetBalanceAndApproval() {
-        const connectedWalletContractAddress = getConnectedWalletsContractAddress[props.networkId];
-        const provider = getJSONRPCProvider(props.networkId);
-        const erc20Contract = await getRpcContract(provider, props.tokenAddress, "/ERC20.json").catch(console.error);
-        const balance = await balanceOf(erc20Contract, props.creatorAddress).catch(console.error);;
-        const allowance = await getAllowance(erc20Contract, props.creatorAddress, connectedWalletContractAddress).catch(console.error);
-        setConnectedWalletBalance(formatEther(balance) + " " + props.currencyName);
-        setCurrentApprovalAmount(formatEther(allowance) + " " + props.currencyName);
-        if (allowance >= balance) {
-            setSpendableBalance(formatEther(balance) + " " + props.currencyName)
-        } else {
-            setSpendableBalance(formatEther(allowance) + " " + props.currencyName);
+        try {
+            const connectedWalletContractAddress = getConnectedWalletsContractAddress[props.networkId];
+            const provider = getJSONRPCProvider(props.networkId);
+            const erc20Contract: any = await getRpcContract(provider, props.tokenAddress, "/ERC20.json");
+
+            const [balance, allowance, rawDecimals] = await Promise.all([
+                balanceOf(erc20Contract, props.creatorAddress),
+                getAllowance(erc20Contract, props.creatorAddress, connectedWalletContractAddress),
+                erc20Contract.decimals(),
+            ]);
+            const decimals = Number(rawDecimals);
+
+            const spendable = allowance >= balance ? balance : allowance;
+
+            setConnectedWalletBalance(formatUnits(balance, decimals) + " " + props.currencyName);
+            setCurrentApprovalAmount(formatUnits(allowance, decimals) + " " + props.currencyName);
+            setSpendableBalance(formatUnits(spendable, decimals) + " " + props.currencyName);
+        } catch (err) {
+            console.error(err);
+            setConnectedWalletBalance("Error");
+            setCurrentApprovalAmount("Error");
+            setSpendableBalance("Error");
         }
     }
 

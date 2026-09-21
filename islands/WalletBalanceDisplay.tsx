@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { AccountTypes } from "../lib/enums.ts";
-import { formatEther, getContract, getJSONRPCProvider, getRpcContract, parseEther } from "../lib/frontend/web3.ts";
+import { formatEther, getContract, getJSONRPCProvider, getRpcContract, parseEther, isZero, formatUnits } from "../lib/frontend/web3.ts";
 import { ChainIds, ConnectedWalletsContractAddress, VirtualAccountsContractAddress, getConnectedWalletsContractAddress, getVirtualAccountsContractAddress } from "../lib/shared/web3.ts";
 import { requestBalanceRefresh } from "../lib/frontend/fetch.ts";
 
@@ -33,16 +33,28 @@ export default function WalletBalanceDisplay(props: WalletBalanceDisplayProps) {
                 contractAddr,
                 "/DirectDebit.json",
             );
-            const account = await debitcontract.getAccount(props.commitment)
-            const balance = account[3];
-            if (parseEther(props.oldBalance) !== balance) {
-                //send a request to update balance if the old is not new
-                console.log("sending a balance refresh!")
+            const account = await debitcontract.getAccount(props.commitment);
+            const tokenAddress: string = account.token ?? account[2];
+            const balance = account.balance ?? account[3];
+
+            if (props.oldBalance?.toString() !== balance.toString()) {
+                console.log("sending a balance refresh!");
                 await requestBalanceRefresh(props.commitment, props.network, props.calledFrom);
             }
+
+            let formatted: string;
+            if (isZero(tokenAddress)) {
+                // ETH account
+                formatted = formatEther(balance);
+            } else {
+                const tokenContract: any = await getRpcContract(provider, tokenAddress, "/ERC20.json");
+                const decimals = Number(await tokenContract.decimals());
+                formatted = formatUnits(balance, decimals);
+            }
+
             setTimeout(() => {
                 setLoading(false);
-                setWalletBalance(formatEther((balance)));
+                setWalletBalance(formatted);
             }, 1000)
 
         }
