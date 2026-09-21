@@ -13,7 +13,7 @@ export function UiSwitcherButtons(props: {
     return <form action={props.navigateTo} method="GET"><button
         aria-label="switch between access token and webhook tab"
         disabled={props.disabled}
-        href={props.navigateTo}
+        // href={props.navigateTo}
         class="disabled:opacity-50 disabled:cursor-not-allowed mx-2 mb-2 bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
         {props.text}</button></form>
 }

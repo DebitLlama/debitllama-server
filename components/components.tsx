@@ -424,10 +424,12 @@ export function getGoodToKnowMessage(accountAccessSelected: AccountAccess) {
     switch (accountAccessSelected) {
         case AccountAccess.metamask:
             return "Your account is encrypted using your wallet's public key. This feature relies on Metamask for decryption and might not work with other wallets!";
-        case AccountAccess.password:
-            return "Wallet abstraction with double encryption. The password is used for securing your account and it's needed for spending. Do not reuse your login password. The accounts are non-custodial and if you loose your password we can't recover it for you. You can always disconnect your wallet if you don't want to continue using it! ";
-        case AccountAccess.passkey:
-            return "Your account is stored inside a hardware authenticator device like a Yubi key or IPhone. This feature is experimental and not all authenticator devices are supported. IOS 17 and Safari 17 is Required! You can connect a device to see if it's supported!";
+        case AccountAccess.agent:
+            return "You need to use the debitllama-mcp to create the account credentials, then your AI agent can interact with debitllama autoomously using the account."
+        // case AccountAccess.password:
+        //     return "Wallet abstraction with double encryption. The password is used for securing your account and it's needed for spending. Do not reuse your login password. The accounts are non-custodial and if you loose your password we can't recover it for you. You can always disconnect your wallet if you don't want to continue using it! ";
+        // case AccountAccess.passkey:
+        //     return "Your account is stored inside a hardware authenticator device like a Yubi key or IPhone. This feature is experimental and not all authenticator devices are supported. IOS 17 and Safari 17 is Required! You can connect a device to see if it's supported!";
         default:
             return "";
     }

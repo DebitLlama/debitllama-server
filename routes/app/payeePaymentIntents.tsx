@@ -145,6 +145,7 @@ export default function CreatedPaymentIntents(props: PageProps) {
                             </tr>
                             {props.dynamicPaymentRequestJobArr[0].status === DynamicPaymentRequestJobsStatus.CREATED ? <tr>
                                 <UnderlinedTd extraStyles="borderNone bg-gray-50 dark:bg-gray-800 text-slate-400 dark:text-slate-200  text-sm" >
+                                    {null}
                                 </UnderlinedTd>
                                 <UnderlinedTd extraStyles="paddingZero borderNone">
                                     <CancelDynamicPaymentRequestButton
@@ -153,6 +154,7 @@ export default function CreatedPaymentIntents(props: PageProps) {
                                         paymentIntent={pi}></CancelDynamicPaymentRequestButton>
                                 </UnderlinedTd>
                                 <UnderlinedTd extraStyles="borderNone">
+                                    {null}
                                 </UnderlinedTd>
                             </tr> : null}
                         </tbody>

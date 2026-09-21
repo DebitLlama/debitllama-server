@@ -133,7 +133,7 @@ export const handler = {
           }),
         );
       }
-    } catch (err) {
+    } catch (err: any) {
       return v1Error(
         DynamicPaymentRequestResponseBuilder({
           returnError: true,

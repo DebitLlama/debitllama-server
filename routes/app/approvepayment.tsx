@@ -100,7 +100,7 @@ export const handler: Handlers<any, State> = {
     const encryptedNote = await getEncryptedNote(accountcommitment, accountNetwork, accountdata[0].accountType);
 
     //Decrypt the encrypted note only if the account_access is password
-    const cipherNote = accountdata[0].account_access === AccountAccess.password ? await decryptData(ethEncryptPrivateKey, encryptedNote) : encryptedNote;
+    const cipherNote = encryptedNote //acountdata[0].account_access === AccountAccess.password ? await decryptData(ethEncryptPrivateKey, encryptedNote) : encryptedNote;
 
 
     const resp = await ctx.render(
