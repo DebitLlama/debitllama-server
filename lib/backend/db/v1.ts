@@ -113,21 +113,11 @@ export async function selectSingleCheckoutItemForAPIV1(
     args,
     name: "selectSingleCheckoutItemForAPIV1",
     impl: async (p) => {
-      const { data, error } = await p.client
+      return await p.client
         .from("Items")
         .select("*")
         .eq("button_id", p.args.button_id)
         .limit(1);
-
-      if (error) {
-        throw error;
-      }
-
-      if (!data || data.length === 0) {
-        throw new Error(`No item found for button_id: ${p.args.button_id}`);
-      }
-
-      return data[0];
     },
   });
 }

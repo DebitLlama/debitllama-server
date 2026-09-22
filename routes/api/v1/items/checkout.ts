@@ -24,11 +24,16 @@ export const handler = {
         { button_id: checkoutId },
       );
 
+      if (!item.data || item.data.length === 0) {
+        throw new Error(`No item found for button_id: ${checkoutId}`);
+      }
+
+
       if (item.error) {
         throw new Error("Unable to find checkout item");
       }
 
-      if (item.data.deleted) {
+      if (item.data[0].deleted) {
         throw new Error("The checkout item was deleted");
       }
 
@@ -40,7 +45,7 @@ export const handler = {
             status: 0,
             timestamp: "",
           },
-          item: item.data,
+          item: item.data[0],
         }),
       );
     } catch (err: any) {
