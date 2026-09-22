@@ -237,7 +237,7 @@ export const arbitrumSepoliaCurrencies: SelectableCurrency[] = [
     name: "USDC",
     native: false,
     contractAddress: "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d",
-    minimumAmount: "0.0s1",
+    minimumAmount: "0.01",
   },
   {
     name: "USDG",
