@@ -141,7 +141,7 @@ const SPENDER_FEATURES = [
         tag: "accounts",
         title: "Bespoke wallet abstractions",
         body:
-            "Accounts support direct-debit pull payments, with meta-transactions relayed trustlessly by intent solvers. Creating an account depends on an active wallet, but once it exists, payments can be approved with just a password or a passkey — or by continuing to use Metamask. Spending approval and ownership are decoupled.",
+            "Accounts support direct-debit pull payments, with meta-transactions relayed trustlessly by intent solvers. Creating an account depends on an active wallet, but once it exists, payments can be approved with Metamask or deletage access to an agent via the MCP server. Spending approval and ownership are decoupled.",
     },
 ];
 
@@ -194,11 +194,11 @@ export function AgentAccountsSection() {
                         </li>
                         <li class="flex gap-3">
                             <span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-[#4338CA]"></span>
-                            The agent authenticates with the account's password, so it can shop without you present for each purchase.
+                            The agent authenticates with the MCP server so it can shop without you present for each purchase.
                         </li>
                         <li class="flex gap-3">
                             <span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-[#4338CA]"></span>
-                            Want a human in the loop instead? Connect a passkey or Metamask's public-key encryption, and every payment needs your manual touch to approve.
+                            Want a human in the loop instead? Connect with Metamask's public-key encryption, and every subscription payment agreement needs your manual touch to approve.
                         </li>
                     </ul>
                 </div>
@@ -218,7 +218,7 @@ export function AgentAccountsSection() {
                         <div class="rounded-md border border-[#E4E1D8] bg-white px-4 py-3">
                             <span class="font-mono text-xs text-[#4338CA]">agent</span>
                             <p class="text-sm font-semibold text-[#14171F]">
-                                Pays with the account + password at checkout, up to the balance loaded
+                                Pays with MCP server at checkout, up to the balance loaded
                             </p>
                         </div>
                     </div>
@@ -260,10 +260,10 @@ export function FeesInfoSection() {
                     The service charges a 5% fee on each successful direct debit in the smart contract. Fees are subject to change.
                 </p>
                 <p class="mt-4 text-base leading-7 text-[#5B5F6B]">
-                    Set up your account once and approve payments from it on any device — Metamask, a password-based wallet abstraction, or a passkey.
+                    Set up your account once and approve payments from it on any device — Metamask, or connect it directly to your Agent.
                 </p>
                 <p class="mt-4 text-base leading-7 text-[#5B5F6B]">
-                    DebitLlama is not a money transmitter. It does not custody funds or process blockchain transactions on behalf of users — it stores intents and provides an interface to fulfill them, and charges a fee for that interface. Registered subscription service providers process their own transactions and cover gas fees. If you want to sell a subscription service but don't know how to host a relayer and debit your customers, fill out the contact form below and we'll get back to you with hands-on support.
+                    DebitLlama is not a money transmitter. It does not custody funds or process blockchain transactions on behalf of users — it stores intents and provides an interface to fulfill them, and charges a fee for that interface. Registered subscription service providers process their own transactions and cover gas fees. If you want to sell a subscription service but don't know how to host a relayer and debit your customers.
                 </p>
             </div>
         </section>
@@ -555,7 +555,7 @@ const FAQS = [
     },
     {
         q: "What wallets are supported?",
-        a: "Metamask and other standard EOA wallets work out of the box. You can also approve payments with just a password or a passkey once an account exists, without touching a browser extension.",
+        a: "Metamask and other standard EOA wallets work out of the box. You can also approve payments with AI Agent.",
     },
     {
         q: "Who pays the gas fees?",
