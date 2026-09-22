@@ -340,9 +340,9 @@ export function onCreateAccountSubmit(args: onCreateAccountSubmitArgs) {
       }
     }
     const [virtualaccount, error, errorMessage] = await switch_setupAccount(
-      args.ethEncryptPublicKey,
       address,
       args.accountAccessSelected,
+      args.commitment,
     );
 
     if (error) {
