@@ -17,7 +17,7 @@
     "main": "deno run -A --unstable-kv main.ts",
     "build": "RELAYERAUTHTOKEN=asd SLACKFEEDBACKSURL=asd SLACKUSERSIGNUPS=asd USER_FEEDBACKS_WEBHOOK=asd SMTP_HOSTNAME=asd SMTP_USERNAME=asd SMTP_PASSWORD=asd TESTACCESSTOKEN=asd SUPABASE_URL=asf SUPABASE_KEY=asd ETHENCRYPTPUBLICKEY=asf ETHENCRYPTPRIVATEKEY=sad SALESTEAMEMAILADDRESS=asd deno run -A --unstable-kv dev.ts build",
     "preview": "deno run -A main.ts",
-    "redeploy": "bash deploy.sh"
+    "redeploy": "bash redeploy.sh"
   },
   "imports": {
     "$fresh/": "https://deno.land/x/fresh@1.7.2/",
