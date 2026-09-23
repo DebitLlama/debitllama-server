@@ -1,7 +1,9 @@
 import { PaymentIntentsTableColNames, PaymentIntentsTablePages, Pricing } from "../lib/enums.ts";
 import { TooltipWithTitle, getPaymentIntentStatusLogo } from "./components.tsx";
-import { formatEther, parseEther } from "../lib/frontend/web3.ts";
-import { ChainIds, networkNameFromId } from "../lib/shared/web3.ts";
+import {
+    formatEther, formatUnits, parseEther, parseUnits
+} from "../lib/frontend/web3.ts";
+import { ChainIds, getTokenDecimals, networkNameFromId, ZERO_ADDRESS } from "../lib/shared/web3.ts";
 
 export interface PaymentIntentsTablePropWithFilter {
     paymentIntentData: Array<any>
@@ -16,22 +18,72 @@ export function getNextPaymentDateDisplay(nextPaymentDate: any) {
     return new Date(nextPaymentDate).toLocaleString()
 }
 
-export function getPaymentColValue(pricing: string, maxDebitAmount: string, currencyName: string) {
-    if (pricing === Pricing.Fixed) {
-        return `${maxDebitAmount} ${currencyName}`
-    } else {
-        return `${maxDebitAmount} ${currencyName} Limit`
+function getCurrencyDecimals(network: string, currencyAddress: string): number {
+    if (currencyAddress && currencyAddress !== ZERO_ADDRESS) {
+        return getTokenDecimals(network, currencyAddress)
     }
+    return 18 // native currency
 }
 
-export function getTotalPaymentValue(pricing: string, maxDebitAmount: string, currencyName: string, debitTimes: number) {
-    const totalinWEI = parseEther(maxDebitAmount) * BigInt(`${debitTimes}`);
-    if (pricing === Pricing.Fixed) {
+function withPricingSuffix(pricing: string, value: string, currencyName: string) {
+    return pricing === Pricing.Fixed
+        ? `${value} ${currencyName}`
+        : `${value} ${currencyName} Limit`
+}
 
-        return `${formatEther(totalinWEI)} ${currencyName}`
-    } else {
-        return `${formatEther(totalinWEI)} ${currencyName} Limit`
+export function getPaymentColValue(
+    pricing: string,
+    maxDebitAmount: string,
+    currencyName: string,
+    network: string,
+    currencyAddress: string
+) {
+    const decimals = getCurrencyDecimals(network, currencyAddress)
+    const amount = formatUnits(BigInt(maxDebitAmount), decimals)
+    return withPricingSuffix(pricing, amount, currencyName)
+}
+
+
+
+export function getTotalPaymentValue(
+    pricing: string,
+    maxDebitAmount: string,
+    currencyName: string,
+    debitTimes: number,
+    network: string,
+    currencyAddress: string
+) {
+    if (!Number.isInteger(debitTimes) || debitTimes < 0) {
+        throw new Error(`Invalid debitTimes: ${debitTimes}`)
     }
+    const decimals = getCurrencyDecimals(network, currencyAddress)
+    // const totalInBaseUnits = BigInt(maxDebitAmount) * BigInt(debitTimes)
+    const amount = Number.isInteger(Number(maxDebitAmount))
+        ? BigInt(maxDebitAmount)
+        : parseUnits(String(maxDebitAmount), decimals)
+    const totalInBaseUnits = amount * BigInt(debitTimes)
+    const total = formatUnits(totalInBaseUnits, decimals)
+    return withPricingSuffix(pricing, total, currencyName)
+}
+
+
+// Raw on-chain amounts arrive as integer strings ("20000").
+// Human-readable amounts arrive as numbers (0.02) or decimal strings ("0.02").
+function toBaseUnits(value: string | number, decimals: number): bigint {
+    if (typeof value === "string") {
+        const s = value.trim()
+        return /^\d+$/.test(s) ? BigInt(s) : parseUnits(s, decimals)
+    }
+    if (!Number.isFinite(value)) throw new Error(`Invalid amount: ${value}`)
+    const s = value.toLocaleString("en-US", { useGrouping: false, maximumFractionDigits: 20 })
+    return parseUnits(s, decimals)
+}
+
+// String(1e-7) === "1e-7", which parseUnits rejects, so avoid exponent notation
+function toDecimalString(value: string | number): string {
+    if (typeof value === "string") return value.trim()
+    if (!Number.isFinite(value)) throw new Error(`Invalid amount: ${value}`)
+    return value.toLocaleString("en-US", { useGrouping: false, maximumFractionDigits: 20 })
 }
 
 function getUrlPath(forPage: PaymentIntentsTablePages) {
@@ -102,6 +154,7 @@ export function PaymentIntentsTable(props: PaymentIntentsTablePropWithFilter) {
                             {props.paymentIntentData.map((data) => {
                                 const currency = JSON.parse(data.currency);
                                 const currencyName = currency.name;
+                                const currencyAddress = currency.contractAddress
                                 return <tr tabIndex={props.paymentIntentData.indexOf(data) + 7} class="cursor-pointer bg-white hover:bg-gray-100" >
                                     {props.forPage === PaymentIntentsTablePages.ITEM
                                         ? null // Don't show this on the debit item page
@@ -120,7 +173,7 @@ export function PaymentIntentsTable(props: PaymentIntentsTablePropWithFilter) {
                                         <td class="px-4 py-4 text-sm   whitespace-nowrap" onClick={paymentIntentRowClicked(data.paymentIntent)}>
                                             <div class="flex items-center gap-x-2">
                                                 <div>
-                                                    <p class="text-xs font-normal  ">{getPaymentColValue(data.pricing, data.maxDebitAmount, currencyName)}</p>
+                                                    <p class="text-xs font-normal  ">{getPaymentColValue(data.pricing, data.maxDebitAmount, currencyName, data.network, currencyAddress)}</p>
                                                 </div>
                                             </div>
                                         </td>}
@@ -129,7 +182,7 @@ export function PaymentIntentsTable(props: PaymentIntentsTablePropWithFilter) {
                                         <td class="px-4 py-4 text-sm   whitespace-nowrap" onClick={paymentIntentRowClicked(data.paymentIntent)}>
                                             <div class="flex items-center gap-x-2">
                                                 <div>
-                                                    <p class="text-xs font-normal  ">{getTotalPaymentValue(data.pricing, data.maxDebitAmount, currencyName, data.debitTimes)}</p>
+                                                    <p class="text-xs font-normal  ">{getTotalPaymentValue(data.pricing, data.maxDebitAmount, currencyName, data.debitTimes, data.network, currencyAddress)}</p>
                                                 </div>
                                             </div>
                                         </td>}
