@@ -253,10 +253,22 @@ export async function selectAllPaymentIntentsByCreatorIdApiV1FilterCommitment(
         .eq("commitment", p.args.commitment)
         .order(p.args.order, { ascending: p.args.ascending })
         .range(p.args.rangeFrom, p.args.rangeTo);
-      for (let i = 0; i < p.args.filter.length; i++) {
-        q.eq(p.args.filter[i].parameter, p.args.filter[i].value);
+
+      for (const filter of p.args.filter) {
+        q.eq(filter.parameter, filter.value);
       }
-      return await q;
+
+      const result = await q;
+
+      if (result.error?.code === "PGRST103") {
+        return {
+          data: [],
+          count: 0,
+          error: null,
+        };
+      }
+
+      return result;
     },
     name: "selectAllPaymentIntentsByCreatorIdApiV1FilterCommitment",
   });
