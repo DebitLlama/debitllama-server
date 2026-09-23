@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'preact/hooks';
-import { NetworkNames, SelectableCurrency, availableNetworks, arbitrumMainnetCurrencies, mapNetworkNameToFeeDivider } from "../lib/shared/web3.ts";
+import { NetworkNames, SelectableCurrency, arbitrumSepoliaCurrencies, availableNetworks, mapNetworkNameToFeeDivider } from "../lib/shared/web3.ts";
 import CurrencySelectDropdown from './CurrencySelectDropdown.tsx';
 import { DocsLinks, Pricing } from "../lib/enums.ts";
 import WalletAddressSelector from "./utils/WalletAddressSelector.tsx";
@@ -12,7 +12,7 @@ interface AddNewDebitItemFormProps {
 
 export default function AddNewDebitItemPageForm(props: AddNewDebitItemFormProps) {
     const [selectedNetwork, setSelectedNetwork] = useState(availableNetworks[0]);
-    const [selectableCurrencyArray, setSelectableCurrencyArray] = useState<SelectableCurrency[]>(arbitrumMainnetCurrencies);
+    const [selectableCurrencyArray, setSelectableCurrencyArray] = useState<SelectableCurrency[]>(arbitrumSepoliaCurrencies);
 
     const [selectedCurrency, setSelectedCurrency] = useState<SelectableCurrency>(selectableCurrencyArray[0]);
 

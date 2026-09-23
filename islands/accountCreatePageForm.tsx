@@ -3,7 +3,7 @@ import { useState } from 'preact/hooks';
 import CurrencySelectDropdown from "./CurrencySelectDropdown.tsx";
 import AccountPasswordInput from "./accountPasswordInput.tsx";
 import { approveSpend, depositEth, depositToken, getAllowance, getContract, handleNetworkSelect, parseEther, requestAccounts, switch_setupAccount } from "../lib/frontend/web3.ts";
-import { ChainIds, NetworkNames, SelectableCurrency, availableNetworks, arbitrumMainnetCurrencies, chainIdFromNetworkName, getVirtualAccountsContractAddress, isValidNoteHex } from "../lib/shared/web3.ts";
+import { ChainIds, NetworkNames, SelectableCurrency, arbitrumSepoliaCurrencies, availableNetworks, chainIdFromNetworkName, getVirtualAccountsContractAddress, isValidNoteHex } from "../lib/shared/web3.ts";
 import Overlay from '../components/Overlay.tsx';
 import { redirectToAccountsPage, saveAccount } from '../lib/frontend/fetch.ts';
 import { AccountAccess, AccountTypes } from '../lib/enums.ts';
@@ -34,7 +34,7 @@ export default function AccountCreatePageForm(props: AccountCreatePageFormProps)
 
     const [createAccountButtonText, setCreateAccountButtonText] = useState("Create Account");
     const [selectedNetwork, setSelectedNetwork] = useState(availableNetworks[0]);
-    const [selectableCurrencyArray, setSelectableCurrencyArray] = useState<SelectableCurrency[]>(arbitrumMainnetCurrencies);
+    const [selectableCurrencyArray, setSelectableCurrencyArray] = useState<SelectableCurrency[]>(arbitrumSepoliaCurrencies);
 
     const [selectedCurrency, setSelectedCurrency] = useState<SelectableCurrency>(selectableCurrencyArray[0]);
 
