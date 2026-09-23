@@ -12,10 +12,10 @@ export function getAverageGasLimit() {
 }
 
 export enum NetworkNames {
-  BTT_TESTNET = "BTT Donau Testnet",
-  BTT_MAINNET = "BitTorrent Chain",
+  // BTT_TESTNET = "BTT Donau Testnet",
+  // BTT_MAINNET = "BitTorrent Chain",
   ARBITRUM_SEPOLIA = "Arbitrum Sepolia Testnet",
-  ARBITRUM_MAINNET = "Arbitrum Mainnet",
+  // ARBITRUM_MAINNET = "Arbitrum Mainnet",
 }
 //TODO: add here new networks to select
 export const availableNetworks = [
@@ -33,17 +33,17 @@ export enum NetworkTickers {
 }
 
 export enum ChainIds {
-  BTT_TESTNET_ID = "0x405", // 1029 - BitTorrent Chain (Donau testnet)
-  BTT_MAINNET_ID = "0xc7", // 199 - BitTorrent Chain Mainnet
+  // BTT_TESTNET_ID = "0x405", // 1029 - BitTorrent Chain (Donau testnet)
+  // BTT_MAINNET_ID = "0xc7", // 199 - BitTorrent Chain Mainnet
   ARBITRUM_SEPOLIA_ID = "0x66eee", // 421614 - Arbitrum Sepolia
-  ARBITRUM_MAINNET_ID = "0xa4b1", // 42161 - Arbitrum One Mainnet
+  // ARBITRUM_MAINNET_ID = "0xa4b1", // 42161 - Arbitrum One Mainnet
 }
 
 export const availableChainIds = [
-  ChainIds.BTT_TESTNET_ID.toString(),
-  ChainIds.BTT_MAINNET_ID.toString(),
+  // ChainIds.BTT_TESTNET_ID.toString(),
+  // ChainIds.BTT_MAINNET_ID.toString(),
   ChainIds.ARBITRUM_SEPOLIA_ID.toString(),
-  ChainIds.ARBITRUM_MAINNET_ID.toString(),
+  // ChainIds.ARBITRUM_MAINNET_ID.toString(),
 ];
 
 export enum VirtualAccountsContractAddress {
@@ -84,69 +84,69 @@ export enum BTTMAinnetTokens {
 }
 
 export const rpcUrl: { [key in ChainIds]: RPCURLS } = {
-  [ChainIds.BTT_TESTNET_ID]: RPCURLS.BTT_TESTNET,
-  [ChainIds.BTT_MAINNET_ID]: RPCURLS.BTT_MAINNET,
+  // [ChainIds.BTT_TESTNET_ID]: RPCURLS.BTT_TESTNET,
+  // [ChainIds.BTT_MAINNET_ID]: RPCURLS.BTT_MAINNET,
   [ChainIds.ARBITRUM_SEPOLIA_ID]: RPCURLS.ARBITRUM_SEPOLIA,
-  [ChainIds.ARBITRUM_MAINNET_ID]: RPCURLS.ARBITRUM_MAINNET,
+  // [ChainIds.ARBITRUM_MAINNET_ID]: RPCURLS.ARBITRUM_MAINNET,
 };
 
 export const explorerUrl: { [key in ChainIds]: EXPORERURLS } = {
-  [ChainIds.BTT_TESTNET_ID]: EXPORERURLS.BTT_TESTNET,
-  [ChainIds.BTT_MAINNET_ID]: EXPORERURLS.BTT_MAINNET,
+  // [ChainIds.BTT_TESTNET_ID]: EXPORERURLS.BTT_TESTNET,
+  // [ChainIds.BTT_MAINNET_ID]: EXPORERURLS.BTT_MAINNET,
   [ChainIds.ARBITRUM_SEPOLIA_ID]: EXPORERURLS.ARBITRUM_SEPOLIA,
-  [ChainIds.ARBITRUM_MAINNET_ID]: EXPORERURLS.ARBITRUM_MAINNET,
+  // [ChainIds.ARBITRUM_MAINNET_ID]: EXPORERURLS.ARBITRUM_MAINNET,
 };
 
 export const explorerUrlAddressPath: { [key in ChainIds]: string } = {
-  [ChainIds.BTT_TESTNET_ID]: "/#/address/",
-  [ChainIds.BTT_MAINNET_ID]: "/address/",
+  // [ChainIds.BTT_TESTNET_ID]: "/#/address/",
+  // [ChainIds.BTT_MAINNET_ID]: "/address/",
   [ChainIds.ARBITRUM_SEPOLIA_ID]: "/address/",
-  [ChainIds.ARBITRUM_MAINNET_ID]: "/address/",
+  // [ChainIds.ARBITRUM_MAINNET_ID]: "/address/",
 };
 
 export const walletCurrency: { [key in ChainIds]: NetworkTickers } = {
-  [ChainIds.BTT_TESTNET_ID]: NetworkTickers.BTT_TESTNET,
-  [ChainIds.BTT_MAINNET_ID]: NetworkTickers.BTT_MAINNET,
+  // [ChainIds.BTT_TESTNET_ID]: NetworkTickers.BTT_TESTNET,
+  // [ChainIds.BTT_MAINNET_ID]: NetworkTickers.BTT_MAINNET,
   [ChainIds.ARBITRUM_SEPOLIA_ID]: NetworkTickers.ARBITRUM_SEPOLIA,
-  [ChainIds.ARBITRUM_MAINNET_ID]: NetworkTickers.ARBITRUM_MAINNET,
+  // [ChainIds.ARBITRUM_MAINNET_ID]: NetworkTickers.ARBITRUM_MAINNET,
 };
 
 export const mapNetworkNameToFeeDivider: { [key in NetworkNames]: string } = {
-  [NetworkNames.BTT_MAINNET]: FeeDividerPerNetwork.BTT_MAINNET[1] as string,
-  [NetworkNames.BTT_TESTNET]: FeeDividerPerNetwork.BTT_TESTNET[1] as string,
+  // [NetworkNames.BTT_MAINNET]: FeeDividerPerNetwork.BTT_MAINNET[1] as string,
+  // [NetworkNames.BTT_TESTNET]: FeeDividerPerNetwork.BTT_TESTNET[1] as string,
   [NetworkNames.ARBITRUM_SEPOLIA]: FeeDividerPerNetwork.ARBITRUM_SEPOLIA[1] as string,
-  [NetworkNames.ARBITRUM_MAINNET]: FeeDividerPerNetwork.ARBITRUM_MAINNET[1] as string,
+  // [NetworkNames.ARBITRUM_MAINNET]: FeeDividerPerNetwork.ARBITRUM_MAINNET[1] as string,
 };
 
 export const mapChainIdToFeePercentage: { [key in ChainIds]: string } = {
-  [ChainIds.BTT_MAINNET_ID]: FeeDividerPerNetwork.BTT_MAINNET[1] as string,
-  [ChainIds.BTT_TESTNET_ID]: FeeDividerPerNetwork.BTT_TESTNET[1] as string,
+  // [ChainIds.BTT_MAINNET_ID]: FeeDividerPerNetwork.BTT_MAINNET[1] as string,
+  // [ChainIds.BTT_TESTNET_ID]: FeeDividerPerNetwork.BTT_TESTNET[1] as string,
   [ChainIds.ARBITRUM_SEPOLIA_ID]: FeeDividerPerNetwork.ARBITRUM_SEPOLIA[1] as string,
-  [ChainIds.ARBITRUM_MAINNET_ID]: FeeDividerPerNetwork.ARBITRUM_MAINNET[1] as string,
+  // [ChainIds.ARBITRUM_MAINNET_ID]: FeeDividerPerNetwork.ARBITRUM_MAINNET[1] as string,
 };
 export const mapChainIdToFeeDivider: { [key in ChainIds]: number } = {
-  [ChainIds.BTT_MAINNET_ID]: FeeDividerPerNetwork.BTT_MAINNET[0] as number,
-  [ChainIds.BTT_TESTNET_ID]: FeeDividerPerNetwork.BTT_TESTNET[0] as number,
+  // [ChainIds.BTT_MAINNET_ID]: FeeDividerPerNetwork.BTT_MAINNET[0] as number,
+  // [ChainIds.BTT_TESTNET_ID]: FeeDividerPerNetwork.BTT_TESTNET[0] as number,
   [ChainIds.ARBITRUM_SEPOLIA_ID]: FeeDividerPerNetwork.ARBITRUM_SEPOLIA[0] as number,
-  [ChainIds.ARBITRUM_MAINNET_ID]: FeeDividerPerNetwork.ARBITRUM_MAINNET[0] as number,
+  // [ChainIds.ARBITRUM_MAINNET_ID]: FeeDividerPerNetwork.ARBITRUM_MAINNET[0] as number,
 };
 
 export const getVirtualAccountsContractAddress: {
   [keys in ChainIds]: VirtualAccountsContractAddress;
 } = {
-  [ChainIds.BTT_TESTNET_ID]: VirtualAccountsContractAddress.BTT_TESTNET,
-  [ChainIds.BTT_MAINNET_ID]: VirtualAccountsContractAddress.BTT_MAINNET,
+  // [ChainIds.BTT_TESTNET_ID]: VirtualAccountsContractAddress.BTT_TESTNET,
+  // [ChainIds.BTT_MAINNET_ID]: VirtualAccountsContractAddress.BTT_MAINNET,
   [ChainIds.ARBITRUM_SEPOLIA_ID]: VirtualAccountsContractAddress.ARBITRUM_SEPOLIA,
-  [ChainIds.ARBITRUM_MAINNET_ID]: VirtualAccountsContractAddress.ARBITRUM_MAINNET,
+  // [ChainIds.ARBITRUM_MAINNET_ID]: VirtualAccountsContractAddress.ARBITRUM_MAINNET,
 };
 
 export const getConnectedWalletsContractAddress: {
   [keys in ChainIds]: ConnectedWalletsContractAddress;
 } = {
-  [ChainIds.BTT_TESTNET_ID]: ConnectedWalletsContractAddress.BTT_TESTNET,
-  [ChainIds.BTT_MAINNET_ID]: ConnectedWalletsContractAddress.BTT_MAINNET,
+  // [ChainIds.BTT_TESTNET_ID]: ConnectedWalletsContractAddress.BTT_TESTNET,
+  // [ChainIds.BTT_MAINNET_ID]: ConnectedWalletsContractAddress.BTT_MAINNET,
   [ChainIds.ARBITRUM_SEPOLIA_ID]: ConnectedWalletsContractAddress.ARBITRUM_SEPOLIA,
-  [ChainIds.ARBITRUM_MAINNET_ID]: ConnectedWalletsContractAddress.ARBITRUM_MAINNET,
+  // [ChainIds.ARBITRUM_MAINNET_ID]: ConnectedWalletsContractAddress.ARBITRUM_MAINNET,
 };
 
 export const getAbiJsonByAccountType: {
@@ -157,29 +157,29 @@ export const getAbiJsonByAccountType: {
 };
 
 export const networkNameFromId: { [key in ChainIds]: NetworkNames } = {
-  [ChainIds.BTT_TESTNET_ID]: NetworkNames.BTT_TESTNET,
-  [ChainIds.BTT_MAINNET_ID]: NetworkNames.BTT_MAINNET,
+  // [ChainIds.BTT_TESTNET_ID]: NetworkNames.BTT_TESTNET,
+  // [ChainIds.BTT_MAINNET_ID]: NetworkNames.BTT_MAINNET,
   [ChainIds.ARBITRUM_SEPOLIA_ID]: NetworkNames.ARBITRUM_SEPOLIA,
-  [ChainIds.ARBITRUM_MAINNET_ID]: NetworkNames.ARBITRUM_MAINNET,
+  // [ChainIds.ARBITRUM_MAINNET_ID]: NetworkNames.ARBITRUM_MAINNET,
 };
 
 export const chainIdFromNetworkName: { [key in NetworkNames]: ChainIds } = {
-  [NetworkNames.BTT_TESTNET]: ChainIds.BTT_TESTNET_ID,
-  [NetworkNames.BTT_MAINNET]: ChainIds.BTT_MAINNET_ID,
+  // [NetworkNames.BTT_TESTNET]: ChainIds.BTT_TESTNET_ID,
+  // [NetworkNames.BTT_MAINNET]: ChainIds.BTT_MAINNET_ID,
   [NetworkNames.ARBITRUM_SEPOLIA]: ChainIds.ARBITRUM_SEPOLIA_ID,
-  [NetworkNames.ARBITRUM_MAINNET]: ChainIds.ARBITRUM_MAINNET_ID,
+  // [NetworkNames.ARBITRUM_MAINNET]: ChainIds.ARBITRUM_MAINNET_ID,
 };
 
 export function getChainExplorerForChainId(chainId: ChainIds, tx: string) {
   switch (chainId) {
-    case ChainIds.BTT_TESTNET_ID:
-      return `https://testnet.bttcscan.com/tx/${tx}`;
-    case ChainIds.BTT_MAINNET_ID:
-      return `https://bttcscan.com/tx/${tx}`;
+    // case ChainIds.BTT_TESTNET_ID:
+    //   return `https://testnet.bttcscan.com/tx/${tx}`;
+    // case ChainIds.BTT_MAINNET_ID:
+    //   return `https://bttcscan.com/tx/${tx}`;
     case ChainIds.ARBITRUM_SEPOLIA_ID:
       return `https://sepolia.arbiscan.io/tx/${tx}`;
-    case ChainIds.ARBITRUM_MAINNET_ID:
-      return `https://arbiscan.io/tx/${tx}`;
+    // case ChainIds.ARBITRUM_MAINNET_ID:
+    //   return `https://arbiscan.io/tx/${tx}`;
     default:
       return ``;
   }
@@ -190,41 +190,9 @@ export type SelectableCurrency = {
   native: boolean;
   contractAddress: string;
   minimumAmount: string;
+  decimals: number; //TODO: I need to fill this decimals
 };
 
-export const ethereumCurrencies: SelectableCurrency[] = [
-  { name: "ETH", native: true, contractAddress: "", minimumAmount: "0.01" },
-  { name: "USDC", native: false, contractAddress: "", minimumAmount: "1" },
-];
-
-export const bittorrentCurrencies: SelectableCurrency[] = [{
-  name: "BTT",
-  native: true,
-  contractAddress: "",
-  minimumAmount: "5000",
-}, {
-  name: "USDTM",
-  native: false,
-  contractAddress: DonauTestnetTokens.USDTM,
-  minimumAmount: "1",
-}];
-
-export const bttMainnetCurrencies: SelectableCurrency[] = [{
-  name: "BTT",
-  native: true,
-  contractAddress: "",
-  minimumAmount: "5000",
-}, {
-  name: "USDD_t",
-  native: false,
-  contractAddress: "0x17F235FD5974318E4E2a5e37919a209f7c37A6d1",
-  minimumAmount: "0.1",
-}, {
-  name: "USDT_e",
-  native: false,
-  contractAddress: "0xE887512ab8BC60BcC9224e1c3b5Be68E26048B8B",
-  minimumAmount: "0.1",
-}];
 
 export const arbitrumSepoliaCurrencies: SelectableCurrency[] = [
   {
@@ -232,76 +200,48 @@ export const arbitrumSepoliaCurrencies: SelectableCurrency[] = [
     native: true,
     contractAddress: "",
     minimumAmount: "0.001",
+    decimals: 18
   },
   {
     name: "USDC",
     native: false,
     contractAddress: "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d",
     minimumAmount: "0.01",
+    decimals: 6
   },
   {
     name: "USDG",
     native: false,
     contractAddress: "0xFFC95faa3d63Cde504a05B567C600B78C0b41892",
-    minimumAmount: "0.01"
+    minimumAmount: "0.01",
+    decimals: 6
   }
 ];
 
-export const arbitrumMainnetCurrencies: SelectableCurrency[] = [
-  {
-    name: "ETH",
-    native: true,
-    contractAddress: "",
-    minimumAmount: "0.001",
-  },
-  {
-    name: "USDC",
-    native: false,
-    contractAddress: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
-    minimumAmount: "1",
-  },
-];
+// export const arbitrumMainnetCurrencies: SelectableCurrency[] = [
+//   {
+//     name: "ETH",
+//     native: true,
+//     contractAddress: "",
+//     minimumAmount: "0.001",
+//   },
+//   {
+//     name: "USDC",
+//     native: false,
+//     contractAddress: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+//     minimumAmount: "1",
+//   },
+// ];
 
 export const getCurrenciesForNetworkName: {
   [key in NetworkNames]: SelectableCurrency[];
 } = {
-  [NetworkNames.BTT_TESTNET]: bittorrentCurrencies,
-  [NetworkNames.BTT_MAINNET]: bttMainnetCurrencies,
   [NetworkNames.ARBITRUM_SEPOLIA]: arbitrumSepoliaCurrencies,
-  [NetworkNames.ARBITRUM_MAINNET]: arbitrumMainnetCurrencies,
+  // [NetworkNames.ARBITRUM_MAINNET]: arbitrumMainnetCurrencies,
 };
 
 export const responseBuildersSupportedNetworks = [
-  {
-    name: NetworkNames.BTT_TESTNET,
-    rpc: rpcUrl[ChainIds.BTT_TESTNET_ID],
-    chain_id: ChainIds.BTT_TESTNET_ID,
-    virtual_accounts_contract: VirtualAccountsContractAddress.BTT_TESTNET,
-    connected_wallets_contract: ConnectedWalletsContractAddress.BTT_TESTNET,
-    currency: "BTT",
-    available_currencies: bittorrentCurrencies.map((curr) => {
-      return {
-        name: curr.name,
-        native: curr.native,
-        contractAddress: curr.contractAddress,
-      };
-    }),
-  },
-  {
-    name: NetworkNames.BTT_MAINNET,
-    rpc: rpcUrl[ChainIds.BTT_MAINNET_ID],
-    chain_id: ChainIds.BTT_MAINNET_ID,
-    virtual_accounts_contract: VirtualAccountsContractAddress.BTT_MAINNET,
-    connected_wallets_contract: ConnectedWalletsContractAddress.BTT_MAINNET,
-    currency: "BTT",
-    available_currencies: bttMainnetCurrencies.map((curr) => {
-      return {
-        name: curr.name,
-        native: curr.native,
-        contractAddress: curr.contractAddress,
-      };
-    }),
-  },
+  
   {
     name: NetworkNames.ARBITRUM_SEPOLIA,
     rpc: rpcUrl[ChainIds.ARBITRUM_SEPOLIA_ID],
@@ -314,24 +254,25 @@ export const responseBuildersSupportedNetworks = [
         name: curr.name,
         native: curr.native,
         contractAddress: curr.contractAddress,
+        decimals: curr.decimals,
       };
     }),
   },
-  {
-    name: NetworkNames.ARBITRUM_MAINNET,
-    rpc: rpcUrl[ChainIds.ARBITRUM_MAINNET_ID],
-    chain_id: ChainIds.ARBITRUM_MAINNET_ID,
-    virtual_accounts_contract: VirtualAccountsContractAddress.ARBITRUM_MAINNET,
-    connected_wallets_contract: ConnectedWalletsContractAddress.ARBITRUM_MAINNET,
-    currency: "ETH",
-    available_currencies: arbitrumMainnetCurrencies.map((curr) => {
-      return {
-        name: curr.name,
-        native: curr.native,
-        contractAddress: curr.contractAddress,
-      };
-    }),
-  },
+  // {
+  //   name: NetworkNames.ARBITRUM_MAINNET,
+  //   rpc: rpcUrl[ChainIds.ARBITRUM_MAINNET_ID],
+  //   chain_id: ChainIds.ARBITRUM_MAINNET_ID,
+  //   virtual_accounts_contract: VirtualAccountsContractAddress.ARBITRUM_MAINNET,
+  //   connected_wallets_contract: ConnectedWalletsContractAddress.ARBITRUM_MAINNET,
+  //   currency: "ETH",
+  //   available_currencies: arbitrumMainnetCurrencies.map((curr) => {
+  //     return {
+  //       name: curr.name,
+  //       native: curr.native,
+  //       contractAddress: curr.contractAddress,
+  //     };
+  //   }),
+  // },
 ];
 
 
