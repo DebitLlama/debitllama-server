@@ -33,7 +33,17 @@ import {
   estimateRelayerGas,
   getAccount,
   parseEther,
+  parseUnits,
 } from "../../../../lib/backend/web3.ts";
+import { getTokenDecimals } from "../../../../lib/shared/web3.ts";
+
+/** BigNumber to hex string of specified length */
+export function toNoteHex(number: Buffer | any, length = 32) {
+  const str = number instanceof Buffer
+    ? number.toString("hex")
+    : BigInt(number).toString(16);
+  return "0x" + str.padStart(length * 2, "0");
+}
 
 export const handler = {
   async GET(_req: Request, ctx: HandlerContext<any, State>) {
@@ -180,27 +190,14 @@ export const handler = {
       const debitTimes = publicInputs.debitTimes;
       const debitInterval = publicInputs.debitInterval;
 
-      // Decimal columns (max_price, debit_interval) can come back as strings
-      // with a decimal point even for whole-number amounts (e.g. "100.0"),
-      // which makes BigInt() throw. This coerces safely and rejects anything
-      // with a genuine fractional part, since these represent integer public
-      // inputs to the circuit.
-      const decimalToBigInt = (value: string | number): bigint => {
-        const [whole, fraction = ""] = value.toString().split(".");
-        if (/[1-9]/.test(fraction)) {
-          throw new Error(
-            `Expected an integer amount, got fractional value: ${value}`,
-          );
-        }
-        return BigInt(whole);
-      };
-
       const queryBuilder = new QueryBuilder(ctx);
       const select = queryBuilder.select();
       const insert = queryBuilder.insert();
 
       // ASSUMPTION — confirmed by you: this is byButtonId, called with checkoutId.
+      console.log("Fetching by button ID before");
       const { data: itemData } = await select.Items.byButtonId(checkoutId);
+      console.log("Fetching by button ID after");
       if (!itemData || itemData.length === 0) {
         return new Response(null, { status: 404 });
       }
@@ -214,36 +211,22 @@ export const handler = {
         return new Response(null, { status: 400 });
       }
 
-      if (item.pricing === Pricing.Fixed) {
-        // Fixed pricing: the debited amount must match the item exactly.
-        if (
-          decimalToBigInt(maxDebitAmount) !== decimalToBigInt(item.max_price)
-        ) {
-          return new Response(null, { status: 400 });
-        }
-      } else {
-        // ASSUMPTION — for variable pricing I don't know the exact semantics
-        // of item.max_price (a hard cap the customer can't exceed, vs. just a
-        // display default). Treating it as a cap here; adjust if that's wrong.
-        if (decimalToBigInt(maxDebitAmount) > decimalToBigInt(item.max_price)) {
-          return new Response(null, { status: 400 });
-        }
-      }
-
       // item.debit_times/debit_interval come back as BigInt/Decimal columns —
       // likely strings at runtime — so compare numerically rather than with
       // strict equality, which would wrongly reject e.g. 5 !== "5".
       if (Number(item.debit_times) !== debitTimes) {
         return new Response(null, { status: 400 });
       }
+      console.log("3");
 
       if (Number(item.debit_interval) !== debitInterval) {
         return new Response(null, { status: 400 });
       }
-
       const { data: accountData } = await select.Accounts.byCommitment(
-        commitment,
+        toNoteHex(commitment),
       );
+
+
       if (!accountData || accountData.length === 0) {
         return new Response(null, { status: 404 });
       }
@@ -257,6 +240,38 @@ export const handler = {
 
       if (account.closed) {
         return new Response(null, { status: 409 });
+      }
+
+      //Fetch the account decimals...
+
+      // Check the network first, so the decimals we look up are the right ones
+      // for both the account and the item.
+      if (item.network !== account.network_id) {
+        return new Response(null, { status: 400 });
+      }
+
+      const currency = JSON.parse(account.currency);
+      const decimals = getTokenDecimals(
+        account.network_id,
+        currency.contractAddress,
+      );
+
+      // maxDebitAmount is already in token base units (e.g. 20000 for 0.02 USDC).
+      // item.max_price is stored as a human-readable decimal (e.g. "0.02"),
+      // so scale it by the token's decimals before comparing.
+      const debitAmount = parseUnits(maxDebitAmount.toString(), 0);
+      const itemPrice = parseUnits(item.max_price.toString(), decimals);
+
+      if (item.pricing === Pricing.Fixed) {
+        // Fixed pricing: the debited amount must match the item exactly.
+        if (debitAmount !== itemPrice) {
+          return new Response(null, { status: 400 });
+        }
+      } else {
+        // ASSUMPTION — treating item.max_price as a hard cap for variable pricing.
+        if (debitAmount > itemPrice) {
+          return new Response(null, { status: 400 });
+        }
       }
 
       if (item.network !== account.network_id) {
@@ -284,6 +299,7 @@ export const handler = {
       }
 
       if (account.closed) {
+        console.log("Account is closed?");
         return new Response(null, { status: 409 });
       }
 
@@ -296,11 +312,12 @@ export const handler = {
           : "0";
 
       let estimatedGas: bigint;
+
       try {
         estimatedGas = await estimateRelayerGas(
           {
             proof,
-            publicSignals,
+            publicSignals: publicSignals, //I stringify because internally there is a parse that is used from another place
             payeeAddress: item.payee_address,
             maxDebitAmount,
             actualDebitedAmount: getActualDebitedAmount,
@@ -315,10 +332,9 @@ export const handler = {
         // on-chain (or genuinely insufficient funds — those two cases are
         // presumably indistinguishable from the revert alone, since virtual
         // account balance was already checked above for fixed pricing).
+        console.log(gasErr)
         console.error(
-          "estimateRelayerGas reverted — treating as invalid proof",
-          gasErr,
-        );
+          "estimateRelayerGas reverted — treating as invalid proof" );
         return new Response(null, { status: 400 });
       }
 
@@ -327,6 +343,8 @@ export const handler = {
           value,
           (_key, v) => (typeof v === "bigint" ? v.toString() : v),
         );
+
+      // console.log("WAS ABLE TO ESTIMATE GAS:", estimatedGas);
 
       const { data: insertedIntent, error: insertError } = await insert
         .PaymentIntent
@@ -339,7 +357,7 @@ export const handler = {
           debitInterval.toString(),
           paymentIntentId,
           commitment,
-          estimatedGas.toString(),
+          "0",//estimatedGas.toString(),
           PaymentIntentStatus.CREATED,
           item.pricing,
           item.currency,
@@ -350,6 +368,8 @@ export const handler = {
         );
 
       if (insertError !== null) {
+        console.log("LOGGING INSERT ERROR");
+        console.log(insertError);
         return new Response(null, { status: 500 });
       }
 
@@ -362,8 +382,9 @@ export const handler = {
         status: 200,
         headers: { "content-type": "application/json" },
       });
-    } catch (err) {
-      console.error("POST /payment_intents failed", err);
+    } catch (err: any) {
+      console.log(err.message);
+      console.error("POST /payment_intents failed");
       return new Response(null, { status: 500 });
     }
   },
