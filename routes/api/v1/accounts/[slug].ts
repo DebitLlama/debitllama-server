@@ -111,10 +111,11 @@ export const handler = {
       if (!data[0].closed && data[0].user_id === ctx.state.userid) {
         //TODO: RATE LIMITER! REFRESH BALANCE MAX ONLY ONCE VERY few minutes!
         // If the data in the db is not closed this will refresh the database
+        
         const onChainAccount = await refreshDBBalance(data, slug, queryBuilder);
         // Now the account could be closed for all I know, if it refreshed!
-
-        if (parseEther(data[0].balance) !== onChainAccount.account[3]) {
+        
+        if (data[0].balance !== onChainAccount.account[3]) {
           updatedBalance = formatEther(onChainAccount.account[3]);
           // Update the closed parameter too if it changed
           updatedClosed = !onChainAccount.account[0];

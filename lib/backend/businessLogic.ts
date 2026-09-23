@@ -211,7 +211,7 @@ export async function refreshDBBalance(
   // If account on chain is active but the balance is not the same as the balance I saved
   if (
     onChainAccount.account[0] &&
-    parseEther(data[0].balance) !== onChainAccount.account[3]
+    data[0].balance !== onChainAccount.account[3]
   ) {
     //Check if there were payment intents with account balance too low and
     // calculate how much balance was added and set them to recurring or created where possible

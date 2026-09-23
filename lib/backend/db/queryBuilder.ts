@@ -269,7 +269,7 @@ export default class QueryBuilder {
             name,
             closed: false,
             currency,
-            balance: formatEther(balance),
+            balance: balance,
             last_modified: new Date().toUTCString(),
             accountType,
             creator_address,
@@ -438,7 +438,7 @@ export default class QueryBuilder {
           (async (balance: string, closed: boolean, id: number) => {
             const res = await this.client.from("Accounts")
               .update({
-                balance: formatEther(balance),
+                balance: balance, 
                 closed,
                 last_modified: new Date().toUTCString(),
               }).eq("id", id);
