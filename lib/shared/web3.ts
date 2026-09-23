@@ -114,20 +114,23 @@ export const walletCurrency: { [key in ChainIds]: NetworkTickers } = {
 export const mapNetworkNameToFeeDivider: { [key in NetworkNames]: string } = {
   // [NetworkNames.BTT_MAINNET]: FeeDividerPerNetwork.BTT_MAINNET[1] as string,
   // [NetworkNames.BTT_TESTNET]: FeeDividerPerNetwork.BTT_TESTNET[1] as string,
-  [NetworkNames.ARBITRUM_SEPOLIA]: FeeDividerPerNetwork.ARBITRUM_SEPOLIA[1] as string,
+  [NetworkNames.ARBITRUM_SEPOLIA]: FeeDividerPerNetwork
+    .ARBITRUM_SEPOLIA[1] as string,
   // [NetworkNames.ARBITRUM_MAINNET]: FeeDividerPerNetwork.ARBITRUM_MAINNET[1] as string,
 };
 
 export const mapChainIdToFeePercentage: { [key in ChainIds]: string } = {
   // [ChainIds.BTT_MAINNET_ID]: FeeDividerPerNetwork.BTT_MAINNET[1] as string,
   // [ChainIds.BTT_TESTNET_ID]: FeeDividerPerNetwork.BTT_TESTNET[1] as string,
-  [ChainIds.ARBITRUM_SEPOLIA_ID]: FeeDividerPerNetwork.ARBITRUM_SEPOLIA[1] as string,
+  [ChainIds.ARBITRUM_SEPOLIA_ID]: FeeDividerPerNetwork
+    .ARBITRUM_SEPOLIA[1] as string,
   // [ChainIds.ARBITRUM_MAINNET_ID]: FeeDividerPerNetwork.ARBITRUM_MAINNET[1] as string,
 };
 export const mapChainIdToFeeDivider: { [key in ChainIds]: number } = {
   // [ChainIds.BTT_MAINNET_ID]: FeeDividerPerNetwork.BTT_MAINNET[0] as number,
   // [ChainIds.BTT_TESTNET_ID]: FeeDividerPerNetwork.BTT_TESTNET[0] as number,
-  [ChainIds.ARBITRUM_SEPOLIA_ID]: FeeDividerPerNetwork.ARBITRUM_SEPOLIA[0] as number,
+  [ChainIds.ARBITRUM_SEPOLIA_ID]: FeeDividerPerNetwork
+    .ARBITRUM_SEPOLIA[0] as number,
   // [ChainIds.ARBITRUM_MAINNET_ID]: FeeDividerPerNetwork.ARBITRUM_MAINNET[0] as number,
 };
 
@@ -136,7 +139,8 @@ export const getVirtualAccountsContractAddress: {
 } = {
   // [ChainIds.BTT_TESTNET_ID]: VirtualAccountsContractAddress.BTT_TESTNET,
   // [ChainIds.BTT_MAINNET_ID]: VirtualAccountsContractAddress.BTT_MAINNET,
-  [ChainIds.ARBITRUM_SEPOLIA_ID]: VirtualAccountsContractAddress.ARBITRUM_SEPOLIA,
+  [ChainIds.ARBITRUM_SEPOLIA_ID]:
+    VirtualAccountsContractAddress.ARBITRUM_SEPOLIA,
   // [ChainIds.ARBITRUM_MAINNET_ID]: VirtualAccountsContractAddress.ARBITRUM_MAINNET,
 };
 
@@ -145,7 +149,8 @@ export const getConnectedWalletsContractAddress: {
 } = {
   // [ChainIds.BTT_TESTNET_ID]: ConnectedWalletsContractAddress.BTT_TESTNET,
   // [ChainIds.BTT_MAINNET_ID]: ConnectedWalletsContractAddress.BTT_MAINNET,
-  [ChainIds.ARBITRUM_SEPOLIA_ID]: ConnectedWalletsContractAddress.ARBITRUM_SEPOLIA,
+  [ChainIds.ARBITRUM_SEPOLIA_ID]:
+    ConnectedWalletsContractAddress.ARBITRUM_SEPOLIA,
   // [ChainIds.ARBITRUM_MAINNET_ID]: ConnectedWalletsContractAddress.ARBITRUM_MAINNET,
 };
 
@@ -193,29 +198,28 @@ export type SelectableCurrency = {
   decimals: number; //TODO: I need to fill this decimals
 };
 
-
 export const arbitrumSepoliaCurrencies: SelectableCurrency[] = [
   {
     name: "ETH",
     native: true,
     contractAddress: "",
     minimumAmount: "0.001",
-    decimals: 18
+    decimals: 18,
   },
   {
     name: "USDC",
     native: false,
     contractAddress: "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d",
     minimumAmount: "0.01",
-    decimals: 6
+    decimals: 6,
   },
   {
     name: "USDG",
     native: false,
     contractAddress: "0xFFC95faa3d63Cde504a05B567C600B78C0b41892",
     minimumAmount: "0.01",
-    decimals: 6
-  }
+    decimals: 6,
+  },
 ];
 
 // export const arbitrumMainnetCurrencies: SelectableCurrency[] = [
@@ -233,6 +237,36 @@ export const arbitrumSepoliaCurrencies: SelectableCurrency[] = [
 //   },
 // ];
 
+const currenciesByNetwork: Record<string, SelectableCurrency[]> = {
+  [ChainIds.ARBITRUM_SEPOLIA_ID]: arbitrumSepoliaCurrencies,
+};
+
+export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+
+export const getTokenDecimals = (
+  networkId: string,
+  contractAddress: string,
+): number => {
+  const currencies = currenciesByNetwork[networkId.toLowerCase()];
+  if (!currencies) {
+    throw new Error(`Unsupported network: ${networkId}`);
+  }
+
+  const address = contractAddress.trim().toLowerCase();
+  const isNative = address === "" || address === ZERO_ADDRESS;
+
+  const currency = currencies.find((c) =>
+    isNative ? c.native : c.contractAddress.toLowerCase() === address
+  );
+  if (!currency) {
+    throw new Error(
+      `Unknown currency ${contractAddress} on network ${networkId}`,
+    );
+  }
+
+  return currency.decimals;
+};
+
 export const getCurrenciesForNetworkName: {
   [key in NetworkNames]: SelectableCurrency[];
 } = {
@@ -241,13 +275,13 @@ export const getCurrenciesForNetworkName: {
 };
 
 export const responseBuildersSupportedNetworks = [
-  
   {
     name: NetworkNames.ARBITRUM_SEPOLIA,
     rpc: rpcUrl[ChainIds.ARBITRUM_SEPOLIA_ID],
     chain_id: ChainIds.ARBITRUM_SEPOLIA_ID,
     virtual_accounts_contract: VirtualAccountsContractAddress.ARBITRUM_SEPOLIA,
-    connected_wallets_contract: ConnectedWalletsContractAddress.ARBITRUM_SEPOLIA,
+    connected_wallets_contract:
+      ConnectedWalletsContractAddress.ARBITRUM_SEPOLIA,
     currency: "ETH",
     available_currencies: arbitrumSepoliaCurrencies.map((curr) => {
       return {
@@ -275,10 +309,9 @@ export const responseBuildersSupportedNetworks = [
   // },
 ];
 
-
 // BN254 scalar field modulus (r)
 export const SNARK_FIELD_SIZE: bigint = BigInt(
-  "21888242871839275222246405745257275088548364400416034343698204186575808495617"
+  "21888242871839275222246405745257275088548364400416034343698204186575808495617",
 );
 
 export type NoteHex = `0x${string}`;
