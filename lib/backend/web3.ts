@@ -73,29 +73,78 @@ export interface DirectDebitArgs {
   debitInterval: number;
 }
 
+const MOCKADDRESS = "0x8c2d2a0C51f8F9476423476a79A572C46b622D6e";
+
 export async function estimateRelayerGas(
   args: DirectDebitArgs,
   networkId: string,
   accountType: AccountTypes,
 ) {
+  console.log(args);
+
   const provider = getProvider(networkId);
   const contract = getContract(provider, networkId, accountType);
-  const publicSignals = JSON.parse(args.publicSignals);
 
-  return await contract.directdebit.estimateGas(
-    packToSolidityProof(JSON.parse(args.proof)),
-    [
-      toNoteHex(publicSignals[0]),
-      toNoteHex(publicSignals[1]),
-    ],
-    args.payeeAddress,
-    [
-      parseEther(args.maxDebitAmount),
-      args.debitTimes,
-      args.debitInterval,
-      parseEther(args.actualDebitedAmount),
-    ],
-  );
+  const publicSignals =
+    typeof args.publicSignals === "string"
+      ? JSON.parse(args.publicSignals)
+      : args.publicSignals;
+
+  try {
+    return await contract.directdebit.estimateGas(
+      packToSolidityProof(
+        typeof args.proof === "string"
+          ? JSON.parse(args.proof)
+          : args.proof,
+      ),
+      [
+        toNoteHex(publicSignals[0]),
+        toNoteHex(publicSignals[1]),
+      ],
+      args.payeeAddress,
+      [
+        parseEther(args.maxDebitAmount),
+        args.debitTimes,
+        args.debitInterval,
+        parseEther(args.actualDebitedAmount),
+      ],
+      {
+        from: MOCKADDRESS,
+      },
+    );
+  } catch (error: any) {
+    console.error(
+      `estimateGas failed: ${JSON.stringify(error, Object.getOwnPropertyNames(error), 2)}`
+    );
+
+    const revertData =
+      error?.data ??
+      error?.info?.error?.data ??
+      error?.error?.data;
+
+    console.error(`Revert data: ${revertData ?? "NONE"}`);
+
+    if (revertData) {
+      try {
+        const decoded = contract.interface.parseError(revertData);
+
+        console.error(
+          `Decoded error: ${JSON.stringify({
+            name: decoded?.name,
+            args: decoded?.args ? Array.from(decoded.args) : undefined,
+            signature: decoded?.signature,
+            selector: decoded?.selector,
+          }, null, 2)}`
+        );
+      } catch (decodeError: any) {
+        console.error(
+          `Could not decode revert data: ${decodeError?.message ?? String(decodeError)}`
+        );
+      }
+    }
+
+    throw error;
+  }
 }
 
 function packToSolidityProof(proof: any) {
@@ -125,6 +174,10 @@ export function parseEther(input: string) {
 }
 export function formatEther(input: any) {
   return ethers.formatEther(input);
+}
+
+export function parseUnits(value: string, unit: number) {
+  return ethers.parseUnits(value, unit);
 }
 
 export async function fetchTopUpEvent(
